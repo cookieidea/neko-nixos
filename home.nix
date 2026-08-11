@@ -7,7 +7,7 @@
 # 编辑器：nixvim（替代 neovim + lazyvim）
 # AUR-only 与 nixpkgs 差异见底部注释。
 
-{ config, pkgs, lib, desktop, username, nixvim, noctalia, opencode, ... }:
+{ config, pkgs, lib, desktop, username, nixvim, noctalia, opencode, selfPackages, ... }:
 
 {
   imports = [
@@ -100,6 +100,18 @@
   ++ [
     opencode.packages.${pkgs.stdenv.hostPlatform.system}.default
     noctalia.packages.${pkgs.stdenv.hostPlatform.system}.default
+  ]
+
+  # 自构建程序（flake 包，见 ./pkgs；对应原 Arch 的 AUR `-git` / 私有仓库）
+  # noctalia-shell 已通过上面的 noctalia flake 输入提供，这里不再重复。
+  ++ [
+    selfPackages.niri-sidebar     # niri-sidebar-git
+    selfPackages.pins             # pins-git
+    selfPackages.miyu             # miyu
+    selfPackages.pywalfox         # python-pywalfox
+    selfPackages.shorin-contrib   # shorin-contrib-git
+    selfPackages.proton-wrapper   # shorin-proton-wrapper-git
+    selfPackages.splayer-next     # SPlayer-Dev/SPlayer-Next（非 nixpkgs 的 splayer）
   ];
 
   # ============================================================

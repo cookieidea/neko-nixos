@@ -38,6 +38,7 @@ neko-nixos/
 ├── flake.nix              # flake 入口：inputs（含国内镜像）、username/hostname/desktop 变量
 ├── configuration.nix      # 系统层：内核/显卡/网络/flatpak/登录管理器/桌面服务…
 ├── home.nix               # 用户层（Home Manager）：软件包、git/编辑器/主题等
+├── pkgs/                 # 自构建程序派生（见下「自构建程序」一节）
 ├── install.sh             # 一键安装脚本（全新安装 / 已装系统更新 双模式）
 ├── dotfiles/              # 桌面与程序配置（niri、Noctalia、fcitx5、fish、kitty…）
 │   ├── config/            # ~/.config 下内容（xdg.configFile 部署）
@@ -59,6 +60,8 @@ neko-nixos/
 - **原清单遗漏补回**：`virt-manager` `video-downloader`
 - **niri 生态依赖**：`niri` `kitty` `fuzzel` `thunar` `satty` `cliphist` `wl-clipboard` `xsettingsd`
 - **flake 包（不在 nixpkgs 核心）**：`opencode`（AI 编程 Agent）、`noctalia`（桌面 shell）
+- **自构建程序（`./pkgs` 派生，对应原 Arch 的 AUR `-git` / 私有仓库）**：`niri-sidebar` `pins` `miyu` `pywalfox` `shorin-contrib` `proton-wrapper` `splayer-next`
+  - ⚠️ `splayer-next` 是 **SPlayer-Dev/SPlayer-Next**（Electron 音乐播放器），与 nixpkgs 里的 `splayer`（Simple Netease Cloud Music player）**不是同一个软件**，切勿混用。
 
 > `flatseal` 在此是以 **nixpkgs 原生包** 形式安装（AUR/官方源同名），不是走 flatpak 运行时。
 
@@ -84,6 +87,37 @@ neko-nixos/
 - 自定义模板（pywalfox / fcitx5 / starship / gtk-folder / fastfetch 等）写在 `user-templates.toml`，模板源文件在 `dotfiles/config/noctalia/templates/`。
 - ⚠️ v4 与 v5 **不兼容**：v5 改成单一 TOML（`config.toml`），v4 一律不读；本仓库当前是 v4 状态，`config.toml` 已移除。
 - 上机后用 `noctalia theme --list-templates` 核对 `builtin_ids`（内置模板 id：kitty / niri / fuzzel / btop / cava / gtk），按需微调。
+
+---
+
+## 自构建程序（`./pkgs` 派生）
+
+原 Arch 脚本里一批软件走 AUR `-git` 或私有仓库，nixpkgs 26.05 没有等价包。它们在
+Nix 里改用 **flake 内的 Nix 派生** 从源码/发布构建，集中在 `pkgs/`：
+
+| 程序 | 上游 | 构建系统 | 对应原 Arch 包 |
+| --- | --- | --- | --- |
+| `niri-sidebar` | Vigintillionn/niri-sidebar | Rust / cargo | niri-sidebar-git |
+| `pins` | fabrialberio/Pins | GTK4/libadwaita, meson | pins-git |
+| `miyu` | SHORiN-KiWATA/Miyu | Rust / cargo | miyu |
+| `pywalfox` | Frewacom/pywalfox（PyPI `pywalfox`） | Python（buildPythonApplication） | python-pywalfox |
+| `shorin-contrib` | SHORiN-KiWATA/shorin-contrib | Shell 脚本 | shorin-contrib-git |
+| `proton-wrapper` | SHORiN-KiWATA/proton-wrapper | bash/Python + .desktop | shorin-proton-wrapper-git |
+| `splayer-next` | SPlayer-Dev/SPlayer-Next | Electron（AppImage 包装） | splayer-next-git |
+
+- 这些包通过 `packages.<system>` 暴露成 flake 包，可单独构建：
+  ```bash
+  nix build .#miyu          # 只构建 miyu
+  nix build .#splayer-next  # 拉取官方 AppImage 并包装
+  ```
+- 它们也已加入 `home.nix` 的 `home.packages`，`nixos-rebuild switch` 时会自动构建并安装。
+- `install.sh` 在跑 `nixos-install` / `nixos-rebuild` **之前** 会先逐个预构建这些包，提前暴露错误。
+
+> ⚠️ **SPlayer-Next ≠ nixpkgs 的 `splayer`**：nixpkgs 里的 `splayer`（meta 写的是「Simple Netease Cloud Music player」）和上游 `SPlayer-Dev/SPlayer-Next` 是**两个不同软件**。本配置用的是真正的 SPlayer-Next，通过官方发布 AppImage + `appimage-run` 包装（从源码在 Nix 里构建 Electron 应用很脆弱，故采用此可靠方式；要从源码构建可参考 AUR `splayer-next-git` 的 PKGBUILD）。
+>
+> ⚠️ **`miyu` 需要较新的 Rust**（Cargo.toml 要求 `rust-version = "1.89"`）。若 nixpkgs 26.05 自带的 Rust 偏旧导致构建失败，请用 `rust-overlay` 或等 nixpkgs 更新。
+>
+> ⚠️ **`shorin-contrib` 没有 `shorin` 元命令**：原 Arch 脚本里的 `shorin link` 不在本仓库中；请直接调用各脚本（如 `clean`、`sysup`、`pac`、`pacd`、`mirror-update` 等）。
 
 ---
 
@@ -115,7 +149,8 @@ sudo bash install.sh [用户名]
 - 把配置里的硬编码用户名 `cookie` 替换成你的用户名（含 `flake.nix` 与 `dotfiles/` 下的路径）；
 - 全新安装模式跑 `nixos-install --flake <挂载点>/etc/nixos/#nixos`；
 - 更新模式跑 `nixos-rebuild switch --flake /etc/nixos/#nixos`；
-- 复制后清理 `.git`，不覆盖你 `generate` 出来的 `hardware-configuration.nix`。
+- 复制后清理 `.git`，不覆盖你 `generate` 出来的 `hardware-configuration.nix`；
+- **预构建自构建程序**（`pkgs/` 里的派生，对应原 Arch 的 AUR `-git` / 私有仓库），逐个 `nix build .#<name>`，提前暴露错误。
 
 一行安装（从 GitHub 拉取并执行）：
 

@@ -80,6 +80,22 @@ else
   echo "==> 目标用户名即 cookie，跳过替换。"
 fi
 
+# ---------- 预构建自构建程序（flake 包）----------
+# 这些程序不在 nixpkgs 核心，由 ./pkgs 里的派生从源码 / 发布构建
+# （对应原 Arch 的 AUR `-git` 与私有仓库）。这里先单独构建，便于提前暴露
+# 错误；后续 nixos-install / nixos-rebuild 会复用已构建的结果。
+SELF_PKGS=(niri-sidebar pins miyu pywalfox shorin-contrib proton-wrapper splayer-next)
+echo "==> 预构建自构建程序（flake 包）..."
+for p in "${SELF_PKGS[@]}"; do
+  echo "    • 构建 $p ..."
+  if nix build ".#$p" --no-link 2>"$SRC/.build-$p.log"; then
+    echo "      ✓ $p 构建成功"
+  else
+    # 不中断整体安装：后续 nixos-rebuild 会再次报错并给出完整信息
+    echo "      ✗ $p 构建失败（详见 $SRC/.build-$p.log）；继续。" >&2
+  fi
+done
+
 if [[ -n "$MNT" ]]; then
   # ================= 全新安装模式（minimal ISO） =================
   DEST="$MNT/etc/nixos"

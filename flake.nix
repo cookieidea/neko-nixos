@@ -41,7 +41,14 @@
       hostname = "nixos";
       desktop  = "niri";       # 当前仅 "niri"（niri + Noctalia）
       # ───────────────────────────────────────────────────────
+
+      # 自构建程序（AUR `-git` / 私有仓库）的派生，见 ./pkgs
+      pkgs = nixpkgs.legacyPackages.${system};
+      selfPackages = import ./pkgs { inherit pkgs; };
     in {
+      # 暴露自构建派生为 flake 包：可单独 `nix build .#<name>`
+      packages.${system} = selfPackages;
+
       nixosConfigurations.${hostname} = nixpkgs.lib.nixosSystem {
         inherit system;
         modules = [
@@ -54,8 +61,8 @@
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
             home-manager.users.${username} = import ./home.nix;
-            # 把 nixvim / noctalia / opencode 三个 flake 输入传给 home 配置
-            home-manager.extraSpecialArgs = { inherit desktop username nixvim noctalia opencode; };
+            # 把 nixvim / noctalia / opencode 三个 flake 输入，以及自构建包传给 home 配置
+            home-manager.extraSpecialArgs = { inherit desktop username nixvim noctalia opencode selfPackages; };
           }
         ];
       };
