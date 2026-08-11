@@ -18,8 +18,11 @@
 
     # ── Noctalia：Wayland 桌面 shell（状态栏/启动器/通知/锁屏…）──
     # 支持 niri / Hyprland / Sway / Labwc 等 compositor。
+    # ⚠️ 固定到 v5：v5 配置是 TOML（~/.config/noctalia/config.toml），
+    #    与 v4 的 settings.json/plugins.json/colors.json(JSON) 不兼容。
+    #    仓库里的 dotfiles/config/noctalia/*.json 是 v4 格式，v5 不会读取。
     noctalia = {
-      url = "github:noctalia-dev/noctalia";
+      url = "github:noctalia-dev/noctalia/v5.0.0-beta.8";
     };
 
     # ── opencode（AI 编程 Agent，用 flake 装，拿最新版）──

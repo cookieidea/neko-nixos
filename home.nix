@@ -90,7 +90,7 @@
     fuzzel                                     # 启动器兜底（binds: Mod+Z 失败回退 fuzzel）
     thunar                                     # 文件管理器（binds: Mod+E）
     satty                                      # 截图标注（binds: Mod+Shift+S）
-    cliphist                                   # 剪贴板历史（settings.json 的 watch 命令）
+    cliphist                                   # 剪贴板历史（noctalia config.toml 的 clipboard watch 命令）
     wl-clipboard                               # wl-paste / wl-copy（剪贴板 + 截图管道）
     xsettingsd                                 # GTK 主题/字体经 XSETTINGS 注入应用（niri 无 DE 时需要）
   ];
@@ -144,9 +144,9 @@
 
   # ============================================================
   #  Noctalia 桌面 shell（niri 之上的一层）
-  #  用 flake 提供的 noctalia 包（见 home.packages）+ settings.json
-  #  通过 xdg.configFile 部署到 ~/.config/noctalia/settings.json
-  #  （不再用 programs.noctalia.settings，避免和手写文件冲突）
+  #  用 flake 提供的 noctalia 包（见 home.packages）+ config.toml（v5 的 TOML 配置）
+  #  通过 xdg.configFile 部署到 ~/.config/noctalia/config.toml
+  #  （v5 不再读 v4 的 settings.json/plugins.json/colors.json；不用 programs.noctalia.settings）
   # ============================================================
 
   # ============================================================
@@ -195,9 +195,8 @@
     "niri/outputs.kdl".source = ./dotfiles/config/niri/outputs.kdl;
     "niri/supertab.kdl".source = ./dotfiles/config/niri/supertab.kdl;
     "niri/windowrules.kdl".source = ./dotfiles/config/niri/windowrules.kdl;
-    "noctalia/colors.json".source = ./dotfiles/config/noctalia/colors.json;
-    "noctalia/plugins.json".source = ./dotfiles/config/noctalia/plugins.json;
-    "noctalia/settings.json".source = ./dotfiles/config/noctalia/settings.json;
+    # v5 配置（TOML）：替代 v4 的 settings.json/plugins.json/colors.json
+    "noctalia/config.toml".source = ./dotfiles/config/noctalia/config.toml;
     "noctalia/templates/btop.theme".source = ./dotfiles/config/noctalia/templates/btop.theme;
     "noctalia/templates/cava-colors.ini".source = ./dotfiles/config/noctalia/templates/cava-colors.ini;
     "noctalia/templates/fastfetch-config.jsonc".source = ./dotfiles/config/noctalia/templates/fastfetch-config.jsonc;
@@ -235,7 +234,7 @@
     "noctalia/templates/pywalfox-colors.json".source = ./dotfiles/config/noctalia/templates/pywalfox-colors.json;
     "noctalia/templates/starship-colors.toml".source = ./dotfiles/config/noctalia/templates/starship-colors.toml;
     "noctalia/templates/yazi-theme.toml".source = ./dotfiles/config/noctalia/templates/yazi-theme.toml;
-    "noctalia/user-templates.toml".source = ./dotfiles/config/noctalia/user-templates.toml;
+    # user-templates.toml 已移植进 config.toml 的 [theme.templates.user.*]，不再单独部署
     "qq-flags.conf".source = ./dotfiles/config/qq-flags.conf;
     "satty/config.toml".source = ./dotfiles/config/satty/config.toml;
     "starship.toml".source = ./dotfiles/config/starship.toml;
@@ -303,7 +302,7 @@
   #
   # niri / Noctalia 以及其余 SHORiN rice 配置已落到 dotfiles/ 并通过 xdg.configFile / home.file 部署：
   #   - dotfiles/config/niri/*.kdl   （config.kdl + 9 个 include 拆分文件）
-  #   - dotfiles/config/noctalia/settings.json
+  #   - dotfiles/config/noctalia/config.toml   （v5 TOML 配置；v4 的 settings.json 已弃用）
   # 已针对 NixOS 适配：启动方式从 `qs -c noctalia-shell`（SHORiN 的 quickshell 写法）
   # 改为直接 `spawn-at-startup "noctalia"`；注释掉了 Arch 专用的 /usr/lib/polkit-gnome、
   # /usr/lib/xdg-desktop-portal-gnome，以及依赖私有脚本的截图音效、linuxqq-clipsync 等。
