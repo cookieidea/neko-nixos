@@ -60,7 +60,7 @@ neko-nixos/
 - **原清单遗漏补回**：`virt-manager` `video-downloader`
 - **niri 生态依赖**：`niri` `kitty` `fuzzel` `thunar` `satty` `cliphist` `wl-clipboard` `xsettingsd`
 - **flake 包（不在 nixpkgs 核心）**：`opencode`（AI 编程 Agent）、`noctalia`（桌面 shell）
-- **自构建程序（`./pkgs` 派生，对应原 Arch 的 AUR `-git` / 私有仓库）**：`niri-sidebar` `pins` `miyu` `pywalfox` `shorin-contrib` `proton-wrapper` `splayer-next`
+- **自构建程序（`./pkgs` 派生，对应原 Arch 的 AUR `-git` / 私有仓库）**：`niri-sidebar` `pins` `pywalfox` `shorin-contrib` `proton-wrapper` `splayer-next`
   - ⚠️ `splayer-next` 是 **SPlayer-Dev/SPlayer-Next**（Electron 音乐播放器），与 nixpkgs 里的 `splayer`（Simple Netease Cloud Music player）**不是同一个软件**，切勿混用。
 
 > `flatseal` 在此是以 **nixpkgs 原生包** 形式安装（AUR/官方源同名），不是走 flatpak 运行时。
@@ -99,7 +99,6 @@ Nix 里改用 **flake 内的 Nix 派生** 从源码/发布构建，集中在 `pk
 | --- | --- | --- | --- |
 | `niri-sidebar` | Vigintillionn/niri-sidebar | Rust / cargo | niri-sidebar-git |
 | `pins` | fabrialberio/Pins | GTK4/libadwaita, meson | pins-git |
-| `miyu` | SHORiN-KiWATA/Miyu | Rust / cargo | miyu |
 | `pywalfox` | Frewacom/pywalfox（PyPI `pywalfox`） | Python（buildPythonApplication） | python-pywalfox |
 | `shorin-contrib` | SHORiN-KiWATA/shorin-contrib | Shell 脚本 | shorin-contrib-git |
 | `proton-wrapper` | SHORiN-KiWATA/proton-wrapper | bash/Python + .desktop | shorin-proton-wrapper-git |
@@ -107,7 +106,6 @@ Nix 里改用 **flake 内的 Nix 派生** 从源码/发布构建，集中在 `pk
 
 - 这些包通过 `packages.<system>` 暴露成 flake 包，可单独构建：
   ```bash
-  nix build .#miyu          # 只构建 miyu
   nix build .#splayer-next  # 拉取官方 AppImage 并包装
   ```
 - 它们也已加入 `home.nix` 的 `home.packages`，`nixos-rebuild switch` 时会自动构建并安装。
@@ -115,9 +113,9 @@ Nix 里改用 **flake 内的 Nix 派生** 从源码/发布构建，集中在 `pk
 
 > ⚠️ **SPlayer-Next ≠ nixpkgs 的 `splayer`**：nixpkgs 里的 `splayer`（meta 写的是「Simple Netease Cloud Music player」）和上游 `SPlayer-Dev/SPlayer-Next` 是**两个不同软件**。本配置用的是真正的 SPlayer-Next，通过官方发布 AppImage + `appimage-run` 包装（从源码在 Nix 里构建 Electron 应用很脆弱，故采用此可靠方式；要从源码构建可参考 AUR `splayer-next-git` 的 PKGBUILD）。
 >
-> ⚠️ **`miyu` 需要较新的 Rust**（Cargo.toml 要求 `rust-version = "1.89"`）。若 nixpkgs 26.05 自带的 Rust 偏旧导致构建失败，请用 `rust-overlay` 或等 nixpkgs 更新。
->
 > ⚠️ **`shorin-contrib` 没有 `shorin` 元命令**：原 Arch 脚本里的 `shorin link` 不在本仓库中；请直接调用各脚本（如 `clean`、`sysup`、`pac`、`pacd`、`mirror-update` 等）。
+>
+> ℹ️ **`miyu` 已移除**：按需求从自构建清单、`./pkgs`、home.nix、`install.sh` 中删除，不再构建。
 
 ---
 
@@ -175,7 +173,7 @@ sudo nixos-rebuild switch --flake /etc/nixos/#nixos
 ## 部署前需要改的地方
 
 1. **用户名**：改 `flake.nix` 的 `username`（或用 `install.sh` 传入自动替换）。
-2. **Git 身份**：`home.nix` 中 `programs.git.userName` / `userEmail` 目前是占位符 `yourname` / `you@example.com`，部署前换成你的真实信息。
+2. **Git 身份**：`home.nix` 中 `programs.git.userName` / `userEmail` 已设为 `cookieidea` / `jhbhyvv@outlook.com`，按需自行替换。
 3. **首次登录密码**：全新安装时 `install.sh` 会交互提示设置 `initialPassword`；留空则装后用 `passwd <用户名>` 手动设。
 4. **硬件差异**：NVIDIA / Intel 核显 / 笔记本双显卡用户需调整 `configuration.nix` 的 GPU 段。
 
@@ -204,7 +202,7 @@ sudo nixos-rebuild switch --rollback
 - 包管理器从 `pacman`/`yay`(AUR) 换成 Nix flake + Home Manager，所有软件声明式管理、可复现。
 - 编辑器用 `vscodium` 替代 AUR 的 `visual-studio-code-bin`（去遥测）。
 - 壁纸/主题/启动器等桌面交互走 Noctalia（nixpkgs 无，用 flake 引入）。
-- 配置文件从「散装 dotfiles + 私有脚本」改为 Home Manager 托管（`xdg.configFile` / `home.file` / `programs.*`），并去掉了 Arch 专属的 `/usr/lib/...` 路径与依赖私有脚本的绑定（截图音效、linuxqq-clipsync 等）。
+- 配置文件从「散装 dotfiles + 私有脚本」改为 Home Manager 托管（`xdg.configFile` / `home.file` / `programs.*`）。Arch 专属的 `/usr/lib/...` 路径已改写；SHORiN 私有 niri 脚本（`niri-binds` / `niri-pick` / `niri-force-kill-window` / `screenshot-sound.sh`）已通过本次配置迁移部署到 `~/.config/niri/scripts/`，截图音效守护也已接回 `config.kdl`，对应绑定（快捷键菜单、取窗口信息、强杀窗口、截图音效）现可用。仍依赖 AUR、本仓库未纳入的脚本（`shorin-screenrec-menu` / `quicksave` / `quickload`）对应的绑定（Mod+F3/F5/F8）会静默失败，需要时可自行补充。
 
 ---
 

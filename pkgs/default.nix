@@ -16,7 +16,6 @@
 {
   niri-sidebar   = import ./niri-sidebar   { inherit pkgs; };
   pins           = import ./pins           { inherit pkgs; };
-  miyu           = import ./miyu           { inherit pkgs; };
   pywalfox       = import ./pywalfox       { inherit pkgs; };
   shorin-contrib = import ./shorin-contrib { inherit pkgs; };
   proton-wrapper = import ./proton-wrapper { inherit pkgs; };

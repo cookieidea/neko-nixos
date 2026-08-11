@@ -93,6 +93,7 @@
     cliphist                                   # 剪贴板历史（noctalia config.toml 的 clipboard watch 命令）
     wl-clipboard                               # wl-paste / wl-copy（剪贴板 + 截图管道）
     xsettingsd                                 # GTK 主题/字体经 XSETTINGS 注入应用（niri 无 DE 时需要）
+    xorg.xprop                                 # niri-force-kill-window 的 XWayland 进程树判定依赖
   ];
 
   # opencode（AI 编程 Agent）走 flake 装，拿最新版（不在 nixpkgs 核心）
@@ -107,7 +108,6 @@
   ++ [
     selfPackages.niri-sidebar     # niri-sidebar-git
     selfPackages.pins             # pins-git
-    selfPackages.miyu             # miyu
     selfPackages.pywalfox         # python-pywalfox
     selfPackages.shorin-contrib   # shorin-contrib-git
     selfPackages.proton-wrapper   # shorin-proton-wrapper-git
@@ -120,8 +120,8 @@
   programs = {
     git = {
       enable = true;
-      userName = "yourname";      # 改
-      userEmail = "you@example.com"; # 改
+      userName = "cookieidea";
+      userEmail = "jhbhyvv@outlook.com";
     };
     starship.enable = true;       # starship
     zoxide.enable = true;         # zoxide
@@ -299,6 +299,16 @@
     ".local/share/icons/Adwaita-Matugen-B/scalable/status/user-trash-full.svg".source = ./dotfiles/local/share/icons/Adwaita-Matugen-B/scalable/status/user-trash-full.svg;
     ".local/share/nwg-look/gsettings".source = ./dotfiles/local/share/nwg-look/gsettings;
     ".vimrc".source = ./dotfiles/home/.vimrc;
+
+    # ── SHORiN 私有 niri 脚本（配置迁移：从上游 noctalia-dotfiles 引入）──
+    # 对应 binds.kdl 里直接调用 ~/.config/niri/scripts/* 的绑定：
+    #   niri-binds（Mod+Shift+Slash 快捷键菜单）、niri-pick（Mod+P 取窗口/颜色信息）、
+    #   niri-force-kill-window（Alt+F4 强杀窗口）、screenshot-sound.sh（截图音效守护，见 config.kdl）。
+    # random-anime-wallpaper-noctalia 已在上面 .local/bin 部署；niri-sidebar 走 selfPackages。
+    ".config/niri/scripts/niri-binds".source = ./dotfiles/config/niri/scripts/niri-binds; executable = true;
+    ".config/niri/scripts/niri-pick".source = ./dotfiles/config/niri/scripts/niri-pick; executable = true;
+    ".config/niri/scripts/niri-force-kill-window".source = ./dotfiles/config/niri/scripts/niri-force-kill-window; executable = true;
+    ".config/niri/scripts/screenshot-sound.sh".source = ./dotfiles/config/niri/scripts/screenshot-sound.sh; executable = true;
   };
 
   # polkit 认证代理：NixOS 上没有 Arch 的 /usr/lib/polkit-gnome，
@@ -324,19 +334,23 @@
   # /usr/lib/xdg-desktop-portal-gnome，以及依赖私有脚本的截图音效、linuxqq-clipsync 等。
   # polkit 代理改用 services.polkit-gnome.enable。
   #
-  # ⚠️ 想完全还原 SHORiN 原版交互（启动器/设置/壁纸/电源菜单/锁屏/音量亮度 等
-  # 走 `qs -c noctalia-shell ipc call ...` 的绑定），需要：
-  #   1) 在 home.packages 安装 quickshell（nixpkgs 有），
-  #   2) 把 dotfiles/config/niri/config.kdl 的启动行改回 `spawn-sh-at-startup "qs -c noctalia-shell"`，
-  #   3) 补充 SHORiN 私有脚本（~/.config/niri/scripts/*、niri-sidebar、quicksave、quickload、
-  #      shorin-screenrec-menu、random-anime-wallpaper-noctalia 等，原仓库未纳入本转换）。
+  # ⚠️ 关于 SHORiN 原版交互的还原程度（配置迁移结果）：
+  #  • 私有 niri 脚本已迁移（见上面 home.file 的 ~/.config/niri/scripts/*）：
+  #    niri-binds / niri-pick / niri-force-kill-window / screenshot-sound.sh
+  #    —— 对应 binds.kdl 的快捷键菜单(Mod+Shift+Slash)、取窗口信息(Mod+P)、
+  #       强杀窗口(Alt+F4)、截图音效等绑定现已可用；截图音效需 config.kdl 里
+  #       的 `spawn-at-startup "~/.config/niri/scripts/screenshot-sound.sh"` 已启用。
+  #    random-anime-wallpaper-noctalia 已在 .local/bin 部署；niri-sidebar 走 selfPackages。
+  #  • 仍依赖 AUR、本仓库未纳入的脚本（shorin-screenrec-menu / quicksave / quickload，
+  #    来自 AUR noctalia-shell / shorin-contrib）对应的绑定（Mod+F3/F5/F8）会静默失败，
+  #    需要时可自行补充或打包。
+  #  • 启动器/设置/壁纸/电源菜单/锁屏/音量/亮度等绑定走
+  #    `qs -c noctalia-shell ipc call ...`，需额外安装 quickshell 并把 config.kdl
+  #    启动行改回 `spawn-sh-at-startup "qs -c noctalia-shell"` 才生效（当前用独立
+  #    noctalia v4 包启动，这些 IPC 绑定暂不生效）。
   #
-  # 以下在 nixpkgs 暂无官方包，需自行打包或用其它渠道：
-  #   pins-git                    → AUR 脚本工具，缺失
-  #   kwin-effects-geometry-change→ KWin 特效，niri 用不上
-  #   shorin-contrib-git           → 原仓库自用脚本，缺失
-  #   shorin-proton-wrapper-git    → 原仓库自用 wrapper，缺失
-  #   miyu                         → SHORiN-KiWATA/Miyu，仅 GitHub 源码，需自行 build
-  #   opencode                     → 已用 flake 安装（见 flake.nix 的 opencode 输入）
-  #   noctalia                     → 已用 flake 安装（见 flake.nix 的 noctalia 输入）
+  # 不在 nixpkgs 的包，已用 ./pkgs 自构建派生解决（见 README「自构建程序」一节）：
+  #   niri-sidebar-git / pins-git / python-pywalfox / shorin-contrib-git /
+  #   shorin-proton-wrapper-git / splayer-next
+  # （miyu 已按需求移除。）已用 flake 安装：opencode、noctalia(v4.7.7)。
 }

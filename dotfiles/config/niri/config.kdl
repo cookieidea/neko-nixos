@@ -75,12 +75,13 @@ input {
 }
 
 // ===================== 自动启动 =====================
-// Noctalia 桌面 shell：直接启动（NixOS 上用 flake 提供的 noctalia 包）。
-// 若想要 SHORiN 原版的 qs / quickshell IPC 绑定（启动器、设置、壁纸、
+// Noctalia 桌面 shell：直接启动（NixOS 上用 flake 提供的 noctalia 包，固定 v4.7.7）。
+// 下方 ~/.config/niri/scripts/* 等 SHORiN 私有脚本已在本次配置迁移中部署，
+// 因此截图音效、快捷键菜单、窗口强杀、取窗口信息等绑定现可直接使用。
+// 若还想要 SHORiN 原版的 qs / quickshell IPC 绑定（启动器、设置、壁纸、
 // 电源菜单、锁屏、音量/亮度等），可改为：
 //   spawn-sh-at-startup "qs -c noctalia-shell"
-// 并安装 quickshell（见 home.nix 顶部注释），但那样 binds.kdl 里的
-// `qs -c noctalia-shell ipc call ...` 绑定才会生效。
+// 并安装 quickshell，但那样 binds.kdl 里的 `qs -c noctalia-shell ipc call ...` 绑定才会生效。
 spawn-at-startup "noctalia"
 
 // 输入法
@@ -100,8 +101,8 @@ spawn-sh-at-startup "systemctl --user set-environment XDG_SESSION_CLASS=user"
 // spawn-at-startup "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1"
 // xdg-desktop-portal：NixOS 由 configuration.nix 的 services.xdg.portal 自动管理
 // spawn-sh-at-startup "dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP=niri & /usr/lib/xdg-desktop-portal-gnome"
-// 截图音效守护进程：需要 ~/.config/niri/scripts/screenshot-sound.sh（SHORiN 私有脚本，未纳入）
-// spawn-at-startup "~/.config/niri/scripts/screenshot-sound.sh"
+// 截图音效守护进程：SHORiN 私有脚本已迁移到 ~/.config/niri/scripts/screenshot-sound.sh
+spawn-at-startup "~/.config/niri/scripts/screenshot-sound.sh"
 // 启动随机壁纸：依赖 qs；已由 Noctalia settings.json 的 wallpaper 配置替代
 // spawn-sh-at-startup "sleep 3 && qs -c noctalia-shell ipc call wallpaper random all"
 // linuxqq 剪贴板同步：依赖 linuxqq-clipsync 用户服务（NixOS 无），注释
