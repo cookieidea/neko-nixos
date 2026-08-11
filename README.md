@@ -77,13 +77,13 @@ neko-nixos/
 
 > 说明：原 Arch 脚本（shorin-arch-setup）同样只 **启用 flatpak 服务 + 注册 Flathub 远程**，其应用清单里没有任何 `flatpak:` 前缀条目，因此并不会通过 flatpak 实际安装任何软件；本转换保持了这一行为。
 
-## 关于 Noctalia（已固定 v5）
+## 关于 Noctalia（已固定 v4）
 
-- `flake.nix` 的 noctalia 输入固定为 `github:noctalia-dev/noctalia/v5.0.0-beta.8`（v5 目前处于 Beta）。
-- **v5 配置是单一 TOML 文件**：`dotfiles/config/noctalia/config.toml`，部署到 `~/.config/noctalia/config.toml`。
-- ⚠️ v5 与 v4 **不兼容**：v4 用的是 `settings.json` / `plugins.json` / `colors.json`（JSON），v5 一律不读。本仓库已删除这些 v4 文件，整套配置改为 `config.toml`（基于官方 `example.toml` 默认值 + 移植的自定义项）。
-- 已移植的自定义项：`dock` 开启、`avatar` 路径、5 个用户模板（pywalfox / fcitx5 / starship / gtk-folder / fastfetch，写在 `[theme.templates.user.*]`）、以及内置模板 id（kitty / niri / fuzzel / btop / cava / gtk，写在 `builtin_ids`）。
-- 仍建议上机后用 `noctalia theme --list-templates` 核对 `builtin_ids` 的实际 id，并按需在 GUI 里微调（v5 大量细节样式走 GUI 覆盖，不在 `config.toml` 里）。
+- `flake.nix` 的 noctalia 输入固定为 `github:noctalia-dev/noctalia/v4.7.7`（v4 最后一个稳定版；frozen 分支是 `legacy-v4`）。
+- **v4 配置是 JSON 文件**：`dotfiles/config/noctalia/settings.json` + `plugins.json` + `colors.json` + `user-templates.toml`，由 Home Manager 通过 `xdg.configFile` 部署到 `~/.config/noctalia/`。
+- 自定义模板（pywalfox / fcitx5 / starship / gtk-folder / fastfetch 等）写在 `user-templates.toml`，模板源文件在 `dotfiles/config/noctalia/templates/`。
+- ⚠️ v4 与 v5 **不兼容**：v5 改成单一 TOML（`config.toml`），v4 一律不读；本仓库当前是 v4 状态，`config.toml` 已移除。
+- 上机后用 `noctalia theme --list-templates` 核对 `builtin_ids`（内置模板 id：kitty / niri / fuzzel / btop / cava / gtk），按需微调。
 
 ---
 
