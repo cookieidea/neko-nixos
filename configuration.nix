@@ -132,7 +132,7 @@
   ];
 
   # ── 应用级服务（对应 scripts 中的 enable 步骤）──────────
-  programs.lact.enable = true;          # lact（GPU 控制）
+  services.lact.enable = true;          # lact（GPU 控制）；注意 nixpkgs 26.05 选项是 services.lact（非 programs.lact）
   programs.steam.enable = true;         # steam
   virtualisation.libvirtd.enable = true;  # virt-manager 后端
 
