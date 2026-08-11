@@ -3,6 +3,15 @@
 { config, pkgs, lib, desktop, username, ... }:
 
 {
+  imports = [
+    # 硬件配置（磁盘/filesystems/EFI/swap 等），由 `nixos-generate-config --root /mnt` 生成。
+    # 全新安装（minimal ISO）时务必先生成它，否则 nixos-install 会因缺根分区挂载而失败。
+    ./hardware-configuration.nix
+  ];
+
+  # ── 最新内核（AMD RX 6750 GRE 用新内核 amdgpu 支持更好）──
+  boot.kernelPackages = pkgs.linuxPackages_latest;
+
   # ── Flakes 开关 ───────────────────────────────────────────
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
   nixpkgs.config.allowUnfree = true;   # steam / wechat-uos / 部分驱动需要
