@@ -92,6 +92,7 @@
     satty                                      # 截图标注（binds: Mod+Shift+S）
     cliphist                                   # 剪贴板历史（noctalia config.toml 的 clipboard watch 命令）
     wl-clipboard                               # wl-paste / wl-copy（剪贴板 + 截图管道）
+    libnotify                                 # notify-send（niri-pick / niri-force-kill-window / screenshot-sound.sh 的通知依赖）
     xsettingsd                                 # GTK 主题/字体经 XSETTINGS 注入应用（niri 无 DE 时需要）
     xorg.xprop                                 # niri-force-kill-window 的 XWayland 进程树判定依赖
   ];

@@ -78,7 +78,7 @@ check_dependency() {
     if ! command -v "$cmd" &> /dev/null; then
         local msg; printf -v msg "$STR_ERR_DEP_MSG" "$cmd" "$pkg"
         if command -v notify-send &> /dev/null; then
-            notify-send "$STR_ERR_DEP_TITLE" "$msg" -u critical -i dialog-error
+            notify-send -u critical -i dialog-error "$STR_ERR_DEP_TITLE" "$msg"
         else
             echo -e "[${STR_ERR_DEP_TITLE}]\n${msg}" >&2
         fi
@@ -92,9 +92,9 @@ check_dependency "xprop" "xorg-xprop"
 
 notify_and_play() {
     local title="$1" msg="$2"
-    notify-send "$title" "$msg" -a "Window Killer" -i application-exit
+    notify-send -a "Window Killer" -i application-exit "$title" "$msg"
     if command -v pw-play &> /dev/null; then
-        pw-play /usr/share/sounds/freedesktop/stereo/dialog-error.oga >/dev/null 2>&1 &
+        pw-play "$(ls /run/current-system/sw/share/sounds/freedesktop/stereo/dialog-error.oga /usr/share/sounds/freedesktop/stereo/dialog-error.oga 2>/dev/null | head -1)" >/dev/null 2>&1 &
     fi
 }
 
@@ -110,7 +110,7 @@ app_name="${app_id:-$STR_UNKNOWN_APP}"
 
 if [[ -z "$pid" ]]; then exit 0; fi
 if [[ ! -f "/proc/$pid/comm" ]]; then
-    notify-send "$STR_ERR_INFO_TITLE" "$STR_ERR_INFO_MSG" -a "Window Killer" -i dialog-error
+    notify-send -a "Window Killer" -i dialog-error "$STR_ERR_INFO_TITLE" "$STR_ERR_INFO_MSG"
     exit 1
 fi
 
@@ -128,7 +128,7 @@ else
 fi
 
 if [[ -z "$real_pid" ]]; then
-    notify-send "$STR_ERR_KILL_TITLE" "$STR_ERR_KILL_MSG" -a "Window Killer" -i dialog-error
+    notify-send -a "Window Killer" -i dialog-error "$STR_ERR_KILL_TITLE" "$STR_ERR_KILL_MSG"
     exit 1
 fi
 

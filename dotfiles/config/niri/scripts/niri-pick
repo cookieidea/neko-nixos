@@ -70,14 +70,14 @@ show_notification() {
     local msg="$2"
     local icon="${3:-edit-copy}"
     if command -v notify-send &> /dev/null; then
-        notify-send "$title" "$msg" -a "niri-pick" -i "$icon"
+        notify-send -a "niri-pick" -i "$icon" "$title" "$msg"
     fi
 }
 
 show_error() {
     local msg="$1"
     if command -v notify-send &> /dev/null; then
-        notify-send "$STR_ERR_TITLE" "$msg" -u critical -a "niri-pick" -i "dialog-error"
+        notify-send -u critical -a "niri-pick" -i "dialog-error" "$STR_ERR_TITLE" "$msg"
     fi
     echo -e "\e[31mError: $msg\e[0m" >&2
 }
