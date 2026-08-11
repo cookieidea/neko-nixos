@@ -75,14 +75,12 @@ input {
 }
 
 // ===================== 自动启动 =====================
-// Noctalia 桌面 shell：直接启动（NixOS 上用 flake 提供的 noctalia 包，固定 v4.7.7）。
+// Noctalia 桌面 shell：用 nixpkgs 自带的 noctalia-shell（quickshell 配置 + qs 封装）启动。
 // 下方 ~/.config/niri/scripts/* 等 SHORiN 私有脚本已在本次配置迁移中部署，
 // 因此截图音效、快捷键菜单、窗口强杀、取窗口信息等绑定现可直接使用。
-// 若还想要 SHORiN 原版的 qs / quickshell IPC 绑定（启动器、设置、壁纸、
-// 电源菜单、锁屏、音量/亮度等），可改为：
-//   spawn-sh-at-startup "qs -c noctalia-shell"
-// 并安装 quickshell，但那样 binds.kdl 里的 `qs -c noctalia-shell ipc call ...` 绑定才会生效。
-spawn-at-startup "noctalia"
+// 启动器/设置/壁纸/电源菜单/锁屏/音量/亮度等则通过 noctalia-shell 的 IPC
+// （binds.kdl 里统一用 `noctalia-shell ipc call ...`）控制，现已生效。
+spawn-sh-at-startup "noctalia-shell"
 
 // 输入法
 spawn-at-startup "fcitx5"
@@ -104,7 +102,7 @@ spawn-sh-at-startup "systemctl --user set-environment XDG_SESSION_CLASS=user"
 // 截图音效守护进程：SHORiN 私有脚本已迁移到 ~/.config/niri/scripts/screenshot-sound.sh
 spawn-at-startup "~/.config/niri/scripts/screenshot-sound.sh"
 // 启动随机壁纸：依赖 qs；已由 Noctalia settings.json 的 wallpaper 配置替代
-// spawn-sh-at-startup "sleep 3 && qs -c noctalia-shell ipc call wallpaper random all"
+// spawn-sh-at-startup "sleep 3 && noctalia-shell ipc call wallpaper random all"
 // linuxqq 剪贴板同步：依赖 linuxqq-clipsync 用户服务（NixOS 无），注释
 // spawn-at-startup "systemctl" "--user" "start" "linuxqq-clipsync"
 

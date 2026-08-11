@@ -16,16 +16,9 @@
       url = "github:nix-community/nixvim/nixos-26.05";
     };
 
-    # ── Noctalia：Wayland 桌面 shell（状态栏/启动器/通知/锁屏…）──
-    # 支持 niri / Hyprland / Sway / Labwc 等 compositor。
-    # ⚠️ 固定到 v4：v4 配置是 JSON（~/.config/noctalia/settings.json +
-    #    plugins.json + colors.json + user-templates.toml），由 Home Manager
-    #    通过 xdg.configFile 部署（见 home.nix）。
-    #    v5 改成单一 TOML（config.toml），与 v4 JSON 不兼容；这里换回 v4。
-    #    v4.7.7 是 v4 最后一个稳定版；如需跟踪 frozen 分支可用 legacy-v4。
-    noctalia = {
-      url = "github:noctalia-dev/noctalia/v4.7.7";
-    };
+    # ── Noctalia 桌面 shell 改用 nixpkgs 自带的 `noctalia-shell` ──
+    # （quickshell 配置 + qs 封装，见 home.nix 的 pkgs.noctalia-shell）。
+    # 不再用独立的 noctalia v4 应用 flake 输入。
 
     # ── opencode（AI 编程 Agent，用 flake 装，拿最新版）──
     opencode = {
@@ -33,7 +26,7 @@
     };
   };
 
-  outputs = { self, nixpkgs, home-manager, nixvim, noctalia, opencode, ... }:
+  outputs = { self, nixpkgs, home-manager, nixvim, opencode, ... }:
     let
       system = "x86_64-linux";
       # ── 改这里 ──────────────────────────────────────────────
@@ -61,8 +54,8 @@
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
             home-manager.users.${username} = import ./home.nix;
-            # 把 nixvim / noctalia / opencode 三个 flake 输入，以及自构建包传给 home 配置
-            home-manager.extraSpecialArgs = { inherit desktop username nixvim noctalia opencode selfPackages; };
+            # 把 nixvim / opencode 两个 flake 输入，以及自构建包传给 home 配置
+            home-manager.extraSpecialArgs = { inherit desktop username nixvim opencode selfPackages; };
           }
         ];
       };

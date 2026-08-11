@@ -1,12 +1,10 @@
 // =============================================================
 // niri 按键绑定（来自 SHORiN noctalia-dotfiles，verbatim）
 //
-// 注意：下面大量绑定通过 `qs -c noctalia-shell ipc call ...` 调用
-// SHORiN 的 quickshell 配置。当前 NixOS 适配版直接用 `noctalia` 启动，
-// 没有运行 qs，因此这些 IPC 绑定（启动器/设置/壁纸/电源菜单/锁屏/音量/
-// 亮度/剪贴板）暂时不会生效。
-// 若要恢复：在 home.nix 安装 quickshell，并把 config.kdl 的启动行改回
-//   spawn-sh-at-startup "qs -c noctalia-shell"
+// 注意：下面大量绑定通过 `noctalia-shell ipc call ...` 调用 noctalia-shell
+// （nixpkgs 自带的 quickshell 配置封装）。桌面 shell 现已由 config.kdl 的
+// `spawn-sh-at-startup "noctalia-shell"` 拉起，因此这些 IPC 绑定
+// （启动器/设置/壁纸/电源菜单/锁屏/音量/亮度/剪贴板）现已生效。
 // 此外，部分绑定依赖 SHORiN 私有脚本（见 ~/.config/niri/scripts/ 下、
 // ~/.local/bin/random-anime-wallpaper-noctalia、shorin-screenrec-menu、
 // quicksave、quickload、niri-sidebar 等），这些未纳入本转换，相关绑定会
@@ -18,10 +16,10 @@ binds {
     Mod+Shift+Slash hotkey-overlay-title="快捷键教程 Keybind tutorial" { spawn "~/.config/niri/scripts/niri-binds"; }
 
     // alt+tab切换窗口
-    Alt+Tab hotkey-overlay-title="跳转窗口 swich windows" {spawn "qs" "-c" "noctalia-shell" "ipc" "call" "launcher" "windows";}
+    Alt+Tab hotkey-overlay-title="跳转窗口 swich windows" {spawn "noctalia-shell" "ipc" "call" "launcher" "windows";}
     // 特殊功能
     Mod+F1 hotkey-overlay-title="开关输入法 Toggle fcitx" {spawn-sh "pkill fcitx5 || fcitx5 ";}
-    Mod+F2 hotkey-overlay-title="设置 Settings" { spawn-sh "qs -c noctalia-shell ipc call settings toggle";}
+    Mod+F2 hotkey-overlay-title="设置 Settings" { spawn-sh "noctalia-shell ipc call settings toggle";}
     Mod+F3 hotkey-overlay-title="录屏 Screen record" { spawn "shorin-screenrec-menu";}
     Mod+F5 hotkey-overlay-title="快速存档 Quick save" { spawn "quicksave";}
     Mod+F8 hotkey-overlay-title="快速读档 Quick load" { spawn "quickload";}
@@ -40,11 +38,11 @@ binds {
     // 另一个打开nautilus的快捷键，主要是为了在同时安装thunar和nautilus的情况下打开naultilus
     Mod+Alt+E hotkey-overlay-title=null {spawn "env" "GSK_RENDERER=gl" "GTK_IM_MODULE=fcitx"  "nautilus" "--new-window";}
    
-    Mod+Z hotkey-overlay-title="程序菜单 Applauncher" { spawn-sh "qs -c noctalia-shell ipc call launcher toggle || fuzzel"; }
+    Mod+Z hotkey-overlay-title="程序菜单 Applauncher" { spawn-sh "noctalia-shell ipc call launcher toggle || fuzzel"; }
     // 壁纸选择
-    Mod+Alt+W hotkey-overlay-title="壁纸切换 Wallpaper" { spawn-sh "qs -c noctalia-shell ipc call wallpaper toggle";}
+    Mod+Alt+W hotkey-overlay-title="壁纸切换 Wallpaper" { spawn-sh "noctalia-shell ipc call wallpaper toggle";}
     // 随机切换壁纸
-    Mod+F10 hotkey-overlay-title="随机切换壁纸 Random wallpaper" { spawn-sh "qs -c noctalia-shell ipc call wallpaper random all";}
+    Mod+F10 hotkey-overlay-title="随机切换壁纸 Random wallpaper" { spawn-sh "noctalia-shell ipc call wallpaper random all";}
     // 随机下载壁纸
     Mod+Shift+F10 hotkey-overlay-title="随机下载壁纸 Random Download wallpaper" { spawn "~/.local/bin/random-anime-wallpaper-noctalia";}
 
@@ -234,20 +232,20 @@ binds {
     Mod+Shift+E hotkey-overlay-title="退出niri Quit niri" { quit; }
 
     // 电源菜单
-    Mod+Shift+P hotkey-overlay-title="电源菜单 powermenu" {spawn "qs" "-c" "noctalia-shell" "ipc" "call" "sessionMenu" "toggle";} 
+    Mod+Shift+P hotkey-overlay-title="电源菜单 powermenu" {spawn "noctalia-shell" "ipc" "call" "sessionMenu" "toggle";} 
     // 剪贴板
-    Mod+Alt+V hotkey-overlay-title="剪贴板 Clipboard" {spawn-sh "qs -c noctalia-shell ipc call launcher clipboard";} 
+    Mod+Alt+V hotkey-overlay-title="剪贴板 Clipboard" {spawn-sh "noctalia-shell ipc call launcher clipboard";} 
     // 锁屏
-    Mod+Alt+L hotkey-overlay-title="锁屏 Lock Screen" {spawn "qs" "-c" "noctalia-shell" "ipc" "call" "lockScreen" "lock"; }
+    Mod+Alt+L hotkey-overlay-title="锁屏 Lock Screen" {spawn "noctalia-shell" "ipc" "call" "lockScreen" "lock"; }
     // 锁屏、关闭显示器、休眠
-    Mod+Alt+P hotkey-overlay-title="挂起 Suspend" { spawn-sh "niri msg action power-off-monitors && qs -c noctalia-shell ipc call lockScreen lock && systemctl suspend";}
+    Mod+Alt+P hotkey-overlay-title="挂起 Suspend" { spawn-sh "niri msg action power-off-monitors && noctalia-shell ipc call lockScreen lock && systemctl suspend";}
 
     // === 媒体控制 ===
-    XF86AudioRaiseVolume { spawn "qs" "-c" "noctalia-shell" "ipc" "call" "volume" "increase"; }
-    XF86AudioLowerVolume { spawn "qs" "-c" "noctalia-shell" "ipc" "call" "volume" "decrease"; }
-    XF86AudioMute { spawn "qs" "-c" "noctalia-shell" "ipc" "call" "volume" "muteOutput"; }
-    XF86MonBrightnessUp { spawn "qs" "-c" "noctalia-shell" "ipc" "call" "brightness" "increase"; }
-    XF86MonBrightnessDown { spawn "qs" "-c" "noctalia-shell" "ipc" "call" "brightness" "decrease"; }
+    XF86AudioRaiseVolume { spawn "noctalia-shell" "ipc" "call" "volume" "increase"; }
+    XF86AudioLowerVolume { spawn "noctalia-shell" "ipc" "call" "volume" "decrease"; }
+    XF86AudioMute { spawn "noctalia-shell" "ipc" "call" "volume" "muteOutput"; }
+    XF86MonBrightnessUp { spawn "noctalia-shell" "ipc" "call" "brightness" "increase"; }
+    XF86MonBrightnessDown { spawn "noctalia-shell" "ipc" "call" "brightness" "decrease"; }
 
     // === 工作区导航补充 (无冲突项) ===
     Mod+Page_Down          { focus-workspace-down; }

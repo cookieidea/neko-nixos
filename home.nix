@@ -7,7 +7,7 @@
 # 编辑器：nixvim（替代 neovim + lazyvim）
 # AUR-only 与 nixpkgs 差异见底部注释。
 
-{ config, pkgs, lib, desktop, username, nixvim, noctalia, opencode, selfPackages, ... }:
+{ config, pkgs, lib, desktop, username, nixvim, opencode, selfPackages, ... }:
 
 {
   imports = [
@@ -96,15 +96,15 @@
     xorg.xprop                                 # niri-force-kill-window 的 XWayland 进程树判定依赖
   ];
 
-  # opencode（AI 编程 Agent）走 flake 装，拿最新版（不在 nixpkgs 核心）
-  # noctalia（桌面 shell）同样走 flake 包
+  # opencode（AI 编程 Agent）走 flake 装，拿最新版（不在 nixpkgs 核心）。
+  # noctalia-shell（桌面 shell，quickshell 配置 + qs 封装）直接用 nixpkgs 自带的
+  # `noctalia-shell` 包，不再用独立的 noctalia v4 应用（见文末注释）。
   ++ [
     opencode.packages.${pkgs.stdenv.hostPlatform.system}.default
-    noctalia.packages.${pkgs.stdenv.hostPlatform.system}.default
+    pkgs.noctalia-shell
   ]
 
   # 自构建程序（flake 包，见 ./pkgs；对应原 Arch 的 AUR `-git` / 私有仓库）
-  # noctalia-shell 已通过上面的 noctalia flake 输入提供，这里不再重复。
   ++ [
     selfPackages.niri-sidebar     # niri-sidebar-git
     selfPackages.pins             # pins-git
@@ -156,10 +156,11 @@
 
   # ============================================================
   #  Noctalia 桌面 shell（niri 之上的一层）
-  #  用 flake 提供的 noctalia 包（见 home.packages，v4 最新稳定版 v4.7.7）
-  #  配置是 v4 的 JSON：settings.json / plugins.json / colors.json / user-templates.toml
-  #  通过 xdg.configFile 部署到 ~/.config/noctalia/
-  #  （v4 不用 programs.noctalia.settings，也不读 v5 的 config.toml）
+  #  运行方式：nixpkgs 自带的 `noctalia-shell`（quickshell 配置 + qs 封装），
+  #  由 config.kdl 的 `spawn-sh-at-startup "noctalia-shell"` 拉起。
+  #  下方 ~/.config/noctalia/*.json 等 v4 配置现已不再被 noctalia-shell 读取
+  #  （那是独立 noctalia v4 应用的配置，已弃用）；保留仅作参考，可随时删除。
+  #  IPC 绑定见 binds.kdl：统一用 `noctalia-shell ipc call ...`（见文末说明）。
   # ============================================================
 
   # ============================================================
@@ -328,10 +329,11 @@
   #
   # niri / Noctalia 以及其余 SHORiN rice 配置已落到 dotfiles/ 并通过 xdg.configFile / home.file 部署：
   #   - dotfiles/config/niri/*.kdl   （config.kdl + 9 个 include 拆分文件）
-  #   - dotfiles/config/noctalia/{settings,plugins,colors}.json + user-templates.toml   （v4 JSON 配置；v5 的 config.toml 已移除）
-  # 已针对 NixOS 适配：启动方式从 `qs -c noctalia-shell`（SHORiN 的 quickshell 写法）
-  # 改为直接 `spawn-at-startup "noctalia"`；注释掉了 Arch 专用的 /usr/lib/polkit-gnome、
-  # /usr/lib/xdg-desktop-portal-gnome，以及依赖私有脚本的截图音效、linuxqq-clipsync 等。
+  #   - dotfiles/config/noctalia/{settings,plugins,colors}.json + user-templates.toml   （独立 v4 应用配置，已被 noctalia-shell 取代、不再被读取，保留作参考）
+  # 已针对 NixOS 适配：桌面 shell 用 nixpkgs 自带的 noctalia-shell（quickshell 配置封装），
+  # 由 config.kdl 的 `spawn-sh-at-startup "noctalia-shell"` 拉起，还原了 SHORiN 原版
+  # `qs -c noctalia-shell` 的写法；注释掉了 Arch 专用的 /usr/lib/polkit-gnome、
+  # /usr/lib/xdg-desktop-portal-gnome，以及依赖私有脚本的 linuxqq-clipsync 等。
   # polkit 代理改用 services.polkit-gnome.enable。
   #
   # ⚠️ 关于 SHORiN 原版交互的还原程度（配置迁移结果）：
@@ -344,13 +346,13 @@
   #  • 仍依赖 AUR、本仓库未纳入的脚本（shorin-screenrec-menu / quicksave / quickload，
   #    来自 AUR noctalia-shell / shorin-contrib）对应的绑定（Mod+F3/F5/F8）会静默失败，
   #    需要时可自行补充或打包。
-  #  • 启动器/设置/壁纸/电源菜单/锁屏/音量/亮度等绑定走
-  #    `qs -c noctalia-shell ipc call ...`，需额外安装 quickshell 并把 config.kdl
-  #    启动行改回 `spawn-sh-at-startup "qs -c noctalia-shell"` 才生效（当前用独立
-  #    noctalia v4 包启动，这些 IPC 绑定暂不生效）。
+  #  • 启动器/设置/壁纸/电源菜单/锁屏/音量/亮度等绑定现在走
+  #    `noctalia-shell ipc call ...`（binds.kdl 已全部改用 nixpkgs 的
+  #    noctalia-shell 封装，不再写 `qs -c noctalia-shell`）。桌面 shell 由
+  #    config.kdl 的 `spawn-sh-at-startup "noctalia-shell"` 拉起，这些 IPC 绑定现已生效。
   #
   # 不在 nixpkgs 的包，已用 ./pkgs 自构建派生解决（见 README「自构建程序」一节）：
   #   niri-sidebar-git / pins-git / python-pywalfox / shorin-contrib-git /
   #   shorin-proton-wrapper-git / splayer-next
-  # （miyu 已按需求移除。）已用 flake 安装：opencode、noctalia(v4.7.7)。
+  # （miyu 已按需求移除。）flake 安装：opencode；桌面 shell 改为 nixpkgs 的 noctalia-shell（替代独立 noctalia v4.7.7 应用）。
 }

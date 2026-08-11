@@ -59,7 +59,7 @@ neko-nixos/
 - **游戏 / 影音客户端（用户新增）**：`hmcl` `animeko`(替代 kazumi) `lunarclient` `taterclient-ddnet`
 - **原清单遗漏补回**：`virt-manager` `video-downloader`
 - **niri 生态依赖**：`niri` `kitty` `fuzzel` `thunar` `satty` `cliphist` `wl-clipboard` `xsettingsd`
-- **flake 包（不在 nixpkgs 核心）**：`opencode`（AI 编程 Agent）、`noctalia`（桌面 shell）
+- **flake 包（不在 nixpkgs 核心）**：`opencode`（AI 编程 Agent）。桌面 shell 改用 nixpkgs 自带的 `noctalia-shell`（quickshell 配置封装），不再用独立 `noctalia` v4 应用。
 - **自构建程序（`./pkgs` 派生，对应原 Arch 的 AUR `-git` / 私有仓库）**：`niri-sidebar` `pins` `pywalfox` `shorin-contrib` `proton-wrapper` `splayer-next`
   - ⚠️ `splayer-next` 是 **SPlayer-Dev/SPlayer-Next**（Electron 音乐播放器），与 nixpkgs 里的 `splayer`（Simple Netease Cloud Music player）**不是同一个软件**，切勿混用。
 
@@ -80,13 +80,12 @@ neko-nixos/
 
 > 说明：原 Arch 脚本（shorin-arch-setup）同样只 **启用 flatpak 服务 + 注册 Flathub 远程**，其应用清单里没有任何 `flatpak:` 前缀条目，因此并不会通过 flatpak 实际安装任何软件；本转换保持了这一行为。
 
-## 关于 Noctalia（已固定 v4）
+## 关于 Noctalia（noctalia-shell / quickshell）
 
-- `flake.nix` 的 noctalia 输入固定为 `github:noctalia-dev/noctalia/v4.7.7`（v4 最后一个稳定版；frozen 分支是 `legacy-v4`）。
-- **v4 配置是 JSON 文件**：`dotfiles/config/noctalia/settings.json` + `plugins.json` + `colors.json` + `user-templates.toml`，由 Home Manager 通过 `xdg.configFile` 部署到 `~/.config/noctalia/`。
-- 自定义模板（pywalfox / fcitx5 / starship / gtk-folder / fastfetch 等）写在 `user-templates.toml`，模板源文件在 `dotfiles/config/noctalia/templates/`。
-- ⚠️ v4 与 v5 **不兼容**：v5 改成单一 TOML（`config.toml`），v4 一律不读；本仓库当前是 v4 状态，`config.toml` 已移除。
-- 上机后用 `noctalia theme --list-templates` 核对 `builtin_ids`（内置模板 id：kitty / niri / fuzzel / btop / cava / gtk），按需微调。
+- 桌面 shell 用 **nixpkgs 自带的 `noctalia-shell`**（quickshell 配置 + `qs` 封装），由 `home.nix` 的 `pkgs.noctalia-shell` 安装、niri 的 `config.kdl` 用 `spawn-sh-at-startup "noctalia-shell"` 拉起。这还原了 SHORiN 原版「`qs -c noctalia-shell`」的 quickshell 写法。
+- **IPC 驱动的交互已全部生效**：binds.kdl 里的启动器 / 设置 / 壁纸 / 电源菜单 / 锁屏 / 音量 / 亮度 / 剪贴板等绑定统一走 `noctalia-shell ipc call ...`（不再写 `qs -c noctalia-shell`）。
+- `dotfiles/config/noctalia/*.json`（settings/plugins/colors）与 `user-templates.toml` 是**独立 noctalia v4 应用的配置**，已被 noctalia-shell 取代、不再被读取，保留仅作参考，可随时删除。
+- ⚠️ 主题模板（pywalfox / fcitx5 / starship / gtk-folder / fastfetch）原本由 v4 的 `user-templates.toml` 生成；切换到 noctalia-shell 后这套模板机制需要另行接线（例如直接跑 matugen），暂未处理，属已知待办。
 
 ---
 
@@ -201,8 +200,8 @@ sudo nixos-rebuild switch --rollback
 
 - 包管理器从 `pacman`/`yay`(AUR) 换成 Nix flake + Home Manager，所有软件声明式管理、可复现。
 - 编辑器用 `vscodium` 替代 AUR 的 `visual-studio-code-bin`（去遥测）。
-- 壁纸/主题/启动器等桌面交互走 Noctalia（nixpkgs 无，用 flake 引入）。
-- 配置文件从「散装 dotfiles + 私有脚本」改为 Home Manager 托管（`xdg.configFile` / `home.file` / `programs.*`）。Arch 专属的 `/usr/lib/...` 路径已改写；SHORiN 私有 niri 脚本（`niri-binds` / `niri-pick` / `niri-force-kill-window` / `screenshot-sound.sh`）已通过本次配置迁移部署到 `~/.config/niri/scripts/`，截图音效守护也已接回 `config.kdl`，对应绑定（快捷键菜单、取窗口信息、强杀窗口、截图音效）现可用。仍依赖 AUR、本仓库未纳入的脚本（`shorin-screenrec-menu` / `quicksave` / `quickload`）对应的绑定（Mod+F3/F5/F8）会静默失败，需要时可自行补充。
+- 壁纸/主题/启动器等桌面交互走 noctalia-shell（nixpkgs 自带，quickshell 封装）。
+- 配置文件从「散装 dotfiles + 私有脚本」改为 Home Manager 托管（`xdg.configFile` / `home.file` / `programs.*`）。Arch 专属的 `/usr/lib/...` 路径已改写；SHORiN 私有 niri 脚本（`niri-binds` / `niri-pick` / `niri-force-kill-window` / `screenshot-sound.sh`）已通过本次配置迁移部署到 `~/.config/niri/scripts/`，截图音效守护也已接回 `config.kdl`，对应绑定（快捷键菜单、取窗口信息、强杀窗口、截图音效）现可用。仍依赖 AUR、本仓库未纳入的脚本（`shorin-screenrec-menu` / `quicksave` / `quickload`）对应的绑定（Mod+F3/F5/F8）会静默失败，需要时可自行补充。此外，启动器/设置/壁纸/电源菜单/锁屏/音量/亮度/剪贴板等 IPC 绑定现已通过 noctalia-shell 生效（binds.kdl 统一用 `noctalia-shell ipc call`）。
 
 ---
 
