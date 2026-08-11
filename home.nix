@@ -30,7 +30,7 @@
     baobab                                    # baobab
     mission-center                            # mission-center
     gnome-font-viewer                         # gnome-font-viewer
-    firefox                                   # firefox
+    google-chrome                             # google-chrome (替代 firefox; unfree 已开启)
     transmission-gtk                          # transmission-gtk
     localsend                                 # localsend
     gnome-calendar                            # gnome-calendar

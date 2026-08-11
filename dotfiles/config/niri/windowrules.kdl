@@ -39,16 +39,14 @@ window-rule {
 }
 // 以浮动模式打开的软件
 window-rule {
-    // This app-id regular expression will work for both:
-    // - host Firefox (app-id is "firefox")
-    // - Flatpak Firefox (app-id is "org.mozilla.firefox")
+    // Google Chrome (app-id is "google-chrome") Picture-in-Picture 浮动
     match app-id="com.gabm.satty"
     match app-id="media_info"
     match app-id="video2gif"
     match app-id="floating-term"
     match app-id="nm-connection-editor"
     match app-id="niri-quick-switch"
-    match app-id=r#"firefox$"# title="^Picture-in-Picture$"
+    match app-id=r#"google-chrome$"# title="^Picture-in-Picture$"
     match app-id="steam" title="Friends List"
     match app-id="blueberry.py" title="蓝牙"
     match app-id="blueman-manager"
@@ -171,7 +169,7 @@ window-rule {
     draw-border-with-background false
 }
 window-rule {
-    match app-id=r#"firefox$"# title="^Picture-in-Picture$"
+    match app-id=r#"google-chrome$"# title="^Picture-in-Picture$"
     match app-id="zoom"
     open-floating true
 }

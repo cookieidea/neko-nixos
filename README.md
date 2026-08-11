@@ -51,7 +51,7 @@ neko-nixos/
 
 按来源分组（括号内为原 Arch 包名）：
 
-- **Standard（common-applist）**：`gdu` `baobab` `mission-center` `gnome-font-viewer` `firefox` `transmission-gtk` `localsend` `gnome-calendar` `gnome-clocks` `lutris` `steam` `mangohud` `mpv` `obs-studio` `upscaler` `yazi` `flatseal` `pavucontrol` `mousepad` `easyeffects` `fcitx5-mozc` `rime-wubi`
+- **Standard（common-applist）**：`gdu` `baobab` `mission-center` `gnome-font-viewer` `google-chrome` `transmission-gtk` `localsend` `gnome-calendar` `gnome-clocks` `lutris` `steam` `mangohud` `mpv` `obs-studio` `upscaler` `yazi` `flatseal` `pavucontrol` `mousepad` `easyeffects` `fcitx5-mozc` `rime-wubi`
 - **Shell & Terminal（kde-applist）**：`fish` `starship` `eza` `zoxide` `fastfetch` `imagemagick` `jq` `timg` `bat` `btop`
 - **编辑器**：`vscodium`（替代 AUR 的 `visual-studio-code-bin`，去遥测）
 - **原 AUR 包（已在 nixpkgs 26.05 核实存在）**：`flclash` `wechat` `qq` `gearlever` `lsfg-vk` `protonplus` `mangojuice` `rime-wanxiang`
