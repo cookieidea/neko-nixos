@@ -1,0 +1,129 @@
+// =============================================================
+// niri 配置（基于 SHORiN-KiWATA/shorin-arch-setup 的 noctalia-dotfiles）
+// 已针对 NixOS 适配：原 Arch 专用路径与 qs(quickshell) 依赖已改写/注释。
+// 完整原始版本见 SHORiN 仓库；本文件为可在 NixOS 上直接启动的适配版。
+// 通过 home.nix 的 xdg.configFile 部署到 ~/.config/niri/
+// =============================================================
+
+// 截图保存位置
+screenshot-path "~/Pictures/Screenshots/Niri-screenshots/%Y-%m-%d_%H-%M-%S.png"
+
+// 环境变量
+environment {
+    // 设置界面语言
+    LANGUAGE "zh_CN:en"
+    LANG "zh_CN.UTF-8"
+    // 输入法环境变量
+    XMODIFIERS "@im=fcitx"
+    // qt 主题
+    QT_QPA_PLATFORMTHEME "gtk3"
+    QT_QPA_PLATFORMTHEME_QT6 "gtk3"
+    // 解决 quickshell 图标主题缺失问题（仅在使用 qs 时有用，保留无害）
+    QS_ICON_THEME "Adwaita"
+    // GTK 软件使用的渲染器，可以解决 n 卡双显卡导致的 GTK 应用启动缓慢问题，
+    // AMD 或 Intel 单显卡不需要这行设置可以注释掉
+    //GSK_RENDERER "gl"
+    // 默认文本编辑器
+    EDITOR "vim"
+}
+
+input {
+    keyboard {
+        xkb {
+        }
+        repeat-delay 250
+        repeat-rate 35
+    }
+
+    touchpad {
+        // off
+        tap
+        // dwt
+        // dwtp
+        // drag false
+        // drag-lock
+        // nautural-scroll 可以翻转触摸板滚动的方向
+        natural-scroll
+        //accel-speed -0.5
+        // accel-profile "flat"
+        // scroll-method "two-finger"
+        // disabled-on-external-mouse
+    }
+
+    mouse {
+        // off
+        // natural-scroll
+        // 鼠标速度
+        accel-speed -0.15
+        // 禁用鼠标加速
+        accel-profile "flat"
+        // scroll-method "no-scroll"
+        //speed of scroll,like:
+        //scroll-factor horizontal=2.0 vertical=-5.0
+    }
+
+    trackpoint {
+        // off
+        // natural-scroll
+        // accel-speed 0.2
+        // accel-profile "flat"
+        // scroll-method "on-button-down"
+        // scroll-button 273
+        // scroll-button-lock
+        // middle-emulation
+    }
+}
+
+// ===================== 自动启动 =====================
+// Noctalia 桌面 shell：直接启动（NixOS 上用 flake 提供的 noctalia 包）。
+// 若想要 SHORiN 原版的 qs / quickshell IPC 绑定（启动器、设置、壁纸、
+// 电源菜单、锁屏、音量/亮度等），可改为：
+//   spawn-sh-at-startup "qs -c noctalia-shell"
+// 并安装 quickshell（见 home.nix 顶部注释），但那样 binds.kdl 里的
+// `qs -c noctalia-shell ipc call ...` 绑定才会生效。
+spawn-at-startup "noctalia"
+
+// 输入法
+spawn-at-startup "fcitx5"
+
+// GTK 主题/字体经 XSETTINGS 注入应用（niri 无 DE，靠它让 Thunar 等 GTK 程序统一主题）
+spawn-at-startup "xsettingsd"
+
+// 允许 root 通过用户的 xwayland 打开窗口
+spawn-at-startup "xhost" "+si:localuser:root"
+
+// 设置会话类环境变量（NixOS 上 systemctl 可用）
+spawn-sh-at-startup "systemctl --user set-environment XDG_SESSION_CLASS=user"
+
+// --- 以下为原 Arch 专用 / 依赖缺失项，已注释，保留以便对照 ---
+// polkit 认证代理：在 NixOS 改用 home.nix 的 services.polkit-gnome.enable = true
+// spawn-at-startup "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1"
+// xdg-desktop-portal：NixOS 由 configuration.nix 的 services.xdg.portal 自动管理
+// spawn-sh-at-startup "dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP=niri & /usr/lib/xdg-desktop-portal-gnome"
+// 截图音效守护进程：需要 ~/.config/niri/scripts/screenshot-sound.sh（SHORiN 私有脚本，未纳入）
+// spawn-at-startup "~/.config/niri/scripts/screenshot-sound.sh"
+// 启动随机壁纸：依赖 qs；已由 Noctalia settings.json 的 wallpaper 配置替代
+// spawn-sh-at-startup "sleep 3 && qs -c noctalia-shell ipc call wallpaper random all"
+// linuxqq 剪贴板同步：依赖 linuxqq-clipsync 用户服务（NixOS 无），注释
+// spawn-at-startup "systemctl" "--user" "start" "linuxqq-clipsync"
+
+// 取消启动 niri 时自动开启快捷键教程
+hotkey-overlay {
+    // Uncomment this line to disable the "Important Hotkeys" pop-up at startup.
+    skip-at-startup
+}
+
+// 隐藏窗口标题栏
+prefer-no-csd
+
+// 自 25.11 版本起，niri 的配置文件支持了拆分，每一条 include 都代表把
+// 已经拆分出去的配置文件嵌入进来。
+include "layout.kdl"
+include "animations.kdl"
+include "binds.kdl"
+include "supertab.kdl"
+include "windowrules.kdl"
+include "cursor.kdl"
+include "outputs.kdl"
+include "blur.kdl"
+include "./noctalia.kdl"
