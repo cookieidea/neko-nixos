@@ -2,9 +2,10 @@
   description = "Shorin Arch Setup (shorin-arch-setup) → NixOS + Home Manager conversion";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
+    # 国内镜像（清华 TUNA git 镜像，加速 nixpkgs / home-manager 源码拉取）
+    nixpkgs.url = "git+https://mirrors.tuna.tsinghua.edu.cn/git/nixpkgs.git?ref=nixos-26.05";
     home-manager = {
-      url = "github:nix-community/home-manager/release-26.05";
+      url = "git+https://mirrors.tuna.tsinghua.edu.cn/git/home-manager.git?ref=release-26.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 

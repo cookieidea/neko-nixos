@@ -14,6 +14,10 @@
 
   # ── Flakes 开关 ───────────────────────────────────────────
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
+  # ── 国内镜像源（Nix 二进制缓存，清华）──
+  # 用 extra-substituters 追加，不覆盖默认源；镜像不可达时 Nix 自动回退官方
+  # cache.nixos.org（内容镜像，沿用官方公钥，无需额外 trusted key）。
+  nix.settings.extra-substituters = [ "https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store" ];
   nixpkgs.config.allowUnfree = true;   # steam / wechat-uos / 部分驱动需要
   security.polkit.enable = true;        # polkit 认证（Noctalia / 系统设置需要）
 
@@ -75,6 +79,10 @@
 
   # ── Flatpak（用于 nixpkgs 没有的闭源 App，如 linuxqq）──
   services.flatpak.enable = true;
+  # Flathub 走中科大(USTC)国内镜像，避免直连 dl.flathub.org 慢/超时
+  services.flatpak.remotes.flathub = {
+    location = "https://mirrors.ustc.edu.cn/flathub/repo/flathub.flatpakrepo";
+  };
 
   # ── XDG 桌面门户 ──────────────────────────────────────────
   xdg.portal.enable = true;
