@@ -51,16 +51,15 @@
   hardware.bluetooth.enable = true;
   services.blueman.enable = true;
 
-  # ── GPU 驱动（原 03b-gpu-driver.sh 自动探测，这里手动选）──
+  # ── GPU 驱动（AMD Radeon RX 6750 GRE 10G，RDNA2 / Navi 22；CPU i5-12400F 无核显）──
+  # 单卡 AMD 独显：amdgpu 内核驱动 + mesa（OpenGL / Vulkan(RADV) / VA-API 硬件解码）。
   hardware.opengl.enable = true;
-  # AMD:
-  # services.xserver.videoDrivers = [ "amdgpu" ];
-  # Intel:
-  # services.xserver.videoDrivers = [ "intel" ];
-  # NVIDIA（开源驱动）:
-  # services.xserver.videoDrivers = [ "nvidia" ];
-  # hardware.nvidia.open = true;
-  # hardware.nvidia.prime.offload.enable = true;  # 笔记本双显卡
+  hardware.opengl.extraPackages = with pkgs; [
+    vulkan-loader   # Vulkan ICD 加载器（RADV 由 mesa 提供，6750 GRE 走 RADV）
+    libva           # VA-API 加载器（AMD 硬件解码走 mesa 的 radeonsi VA 驱动）
+  ];
+  services.xserver.videoDrivers = [ "amdgpu" ];
+  # 12400F 无核显 → 不需要 intel 驱动；非笔记本双显卡 → 不需要 NVIDIA Prime/offload。
 
   # ── SSH ───────────────────────────────────────────────────
   services.openssh.enable = true;
