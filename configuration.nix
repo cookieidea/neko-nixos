@@ -148,15 +148,10 @@
       animation = "none";
     };
   };
-  # niri 会话：注册为系统级 desktop 文件（ly 才能列出/启动）
-  services.displayManager.session = [{
-    name = "niri";
-    manage = "desktop";
-    start = ''
-      export PATH="/home/${username}/.nix-profile/bin:/run/current-system/sw/bin:$PATH"
-      exec ${pkgs.niri}/bin/niri
-    '';
-  }];
+  # niri 系统模块：装 niri 包 + 自动注册 niri.desktop 到 wayland-sessions
+  # （services.displayManager.sessionPackages）+ 官方 portal / gnome-keyring 推荐配置。
+  # 注意：26.05 已移除 services.displayManager.session，注册会话要用这个模块。
+  programs.niri.enable = true;
   # 自动登录 cookie → 直接进 niri（ly 模块自动配 ly-autologin PAM）
   services.displayManager.defaultSession = "niri";
   services.displayManager.autoLogin = {
