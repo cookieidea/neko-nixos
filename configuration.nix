@@ -170,6 +170,8 @@
     gparted dosfstools exfatprogs f2fs-tools udftools xfsprogs
     # 登录管理器 greeter（niri 由 home.nix 的 programs.niri 安装）
     tuigreet
+    # virt-manager/libvirtd 后端（原 99-apps 的 qemu-full + swtpm；libvirtd 已 enable）
+    qemu swtpm
     # X11 兼容层：xwayland-satellite（niri 25.08+ 开箱集成，binary 在 PATH 时
     # niri 自动按需拉起 Xwayland；微信/LinuxQQ 等 X11 应用因此可正常启动）
     xwayland-satellite
@@ -178,6 +180,7 @@
   # ── 字体（对应 ttf-jetbrains-mono-nerd / maple / noto-cjk）─
   fonts.packages = with pkgs; [
     noto-fonts-cjk-sans
+    noto-fonts-emoji
     sarasa-gothic
     jetbrains-mono
     nerd-fonts.jetbrains-mono     # 26.05 起 nerdfonts 改名 nerd-fonts 且改为按字体属性取（MapleMono 不在其清单，暂缺）

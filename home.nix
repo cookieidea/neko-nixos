@@ -120,6 +120,10 @@
     xprop                                       # xprop（26.05 起 xorg 属性集弃用，xorg.xprop 改为顶层 xprop；niri-force-kill-window 依赖）
     gpu-screen-recorder                        # 录屏（shorin-screenrec-menu Mod+F3 用，noctalia-shell 也依赖）
     btrfs-assistant                            # btrfs 快照管理 CLI（quickload Mod+F8 的回滚后端）
+    # ── 原 02b/99-apps 补充 ──
+    power-profiles-daemon                      # 电源模式（平衡/省电/性能）
+    cmatrix lolcat sl                          # 彩蛋趣味命令（原 02b 安装）
+    wineWowPackages.stable                     # wine（原 99-apps 的 wine 全家）
   ] ++ [
 
   # opencode（AI 编程 Agent）走 flake 装，拿最新版（不在 nixpkgs 核心）。
