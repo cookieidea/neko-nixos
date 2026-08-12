@@ -13,17 +13,18 @@
     # 国内镜像（清华 TUNA git 镜像）。注意 TUNA 对 nixpkgs 用无 owner 的别名
     # 路径 git/nixpkgs.git（NixOS-CN 教程确认），shallow=1 浅克隆加速。
     nixpkgs.url = "git+https://mirrors.tuna.tsinghua.edu.cn/git/nixpkgs.git?ref=nixos-26.05&shallow=1";
-    # home-manager TUNA 未镜像，用官方 github（慢但可用）
+    # home-manager TUNA 未镜像，用 git+https 直连 github（绕开 GitHub REST API 限流 403）
     home-manager = {
-      url = "github:rycee/home-manager/release-26.05";
+      url = "git+https://github.com/rycee/home-manager.git?ref=release-26.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
     # ── nixvim：Neovim 的配置框架（替代 neovim + lazyvim）──
     # 用 nixos-26.05 分支以匹配下面的 nixpkgs 26.05。
     # 官方建议不要 follows nixpkgs，让它用自己 pin 的 revision。
+    # git+https 直连 github，绕开 API 限流。
     nixvim = {
-      url = "github:nix-community/nixvim/nixos-26.05";
+      url = "git+https://github.com/nix-community/nixvim.git?ref=nixos-26.05";
     };
 
     # ── Noctalia 桌面 shell 改用 nixpkgs 自带的 `noctalia-shell` ──
@@ -32,7 +33,7 @@
 
     # ── opencode（AI 编程 Agent，用 flake 装，拿最新版）──
     opencode = {
-      url = "github:GutMutCode/opencode-nix";
+      url = "git+https://github.com/GutMutCode/opencode-nix.git";
     };
   };
 
