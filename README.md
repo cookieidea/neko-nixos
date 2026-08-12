@@ -71,8 +71,9 @@ neko-nixos/
 
 ## 关于 Flatpak
 
-- `configuration.nix` 里 `services.flatpak.enable = true;`，并挂官方 Flathub 远程
-  （国内 USTC/TUNA/阿里镜像 2026-08 起全部失效）。
+- `configuration.nix` 里 `services.flatpak.enable = true;`，Flathub 仓库先 add 官方
+  （flatpakrepo 文件），再把仓库 URL 切到**中科大镜像** `https://mirrors.ustc.edu.cn/flathub`
+  （2026-08 实测仓库根 200 可用；各镜像的 `.flatpakrepo` 文件本身 404，故不能直接 remote-add 镜像）。
 - **微信 / QQ / Flatseal / Bazaar 应用商店 / OpenOrpheus** 由 `flatpak-repo` one-shot 服务在
   启动时自动安装（幂等，见 `configuration.nix` 的 `systemd.services.flatpak-repo`）：
   `com.tencent.WeChat`、`com.qq.QQ`、`com.github.tchx84.Flatseal`、`io.github.kolunmi.Bazaar`、

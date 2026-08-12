@@ -446,8 +446,11 @@ sudo nixos-rebuild switch
     - merge 卡在 vi：live ISO 无 vi，先 `git config core.editor true` 再 `git commit --no-edit`。
 17. **分叉分支 pull 被拒（divergent branches）**：本地提交过 hardware-configuration.nix 后与
     origin 分叉。`git config pull.rebase false && git pull origin main`（无冲突会直接 merge）。
-18. **flathub 国内镜像全部失效**：USTC/TUNA/阿里 的 `flathub.flatpakrepo` 均返回 404
-    （2026-08 实测），仓库已切官方 `https://dl.flathub.org/repo/flathub.flatpakrepo`。
+18. **flathub 国内镜像：`.flatpakrepo` 文件 404，但仓库 URL 可用**：USTC/TUNA/阿里的
+    `flathub.flatpakrepo` 均返回 404（2026-08 实测），但仓库根 URL 本身 200 可用
+    （`https://mirrors.ustc.edu.cn/flathub/` 实测 OK）。所以正确姿势是
+    **先 `remote-add` 官方 flatpakrepo，再 `remote-modify flathub --url=https://mirrors.ustc.edu.cn/flathub`**
+    （仓库已如此配置；不能直接 remote-add 镜像的 flatpakrepo 路径）。
 19. **QQ 在 flathub 的 ID 是 `com.qq.QQ`**（不是 `org.tencent.qq`，后者 404）。
     微信是 `com.tencent.WeChat`。
 20. **home-manager 激活报 `The name is not activatable`（dconfSettings 步骤）**：

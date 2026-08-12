@@ -123,7 +123,9 @@
 
   # ── Flatpak（用于 nixpkgs 没有/源失效的闭源 App，如 qq/wechat）──
   services.flatpak.enable = true;
-  # Flathub 源：国内镜像（USTC/TUNA/阿里）flatpakrepo 路径均已失效（404），改用官方 dl.flathub.org。
+  # Flathub 源：先 add 官方（flatpakrepo 文件），再把仓库 URL 切到中科大镜像
+  # （https://mirrors.ustc.edu.cn/flathub，2026-08 实测仓库根 200 可用；
+  #  各镜像的 flathub.flatpakrepo 文件本身 404，所以不能直接 remote-add 镜像）。
   # ⚠️ NixOS 26.05 已移除 services.flatpak.remotes 声明式选项，
   #   改用 one-shot systemd 服务在启动时添加 remote 并自动安装 Flatpak 应用
   #   （--if-not-exists / --or-update 保证幂等；构建期不下载，不影响 nixos-install）。
@@ -134,6 +136,8 @@
     path = [ pkgs.flatpak ];
     script = ''
       flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+      # 切国内镜像：中科大（动态缓存 + 302 回源）；USTC 挂了就换官方（注释掉下行）
+      flatpak remote-modify flathub --url=https://mirrors.ustc.edu.cn/flathub
       # 自动安装 Flatpak 应用（幂等）：微信 / QQ / Flatseal / Bazaar 应用商店 / OpenOrpheus（网易云 Orpheus 宿主）
       flatpak install --noninteractive --or-update flathub com.tencent.WeChat com.qq.QQ com.github.tchx84.Flatseal io.github.kolunmi.Bazaar io.github.yucling.open-orpheus
     '';
