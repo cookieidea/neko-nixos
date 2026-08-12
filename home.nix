@@ -266,7 +266,10 @@
 
   home.file = {
     ".gtkrc-2.0".source = ./dotfiles/home/.gtkrc-2.0;
-    ".local/bin/random-anime-wallpaper-noctalia".source = ./dotfiles/local/bin/random-anime-wallpaper-noctalia; executable = true;
+    ".local/bin/random-anime-wallpaper-noctalia" = {
+      source = ./dotfiles/local/bin/random-anime-wallpaper-noctalia;
+      executable = true;
+    };
     ".local/share/fcitx5/rime/default.custom.yaml".source = ./dotfiles/local/share/fcitx5/rime/default.custom.yaml;
     ".local/share/fcitx5/rime/rime_ice.custom.yaml".source = ./dotfiles/local/share/fcitx5/rime/rime_ice.custom.yaml;
     ".local/share/fcitx5/themes/Matugen/theme.conf".source = ./dotfiles/local/share/fcitx5/themes/Matugen/theme.conf;
@@ -307,10 +310,22 @@
     #   niri-binds（Mod+Shift+Slash 快捷键菜单）、niri-pick（Mod+P 取窗口/颜色信息）、
     #   niri-force-kill-window（Alt+F4 强杀窗口）、screenshot-sound.sh（截图音效守护，见 config.kdl）。
     # random-anime-wallpaper-noctalia 已在上面 .local/bin 部署；niri-sidebar 走 selfPackages。
-    ".config/niri/scripts/niri-binds".source = ./dotfiles/config/niri/scripts/niri-binds; executable = true;
-    ".config/niri/scripts/niri-pick".source = ./dotfiles/config/niri/scripts/niri-pick; executable = true;
-    ".config/niri/scripts/niri-force-kill-window".source = ./dotfiles/config/niri/scripts/niri-force-kill-window; executable = true;
-    ".config/niri/scripts/screenshot-sound.sh".source = ./dotfiles/config/niri/scripts/screenshot-sound.sh; executable = true;
+    ".config/niri/scripts/niri-binds" = {
+      source = ./dotfiles/config/niri/scripts/niri-binds;
+      executable = true;
+    };
+    ".config/niri/scripts/niri-pick" = {
+      source = ./dotfiles/config/niri/scripts/niri-pick;
+      executable = true;
+    };
+    ".config/niri/scripts/niri-force-kill-window" = {
+      source = ./dotfiles/config/niri/scripts/niri-force-kill-window;
+      executable = true;
+    };
+    ".config/niri/scripts/screenshot-sound.sh" = {
+      source = ./dotfiles/config/niri/scripts/screenshot-sound.sh;
+      executable = true;
+    };
   };
 
   # polkit 认证代理：NixOS 上没有 Arch 的 /usr/lib/polkit-gnome，
