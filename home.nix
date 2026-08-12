@@ -69,8 +69,7 @@
     flclash                                   # flclash（代理 GUI）
     # wechat / qq —— nixpkgs 26.05 的 src 分别走 web.archive.org（429 限流）与腾讯 CDN
     # 旧版本链接（404），且 wechat 的 src 深埋在 appimageTools.extract 内部无法 override，
-    # 故改走 Flatpak（flathub 官方维护）：
-    #   flatpak install flathub com.tencent.WeChat org.tencent.qq
+    # 故改走 Flatpak（flathub 官方维护），由 configuration.nix 的 flatpak-repo 服务启动时自动安装。
     gearlever                                 # gearlever（管理 AppImage/flatpak）
     lsfg-vk                                   # lsfg-vk（FSR 帧生成 vulkan 层）
     protonplus                                # protonplus（Proton 管理）
@@ -341,11 +340,10 @@
   #  不在 nixpkgs 的包 → 走 flake / 自行打包
   #  （原脚本靠 shorin-arch 自建仓库与 AUR 提供，NixOS 无等价）
   # ============================================================
-  # Flatpak 服务已在 configuration.nix 开启（services.flatpak.enable）。
-  # qq/wechat 因 nixpkgs 26.05 源链接失效（见上文注释）改用 Flatpak，装完系统手动安装：
-  #   flatpak install flathub com.tencent.WeChat org.tencent.qq
-  # 其他缺失的闭源 App 同样可走 Flatpak（flathub 已配 USTC 镜像）。
-  # 若想声明式安装 Flatpak 包，取消下面注释（注意激活期需 flathub remote 已就绪）：
+  # Flatpak 服务已在 configuration.nix 开启，flatpak-repo 服务启动时自动安装：
+  #   com.tencent.WeChat（微信）/ org.tencent.qq（QQ）/ com.github.tchx84.Flatseal（Flatpak 管理）
+  # 其他缺失的闭源 App 同样可走 Flatpak（flathub 已配 USTC 镜像），手动：
+  #   flatpak install flathub <应用ID>
   #   services.flatpak.packages = [
   #     "flathub:org.tencent.qq"
   #   ];
