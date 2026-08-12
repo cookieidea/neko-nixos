@@ -12,7 +12,7 @@ pkgs.stdenv.mkDerivation {
     rev = "d1b7bace3307d5723522045df36d8f823af02d48";
   };
 
-  nativeBuildInputs = [ pkgs.meson pkgs.ninja pkgs.pkg-config pkgs.wrapGAppsHook ];
+  nativeBuildInputs = [ pkgs.meson pkgs.ninja pkgs.pkg-config pkgs.wrapGAppsHook4 ];
   buildInputs = [ pkgs.gtk4 pkgs.libadwaita ];
 
   meta = {
