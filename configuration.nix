@@ -194,12 +194,11 @@
       numberLimit = 0;                # 0 = 不按数量限制，只按时线保留
     };
   };
-  # GRUB 启动菜单显示快照（grub-btrfs 模块，nixpkgs 自带）：
-  # 生成「Snapshots」子菜单，可在此选历史快照启动；启动失败时自动进 GRUB 菜单。
-  services.grub-btrfs = {
-    enable = true;
-    bootsToGrubMenu = true;           # 异常断电/内核崩溃后自动回到 GRUB 菜单，便于选快照
-  };
+  # ⚠️ NixOS 26.05 已移除 services.grub-btrfs 模块（grub-btrfs 在 nixpkgs 中停止维护被删除）。
+  # 暂时去掉「GRUB 快照子菜单」：services.snapper 仍会按时线自动创建快照（/.snapshots），
+  # 回滚可手动：从 live ISO 挂载子卷或用 `snapper rollback` 生成新快照后重启选对应代际。
+  # 若以后要 GRUB 里直接列快照，需自行用 grub-btrfs 包的 grub-btrfsd 接 systemd 服务，
+  # 且必须与 NixOS 的 grub 配置生成协同（不能让 grub-btrfsd 覆盖 /boot/grub/grub.cfg 的代际条目）。
 
   # ── 用户（必须存在，否则 home-manager 报错）──────────────
   users.users.${username} = {
