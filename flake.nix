@@ -69,7 +69,7 @@
         # 必须先 import home-manager 的 NixOS 模块，home-manager.* 选项才有定义
         imports = [ home-manager.nixosModules.home-manager ];
 
-        _module.args = { inherit desktop username; };
+        _module.args = { inherit desktop username selfPackages; };
 
         # Home Manager 集成
         home-manager.useGlobalPkgs = true;

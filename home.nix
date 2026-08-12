@@ -47,8 +47,8 @@
     pavucontrol                               # pavucontrol
     mousepad                                  # mousepad
     easyeffects                               # easyeffects
-    fcitx5-mozc                               # fcitx5-mozc (日语)
-    # rime-wubi 已在 26.05 移除 → 五笔走 rime-wanxiang（见下，含五笔方案）
+    # 日文输入法 fcitx5-mozc 已移除；输入法本体由 i18n.inputMethod 系统级配置
+    # rime-wubi 已在 26.05 移除 → 中文走万象 rime-wanxiang（GitHub 版，见 configuration.nix）
 
     # --- Shell & Terminal (kde-applist.txt) ---
     fish                                      # fish

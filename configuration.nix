@@ -1,6 +1,6 @@
 # Shorin Arch Setup → NixOS system config
 # 对应原仓库 scripts/ 中的系统级步骤（base / nm-backend / gpu-driver / musthave 等）
-{ config, pkgs, lib, desktop, username, ... }:
+{ config, pkgs, lib, desktop, username, selfPackages, ... }:
 
 {
   # ⚠️ hardware-configuration.nix 的 import 已移到 flake.nix 的实体机配置里——
@@ -75,7 +75,7 @@
   time.timeZone = "Asia/Shanghai";
   i18n.defaultLocale = "zh_CN.UTF-8";
 
-  # ── 输入法 fcitx5（对应 fcitx5 + rime-wubi + fcitx5-mozc）──
+  # ── 输入法 fcitx5（仅中文 rime；日文 mozc 已移除）──
   i18n.inputMethod = {
     enable = true;
     type = "fcitx5";
@@ -84,10 +84,12 @@
       # GTK_IM_MODULE/QT_IM_MODULE；XMODIFIERS 仍保留给 XWayland 的微信/QQ 用）
       waylandFrontend = true;
       addons = with pkgs; [
-        fcitx5-rime
-        fcitx5-mozc
+        # 万象拼音走 GitHub 最新版（selfPackages.rime-wanxiang，见 pkgs/rime-wanxiang），
+        # 保留基础 rime-data（默认方案/符号），覆盖 nixpkgs 的 rime-wanxiang
+        (fcitx5-rime.override {
+          rimeDataPkgs = [ rime-data selfPackages.rime-wanxiang ];
+        })
         qt6Packages.fcitx5-chinese-addons   # 26.05 起从 pkgs 移到 qt6Packages
-        rime-wanxiang     # 26.05 移除 rime-wubi → 用万象（含五笔方案）
       ];
     };
   };
