@@ -23,4 +23,5 @@
   splayer-next   = import ./splayer-next   { inherit pkgs; };
   startlive      = import ./startlive      { inherit pkgs; };
   rime-wanxiang  = import ./rime-wanxiang  { inherit pkgs; };
+  ab-download-manager = import ./ab-download-manager { inherit pkgs; };
 }
