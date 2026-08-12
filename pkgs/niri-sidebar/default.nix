@@ -11,7 +11,7 @@ pkgs.rustPlatform.buildRustPackage (rec {
     owner = "Vigintillionn";
     repo  = "niri-sidebar";
     rev   = "954f62e7e395ae14f01af582296e25a548133dc0";
-    sha256 = "sha256-AJN43lsR24n0sd/8FvQOSksGaJpttQ6FzjeI2B+PgQ0=";
+    sha256 = "sha256-MYP1ZiwV9+yJh10zpuri6NQkQH1aYZjGBhXpZEaPZyI=";
   };
 
   # Upstream builds with `cargo build --release --locked`; we vendor from the
