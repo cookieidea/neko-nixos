@@ -136,23 +136,34 @@
 
   # ── 显示服务器 + 登录管理器 + 桌面（niri + Noctalia）─────
   # niri 是纯 Wayland 滚动平铺 compositor，不需要 X server。
-  # 用 greetd + tuigreet 作为登录管理器，登录后直接启动 niri。
-  services.greetd = lib.mkIf (desktop == "niri") {
+  # 登录管理器用 ly（nixpkgs 官方 displayManager 模块，PAM/systemd/config 全自动）。
+  services.displayManager.ly = {
     enable = true;
+    # 纯 Wayland（niri），ly 不需要管理 X server → 去掉 libxcb 依赖
+    x11Support = false;
     settings = {
-      autoLogin = {
-        enable = true;
-        user = username;
-      };
-      default_session = {
-        # tuigreet 列出可用 Wayland 会话；--cmd 直接指定 niri
-        command = "${pkgs.tuigreet}/bin/tuigreet --cmd ${pkgs.niri}/bin/niri --remember --user-menu";
-        user = username;
-      };
+      # ly 内部 PATH：加上 home-manager 用户 profile，
+      # 否则 niri 里启动的 fuzzel/foot 等找不到（home-manager useGlobalPkgs 下可留 sw/bin）
+      path = "/run/current-system/sw/bin:/home/${username}/.nix-profile/bin:/home/${username}/.nix-profile/sbin";
+      animation = "none";
     };
   };
-  # greetd 会自动配置 PAM；如需手动覆盖可加：
-  # security.pam.services.greetd.enable = true;
+  # niri 会话：注册为系统级 desktop 文件（ly 才能列出/启动）
+  services.displayManager.session = [{
+    name = "niri";
+    manage = "desktop";
+    start = ''
+      export PATH="/home/${username}/.nix-profile/bin:/run/current-system/sw/bin:$PATH"
+      exec ${pkgs.niri}/bin/niri
+    '';
+  }];
+  # 自动登录 cookie → 直接进 niri（ly 模块自动配 ly-autologin PAM）
+  services.displayManager.defaultSession = "niri";
+  services.displayManager.autoLogin = {
+    enable = true;
+    user = username;
+  };
+  # ly 的 PAM 服务（ly / ly-autologin）由 displayManager.ly 模块自动配置
 
   # GNOME（原 04d-gnome.sh，已弃用，保留以便回退）
   # services.desktopManager.gnome.enable = lib.mkIf (desktop == "gnome") true;
@@ -168,8 +179,7 @@
     # nm-connection-editor 已在 26.05 移除 → 用自带的 nmtui / nmcli 编辑连接
     # 磁盘/文件系统工具（对应 kde-common-applist）
     gparted dosfstools exfatprogs f2fs-tools udftools xfsprogs
-    # 登录管理器 greeter（niri 由 home.nix 的 programs.niri 安装）
-    tuigreet
+    # 登录管理器 ly 由 displayManager.ly 模块自动装入（见上方登录管理器配置）
     # virt-manager/libvirtd 后端（原 99-apps 的 qemu-full + swtpm；libvirtd 已 enable）
     qemu swtpm
     # X11 兼容层：xwayland-satellite（niri 25.08+ 开箱集成，binary 在 PATH 时

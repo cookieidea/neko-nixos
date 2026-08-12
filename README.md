@@ -2,7 +2,7 @@
 
 把 [SHORiN-KiWATA/shorin-arch-setup](https://github.com/SHORiN-KiWATA/shorin-arch-setup)（Arch Linux 一键配置脚本）转换成 **NixOS 26.05「Yarara」+ Home Manager** 的 flake 配置。
 
-桌面沿用原项目的 **niri（Wayland 滚动平铺 compositor）+ Noctalia（桌面 shell）**，登录管理器用 **greetd + tuigreet**，登录后直接进入 niri。
+桌面沿用原项目的 **niri（Wayland 滚动平铺 compositor）+ Noctalia（桌面 shell）**，登录管理器用 **ly**（nixpkgs `services.displayManager.ly` 模块），自动登录后直接进入 niri。
 
 ---
 

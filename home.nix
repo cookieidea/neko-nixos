@@ -89,7 +89,7 @@
     video-downloader                          # video-downloader（yt-dlp 图形前端）
 
     # --- niri 桌面生态依赖（config.kdl / binds.kdl 里用到的程序）---
-    niri                                       # niri 合成器本体（greetd 直接调，也放这里保持 PATH 一致）
+    niri                                       # niri 合成器本体（ly 直接调，也放这里保持 PATH 一致）
     kitty                                      # 终端（binds: Mod+Return / Mod+T / Mod+Slash / opencode）
     fuzzel                                     # 启动器兜底（binds: Mod+Z 失败回退 fuzzel）
     # 系统图标主题（noctalia 应用启动器/GTK 应用图标解析依赖 freedesktop 主题）

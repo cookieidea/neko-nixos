@@ -248,7 +248,7 @@ reboot
 
 ## 9. 装后验证
 
-- 启动应进 GRUB → 选 NixOS → 进 greetd 自动登录 niri。
+- 启动应进 GRUB → 选 NixOS → ly 自动登录进 niri。
 - 根真是 btrfs：`findmnt -n -o FSTYPE /` 应为 `btrfs`。
 - 子卷：`sudo btrfs subvolume list /`。
 - **zstd 压缩**：
