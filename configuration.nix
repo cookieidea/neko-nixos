@@ -117,7 +117,7 @@
     script = ''
       flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
       # 自动安装 Flatpak 应用（幂等）：微信 / QQ / Flatseal
-      flatpak install --noninteractive --or-update flathub com.tencent.WeChat org.tencent.qq com.github.tchx84.Flatseal
+      flatpak install --noninteractive --or-update flathub com.tencent.WeChat com.qq.QQ com.github.tchx84.Flatseal
     '';
     serviceConfig = {
       Type = "oneshot";
@@ -127,6 +127,9 @@
 
   # ── XDG 桌面门户 ──────────────────────────────────────────
   xdg.portal.enable = true;
+
+  # dconf（home-manager gtk 模块用 dconf 写 GTK 主题设置，需系统提供 dconf 的 DBus 激活服务）
+  programs.dconf.enable = true;
   # hyprland portal 作为兜底：部分 Wayland App（微信/会议）屏幕共享只认它
   xdg.portal.extraPortals = with pkgs; [ xdg-desktop-portal-gtk xdg-desktop-portal-gnome xdg-desktop-portal-hyprland ];
   xdg.portal.config.common.default = "gtk";
