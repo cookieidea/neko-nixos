@@ -90,6 +90,10 @@
     niri                                       # niri 合成器本体（greetd 直接调，也放这里保持 PATH 一致）
     kitty                                      # 终端（binds: Mod+Return / Mod+T / Mod+Slash / opencode）
     fuzzel                                     # 启动器兜底（binds: Mod+Z 失败回退 fuzzel）
+    # 系统图标主题（noctalia 应用启动器/GTK 应用图标解析依赖 freedesktop 主题）
+    adwaita-icon-theme                          # Adwaita 基底图标（默认 freedesktop 标准）
+    papirus-icon-theme                          # Papirus（丰富的应用图标，覆盖 Steam/Flatpak 等）
+    tabler-icons                                # noctalia settings.json iconMode=tabler 用的矢量图标
     thunar                                     # 文件管理器（binds: Mod+E）
     satty                                      # 截图标注（binds: Mod+Shift+S）
     cliphist                                   # 剪贴板历史（noctalia config.toml 的 clipboard watch 命令）
@@ -335,6 +339,17 @@
   # polkit 认证代理：NixOS 上没有 Arch 的 /usr/lib/polkit-gnome，
   # 改用 Home Manager 的 polkit-gnome 用户服务拉起。
   services.polkit-gnome.enable = true;
+
+  # ── GTK / Qt 图标主题（noctalia launcher、GTK 应用图标解析依赖 freedesktop 主题）──
+  # Adwaita 为基底（绝大多数 GTK 应用），Papirus 补 Steam/Flatpak 应用图标，
+  # Tabler 是 noctalia settings.json iconMode=tabler 用的矢量图标集。
+  dconf.settings = {
+    "org/gtk/gtk/settings" = {
+      gtk-icon-theme-name = "Adwaita";
+      gtk-theme-name = "adwaita";
+      gtk-application-prefer-dark-theme = true;
+    };
+  };
 
   # ============================================================
   #  不在 nixpkgs 的包 → 走 flake / 自行打包
