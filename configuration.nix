@@ -181,7 +181,7 @@
   # / 本身是 @ 子卷，让 snapper 正确处理 .snapshots 目录与快照子卷。
   # 快照默认存到 /.snapshots（即独立挂载的 @snapshots 子卷，回滚根时不带快照、更稳）。
   services.snapper = {
-    snapshotRootOnSubvol = true;
+    snapshotRootOnBoot = true;            # / 本身是 @ 子卷：开机时对根子卷打快照（26.05 由 snapshotRootOnSubvol 改名）
     configs."root" = {
       subvolume = "/";
       timelineCreate = true;          # 按时线自动快照
