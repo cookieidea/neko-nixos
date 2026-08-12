@@ -195,18 +195,18 @@
     "fish/functions/fwatch.fish".source = ./dotfiles/config/fish/functions/fwatch.fish;
     "fontconfig/fonts.conf".source = ./dotfiles/config/fontconfig/fonts.conf;
     "fuzzel/fuzzel.ini".source = ./dotfiles/config/fuzzel/fuzzel.ini;
-    "fuzzel/themes/noctalia".source = ./dotfiles/config/fuzzel/themes/noctalia;
+    # fuzzel/themes/noctalia 由 noctalia-shell 模板系统生成（matugen 写色），不可 home-manager 只读部署
     "gtk-3.0/bookmarks".source = ./dotfiles/config/gtk-3.0/bookmarks;
     "gtk-3.0/gtk.css".source = ./dotfiles/config/gtk-3.0/gtk.css;
-    "gtk-3.0/noctalia.css".source = ./dotfiles/config/gtk-3.0/noctalia.css;
+    # gtk-3.0/noctalia.css 由 noctalia 模板生成（matugen 写色），不部署
     "gtk-3.0/settings.ini".source = ./dotfiles/config/gtk-3.0/settings.ini;
     "gtk-4.0/gtk.css".source = ./dotfiles/config/gtk-4.0/gtk.css;
-    "gtk-4.0/noctalia.css".source = ./dotfiles/config/gtk-4.0/noctalia.css;
+    # gtk-4.0/noctalia.css 由 noctalia 模板生成（matugen 写色），不部署
     "gtk-4.0/settings.ini".source = ./dotfiles/config/gtk-4.0/settings.ini;
     "kitty/current-theme.conf".source = ./dotfiles/config/kitty/current-theme.conf;
     "kitty/kitty.conf".source = ./dotfiles/config/kitty/kitty.conf;
     "kitty/themes/kitty.conf".source = ./dotfiles/config/kitty/themes/kitty.conf;
-    "kitty/themes/noctalia.conf".source = ./dotfiles/config/kitty/themes/noctalia.conf;
+    # kitty/themes/noctalia.conf 由 noctalia 模板生成（matugen 写色），不部署
     "mimeapps.list".source = ./dotfiles/config/mimeapps.list;
     "mpv/config".source = ./dotfiles/config/mpv/config;
     "niri/animations.kdl".source = ./dotfiles/config/niri/animations.kdl;
@@ -219,48 +219,10 @@
     "niri/outputs.kdl".source = ./dotfiles/config/niri/outputs.kdl;
     "niri/supertab.kdl".source = ./dotfiles/config/niri/supertab.kdl;
     "niri/windowrules.kdl".source = ./dotfiles/config/niri/windowrules.kdl;
+    # v4 版 noctalia 配置（settings/plugins/colors/user-templates/templates/*）已全部移除：
+    # 不读取且 colors.json 等与 noctalia-shell 模板输出冲突（只读 symlink 无法写入）；
+    # 配色/主题模板由 noctalia-shell 的 matugen 模板系统生成（可写真实文件）。
     # v4 配置（JSON）：settings.json / plugins.json / colors.json / user-templates.toml
-    "noctalia/settings.json".source = ./dotfiles/config/noctalia/settings.json;
-    "noctalia/plugins.json".source = ./dotfiles/config/noctalia/plugins.json;
-    "noctalia/colors.json".source = ./dotfiles/config/noctalia/colors.json;
-    "noctalia/user-templates.toml".source = ./dotfiles/config/noctalia/user-templates.toml;
-    "noctalia/templates/btop.theme".source = ./dotfiles/config/noctalia/templates/btop.theme;
-    "noctalia/templates/cava-colors.ini".source = ./dotfiles/config/noctalia/templates/cava-colors.ini;
-    "noctalia/templates/fastfetch-config.jsonc".source = ./dotfiles/config/noctalia/templates/fastfetch-config.jsonc;
-    "noctalia/templates/fcitx5-theme.conf".source = ./dotfiles/config/noctalia/templates/fcitx5-theme.conf;
-    "noctalia/templates/fuzzel.ini".source = ./dotfiles/config/noctalia/templates/fuzzel.ini;
-    "noctalia/templates/gtk-folder/Adwaita-Matugen/index.theme".source = ./dotfiles/config/noctalia/templates/gtk-folder/Adwaita-Matugen/index.theme;
-    "noctalia/templates/gtk-folder/Adwaita-Matugen/scalable/mimetypes/application-x-addon.svg".source = ./dotfiles/config/noctalia/templates/gtk-folder/Adwaita-Matugen/scalable/mimetypes/application-x-addon.svg;
-    "noctalia/templates/gtk-folder/Adwaita-Matugen/scalable/mimetypes/application-x-executable.svg".source = ./dotfiles/config/noctalia/templates/gtk-folder/Adwaita-Matugen/scalable/mimetypes/application-x-executable.svg;
-    "noctalia/templates/gtk-folder/Adwaita-Matugen/scalable/mimetypes/audio-x-generic.svg".source = ./dotfiles/config/noctalia/templates/gtk-folder/Adwaita-Matugen/scalable/mimetypes/audio-x-generic.svg;
-    "noctalia/templates/gtk-folder/Adwaita-Matugen/scalable/mimetypes/font-x-generic.svg".source = ./dotfiles/config/noctalia/templates/gtk-folder/Adwaita-Matugen/scalable/mimetypes/font-x-generic.svg;
-    "noctalia/templates/gtk-folder/Adwaita-Matugen/scalable/mimetypes/inode-directory.svg".source = ./dotfiles/config/noctalia/templates/gtk-folder/Adwaita-Matugen/scalable/mimetypes/inode-directory.svg;
-    "noctalia/templates/gtk-folder/Adwaita-Matugen/scalable/mimetypes/text-html.svg".source = ./dotfiles/config/noctalia/templates/gtk-folder/Adwaita-Matugen/scalable/mimetypes/text-html.svg;
-    "noctalia/templates/gtk-folder/Adwaita-Matugen/scalable/mimetypes/text-x-script.svg".source = ./dotfiles/config/noctalia/templates/gtk-folder/Adwaita-Matugen/scalable/mimetypes/text-x-script.svg;
-    "noctalia/templates/gtk-folder/Adwaita-Matugen/scalable/mimetypes/x-office-document.svg".source = ./dotfiles/config/noctalia/templates/gtk-folder/Adwaita-Matugen/scalable/mimetypes/x-office-document.svg;
-    "noctalia/templates/gtk-folder/Adwaita-Matugen/scalable/mimetypes/x-office-presentation.svg".source = ./dotfiles/config/noctalia/templates/gtk-folder/Adwaita-Matugen/scalable/mimetypes/x-office-presentation.svg;
-    "noctalia/templates/gtk-folder/Adwaita-Matugen/scalable/places/folder-documents.svg".source = ./dotfiles/config/noctalia/templates/gtk-folder/Adwaita-Matugen/scalable/places/folder-documents.svg;
-    "noctalia/templates/gtk-folder/Adwaita-Matugen/scalable/places/folder-download.svg".source = ./dotfiles/config/noctalia/templates/gtk-folder/Adwaita-Matugen/scalable/places/folder-download.svg;
-    "noctalia/templates/gtk-folder/Adwaita-Matugen/scalable/places/folder-drag-accept.svg".source = ./dotfiles/config/noctalia/templates/gtk-folder/Adwaita-Matugen/scalable/places/folder-drag-accept.svg;
-    "noctalia/templates/gtk-folder/Adwaita-Matugen/scalable/places/folder-music.svg".source = ./dotfiles/config/noctalia/templates/gtk-folder/Adwaita-Matugen/scalable/places/folder-music.svg;
-    "noctalia/templates/gtk-folder/Adwaita-Matugen/scalable/places/folder-pictures.svg".source = ./dotfiles/config/noctalia/templates/gtk-folder/Adwaita-Matugen/scalable/places/folder-pictures.svg;
-    "noctalia/templates/gtk-folder/Adwaita-Matugen/scalable/places/folder-publicshare.svg".source = ./dotfiles/config/noctalia/templates/gtk-folder/Adwaita-Matugen/scalable/places/folder-publicshare.svg;
-    "noctalia/templates/gtk-folder/Adwaita-Matugen/scalable/places/folder-remote.svg".source = ./dotfiles/config/noctalia/templates/gtk-folder/Adwaita-Matugen/scalable/places/folder-remote.svg;
-    "noctalia/templates/gtk-folder/Adwaita-Matugen/scalable/places/folder-templates.svg".source = ./dotfiles/config/noctalia/templates/gtk-folder/Adwaita-Matugen/scalable/places/folder-templates.svg;
-    "noctalia/templates/gtk-folder/Adwaita-Matugen/scalable/places/folder-videos.svg".source = ./dotfiles/config/noctalia/templates/gtk-folder/Adwaita-Matugen/scalable/places/folder-videos.svg;
-    "noctalia/templates/gtk-folder/Adwaita-Matugen/scalable/places/folder.svg".source = ./dotfiles/config/noctalia/templates/gtk-folder/Adwaita-Matugen/scalable/places/folder.svg;
-    "noctalia/templates/gtk-folder/Adwaita-Matugen/scalable/places/network-server.svg".source = ./dotfiles/config/noctalia/templates/gtk-folder/Adwaita-Matugen/scalable/places/network-server.svg;
-    "noctalia/templates/gtk-folder/Adwaita-Matugen/scalable/places/network-workgroup.svg".source = ./dotfiles/config/noctalia/templates/gtk-folder/Adwaita-Matugen/scalable/places/network-workgroup.svg;
-    "noctalia/templates/gtk-folder/Adwaita-Matugen/scalable/places/user-bookmarks.svg".source = ./dotfiles/config/noctalia/templates/gtk-folder/Adwaita-Matugen/scalable/places/user-bookmarks.svg;
-    "noctalia/templates/gtk-folder/Adwaita-Matugen/scalable/places/user-desktop.svg".source = ./dotfiles/config/noctalia/templates/gtk-folder/Adwaita-Matugen/scalable/places/user-desktop.svg;
-    "noctalia/templates/gtk-folder/Adwaita-Matugen/scalable/places/user-home.svg".source = ./dotfiles/config/noctalia/templates/gtk-folder/Adwaita-Matugen/scalable/places/user-home.svg;
-    "noctalia/templates/gtk-folder/Adwaita-Matugen/scalable/places/user-trash.svg".source = ./dotfiles/config/noctalia/templates/gtk-folder/Adwaita-Matugen/scalable/places/user-trash.svg;
-    "noctalia/templates/gtk-folder/Adwaita-Matugen/scalable/status/folder-open.svg".source = ./dotfiles/config/noctalia/templates/gtk-folder/Adwaita-Matugen/scalable/status/folder-open.svg;
-    "noctalia/templates/gtk-folder/Adwaita-Matugen/scalable/status/user-trash-full.svg".source = ./dotfiles/config/noctalia/templates/gtk-folder/Adwaita-Matugen/scalable/status/user-trash-full.svg;
-    "noctalia/templates/gtk-folder/recolor.sh".source = ./dotfiles/config/noctalia/templates/gtk-folder/recolor.sh;
-    "noctalia/templates/pywalfox-colors.json".source = ./dotfiles/config/noctalia/templates/pywalfox-colors.json;
-    "noctalia/templates/starship-colors.toml".source = ./dotfiles/config/noctalia/templates/starship-colors.toml;
-    "noctalia/templates/yazi-theme.toml".source = ./dotfiles/config/noctalia/templates/yazi-theme.toml;
     # user-templates.toml 随上方 4 个 v4 JSON 一起部署（不再塞进 v5 的 config.toml）
     "qq-flags.conf".source = ./dotfiles/config/qq-flags.conf;
     "satty/config.toml".source = ./dotfiles/config/satty/config.toml;
