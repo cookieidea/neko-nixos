@@ -124,6 +124,21 @@
     power-profiles-daemon                      # 电源模式（平衡/省电/性能）
     cmatrix lolcat sl                          # 彩蛋趣味命令（原 02b 安装）
     wineWow64Packages.stable                   # wine（原 99-apps 的 wine 全家；26.05 弃用 wineWowPackages）
+
+    # ── 全量脚本审查补漏（04j-minimal-niri / 04k-noctalia 核对结果）──
+    matugen                                    # 主题生成器（random-anime-wallpaper-noctalia 与 noctalia-shell 模板直接调用）
+    imv                                        # 图片查看器（mimeapps.list 的 image/* 默认打开器）
+    breeze-cursors                             # 光标主题（cursor.kdl 指定 xcursor-theme "breeze_cursors"）
+    xhost                                      # XWayland 授权（config.kdl spawn-at-startup "xhost"；26.05 xorg 包集移到顶层）
+    pipewire                                   # 提供 pw-play（截图/强杀音效脚本依赖；服务已在 configuration.nix 开启）
+    qt6Packages.fcitx5-configtool              # fcitx5 配置 GUI（原 fcitx5-configtool；26.05 移到 qt6Packages）
+    tumbler                                    # thunar 缩略图后端（图片/文档缩略图，原 04j/04k 必装）
+    xdg-terminal-exec                          # 终端选择器（xdg-open 按 xdg-terminials.list 选 kitty）
+    adw-gtk-theme                              # libadwaita 主题（flatpak 应用 GTK_THEME=adw-gtk3-dark）
+    nwg-look                                   # GTK 主题设置（原脚本 + dotfiles 已部署 nwg-look/gsettings）
+    libgsf                                     # ODF/Office 文档缩略图（thunar，原 FM_PKGS2）
+    icoextract                                 # Windows exe/ico 图标缩略图（原 FM_PKGS1）
+    cava                                       # 音频可视化（终端彩蛋，原 04k TERM_PKGS）
   ] ++ [
 
   # opencode（AI 编程 Agent）走 flake 装，拿最新版（不在 nixpkgs 核心）。
