@@ -42,6 +42,8 @@ pkgs.stdenv.mkDerivation {
     runHook preInstall
     mkdir -p $out/bin $out/share/startlive
     cp -r . "$out/share/startlive/"
+    # nix store 源只读（444/555），cp 保留只读权限 → 先放开写权限再清理
+    chmod -R u+w "$out/share/startlive/"
     rm -rf "$out/share/startlive/.git"
 
     # velopack Linux stub（Windows 自动更新器在 Linux 下是 no-op）

@@ -22,6 +22,8 @@ pkgs.stdenv.mkDerivation {
     runHook preInstall
     mkdir -p $out/share/rime
     cp -r $src/. "$out/share/rime/"
+    # nix store 源只读（444/555），cp 保留只读权限 → 先放开写权限再清理
+    chmod -R u+w "$out/share/rime/"
     # 清理非 RIME 文件（保留 dicts/ custom/ lua/ 等运行时数据）
     rm -rf "$out/share/rime/.git" "$out/share/rime/.github" \
            "$out/share/rime/docs" "$out/share/rime/mkdocs.yml" \
