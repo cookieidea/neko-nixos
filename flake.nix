@@ -35,9 +35,16 @@
     opencode = {
       url = "git+https://github.com/GutMutCode/opencode-nix.git";
     };
+
+    # ── bili-danmaku-tui（B 站直播间弹幕 TUI，Go/bubbletea）──
+    # 自带 flake.nix（buildGoModule，vendorHash 已锁）；follows nixpkgs 复用本地镜像源
+    bili-danmaku-tui = {
+      url = "git+https://github.com/Youthdreamer/bili-danmaku-tui.git";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, nixpkgs, home-manager, nixvim, opencode, ... }:
+  outputs = { self, nixpkgs, home-manager, nixvim, opencode, bili-danmaku-tui, ... }:
     let
       system = "x86_64-linux";
       # ── 改这里 ──────────────────────────────────────────────
@@ -61,8 +68,8 @@
         home-manager.useGlobalPkgs = true;
         home-manager.useUserPackages = true;
         home-manager.users.${username} = import ./home.nix;
-        # 把 nixvim / opencode 两个 flake 输入，以及自构建包传给 home 配置
-        home-manager.extraSpecialArgs = { inherit desktop username nixvim opencode selfPackages; };
+        # 把 nixvim / opencode / bili-danmaku-tui 三个 flake 输入，以及自构建包传给 home 配置
+        home-manager.extraSpecialArgs = { inherit desktop username nixvim opencode bili-danmaku-tui selfPackages; };
       };
     in {
       # 暴露自构建派生为 flake 包：可单独 `nix build .#<name>`

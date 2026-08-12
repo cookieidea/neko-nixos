@@ -7,7 +7,7 @@
 # 编辑器：nixvim（替代 neovim + lazyvim）
 # AUR-only 与 nixpkgs 差异见底部注释。
 
-{ config, pkgs, lib, desktop, username, nixvim, opencode, selfPackages, ... }:
+{ config, pkgs, lib, desktop, username, nixvim, opencode, bili-danmaku-tui, selfPackages, ... }:
 
 {
   imports = [
@@ -157,6 +157,9 @@
     selfPackages.shorin-contrib   # shorin-contrib-git
     selfPackages.proton-wrapper   # shorin-proton-wrapper-git
     selfPackages.splayer-next     # SPlayer-Dev/SPlayer-Next（非 nixpkgs 的 splayer）
+    selfPackages.startlive        # StartLive（B 站推流地址获取，PySide6 GUI；自构建）
+    # 走 flake 输入的包（不在 nixpkgs 核心，直接引用其 flake 构建产物）
+    bili-danmaku-tui.packages.${pkgs.stdenv.hostPlatform.system}.default  # B 站直播间弹幕 TUI
   ];
 
   # ============================================================

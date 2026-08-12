@@ -21,4 +21,5 @@
   shorin-contrib = import ./shorin-contrib { inherit pkgs; };
   proton-wrapper = import ./proton-wrapper { inherit pkgs; };
   splayer-next   = import ./splayer-next   { inherit pkgs; };
+  startlive      = import ./startlive      { inherit pkgs; };
 }
