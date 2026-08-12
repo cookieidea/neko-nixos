@@ -95,12 +95,12 @@
     libnotify                                 # notify-send（niri-pick / niri-force-kill-window / screenshot-sound.sh 的通知依赖）
     xsettingsd                                 # GTK 主题/字体经 XSETTINGS 注入应用（niri 无 DE 时需要）
     xorg.xprop                                 # niri-force-kill-window 的 XWayland 进程树判定依赖
-  ];
+  ] ++ [
 
   # opencode（AI 编程 Agent）走 flake 装，拿最新版（不在 nixpkgs 核心）。
   # noctalia-shell（桌面 shell，quickshell 配置 + qs 封装）直接用 nixpkgs 自带的
   # `noctalia-shell` 包，不再用独立的 noctalia v4 应用（见文末注释）。
-  ++ [
+
     opencode.packages.${pkgs.stdenv.hostPlatform.system}.default
     pkgs.noctalia-shell
   ]
