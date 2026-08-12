@@ -339,14 +339,18 @@
   # 改用 Home Manager 的 polkit-gnome 用户服务拉起。
   services.polkit-gnome.enable = true;
 
-  # ── GTK / Qt 图标主题（noctalia launcher、GTK 应用图标解析依赖 freedesktop 主题）──
-  # Adwaita 为基底（绝大多数 GTK 应用），Papirus 补 Steam/Flatpak 应用图标，
-  # Tabler 是 noctalia settings.json iconMode=tabler 用的矢量图标集。
-  dconf.settings = {
-    "org/gtk/gtk/settings" = {
-      gtk-icon-theme-name = "Adwaita";
-      gtk-theme-name = "adwaita";
-      gtk-application-prefer-dark-theme = true;
+  # ── GTK 图标主题（noctalia launcher、GTK 应用图标解析依赖 freedesktop 主题）──
+  # Adwaita 为基底（绝大多数 GTK 应用），Papirus 装好备用（覆盖 Steam/Flatpak 图标）。
+  # 用 home-manager 的 gtk 模块（写 settings.ini，不依赖 DBus/dconf，激活稳定）。
+  gtk = {
+    enable = true;
+    iconTheme = {
+      name = "Adwaita";
+      package = pkgs.adwaita-icon-theme;
+    };
+    theme = {
+      name = "adwaita";
+      package = pkgs.gnome-themes-extra;
     };
   };
 
