@@ -3,9 +3,10 @@
 
   inputs = {
     # 国内镜像（清华 TUNA git 镜像，加速 nixpkgs / home-manager 源码拉取）
-    nixpkgs.url = "git+https://mirrors.tuna.tsinghua.edu.cn/git/nixpkgs.git?ref=nixos-26.05";
+    # 注意 TUNA git 镜像路径必须带所有者前缀：git/<owner>/<repo>.git
+    nixpkgs.url = "git+https://mirrors.tuna.tsinghua.edu.cn/git/NixOS/nixpkgs.git?ref=nixos-26.05";
     home-manager = {
-      url = "git+https://mirrors.tuna.tsinghua.edu.cn/git/home-manager.git?ref=release-26.05";
+      url = "git+https://mirrors.tuna.tsinghua.edu.cn/git/rycee/home-manager.git?ref=release-26.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
