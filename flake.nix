@@ -2,7 +2,7 @@
   description = "Shorin Arch Setup (shorin-arch-setup) → NixOS + Home Manager conversion";
 
   # 国内二进制缓存（清华 TUNA）。仅加速「包下载」，不影响 flake 源码拉取。
-  # nixpkgs 源码走 TUNA git 镜像；home-manager/nixvim/opencode/nixos-wsl TUNA 未镜像，走 github
+  # nixpkgs 源码走 TUNA git 镜像；home-manager/nixvim/opencode TUNA 未镜像，走 github
   # （慢但可用；若 github 被墙可加代理或换镜像）。
   nixConfig = {
     extra-substituters = [ "https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store" ];
@@ -35,14 +35,9 @@
     opencode = {
       url = "git+https://github.com/GutMutCode/opencode-nix.git";
     };
-
-    # ── NixOS-WSL（Windows Subsystem for Linux 支持，供 `.#wsl` 配置用）──
-    nixos-wsl = {
-      url = "git+https://github.com/nix-community/NixOS-WSL.git";
-    };
   };
 
-  outputs = { self, nixpkgs, home-manager, nixvim, opencode, nixos-wsl, ... }:
+  outputs = { self, nixpkgs, home-manager, nixvim, opencode, ... }:
     let
       system = "x86_64-linux";
       # ── 改这里 ──────────────────────────────────────────────
@@ -55,7 +50,7 @@
       pkgs = nixpkgs.legacyPackages.${system};
       selfPackages = import ./pkgs { inherit pkgs; };
 
-      # 公共 Home Manager 集成模块（nixos 实体机 与 wsl 两个配置共用）
+      # 公共 Home Manager 集成模块（nixos 实体机配置用）
       hmModule = {
         _module.args = { inherit desktop username; };
 
@@ -79,18 +74,6 @@
           modules = [
             ./hardware-configuration.nix
             ./configuration.nix
-            hmModule
-          ];
-        };
-
-        # ── WSL（Windows Subsystem for Linux，WSLg 跑 niri + Noctalia）──
-        # 复用 configuration.nix 的公共部分，wsl.nix 用 mkForce 覆盖实体机专属项。
-        wsl = nixpkgs.lib.nixosSystem {
-          inherit system;
-          modules = [
-            nixos-wsl.nixosModules.default
-            ./configuration.nix
-            ./wsl.nix
             hmModule
           ];
         };
