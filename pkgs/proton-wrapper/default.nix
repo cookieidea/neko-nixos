@@ -7,11 +7,9 @@ pkgs.stdenv.mkDerivation {
   pname = "shorin-proton-wrapper";
   version = "unstable-2026-08-12";
 
-  src = pkgs.fetchFromGitHub {
-    owner = "SHORiN-KiWATA";
-    repo  = "proton-wrapper";
-    rev   = "7e70126ecae420f00783d0375b72451c06956549";
-    sha256 = "sha256-+bUCpkPlaXdUqiEQaqCCKloObB+OXlukpUg3NI0PpzQ=";
+  src = builtins.fetchGit {
+    url = "https://github.com/SHORiN-KiWATA/proton-wrapper";
+    rev = "7e70126ecae420f00783d0375b72451c06956549";
   };
 
   nativeBuildInputs = [ pkgs.makeWrapper ];

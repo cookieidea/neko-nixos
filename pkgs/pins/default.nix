@@ -7,11 +7,9 @@ pkgs.stdenv.mkDerivation {
   pname = "pins";
   version = "2.4.5-unstable-2026-08-12";
 
-  src = pkgs.fetchFromGitHub {
-    owner = "fabrialberio";
-    repo  = "Pins";
-    rev   = "d1b7bace3307d5723522045df36d8f823af02d48";
-    sha256 = "sha256-8fkz8Edy1MysAJmGpVZ5IHkFDhGCC3ZyijqyyOxbqlY=";
+  src = builtins.fetchGit {
+    url = "https://github.com/fabrialberio/Pins";
+    rev = "d1b7bace3307d5723522045df36d8f823af02d48";
   };
 
   nativeBuildInputs = [ pkgs.meson pkgs.ninja pkgs.pkg-config pkgs.wrapGAppsHook ];

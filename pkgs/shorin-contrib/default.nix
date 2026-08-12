@@ -11,11 +11,9 @@ pkgs.stdenv.mkDerivation {
   pname = "shorin-contrib";
   version = "unstable-2026-08-12";
 
-  src = pkgs.fetchFromGitHub {
-    owner = "SHORiN-KiWATA";
-    repo  = "shorin-contrib";
-    rev   = "1a7cc34c54dd734c64ed4fd202c74ffaf7c26ec1";
-    sha256 = "sha256-1kGetis8TpuMphAITVq/thpdrCFudVtMloHE8l7Cckk=";
+  src = builtins.fetchGit {
+    url = "https://github.com/SHORiN-KiWATA/shorin-contrib";
+    rev = "1a7cc34c54dd734c64ed4fd202c74ffaf7c26ec1";
   };
 
   installPhase = ''

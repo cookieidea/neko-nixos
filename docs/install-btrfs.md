@@ -399,6 +399,9 @@ sudo nixos-rebuild switch
 13. **`nerdfonts` 不存在（26.05 已删）**：改名 `nerd-fonts` 且改为每字体一属性
     （`nerd-fonts.jetbrains-mono`），不接受 `override { fonts = [...] }`；MapleMono 不在其
     manifest，nixpkgs 也无独立包。仓库已改。
-14. **自构建包报 `invalid hash` / fetch 失败**：`pkgs/*/default.nix` 的 sha256 必须是
-    SRI 格式（`sha256-` + 44 位 base64，`nix-prefetch-url` 生成），不能手写 64 位 hex。
-    仓库 6 个包已全部换成实测哈希。
+14. **自构建包报 `invalid hash` / hash mismatch**：`pkgs/*/default.nix` 的 sha256 必须是
+    SRI 格式（`sha256-` + 44 位 base64，`nix-prefetch-url` / `nix store prefetch-file` 生成），
+    不能手写 64 位 hex。⚠️ 且 **GitHub codeload 的 tar.gz 对不同网络/客户端会生成不同字节**
+    （同一 rev 宿主机与 VM 实测哈希不同）——GitHub 仓库源一律改用 `builtins.fetchGit`
+    （按 commit 内容寻址、免哈希、确定性）；GitHub release 静态资源与 PyPI sdist 哈希稳定，
+    可继续用 fetchurl/fetchPypi。仓库已按此处理。
