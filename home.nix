@@ -97,6 +97,21 @@
     papirus-icon-theme                          # Papirus（丰富的应用图标，覆盖 Steam/Flatpak 等）
     thunar                                     # 文件管理器（binds: Mod+E 优先）
     nautilus                                    # nautilus（GNOME Files，binds: Mod+Alt+E / Mod+E 兜底）
+    # ── 原 04k 脚本的文件管理器生态（全量迁移）──
+    gnome-keyring                             # 密钥环（登录钥匙串，nautilus/远程/应用依赖）
+    gvfs                                      # 虚拟文件系统（smb/mtp/gphoto2 挂载）
+    ffmpegthumbnailer                         # 视频缩略图（thunar/nautilus）
+    file-roller                               # 归档 GUI（= ark 的 GNOME 版）
+    thunar-archive-plugin                     # thunar 归档插件
+    thunar-volman                             # thunar 卷管理
+    webp-pixbuf-loader                        # webp 缩略图
+    poppler                                   # PDF 缩略图（libpoppler-glib）
+    gst_all_1.gst-plugins-base                # GStreamer 基础插件
+    gst_all_1.gst-plugins-good                # GStreamer 常规插件
+    gst_all_1.gst-libav                       # GStreamer libav（解码）
+    usbutils                                  # lsusb
+    pciutils                                  # lspci
+    font-awesome                              # Font Awesome 图标字体（原 otf-font-awesome）
     satty                                      # 截图标注（binds: Mod+Shift+S）
     cliphist                                   # 剪贴板历史（noctalia config.toml 的 clipboard watch 命令）
     wl-clipboard                               # wl-paste / wl-copy（剪贴板 + 截图管道）
