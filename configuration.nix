@@ -18,7 +18,11 @@
   # 用 extra-substituters 追加，不覆盖默认源；镜像不可达时 Nix 自动回退官方
   # cache.nixos.org（内容镜像，沿用官方公钥，无需额外 trusted key）。
   nix.settings.extra-substituters = [ "https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store" ];
-  nixpkgs.config.allowUnfree = true;   # steam / wechat-uos / 部分驱动需要
+  nixpkgs.config = {
+    allowUnfree = true;   # steam / wechat-uos / 部分驱动需要
+    # animeko 因 JetBrains JCEF 变更被 nixpkgs 标 broken（运行期风险，构建一般能过）；放行评估
+    problems.handlers.animeko.broken = "warn";
+  };
   security.polkit.enable = true;        # polkit 认证（Noctalia / 系统设置需要）
 
   # ── 自动垃圾回收 / store 去重（防滚版本撑爆 /）────────────
