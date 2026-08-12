@@ -48,7 +48,7 @@
     # BlueArchive GRUB 主题（opendesktop p/2329987，游戏开发部全员 5 款配色）：
     #   yuzu(柚子) / tao(桃) / nagisa(渚) / aris(爱丽丝) / midori(绿)
     #   —— 想换配色改这里即可（midori 主题目录无子目录，其余为 <名>/Alice）
-    theme = ./grub-theme/yuzu/Alice;
+    theme = ./grub-theme/aris/Alice;   # aris = 爱丽丝
   };
   # ── 文件系统支持（btrfs 根分区 + initrd 挂载）────────────
   boot.supportedFilesystems = [ "btrfs" ];
