@@ -138,8 +138,8 @@
       flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
       # 切国内镜像：中科大（动态缓存 + 302 回源）；USTC 挂了就换官方（注释掉下行）
       flatpak remote-modify flathub --url=https://mirrors.ustc.edu.cn/flathub
-      # 自动安装 Flatpak 应用（幂等）：微信 / QQ / Flatseal / Bazaar / OpenOrpheus / Telegram Desktop
-      flatpak install --noninteractive --or-update flathub com.tencent.WeChat com.qq.QQ com.github.tchx84.Flatseal io.github.kolunmi.Bazaar io.github.yucling.open-orpheus org.telegram.desktop
+      # 自动安装 Flatpak 应用（幂等）：微信 / QQ / Flatseal / Bazaar / OpenOrpheus
+      flatpak install --noninteractive --or-update flathub com.tencent.WeChat com.qq.QQ com.github.tchx84.Flatseal io.github.kolunmi.Bazaar io.github.yucling.open-orpheus
     '';
     serviceConfig = {
       Type = "oneshot";
