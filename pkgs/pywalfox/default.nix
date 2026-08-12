@@ -16,6 +16,7 @@ pkgs.python3Packages.buildPythonApplication {
   src = pkgs.fetchPypi {
     pname = "pywalfox";
     version = "2.9.0";
+    sha256 = "sha256-ig3uT3rfp4YJMUkF8kXl2hu01/DRyuej2lbE4oTdNQE=";
   };
 
   # The native host has no Python runtime deps; at runtime it reads the

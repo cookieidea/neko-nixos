@@ -15,7 +15,7 @@ pkgs.stdenv.mkDerivation {
     owner = "SHORiN-KiWATA";
     repo  = "shorin-contrib";
     rev   = "1a7cc34c54dd734c64ed4fd202c74ffaf7c26ec1";
-    sha256 = "sha256-d6419eb62b3c4e9b8ca610084d5abfb61a5dac216e755b4c9681c4f25ec27249";
+    sha256 = "sha256-1kGetis8TpuMphAITVq/thpdrCFudVtMloHE8l7Cckk=";
   };
 
   installPhase = ''

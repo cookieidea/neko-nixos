@@ -11,7 +11,7 @@ pkgs.stdenv.mkDerivation {
     owner = "SHORiN-KiWATA";
     repo  = "proton-wrapper";
     rev   = "7e70126ecae420f00783d0375b72451c06956549";
-    sha256 = "sha256-f9b502a643e5697754aa21106aa0822a5a0e6c1f8e5e5ba4a54837348d0fa734";
+    sha256 = "sha256-+bUCpkPlaXdUqiEQaqCCKloObB+OXlukpUg3NI0PpzQ=";
   };
 
   nativeBuildInputs = [ pkgs.makeWrapper ];

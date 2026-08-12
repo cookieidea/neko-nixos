@@ -15,11 +15,12 @@
 # To build from source instead, use the AUR `splayer-next-git` PKGBUILD as a
 # reference and adapt it into a `pkgs.buildFHSUserEnv` derivation — but expect
 # to iterate (electron version pin, ffmpeg patch, native module compile).
-pkgs.appimage-run {
-  name = "splayer-next";
+pkgs.appimageTools.wrapType2 {
+  pname = "splayer-next";
+  version = "1.0.0";
   src = pkgs.fetchurl {
     url = "https://github.com/SPlayer-Dev/SPlayer-Next/releases/download/v1.0.0/splayer-next-1.0.0-x86_64.AppImage";
-    sha256 = "sha256-d756900f183be90b471bc72e44519945be62b3535ee587ab70f5da23c95af548";
+    sha256 = "sha256-11aQDxg76QtHG8cuRFGZRb5is1Ne5YercPXaI8la9Ug=";
   };
   extraPkgs = pkgs: with pkgs; [ ffmpeg ];
 }

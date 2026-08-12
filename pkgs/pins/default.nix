@@ -11,7 +11,7 @@ pkgs.stdenv.mkDerivation {
     owner = "fabrialberio";
     repo  = "Pins";
     rev   = "d1b7bace3307d5723522045df36d8f823af02d48";
-    sha256 = "sha256-f1f933f04772d4ccac009986a556792079050e11820b76728a3ab2c8ec5baa56";
+    sha256 = "sha256-8fkz8Edy1MysAJmGpVZ5IHkFDhGCC3ZyijqyyOxbqlY=";
   };
 
   nativeBuildInputs = [ pkgs.meson pkgs.ninja pkgs.pkg-config pkgs.wrapGAppsHook ];

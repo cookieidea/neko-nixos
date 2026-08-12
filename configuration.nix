@@ -93,8 +93,8 @@
 
   # ── GPU 驱动（AMD Radeon RX 6750 GRE 10G，RDNA2 / Navi 22；CPU i5-12400F 无核显）──
   # 单卡 AMD 独显：amdgpu 内核驱动 + mesa（OpenGL / Vulkan(RADV) / VA-API 硬件解码）。
-  hardware.opengl.enable = true;
-  hardware.opengl.extraPackages = with pkgs; [
+  hardware.graphics.enable = true;          # 26.05 由 hardware.opengl 改名（旧名仅剩弃用警告）
+  hardware.graphics.extraPackages = with pkgs; [
     vulkan-loader   # Vulkan ICD 加载器（RADV 由 mesa 提供，6750 GRE 走 RADV）
     libva           # VA-API 加载器（AMD 硬件解码走 mesa 的 radeonsi VA 驱动）
   ];
@@ -169,7 +169,7 @@
     noto-fonts-cjk-sans
     sarasa-gothic
     jetbrains-mono
-    (nerdfonts.override { fonts = [ "JetBrainsMono" "MapleMono" ]; })
+    nerd-fonts.jetbrains-mono     # 26.05 起 nerdfonts 改名 nerd-fonts 且改为按字体属性取（MapleMono 不在其清单，暂缺）
   ];
 
   # ── 应用级服务（对应 scripts 中的 enable 步骤）──────────
