@@ -154,7 +154,7 @@
   # ── 系统级包（少量，其余都在 home.nix）──────────────────
   environment.systemPackages = with pkgs; [
     git
-    nm-connection-editor
+    # nm-connection-editor 已在 26.05 移除 → 用自带的 nmtui / nmcli 编辑连接
     # 磁盘/文件系统工具（对应 kde-common-applist）
     gparted dosfstools exfatprogs f2fs-tools udftools xfsprogs
     # 登录管理器 greeter（niri 由 home.nix 的 programs.niri 安装）

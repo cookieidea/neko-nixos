@@ -78,7 +78,7 @@
     # --- 游戏 / 影音客户端（用户新增，已在 nixpkgs 26.05 核实存在）---
     hmcl                                      # hmcl（Minecraft 启动器，开源 GPL）
     animeko                                   # animeko（一站式追番/看番平台，开源 AGPL-3.0；替代原计划的 kazumi）
-    lunarclient                                # lunarclient（Minecraft 客户端，unfree，allowUnfree 已在 configuration.nix 开启）
+    lunar-client                               # lunar-client（Minecraft 客户端，unfree；26.05 由 lunarclient 改名）
     taterclient-ddnet                         # taterclient-ddnet（DDNet Teeworlds 修改版客户端，Apache-2.0）
 
     # --- 原清单里有、之前漏加的 ---
