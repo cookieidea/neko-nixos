@@ -387,3 +387,18 @@ sudo nixos-rebuild switch
     `numberLimit`→`NUMBER_LIMIT` …）。`subvolume`/`fstype` 残留会报 assertion；
     其余旧 camelCase 键不报错但写出无效小写键，snapper 不认 → 快照静默不生效。
     仓库已全部改成大写键（第 10 节）。
+11. **`git pull` 报 `TLS connect error: error:0A000126:SSL routines::unexpected eof`**：
+    github 直连 + HTTP/2 在部分网络环境会被掐。先强制 HTTP/1.1 再拉：
+    `git config --global http.version HTTP/1.1 && git pull origin main`；
+    仍失败就换镜像拉：`git pull https://gitclone.com/github.com/<owner>/<repo>.git main`
+    或 gh 代理 `https://ghfast.top/https://github.com/<owner>/<repo>.git`。
+12. **`git pull` 被本地改动挡住（"Your local changes would be overwritten"）**：安装中手动 sed
+    改过 `configuration.nix`（如 snapper 大写键）时，远端提交已包含相同修复 → 直接
+    `git checkout -- configuration.nix` 丢弃本地改动再 pull（**不要** `git reset --hard`，
+    会连 staged 的 `hardware-configuration.nix` 一起清掉）。
+13. **`nerdfonts` 不存在（26.05 已删）**：改名 `nerd-fonts` 且改为每字体一属性
+    （`nerd-fonts.jetbrains-mono`），不接受 `override { fonts = [...] }`；MapleMono 不在其
+    manifest，nixpkgs 也无独立包。仓库已改。
+14. **自构建包报 `invalid hash` / fetch 失败**：`pkgs/*/default.nix` 的 sha256 必须是
+    SRI 格式（`sha256-` + 44 位 base64，`nix-prefetch-url` 生成），不能手写 64 位 hex。
+    仓库 6 个包已全部换成实测哈希。
