@@ -1,11 +1,15 @@
 {
   description = "Shorin Arch Setup (shorin-arch-setup) → NixOS + Home Manager conversion";
 
-  # 国内二进制缓存（清华 TUNA）。仅加速「包下载」，不影响 flake 源码拉取。
+  # 国内二进制缓存（清华 TUNA + 中科大 USTC 双源）。仅加速「包下载」，不影响 flake 源码拉取。
   # nixpkgs 源码走 TUNA git 镜像；home-manager/nixvim/opencode TUNA 未镜像，走 github
   # （慢但可用；若 github 被墙可加代理或换镜像）。
   nixConfig = {
-    extra-substituters = [ "https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store" ];
+    extra-substituters = [
+      "https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store"
+      "https://mirrors.ustc.edu.cn/nix-channels/store"
+      "https://attic.xuyh0120.win/lantian"
+    ];
     extra-trusted-public-keys = [ "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY=" ];
   };
 
