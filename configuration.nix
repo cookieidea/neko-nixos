@@ -190,7 +190,8 @@
   # ── 字体（对应 ttf-jetbrains-mono-nerd / maple / noto-cjk）─
   fonts.packages = with pkgs; [
     noto-fonts-cjk-sans
-    noto-fonts-emoji
+    # 26.05 改名：noto-fonts-emoji → noto-fonts-color-emoji
+    noto-fonts-color-emoji
     sarasa-gothic
     jetbrains-mono
     nerd-fonts.jetbrains-mono     # 26.05 起 nerdfonts 改名 nerd-fonts 且改为按字体属性取（MapleMono 不在其清单，暂缺）

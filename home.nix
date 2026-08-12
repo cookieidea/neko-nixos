@@ -123,7 +123,7 @@
     # ── 原 02b/99-apps 补充 ──
     power-profiles-daemon                      # 电源模式（平衡/省电/性能）
     cmatrix lolcat sl                          # 彩蛋趣味命令（原 02b 安装）
-    wineWowPackages.stable                     # wine（原 99-apps 的 wine 全家）
+    wineWow64Packages.stable                   # wine（原 99-apps 的 wine 全家；26.05 弃用 wineWowPackages）
   ] ++ [
 
   # opencode（AI 编程 Agent）走 flake 装，拿最新版（不在 nixpkgs 核心）。
