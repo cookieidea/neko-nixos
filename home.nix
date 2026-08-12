@@ -215,6 +215,7 @@
   #  通过 xdg.configFile 部署到 ~/.config/
   # ============================================================
   xdg.configFile = {
+    "MangoHud/MangoHud.conf".source = ./dotfiles/config/MangoHud/MangoHud.conf;
     "Thunar/accels.scm".source = ./dotfiles/config/Thunar/accels.scm;
     "Thunar/uca.xml".source = ./dotfiles/config/Thunar/uca.xml;
     "fcitx5/conf/cached_layouts".source = ./dotfiles/config/fcitx5/conf/cached_layouts;
@@ -273,6 +274,9 @@
   };
 
   home.file = {
+    # ── 壁纸（原 resources/Wallpapers，noctalia 壁纸轮播/随机切换依赖 ~/Pictures/Wallpapers）──
+    "Pictures/Wallpapers/wallhaven-d88d53.png".source = ./dotfiles/Pictures/Wallpapers/wallhaven-d88d53.png;
+    "Pictures/Wallpapers/wallhaven-yq8w67.jpg".source = ./dotfiles/Pictures/Wallpapers/wallhaven-yq8w67.jpg;
     # 原 .gtkrc-2.0 内容已并入 gtk.gtk2.extraConfig（fcitx 输入法），不再手动部署避免模块冲突
     ".local/bin/random-anime-wallpaper-noctalia" = {
       source = ./dotfiles/local/bin/random-anime-wallpaper-noctalia;
