@@ -2,7 +2,7 @@
   description = "Shorin Arch Setup (shorin-arch-setup) → NixOS + Home Manager conversion";
 
   # 国内二进制缓存（清华 TUNA）。仅加速「包下载」，不影响 flake 源码拉取。
-  # nixpkgs 源码走 TUNA git 镜像；home-manager/nixvim/opencode TUNA 未镜像，走 github
+  # nixpkgs 源码走 TUNA git 镜像；home-manager/nixvim/opencode/nixos-wsl TUNA 未镜像，走 github
   # （慢但可用；若 github 被墙可加代理或换镜像）。
   nixConfig = {
     extra-substituters = [ "https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store" ];
@@ -35,9 +35,14 @@
     opencode = {
       url = "git+https://github.com/GutMutCode/opencode-nix.git";
     };
+
+    # ── NixOS-WSL（Windows Subsystem for Linux 支持，供 `.#wsl` 配置用）──
+    nixos-wsl = {
+      url = "git+https://github.com/nix-community/NixOS-WSL.git";
+    };
   };
 
-  outputs = { self, nixpkgs, home-manager, nixvim, opencode, ... }:
+  outputs = { self, nixpkgs, home-manager, nixvim, opencode, nixos-wsl, ... }:
     let
       system = "x86_64-linux";
       # ── 改这里 ──────────────────────────────────────────────
@@ -49,26 +54,46 @@
       # 自构建程序（AUR `-git` / 私有仓库）的派生，见 ./pkgs
       pkgs = nixpkgs.legacyPackages.${system};
       selfPackages = import ./pkgs { inherit pkgs; };
+
+      # 公共 Home Manager 集成模块（nixos 实体机 与 wsl 两个配置共用）
+      hmModule = {
+        _module.args = { inherit desktop username; };
+
+        # Home Manager 集成
+        home-manager.useGlobalPkgs = true;
+        home-manager.useUserPackages = true;
+        home-manager.users.${username} = import ./home.nix;
+        # 把 nixvim / opencode 两个 flake 输入，以及自构建包传给 home 配置
+        home-manager.extraSpecialArgs = { inherit desktop username nixvim opencode selfPackages; };
+      };
     in {
       # 暴露自构建派生为 flake 包：可单独 `nix build .#<name>`
       packages.${system} = selfPackages;
 
-      nixosConfigurations.${hostname} = nixpkgs.lib.nixosSystem {
-        inherit system;
-        modules = [
-          ./configuration.nix
-          home-manager.nixosModules.home-manager
-          {
-            _module.args = { inherit desktop username; };
+      nixosConfigurations = {
+        # ── 实体机（btrfs + GRUB + snapper + 休眠）──
+        # hardware-configuration.nix 由 `nixos-generate-config --root /mnt` 在目标机生成，
+        # 需 `git add hardware-configuration.nix` 后才会被 flake 包含。
+        ${hostname} = nixpkgs.lib.nixosSystem {
+          inherit system;
+          modules = [
+            ./hardware-configuration.nix
+            ./configuration.nix
+            hmModule
+          ];
+        };
 
-            # Home Manager 集成
-            home-manager.useGlobalPkgs = true;
-            home-manager.useUserPackages = true;
-            home-manager.users.${username} = import ./home.nix;
-            # 把 nixvim / opencode 两个 flake 输入，以及自构建包传给 home 配置
-            home-manager.extraSpecialArgs = { inherit desktop username nixvim opencode selfPackages; };
-          }
-        ];
+        # ── WSL（Windows Subsystem for Linux，WSLg 跑 niri + Noctalia）──
+        # 复用 configuration.nix 的公共部分，wsl.nix 用 mkForce 覆盖实体机专属项。
+        wsl = nixpkgs.lib.nixosSystem {
+          inherit system;
+          modules = [
+            nixos-wsl.nixosModules.default
+            ./configuration.nix
+            ./wsl.nix
+            hmModule
+          ];
+        };
       };
     };
 }

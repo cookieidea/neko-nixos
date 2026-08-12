@@ -3,11 +3,8 @@
 { config, pkgs, lib, desktop, username, ... }:
 
 {
-  imports = [
-    # 硬件配置（磁盘/filesystems/EFI/swap 等），由 `nixos-generate-config --root /mnt` 生成。
-    # 全新安装（minimal ISO）时务必先生成它，否则 nixos-install 会因缺根分区挂载而失败。
-    ./hardware-configuration.nix
-  ];
+  # ⚠️ hardware-configuration.nix 的 import 已移到 flake.nix 的实体机配置（nixos）里——
+  #    WSL 配置（.#wsl）不引入它。实体机装好系统后请保持该文件被 git add（flake 只认跟踪文件）。
 
   # ── 最新内核（AMD RX 6750 GRE 用新内核 amdgpu 支持更好）──
   boot.kernelPackages = pkgs.linuxPackages_latest;
