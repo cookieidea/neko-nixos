@@ -281,7 +281,7 @@ systemctl hibernate
 
 ```nix
 services.snapper = {
-  snapshotRootOnSubvol = true;        # / 本身是 @ 子卷
+  snapshotRootOnBoot = true;         # / 本身是 @ 子卷：开机时对根子卷打快照（26.05 由 snapshotRootOnSubvol 改名）
   configs."root" = {
     subvolume = "/";
     timelineCreate = true;
@@ -371,3 +371,6 @@ sudo nixos-rebuild switch
    `systemd.services.flatpak-repo` one-shot 服务（仓库已修）。
 8. **`services.grub-btrfs does not exist`**：26.05 移除该模块（停止维护），GRUB 不再列快照
    子菜单；回滚走 generation + snapper（第 10 步，仓库已移除该块）。
+9. **`services.snapper.snapshotRootOnSubvol does not exist`**：26.05 把该 option
+   **改名**为 `services.snapper.snapshotRootOnBoot`（根在 @ 子卷时改成开机对根子卷打快照）。
+   仓库 `configuration.nix` 与本文第 10 节已同步改。
