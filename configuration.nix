@@ -13,13 +13,13 @@
 
   # ── Flakes 开关 ───────────────────────────────────────────
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
-  # ── 国内镜像源（Nix 二进制缓存，清华 TUNA + 中科大 USTC 双源）──
+  # ── 国内镜像源（Nix 二进制缓存，中科大 USTC 优先 + 清华 TUNA 兜底）──
   # 用 extra-substituters 追加，不覆盖默认源；镜像不可达时 Nix 自动回退官方
   # cache.nixos.org（内容镜像，沿用官方公钥，无需额外 trusted key）。
   # CachyOS 内核二进制缓存（attic.xuyh0120.win/lantian，xddxdd 维护，国内快）。
   nix.settings.extra-substituters = [
-    "https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store"
     "https://mirrors.ustc.edu.cn/nix-channels/store"
+    "https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store"
     "https://attic.xuyh0120.win/lantian"
   ];
   nix.settings.extra-trusted-public-keys = [ "lantian:EeAUQ+W+6r7EtwnmYjeVwx5kOGEBpjlBfPlzGlTNvHc=" ];
