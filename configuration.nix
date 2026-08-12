@@ -69,12 +69,17 @@
   i18n.inputMethod = {
     enable = true;
     type = "fcitx5";
-    fcitx5.addons = with pkgs; [
-      fcitx5-rime
-      fcitx5-mozc
-      qt6Packages.fcitx5-chinese-addons   # 26.05 起从 pkgs 移到 qt6Packages
-      rime-wanxiang     # 26.05 移除 rime-wubi → 用万象（含五笔方案）
-    ];
+    fcitx5 = {
+      # Wayland 原生输入法前端（niri 下 GTK/Qt 走 text-input-v3，不再导出
+      # GTK_IM_MODULE/QT_IM_MODULE；XMODIFIERS 仍保留给 XWayland 的微信/QQ 用）
+      waylandFrontend = true;
+      addons = with pkgs; [
+        fcitx5-rime
+        fcitx5-mozc
+        qt6Packages.fcitx5-chinese-addons   # 26.05 起从 pkgs 移到 qt6Packages
+        rime-wanxiang     # 26.05 移除 rime-wubi → 用万象（含五笔方案）
+      ];
+    };
   };
 
   # ── 音频 PipeWire（对应 easyeffects / pavucontrol 后端）──
