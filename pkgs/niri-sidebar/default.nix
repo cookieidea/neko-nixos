@@ -3,7 +3,7 @@
 # niri-sidebar — a lightweight, external sidebar manager for the Niri compositor.
 # Upstream: https://github.com/Vigintillionn/niri-sidebar  (Rust / cargo)
 # Arch AUR: niri-sidebar-git
-pkgs.rustPlatform.buildRustPackage {
+pkgs.rustPlatform.buildRustPackage (rec {
   pname = "niri-sidebar";
   version = "0.3.0-unstable-2026-08-12";
 
@@ -25,4 +25,4 @@ pkgs.rustPlatform.buildRustPackage {
     mainProgram = "niri-sidebar";
     platforms   = pkgs.lib.platforms.linux;
   };
-}
+})
