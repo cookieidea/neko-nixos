@@ -122,8 +122,10 @@
   programs = {
     git = {
       enable = true;
-      userName = "cookieidea";
-      userEmail = "jhbhyvv@outlook.com";
+      settings = {
+        user.name = "cookieidea";
+        user.email = "jhbhyvv@outlook.com";
+      };
     };
     starship.enable = true;       # starship
     zoxide.enable = true;         # zoxide

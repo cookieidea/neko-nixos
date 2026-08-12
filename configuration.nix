@@ -77,7 +77,7 @@
     fcitx5.addons = with pkgs; [
       fcitx5-rime
       fcitx5-mozc
-      fcitx5-chinese-addons
+      qt6Packages.fcitx5-chinese-addons   # 26.05 起从 pkgs 移到 qt6Packages
       rime-wanxiang     # 26.05 移除 rime-wubi → 用万象（含五笔方案）
     ];
   };
