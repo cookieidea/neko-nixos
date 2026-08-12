@@ -22,14 +22,16 @@
   security.polkit.enable = true;        # polkit 认证（Noctalia / 系统设置需要）
 
   # ── 引导 / 磁盘 ───────────────────────────────────────────
-  # 用 systemd-boot（UEFI）。GRUB 方案见末尾备注。
-  boot.loader.systemd-boot.enable = true;
-  boot.loader.efi.canTouchEfiVariables = true;
+  # 用 GRUB（UEFI）。纯 EFI 安装：efiSupport + device="nodev"（不写 MBR）。
+  # 如需双系统引导 Windows，可加 boot.loader.grub.useOSProber = true;
+  boot.loader.grub = {
+    enable = true;
+    efiSupport = true;
+    device = "nodev";
+    configurationLimit = 20;
+  };
   # LUKS 加密（原脚本建议）：取消下面注释并填设备
   # boot.initrd.luks.devices."luks-root".device = "/dev/disk/by-uuid/XXXX";
-
-  # 限制保留的 generation 数，避免 /boot 爆满（原仓库有类似处理）
-  boot.loader.systemd-boot.configurationLimit = 20;
 
   # ── 网络 / 主机 ───────────────────────────────────────────
   networking.hostName = "nixos";
