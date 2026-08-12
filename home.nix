@@ -68,8 +68,14 @@
     # --- 已确认在 nixpkgs 26.05 存在的原 AUR 包 ---
     flclash                                   # flclash（代理 GUI）
     wechat                                    # wechat（腾讯官方原生 Linux 版，unfree，需 allowUnfree）
-    # qq —— 26.05 pin 的 QQ 3.2.29 deb 已被腾讯 CDN 下架（404），装完系统用 flatpak 补：
-    #       flatpak install flathub org.tencent.qq
+    (pkgs.qq.overrideAttrs (old: {
+      # 26.05 pin 的 3.2.29 deb 已被腾讯 CDN 下架（404），override 到今天发布的 3.2.32
+      version = "3.2.32-2026-08-12";
+      src = pkgs.fetchurl {
+        url = "https://qqdl.gtimg.cn/qqfile/QQNT/9.9.33/release/3f89efc5/QQ_3.2.32_260812_amd64_01.deb";
+        sha256 = "sha256-0IXdiTlyJQYeufGUMI9ogSmBjtRFd36XpKChbhPXsOg=";
+      };
+    }))                                       # qq（腾讯官方 Linux 版，override 3.2.32）
     gearlever                                 # gearlever（管理 AppImage/flatpak）
     lsfg-vk                                   # lsfg-vk（FSR 帧生成 vulkan 层）
     protonplus                                # protonplus（Proton 管理）
