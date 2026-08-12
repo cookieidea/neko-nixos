@@ -23,7 +23,10 @@ pkgs.stdenv.mkDerivation {
   installPhase = ''
     runHook preInstall
     mkdir -p $out/lib/abdm $out/bin $out/share/applications $out/share/pixmaps
-    cp -r ABDownloadManager/. "$out/lib/abdm/"
+    # stdenv 解压后 cwd 已在 ABDownloadManager/ 内（sourceRoot），直接 cp 当前目录
+    cp -r . "$out/lib/abdm/"
+    # jpackage 产物是只读打包，放开写权限（tar.gz 解压源）
+    chmod -R u+w "$out/lib/abdm/"
     chmod +x "$out/lib/abdm/bin/ABDownloadManager"
 
     # 启动器
