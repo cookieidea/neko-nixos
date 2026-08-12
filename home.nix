@@ -102,6 +102,8 @@
     libnotify                                 # notify-send（niri-pick / niri-force-kill-window / screenshot-sound.sh 的通知依赖）
     xsettingsd                                 # GTK 主题/字体经 XSETTINGS 注入应用（niri 无 DE 时需要）
     xprop                                       # xprop（26.05 起 xorg 属性集弃用，xorg.xprop 改为顶层 xprop；niri-force-kill-window 依赖）
+    gpu-screen-recorder                        # 录屏（shorin-screenrec-menu Mod+F3 用，noctalia-shell 也依赖）
+    btrfs-assistant                            # btrfs 快照管理 CLI（quickload Mod+F8 的回滚后端）
   ] ++ [
 
   # opencode（AI 编程 Agent）走 flake 装，拿最新版（不在 nixpkgs 核心）。
@@ -239,6 +241,19 @@
     # 原 .gtkrc-2.0 内容已并入 gtk.gtk2.extraConfig（fcitx 输入法），不再手动部署避免模块冲突
     ".local/bin/random-anime-wallpaper-noctalia" = {
       source = ./dotfiles/local/bin/random-anime-wallpaper-noctalia;
+      executable = true;
+    };
+    # SHORiN 私有脚本迁移（对应 binds.kdl：Mod+F3 录屏菜单、Mod+F5 快存、Mod+F8 快读）
+    ".local/bin/shorin-screenrec-menu" = {
+      source = ./dotfiles/local/bin/shorin-screenrec-menu;
+      executable = true;
+    };
+    ".local/bin/quicksave" = {
+      source = ./dotfiles/local/bin/quicksave;
+      executable = true;
+    };
+    ".local/bin/quickload" = {
+      source = ./dotfiles/local/bin/quickload;
       executable = true;
     };
     ".local/share/fcitx5/rime/default.custom.yaml".source = ./dotfiles/local/share/fcitx5/rime/default.custom.yaml;
