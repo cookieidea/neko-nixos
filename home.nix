@@ -134,7 +134,7 @@
     qt6Packages.fcitx5-configtool              # fcitx5 配置 GUI（原 fcitx5-configtool；26.05 移到 qt6Packages）
     tumbler                                    # thunar 缩略图后端（图片/文档缩略图，原 04j/04k 必装）
     xdg-terminal-exec                          # 终端选择器（xdg-open 按 xdg-terminials.list 选 kitty）
-    adw-gtk-theme                              # libadwaita 主题（flatpak 应用 GTK_THEME=adw-gtk3-dark）
+    adw-gtk3                                     # libadwaita 主题 adw-gtk3-dark（nixpkgs 属性名 adw-gtk3，非 adw-gtk-theme）
     nwg-look                                   # GTK 主题设置（原脚本 + dotfiles 已部署 nwg-look/gsettings）
     libgsf                                     # ODF/Office 文档缩略图（thunar，原 FM_PKGS2）
     icoextract                                 # Windows exe/ico 图标缩略图（原 FM_PKGS1）
