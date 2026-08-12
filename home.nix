@@ -95,6 +95,7 @@
     # 系统图标主题（noctalia 应用启动器/GTK 应用图标解析依赖 freedesktop 主题）
     adwaita-icon-theme                          # Adwaita 基底图标（默认 freedesktop 标准）
     papirus-icon-theme                          # Papirus（丰富的应用图标，覆盖 Steam/Flatpak 等）
+    hicolor-icon-theme                          # hicolor 兜底主题（Flatpak 应用图标/桌面文件图标扫描依赖）
     thunar                                     # 文件管理器（binds: Mod+E 优先）
     nautilus                                    # nautilus（GNOME Files，binds: Mod+Alt+E / Mod+E 兜底）
     # ── 原 04k 脚本的文件管理器生态（全量迁移）──
@@ -240,10 +241,10 @@
     "gtk-3.0/bookmarks".source = ./dotfiles/config/gtk-3.0/bookmarks;
     "gtk-3.0/gtk.css".source = ./dotfiles/config/gtk-3.0/gtk.css;
     # gtk-3.0/noctalia.css 由 noctalia 模板生成（matugen 写色），不部署
-    "gtk-3.0/settings.ini".source = ./dotfiles/config/gtk-3.0/settings.ini;
+    # gtk-3.0/settings.ini 不部署：由下方 gtk 模块（home-manager）全权写入，避免只读 symlink 冲突
     "gtk-4.0/gtk.css".source = ./dotfiles/config/gtk-4.0/gtk.css;
     # gtk-4.0/noctalia.css 由 noctalia 模板生成（matugen 写色），不部署
-    "gtk-4.0/settings.ini".source = ./dotfiles/config/gtk-4.0/settings.ini;
+    # gtk-4.0/settings.ini 同上，由 gtk 模块写入
     "kitty/current-theme.conf".source = ./dotfiles/config/kitty/current-theme.conf;
     "kitty/kitty.conf".source = ./dotfiles/config/kitty/kitty.conf;
     "kitty/themes/kitty.conf".source = ./dotfiles/config/kitty/themes/kitty.conf;
@@ -360,22 +361,49 @@
   # 改用 Home Manager 的 polkit-gnome 用户服务拉起。
   services.polkit-gnome.enable = true;
 
-  # ── GTK 图标主题（noctalia launcher、GTK 应用图标解析依赖 freedesktop 主题）──
-  # Adwaita 为基底（绝大多数 GTK 应用），Papirus 装好备用（覆盖 Steam/Flatpak 图标）。
-  # 用 home-manager 的 gtk 模块（写 settings.ini，不依赖 DBus/dconf，激活稳定）。
+  # ── GTK 主题/图标（noctalia launcher、GTK 应用图标解析依赖 freedesktop 主题）──
+  # 由 home-manager gtk 模块全权写 settings.ini（不部署 dotfiles 的 settings.ini，
+  # 避免只读 symlink 挡住模块写入导致图标主题失效）。
+  # 图标用 Papirus（覆盖最广：Steam/Flatpak/Electron/GTK），Adwaita 兜底由包提供；
+  # 主题 adw-gtk3-dark（libadwaita 风格，flatpak 应用 GTK_THEME 也指向它）。
   gtk = {
     enable = true;
     iconTheme = {
+      name = "Papirus";
+      package = pkgs.papirus-icon-theme;
+    };
+    theme = {
+      name = "adw-gtk3-dark";
+      package = pkgs.adw-gtk3;
+    };
+    cursorTheme = {
       name = "Adwaita";
       package = pkgs.adwaita-icon-theme;
     };
-    theme = {
-      name = "adwaita";
-      package = pkgs.gnome-themes-extra;
+    font = {
+      name = "Adwaita Sans";
+      size = 11;
     };
     # 原 dotfiles/home/.gtkrc-2.0 的 fcitx 输入法配置合并进模块（避免 .gtkrc-2.0 管理冲突）
     gtk2.extraConfig = ''
       gtk-im-module="fcitx"
+    '';
+    # 原 dotfiles gtk-3.0/settings.ini 的其余设置（去掉 gtk-im-module，Wayland 前端不需要）
+    gtk3.extraConfig = ''
+      gtk-toolbar-style=GTK_TOOLBAR_ICONS
+      gtk-toolbar-icon-size=GTK_ICON_SIZE_LARGE_TOOLBAR
+      gtk-button-images=0
+      gtk-menu-images=0
+      gtk-enable-event-sounds=1
+      gtk-enable-input-feedback-sounds=0
+      gtk-xft-antialias=1
+      gtk-xft-hinting=1
+      gtk-xft-hintstyle=hintslight
+      gtk-xft-rgba=rgb
+      gtk-application-prefer-dark-theme=1
+    '';
+    gtk4.extraConfig = ''
+      gtk-application-prefer-dark-theme=1
     '';
   };
 
