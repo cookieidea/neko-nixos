@@ -67,7 +67,14 @@
 
     # --- 已确认在 nixpkgs 26.05 存在的原 AUR 包 ---
     flclash                                   # flclash（代理 GUI）
-    wechat                                    # wechat（腾讯官方原生 Linux 版，unfree，需 allowUnfree）
+    (pkgs.wechat.overrideAttrs (old: {
+      # nixpkgs 的 src 走 web.archive.org 存档（429 限流），改用官方 CDN 直链（2026-07-10 版）
+      version = "2026-07-10";
+      src = pkgs.fetchurl {
+        url = "https://dldir1v6.qq.com/weixin/Universal/Linux/WeChatLinux_x86_64.AppImage";
+        sha256 = "sha256-RX26ArkbAxzdRBLu4HT7v/udnQax5Q/Bgi00hw4RSZA=";
+      };
+    }))                                       # wechat（官方 CDN 直链）
     (pkgs.qq.overrideAttrs (old: {
       # 26.05 pin 的 3.2.29 deb 已被腾讯 CDN 下架（404），override 到今天发布的 3.2.32
       version = "3.2.32-2026-08-12";
