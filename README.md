@@ -2,7 +2,7 @@
 
 把 [SHORiN-KiWATA/shorin-arch-setup](https://github.com/SHORiN-KiWATA/shorin-arch-setup)（Arch Linux 一键配置脚本）转换成 **NixOS 26.05「Yarara」+ Home Manager** 的 flake 配置。
 
-桌面沿用原项目的 **niri（Wayland 滚动平铺 compositor）+ Noctalia（桌面 shell）**，登录管理器用 **ly**（nixpkgs `services.displayManager.ly` 模块），自动登录后直接进入 niri。
+桌面沿用原项目的 **niri（Wayland 滚动平铺 compositor）+ Noctalia（桌面 shell）**，登录管理器用 **ly**（nixpkgs `services.displayManager.ly` 模块，登录界面选用户/会话），内核用 **CachyOS RT-BORE**（实时 + BORE 调度器，直播/推流低延迟）。
 
 ---
 
@@ -21,13 +21,14 @@
 ## 已做的环境适配
 
 - **minimal / 无图形界面 ISO 全新安装**：`configuration.nix` 顶部 `imports = [ ./hardware-configuration.nix ]`，配合 `nixos-generate-config --root /mnt` + `nixos-install --flake`（见安装脚本）。
-- **最新内核**：`boot.kernelPackages = pkgs.linuxPackages_latest;`。
+- **CachyOS 内核**：`boot.kernelPackages = pkgs.cachyosKernels.linuxPackages-cachyos-rt-bore;`（flake 输入 `nix-cachyos-kernel` release 分支 + pinned overlay，二进制缓存 `attic.xuyh0120.win/lantian`）。
 - **国内镜像源**（全部已配置，不可达时自动回退官方源，不会硬失败）：
-  - Nix 二进制缓存：`nix.settings.extra-substituters` → 清华 TUNA（`mirrors.tuna.tsinghua.edu.cn/nix-channels/store`）
+  - Nix 二进制缓存：`nix.settings.extra-substituters` → 清华 TUNA + attic.xuyh0120.win/lantian（CachyOS 内核）
   - nixpkgs / home-manager 源码：flake 输入走清华 TUNA git 镜像
-  - Flathub 远程：中科大 USTC 镜像（`mirrors.ustc.edu.cn/flathub`）
-- **AMD 显卡**：开启 `hardware.opengl.enable` + `vulkan-loader`(RADV) + `libva`(VA-API)，videoDriver 设为 `amdgpu`。
+  - Flathub：官方 `dl.flathub.org`（国内 USTC/TUNA/阿里镜像 2026-08 起全部失效，见 docs 踩坑速查 18）
+- **AMD 显卡**：开启 `hardware.graphics.enable`（26.05 由 `hardware.opengl` 改名）+ `vulkan-loader`(RADV) + `libva`(VA-API)，videoDriver 设为 `amdgpu`。
 - **允许 unfree**：`qq` / `wechat` / `lunarclient` 等闭源包需要 `nixpkgs.config.allowUnfree = true;`（已在 `configuration.nix` 开启）。
+- **输入法**：fcitx5 `waylandFrontend = true`（Wayland 原生 text-input），中文走 **rime-wanxiang（GitHub amzxyz 版，自构建）**，无日文输入法。
 
 ---
 
@@ -35,7 +36,7 @@
 
 ```
 neko-nixos/
-├── flake.nix              # flake 入口：inputs（含国内镜像）、username/hostname/desktop 变量
+├── flake.nix              # flake 入口：inputs（nixpkgs/home-manager/nixvim/opencode/bili-danmaku-tui/cachyos-kernel）、username/hostname/desktop 变量
 ├── configuration.nix      # 系统层：内核/显卡/网络/flatpak/登录管理器/桌面服务…
 ├── home.nix               # 用户层（Home Manager）：软件包、git/编辑器/主题等
 ├── pkgs/                 # 自构建程序派生（见下「自构建程序」一节）
@@ -52,40 +53,38 @@ neko-nixos/
 
 按来源分组（括号内为原 Arch 包名）：
 
-- **Standard（common-applist）**：`gdu` `baobab` `mission-center` `gnome-font-viewer` `google-chrome` `transmission-gtk` `localsend` `gnome-calendar` `gnome-clocks` `lutris` `steam` `mangohud` `mpv` `obs-studio` `upscaler` `yazi` `flatseal` `pavucontrol` `mousepad` `easyeffects` `fcitx5-mozc` `rime-wubi`
+- **Standard（common-applist）**：`gdu` `baobab` `mission-center` `gnome-font-viewer` `google-chrome` `transmission_4-gtk` `localsend` `gnome-calendar` `gnome-clocks` `lutris` `steam` `mangohud` `mpv` `obs-studio` `upscaler` `yazi` `pavucontrol` `mousepad` `easyeffects`
 - **Shell & Terminal（kde-applist）**：`fish` `starship` `eza` `zoxide` `fastfetch` `imagemagick` `jq` `timg` `bat` `btop`
 - **编辑器**：`vscodium`（替代 AUR 的 `visual-studio-code-bin`，去遥测）
-- **原 AUR 包（已在 nixpkgs 26.05 核实存在）**：`flclash` `wechat` `qq` `gearlever` `lsfg-vk` `protonplus` `mangojuice` `rime-wanxiang`
-- **游戏 / 影音客户端（用户新增）**：`hmcl` `animeko`(替代 kazumi) `lunarclient` `taterclient-ddnet`
+- **原 AUR 包（已在 nixpkgs 26.05 核实存在）**：`flclash` `discord` `ayugram-desktop` `gearlever` `lsfg-vk` `protonplus` `mangojuice`
+- **游戏 / 影音客户端（用户新增）**：`hmcl` `kazumi`（替代 animeko）`lunar-client` `taterclient-ddnet`
 - **原清单遗漏补回**：`virt-manager` `video-downloader`
-- **niri 生态依赖**：`niri` `kitty` `fuzzel` `thunar` `satty` `cliphist` `wl-clipboard` `xsettingsd`
-- **flake 包（不在 nixpkgs 核心）**：`opencode`（AI 编程 Agent）。桌面 shell 改用 nixpkgs 自带的 `noctalia-shell`（quickshell 配置封装），不再用独立 `noctalia` v4 应用。
-- **自构建程序（`./pkgs` 派生，对应原 Arch 的 AUR `-git` / 私有仓库）**：`niri-sidebar` `pins` `pywalfox` `shorin-contrib` `proton-wrapper` `splayer-next`
+- **niri 生态依赖**：`niri` `kitty` `fuzzel` `thunar` `nautilus` `satty` `cliphist` `wl-clipboard` `xsettingsd` `gpu-screen-recorder` `btrfs-assistant` `matugen` `imv`
+- **主题/图标**：`adwaita-icon-theme` `papirus-icon-theme` `hicolor-icon-theme` `adw-gtk3` `breeze(kdePackages)`——图标主题由 home-manager `gtk` 模块写入（Papirus），settings.ini 不手写部署
+- **flake 包（不在 nixpkgs 核心）**：`opencode`（AI 编程 Agent）、`bili-danmaku-tui`（B 站弹幕 TUI，自带 flake）。桌面 shell 用 nixpkgs 自带的 `noctalia-shell`。
+- **Flatpak 自动安装（flatpak-repo 服务）**：微信 / QQ / Flatseal / Bazaar 应用商店 / OpenOrpheus（网易云 Orpheus 宿主）
+- **自构建程序（`./pkgs` 派生，对应原 Arch 的 AUR `-git` / 私有仓库）**：`niri-sidebar` `pins` `pywalfox` `shorin-contrib` `proton-wrapper` `splayer-next` `startlive` `ab-download-manager` `tabby-terminal` `rime-wanxiang`
   - ⚠️ `splayer-next` 是 **SPlayer-Dev/SPlayer-Next**（Electron 音乐播放器），与 nixpkgs 里的 `splayer`（Simple Netease Cloud Music player）**不是同一个软件**，切勿混用。
-
-> `flatseal` 在此是以 **nixpkgs 原生包** 形式安装（AUR/官方源同名），不是走 flatpak 运行时。
+  - ⚠️ `tabby-terminal` 是 **eugeny/tabby** 终端模拟器；nixpkgs 的 `tabby` 是 TabbyML AI 助手，同名不同项目。
 
 ---
 
 ## 关于 Flatpak
 
-- `configuration.nix` 里 `services.flatpak.enable = true;`，并把手 Flathub 远程指向中科大镜像。
-- **默认没有声明任何 Flatpak 包**——`qq`/`wechat` 都用 nixpkgs 原生版，无需 flatpak。
-- 想用 flatpak 装闭源 App，取消 `home.nix` 末尾 `services.flatpak.packages` 注释并填入包名即可，例如：
-  ```nix
-  services.flatpak.packages = [
-    "flathub:com.qq.QQ"
-  ];
-  ```
-
-> 说明：原 Arch 脚本（shorin-arch-setup）同样只 **启用 flatpak 服务 + 注册 Flathub 远程**，其应用清单里没有任何 `flatpak:` 前缀条目，因此并不会通过 flatpak 实际安装任何软件；本转换保持了这一行为。
+- `configuration.nix` 里 `services.flatpak.enable = true;`，并挂官方 Flathub 远程
+  （国内 USTC/TUNA/阿里镜像 2026-08 起全部失效）。
+- **微信 / QQ / Flatseal / Bazaar 应用商店 / OpenOrpheus** 由 `flatpak-repo` one-shot 服务在
+  启动时自动安装（幂等，见 `configuration.nix` 的 `systemd.services.flatpak-repo`）：
+  `com.tencent.WeChat`、`com.qq.QQ`、`com.github.tchx84.Flatseal`、`io.github.kolunmi.Bazaar`、
+  `io.github.yucling.open-orpheus`。
+- 想加其他 flatpak 应用，往该服务的 `flatpak install` 行追加 ID 即可。
 
 ## 关于 Noctalia（noctalia-shell / quickshell）
 
 - 桌面 shell 用 **nixpkgs 自带的 `noctalia-shell`**（quickshell 配置 + `qs` 封装），由 `home.nix` 的 `pkgs.noctalia-shell` 安装、niri 的 `config.kdl` 用 `spawn-sh-at-startup "noctalia-shell"` 拉起。这还原了 SHORiN 原版「`qs -c noctalia-shell`」的 quickshell 写法。
 - **IPC 驱动的交互已全部生效**：binds.kdl 里的启动器 / 设置 / 壁纸 / 电源菜单 / 锁屏 / 音量 / 亮度 / 剪贴板等绑定统一走 `noctalia-shell ipc call ...`（不再写 `qs -c noctalia-shell`）。
 - `dotfiles/config/noctalia/*.json`（settings/plugins/colors）与 `user-templates.toml` 是**独立 noctalia v4 应用的配置**，已被 noctalia-shell 取代、不再被读取，保留仅作参考，可随时删除。
-- ⚠️ 主题模板（pywalfox / fcitx5 / starship / gtk-folder / fastfetch）原本由 v4 的 `user-templates.toml` 生成；切换到 noctalia-shell 后这套模板机制需要另行接线（例如直接跑 matugen），暂未处理，属已知待办。
+- ⚠️ 主题模板（pywalfox / fcitx5 / starship / gtk-folder / fastfetch）原本由 v4 的 `user-templates.toml` 生成；切换到 noctalia-shell 后**已装 `matugen`**（`random-anime-wallpaper-noctalia` 与 noctalia 主题模板直接调用，Mod+Shift+F10 随机壁纸会顺带重生成主题）。
 
 ---
 
@@ -102,6 +101,10 @@ Nix 里改用 **flake 内的 Nix 派生** 从源码/发布构建，集中在 `pk
 | `shorin-contrib` | SHORiN-KiWATA/shorin-contrib | Shell 脚本 | shorin-contrib-git |
 | `proton-wrapper` | SHORiN-KiWATA/proton-wrapper | bash/Python + .desktop | shorin-proton-wrapper-git |
 | `splayer-next` | SPlayer-Dev/SPlayer-Next | Electron（AppImage 包装） | splayer-next-git |
+| `startlive` | Radekyspec/StartLive | Python + PySide6（wrapper，velopack stub） | startlive-git |
+| `ab-download-manager` | amir1376/ab-download-manager | jpackage（makeWrapper + autoPatchelf） | abdownloadmanager-bin |
+| `tabby-terminal` | eugeny/tabby | Electron（AppImage 包装） | — |
+| `rime-wanxiang` | amzxyz/rime-wanxiang | RIME 数据包（fetchGit → share/rime） | rime-wanxiang（GitHub 版） |
 
 - 这些包通过 `packages.<system>` 暴露成 flake 包，可单独构建：
   ```bash

@@ -248,7 +248,11 @@ reboot
 
 ## 9. 装后验证
 
-- 启动应进 GRUB → 选 NixOS → ly 自动登录进 niri。
+- 启动应进 GRUB（BlueArchive 主题）→ 选 NixOS → **ly 登录界面**（左右选用户、回车输密码，
+  默认会话 niri；`configuration.nix` 里 `autoLogin` 被注释，想恢复自动登录取消注释即可）。
+- **内核**：`uname -r` 应显示 `cachyos`（CachyOS **RT-BORE**：实时调度 + BORE 调度器，
+  直播/推流低延迟）。内核由 flake 输入 `nix-cachyos-kernel`（release 分支 + pinned overlay）
+  提供，二进制缓存 `attic.xuyh0120.win/lantian` 已在 `nix.settings` 配好。
 - 根真是 btrfs：`findmnt -n -o FSTYPE /` 应为 `btrfs`。
 - 子卷：`sudo btrfs subvolume list /`。
 - **zstd 压缩**：
@@ -263,9 +267,22 @@ reboot
   cat /sys/power/resume                           # 应显示 SWAP 分区的设备路径
   ```
 - **快照**：`sudo snapper -c root list` 应有按时线快照。
-- **应用图标**（noctalia 启动器/GTK 应用图标正常，不是紫黑棋盘格）：`ls /run/current-system/sw/share/icons/`
-  应含 `Adwaita`、`Papirus`（仓库已装 adwaita-icon-theme + papirus-icon-theme）。
-- **微信/QQ/Flatseal**：`flatpak list --system 2>/dev/null | grep -iE "wechat|qq|flatseal"`——由
+- **应用图标**（noctalia 启动器/GTK 应用图标正常，不是紫黑棋盘格）：
+  ```bash
+  ls /run/current-system/sw/share/icons/          # 应含 hicolor、Adwaita、Papirus
+  # GTK 图标主题应为 Papirus（home-manager gtk 模块写入，见踩坑速查 21/25/27）
+  ```
+  > ⚠️ 图标主题由 **home-manager `gtk` 模块**写入 settings.ini（不要用 xdg.configFile 部署
+  > settings.ini，只读 symlink 会挡住模块写入导致图标失效——见踩坑速查 27）。
+- **壁纸 / MangoHud**：
+  ```bash
+  ls ~/Pictures/Wallpapers             # 应有 2 张默认壁纸（noctalia 壁纸轮播依赖）
+  ls ~/.config/MangoHud                # 应有 MangoHud.conf
+  ```
+- **输入法**：`fcitx5-diagnose` 不应再出现「推荐取消 GTK_IM_MODULE」提示
+  （`waylandFrontend = true` + GTK settings 已清理）；中文走 **rime-wanxiang（GitHub 版）**，
+  日文 mozc 已移除。
+- **微信/QQ/Flatseal/OpenOrpheus**：`flatpak list --system 2>/dev/null | grep -iE "wechat|qq|flatseal|orpheus"`——由
   `flatpak-repo.service` 启动时自动从官方 `dl.flathub.org` 安装（国内 flathub 镜像已全部失效，见踩坑速查 18）。
 
 ### 测试休眠
@@ -452,3 +469,34 @@ sudo nixos-rebuild switch
     sudo nixos-rebuild switch --flake .#nixos --option substituters "..."
     ```
     之后日常更新：`sudo nixos-rebuild switch --flake github:cookieidea/neko-nixos#nixos`。
+24. **`services.displayManager.session does not exist`（26.05）**：该选项已移除。注册 niri 会话
+    改用系统级 `programs.niri.enable = true`（自动挂 wayland-sessions desktop 文件 +
+    portal/gnome-keyring 推荐配置）。仓库已改。
+25. **包名踩坑（26.05）**：`noto-fonts-emoji`→`noto-fonts-color-emoji`；
+    `wineWowPackages`→`wineWow64Packages`；`fcitx5-configtool`→`qt6Packages.fcitx5-configtool`；
+    `adw-gtk-theme`→`adw-gtk3`；无独立 `breeze-cursors` 属性（光标主题 Breeze_Cursors 由
+    `kdePackages.breeze` 提供）；xorg 包集整体移到顶层（`xprop`/`xhost`）。
+26. **`gtk.gtk3.extraConfig` 类型错误**：26.05 home-manager 的 `gtk3/gtk4.extraConfig` 是
+    **attrset（`{ key = "value"; }`）不是多行字符串**；`gtk2.extraConfig` 才是 lines。
+27. **图标还是消失（软件/软件内）**：根因常是 `xdg.configFile` 部署 `gtk-3.0/settings.ini`
+    为只读 symlink，**挡住 home-manager gtk 模块写入** → `iconTheme` 从未生效。解法：
+    settings.ini 交给 gtk 模块写（不部署），`iconTheme = Papirus`（覆盖 Steam/Flatpak/Electron），
+    并装 `hicolor-icon-theme`（flatpak 应用图标兜底扫描）。
+28. **`git reset --hard` 会删本机独有文件**：`hardware-configuration.nix` 只在本地 git 跟踪
+    （不进远程），reset 后会丢失 → flake 报 `hardware-configuration.nix does not exist`。
+    恢复：`sudo nixos-generate-config --show-hardware-config > hardware-configuration.nix`
+    （重定向需 `sudo sh -c '... > file'`，普通 `sudo cmd > file` 的重定向仍是用户权限）+
+    `sudo git add`。日常对齐远程用 `git merge --ff-only origin/main` 或 `git stash -u`。
+29. **`/home` 只读（git config / 写文件报只读文件系统）**：btrfs 子卷被标记只读（常见于
+    quickload/snapper 快照恢复后，快照挂载只读）。修复：
+    `sudo btrfs property set /home ro false && sudo mount -o remount,rw /home`。
+30. **StartLive 构建报 `sphinx-9.1.0 not supported for interpreter python3.11`**：
+    `python311` 下 keyring→secretstorage 依赖链的 sphinx-9 不支持 py311 → 用 `python312`。
+31. **GRUB 主题目录避免中文名**：跨平台 git + Nix 路径解析对中文目录名会报
+    `path has a trailing slash`；Windows 上 `git mv` 中文路径还会错位合并文件。
+    主题目录用 ASCII（本仓库：yuzu/tao/nagisa/aris/midori），换配色改
+    `configuration.nix` 的 `boot.loader.grub.theme`。
+32. **CachyOS 内核（`nix-cachyos-kernel`）**：flake 输入**不要 follows nixpkgs**（官方要求
+    补丁匹配其 pin 的 nixpkgs）；overlay 用 `pinned` 以命中 `attic.xuyh0120.win/lantian`
+    缓存（否则本地编译内核极慢/VM 易 OOM）；rebuild 命令的 `--option substituters`
+    记得加 `https://attic.xuyh0120.win/lantian`。
