@@ -67,22 +67,10 @@
 
     # --- 已确认在 nixpkgs 26.05 存在的原 AUR 包 ---
     flclash                                   # flclash（代理 GUI）
-    (pkgs.wechat.overrideAttrs (old: {
-      # nixpkgs 的 src 走 web.archive.org 存档（429 限流），改用官方 CDN 直链（2026-07-10 版）
-      version = "2026-07-10";
-      src = pkgs.fetchurl {
-        url = "https://dldir1v6.qq.com/weixin/Universal/Linux/WeChatLinux_x86_64.AppImage";
-        sha256 = "sha256-RX26ArkbAxzdRBLu4HT7v/udnQax5Q/Bgi00hw4RSZA=";
-      };
-    }))                                       # wechat（官方 CDN 直链）
-    (pkgs.qq.overrideAttrs (old: {
-      # 26.05 pin 的 3.2.29 deb 已被腾讯 CDN 下架（404），override 到今天发布的 3.2.32
-      version = "3.2.32-2026-08-12";
-      src = pkgs.fetchurl {
-        url = "https://qqdl.gtimg.cn/qqfile/QQNT/9.9.33/release/3f89efc5/QQ_3.2.32_260812_amd64_01.deb";
-        sha256 = "sha256-0IXdiTlyJQYeufGUMI9ogSmBjtRFd36XpKChbhPXsOg=";
-      };
-    }))                                       # qq（腾讯官方 Linux 版，override 3.2.32）
+    # wechat / qq —— nixpkgs 26.05 的 src 分别走 web.archive.org（429 限流）与腾讯 CDN
+    # 旧版本链接（404），且 wechat 的 src 深埋在 appimageTools.extract 内部无法 override，
+    # 故改走 Flatpak（flathub 官方维护）：
+    #   flatpak install flathub com.tencent.WeChat org.tencent.qq
     gearlever                                 # gearlever（管理 AppImage/flatpak）
     lsfg-vk                                   # lsfg-vk（FSR 帧生成 vulkan 层）
     protonplus                                # protonplus（Proton 管理）
@@ -353,9 +341,11 @@
   #  不在 nixpkgs 的包 → 走 flake / 自行打包
   #  （原脚本靠 shorin-arch 自建仓库与 AUR 提供，NixOS 无等价）
   # ============================================================
-  # Flatpak 服务已在 configuration.nix 开启（services.flatpak.enable），
-  # 但目前未声明任何 Flatpak 包：qq/wechat 都有 nixpkgs 原生版，其余缺失项无需 Flatpak。
-  # 若想改用 Flatpak 版 qq/wechat 或装别的闭源 App，取消下面注释即可：
+  # Flatpak 服务已在 configuration.nix 开启（services.flatpak.enable）。
+  # qq/wechat 因 nixpkgs 26.05 源链接失效（见上文注释）改用 Flatpak，装完系统手动安装：
+  #   flatpak install flathub com.tencent.WeChat org.tencent.qq
+  # 其他缺失的闭源 App 同样可走 Flatpak（flathub 已配 USTC 镜像）。
+  # 若想声明式安装 Flatpak 包，取消下面注释（注意激活期需 flathub remote 已就绪）：
   #   services.flatpak.packages = [
   #     "flathub:org.tencent.qq"
   #   ];
