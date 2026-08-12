@@ -93,7 +93,6 @@
     # 系统图标主题（noctalia 应用启动器/GTK 应用图标解析依赖 freedesktop 主题）
     adwaita-icon-theme                          # Adwaita 基底图标（默认 freedesktop 标准）
     papirus-icon-theme                          # Papirus（丰富的应用图标，覆盖 Steam/Flatpak 等）
-    tabler-icons                                # noctalia settings.json iconMode=tabler 用的矢量图标
     thunar                                     # 文件管理器（binds: Mod+E）
     satty                                      # 截图标注（binds: Mod+Shift+S）
     cliphist                                   # 剪贴板历史（noctalia config.toml 的 clipboard watch 命令）
