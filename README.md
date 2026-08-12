@@ -74,7 +74,7 @@ neko-nixos/
 - 想用 flatpak 装闭源 App，取消 `home.nix` 末尾 `services.flatpak.packages` 注释并填入包名即可，例如：
   ```nix
   services.flatpak.packages = [
-    "flathub:org.tencent.qq"
+    "flathub:com.qq.QQ"
   ];
   ```
 

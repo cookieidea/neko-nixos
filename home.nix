@@ -363,11 +363,11 @@
   #  （原脚本靠 shorin-arch 自建仓库与 AUR 提供，NixOS 无等价）
   # ============================================================
   # Flatpak 服务已在 configuration.nix 开启，flatpak-repo 服务启动时自动安装：
-  #   com.tencent.WeChat（微信）/ org.tencent.qq（QQ）/ com.github.tchx84.Flatseal（Flatpak 管理）
+  #   com.tencent.WeChat（微信）/ com.qq.QQ（QQ）/ com.github.tchx84.Flatseal（Flatpak 管理）
   # 其他缺失的闭源 App 同样可走 Flatpak（flathub 已配 USTC 镜像），手动：
   #   flatpak install flathub <应用ID>
   #   services.flatpak.packages = [
-  #     "flathub:org.tencent.qq"
+  #     "flathub:com.qq.QQ"
   #   ];
   #
   # niri / Noctalia 以及其余 SHORiN rice 配置已落到 dotfiles/ 并通过 xdg.configFile / home.file 部署：
