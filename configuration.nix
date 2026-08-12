@@ -106,9 +106,15 @@
 
   # ── Flatpak（用于 nixpkgs 没有的闭源 App，如 linuxqq）──
   services.flatpak.enable = true;
-  # Flathub 走中科大(USTC)国内镜像，避免直连 dl.flathub.org 慢/超时
-  services.flatpak.remotes.flathub = {
-    location = "https://mirrors.ustc.edu.cn/flathub/repo/flathub.flatpakrepo";
+  # Flathub 走中科大(USTC)国内镜像，避免直连 dl.flathub.org 慢/超时。
+  # ⚠️ NixOS 26.05 已移除 services.flatpak.remotes 声明式选项，
+  #   改用 one-shot systemd 服务在启动时添加 remote（--if-not-exists 保证幂等）。
+  systemd.services.flatpak-repo = {
+    wantedBy = [ "multi-user.target" ];
+    path = [ pkgs.flatpak ];
+    script = ''
+      flatpak remote-add --if-not-exists flathub https://mirrors.ustc.edu.cn/flathub/repo/flathub.flatpakrepo
+    '';
   };
 
   # ── XDG 桌面门户 ──────────────────────────────────────────
