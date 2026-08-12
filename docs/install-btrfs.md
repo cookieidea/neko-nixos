@@ -215,13 +215,22 @@ git add hardware-configuration.nix     # 无需 commit，脏树含暂存文件�
 ```bash
 cd /mnt/etc/nixos
 nixos-install --flake .#nixos \
-  --option substituters "https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store https://cache.nixos.org"
+  --option substituters "https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store https://cache.nixos.org" \
+  --max-jobs 1
 ```
 
 > ⚠️ 必须带 `--option substituters` 把 TUNA 二进制缓存显式传进去：26.05 的 `nixos-install`
 > 守护进程会**忽略** flake 内的 `accept-flake-config`（甚至不认 `--accept-flake-config` 这个
 > flag，给了直接 `unknown option`）。不传的话包下载直连官方源，国内很慢。
 > flake 源码拉取若遇 GitHub 403（共享 IP 限流），属正常，官方 `git+https` 会重试 / 走代理即可。
+>
+> **⚠️ 评估阶段 OOM（进程被 `Killed` 无任何报错）**：本配置（home-manager + nixvim + opencode
+> 同评）的 flake 评估峰值约 **6.6GB 匿名内存**，内存 <8G 的机器会被内核 OOM 杀掉（dmesg 可见
+> `Out of memory: Killed process ... (nix)`）。`--max-jobs` 只管构建期、对评估无效。兜底：
+> ```bash
+> modprobe zram && zramctl -f -s 16G && mkswap /dev/zram0 && swapon -p 100 /dev/zram0 && free -h
+> ```
+> 或把内存加到 12G+。**注意 live ISO 的 `/` 是 tmpfs（内存盘），swapfile 不能建在 `/` 上**。
 
 装完设密码（配置没设 `initialPassword`）：
 
@@ -254,6 +263,10 @@ reboot
   cat /sys/power/resume                           # 应显示 SWAP 分区的设备路径
   ```
 - **快照**：`sudo snapper -c root list` 应有按时线快照。
+- **应用图标**（noctalia 启动器/GTK 应用图标正常，不是紫黑棋盘格）：`ls /run/current-system/sw/share/icons/`
+  应含 `Adwaita`、`Papirus`（仓库已装 adwaita-icon-theme + papirus-icon-theme）。
+- **微信/QQ/Flatseal**：`flatpak list --system 2>/dev/null | grep -iE "wechat|qq|flatseal"`——由
+  `flatpak-repo.service` 启动时自动从官方 `dl.flathub.org` 安装（国内 flathub 镜像已全部失效，见踩坑速查 18）。
 
 ### 测试休眠
 
@@ -405,3 +418,37 @@ sudo nixos-rebuild switch
     （同一 rev 宿主机与 VM 实测哈希不同）——GitHub 仓库源一律改用 `builtins.fetchGit`
     （按 commit 内容寻址、免哈希、确定性）；GitHub release 静态资源与 PyPI sdist 哈希稳定，
     可继续用 fetchurl/fetchPypi。仓库已按此处理。
+15. **`nixos-install` 评估阶段进程被 `Killed`（无报错）**：OOM 实锤（见第 8 节）——
+    flake 评估峰值 ~6.6GB，内存不足被杀。解法：zram 16G 兜底 或 VM 内存加到 12G+。
+    **live ISO 的 `/` 是 tmpfs**，swapfile 建在 `/` 上无效；要建磁盘 swapfile 得在 `/mnt`
+    （btrfs 需先 `truncate -s 0` + `chattr +C` 设 NoCOW 再写零/mkswap/swapon）。
+16. **`git+file` flake 的 dirty 树源缓存坑**：`git pull` 后配置改动"不生效"（构建仍用旧文件，
+    连 drv 名都不变）。dirty 树的源复制/缓存不可靠。解法：
+    - 提交使树干净：`git add -A && git commit -m sync`（nix 用 HEAD rev 确定性内容）；
+    - 或绕过 git：`nixos-install --flake path:/mnt/etc/nixos#nixos`（直读文件系统）。
+    - merge 卡在 vi：live ISO 无 vi，先 `git config core.editor true` 再 `git commit --no-edit`。
+17. **分叉分支 pull 被拒（divergent branches）**：本地提交过 hardware-configuration.nix 后与
+    origin 分叉。`git config pull.rebase false && git pull origin main`（无冲突会直接 merge）。
+18. **flathub 国内镜像全部失效**：USTC/TUNA/阿里 的 `flathub.flatpakrepo` 均返回 404
+    （2026-08 实测），仓库已切官方 `https://dl.flathub.org/repo/flathub.flatpakrepo`。
+19. **QQ 在 flathub 的 ID 是 `com.qq.QQ`**（不是 `org.tencent.qq`，后者 404）。
+    微信是 `com.tencent.WeChat`。
+20. **home-manager 激活报 `The name is not activatable`（dconfSettings 步骤）**：
+    home-manager 26.05 的 **gtk 模块（iconTheme/theme）内部用 dconf 写 GTK 设置**，
+    NixOS 必须配套 `programs.dconf.enable = true`（提供 dconf 的 DBus 激活服务）。
+21. **进桌面后应用图标全是紫黑棋盘格**：系统只装了 hicolor，缺 freedesktop 图标主题。
+    装 `adwaita-icon-theme` + `papirus-icon-theme`，并用 home-manager `gtk` 模块设
+    `iconTheme`。注意 `gtk.gtk2.extraConfig` 是 **lines 类型（多行字符串）不是 attrset**；
+    启用 gtk 模块后不要再手动部署 `.gtkrc-2.0`（冲突），fcitx 输入法配置并入
+    `gtk2.extraConfig`。
+22. **`tabler-icons` 不存在（26.05）**：nixpkgs 无此包，noctalia 的 UI 图标由包自带。
+23. **装完系统后 `/etc/nixos` 是空的**：需重新 clone 仓库 + 生成硬件配置再 rebuild：
+    ```bash
+    sudo rm -rf /etc/nixos && sudo git clone https://github.com/cookieidea/neko-nixos /etc/nixos
+    cd /etc/nixos
+    sudo nixos-generate-config
+    sudo git add -A && sudo git config user.email "you@example.com" && sudo git config user.name "you"
+    sudo git commit -m "hardware-configuration"     # flake 只认 tracked 文件！
+    sudo nixos-rebuild switch --flake .#nixos --option substituters "..."
+    ```
+    之后日常更新：`sudo nixos-rebuild switch --flake github:cookieidea/neko-nixos#nixos`。
