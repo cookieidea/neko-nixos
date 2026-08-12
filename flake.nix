@@ -42,9 +42,16 @@
       url = "git+https://github.com/Youthdreamer/bili-danmaku-tui.git";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    # ── CachyOS 内核（xddxdd/nix-cachyos-kernel）──
+    # release 分支带二进制缓存（attic.xuyh0120.win/lantian，国内快）；
+    # ⚠️ 官方明确不要 follows nixpkgs（补丁与内核版本需匹配其 pin 的 nixpkgs）
+    nix-cachyos-kernel = {
+      url = "git+https://github.com/xddxdd/nix-cachyos-kernel?ref=release";
+    };
   };
 
-  outputs = { self, nixpkgs, home-manager, nixvim, opencode, bili-danmaku-tui, ... }:
+  outputs = { self, nixpkgs, home-manager, nixvim, opencode, bili-danmaku-tui, nix-cachyos-kernel, ... }:
     let
       system = "x86_64-linux";
       # ── 改这里 ──────────────────────────────────────────────
@@ -85,6 +92,10 @@
             ./hardware-configuration.nix
             ./configuration.nix
             hmModule
+            # CachyOS 内核 overlay（pinned：固定其 nixpkgs rev 以命中二进制缓存）
+            {
+              nixpkgs.overlays = [ nix-cachyos-kernel.overlays.pinned ];
+            }
           ];
         };
       };

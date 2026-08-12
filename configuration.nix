@@ -6,15 +6,22 @@
   # ⚠️ hardware-configuration.nix 的 import 已移到 flake.nix 的实体机配置里——
   #    实体机装好系统后请保持该文件被 git add（flake 只认跟踪文件）。
 
-  # ── 最新内核（AMD RX 6750 GRE 用新内核 amdgpu 支持更好）──
-  boot.kernelPackages = pkgs.linuxPackages_latest;
+  # ── 内核：CachyOS RT-BORE（实时调度 + BORE 调度器，直播/推流低延迟）──
+  # overlay 来自 flake 输入 nix-cachyos-kernel（release 分支，overlays.pinned）。
+  # 提供方：pkgs.cachyosKernels.linuxPackages-cachyos-rt-bore（amdgpu 由 6.x 最新内核支持）。
+  boot.kernelPackages = pkgs.cachyosKernels.linuxPackages-cachyos-rt-bore;
 
   # ── Flakes 开关 ───────────────────────────────────────────
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
   # ── 国内镜像源（Nix 二进制缓存，清华）──
   # 用 extra-substituters 追加，不覆盖默认源；镜像不可达时 Nix 自动回退官方
   # cache.nixos.org（内容镜像，沿用官方公钥，无需额外 trusted key）。
-  nix.settings.extra-substituters = [ "https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store" ];
+  # CachyOS 内核二进制缓存（attic.xuyh0120.win/lantian，xddxdd 维护，国内快）。
+  nix.settings.extra-substituters = [
+    "https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store"
+    "https://attic.xuyh0120.win/lantian"
+  ];
+  nix.settings.extra-trusted-public-keys = [ "lantian:EeAUQ+W+6r7EtwnmYjeVwx5kOGEBpjlBfPlzGlTNvHc=" ];
   nixpkgs.config = {
     allowUnfree = true;   # steam / wechat-uos / 部分驱动需要
   };
