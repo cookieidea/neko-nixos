@@ -48,7 +48,7 @@
     mousepad                                  # mousepad
     easyeffects                               # easyeffects
     fcitx5-mozc                               # fcitx5-mozc (日语)
-    rime-wubi                                 # rime-wubi (五笔)
+    # rime-wubi 已在 26.05 移除 → 五笔走 rime-wanxiang（见下，含五笔方案）
 
     # --- Shell & Terminal (kde-applist.txt) ---
     fish                                      # fish

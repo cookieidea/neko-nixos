@@ -74,7 +74,7 @@
       fcitx5-rime
       fcitx5-mozc
       fcitx5-chinese-addons
-      rime-wubi
+      rime-wanxiang     # 26.05 移除 rime-wubi → 用万象（含五笔方案）
     ];
   };
 
