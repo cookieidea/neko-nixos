@@ -95,7 +95,7 @@
     wl-clipboard                               # wl-paste / wl-copy（剪贴板 + 截图管道）
     libnotify                                 # notify-send（niri-pick / niri-force-kill-window / screenshot-sound.sh 的通知依赖）
     xsettingsd                                 # GTK 主题/字体经 XSETTINGS 注入应用（niri 无 DE 时需要）
-    xorg.xprop                                 # niri-force-kill-window 的 XWayland 进程树判定依赖
+    xprop                                       # xprop（26.05 起 xorg 属性集弃用，xorg.xprop 改为顶层 xprop；niri-force-kill-window 依赖）
   ] ++ [
 
   # opencode（AI 编程 Agent）走 flake 装，拿最新版（不在 nixpkgs 核心）。
