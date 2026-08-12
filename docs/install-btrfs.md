@@ -15,7 +15,7 @@
 - 分区表：GPT
 - EFI 分区：`1G`，FAT32，卷标 `BOOT` → 挂 `/boot`（GRUB 与内核都在这里）
 - Root 分区：剩余空间，Btrfs，卷标 `nixos`
-- Swap：Btrfs **swapfile**，路径 `/swap/swapfile`，由 NixOS 配置（`swapDevices`）自动创建
+- Swap：Btrfs **swapfile**，路径 `/swap/swapfile`，由 flake 的 `configuration.nix`（`swapDevices`）自动创建
 - 子卷：`@`（根）/ `@home` / `@nix` / `@swap` / `@snapshots`（snapper 用）
 
 ```text
@@ -149,8 +149,9 @@ nixos-generate-config --root /mnt
 
 ## 6. 修改硬件配置（关键）
 
-编辑 `/mnt/etc/nixos/hardware-configuration.nix`，改成 **by-label 挂载 + 显式子卷选项**，
-并让 NixOS 自动创建 swapfile。把 `fileSystems` / `swapDevices` 相关部分替换为：
+编辑 `/mnt/etc/nixos/hardware-configuration.nix`，把 `fileSystems` 改成 **by-label 挂载 +
+显式子卷选项**（swapfile 由 flake 的 `configuration.nix` 里的 `swapDevices` 自动创建，
+**无需在此配置**）。把 `fileSystems` 相关部分替换为：
 
 ```nix
 fileSystems."/" = {
@@ -189,20 +190,16 @@ fileSystems."/boot" = {
   options = [ "umask=0077" ];                 # EFI 分区仅 root 可访问
 };
 
-swapDevices = [
-  {
-    device = "/swap/swapfile";
-    size = 8 * 1024;                          # 单位 MiB → 8 GiB（按需调整）
-  }
-];
+# 注意：swapfile 不用在 hardware-configuration.nix 里配，它由 flake 的 configuration.nix
+# 里的 swapDevices 自动创建（见上方「说明」）。
 ```
 
 > 说明：
 > - `compress=zstd` + `noatime` 是 btrfs root/home/nix 的常见组合；`noatime` 减少元数据写入。
 > - `/swap` **不压缩**（swapfile 不能被压缩）。
-> - `size` 单位是 MiB，`8 * 1024` = 8 GiB。
-> - NixOS 会自动 `dd` + `chattr +C`(NOCOW) + `mkswap` 创建这个 swapfile
->   （btrfs 要求 swapfile 必须 NOCOW，且不能被压缩）。
+> - **swapfile 不用在这里配** —— `swapDevices` 已写在 flake 的 `configuration.nix`
+>   （size 单位 MiB，`8 * 1024` = 8 GiB），NixOS 首次 switch 时自动 `dd` + `chattr +C`(NOCOW)
+>   + `mkswap` 生成 `/swap/swapfile`。这里只需保证 `/swap` 子卷挂上来即可。
 
 ---
 

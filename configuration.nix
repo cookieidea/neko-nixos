@@ -47,6 +47,14 @@
   # LUKS 加密（原脚本建议）：取消下面注释并填设备
   # boot.initrd.luks.devices."luks-root".device = "/dev/disk/by-uuid/XXXX";
 
+  # ── swap（btrfs @swap 子卷 → /swap，由 NixOS 自动建 swapfile）──
+  # @swap 子卷在硬件配置里挂到 /swap（见 docs/install-btrfs.md 第 6 步）。
+  # NixOS 在首次 switch 时自动 dd + chattr +C（NOCOW）+ mkswap 生成 /swap/swapfile，
+  # 无需手动 dd / mkswap；btrfs 上 swapfile 必须 NOCOW 且不能压缩（@swap 子卷已不压缩）。
+  swapDevices = [
+    { device = "/swap/swapfile"; size = 8 * 1024; }  # size 单位 MiB → 8 GiB（按需调）
+  ];
+
   # ── 网络 / 主机 ───────────────────────────────────────────
   networking.hostName = "nixos";
   networking.networkmanager.enable = true;   # 对应 01c-nm-backend.sh
