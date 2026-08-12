@@ -280,6 +280,11 @@
   };
 
   home.file = {
+    # ── OBS VDO.Ninja 插件（steveseguin/ninja-obs-plugin v1.1.65，AGPL-3.0）──
+    # nixpkgs 无此包，用官方 Linux 预编译产物声明式部署到用户级插件目录
+    # （OBS 扫描 ~/.config/obs-studio/plugins/<name>/{bin/64bit,data}）
+    ".config/obs-studio/plugins/obs-vdoninja/bin/64bit".source = ./dotfiles/obs-plugins/bin/64bit;
+    ".config/obs-studio/plugins/obs-vdoninja/data".source = ./dotfiles/obs-plugins/data;
     # ── 壁纸（原 resources/Wallpapers，noctalia 壁纸轮播/随机切换依赖 ~/Pictures/Wallpapers）──
     "Pictures/Wallpapers/wallhaven-d88d53.png".source = ./dotfiles/Pictures/Wallpapers/wallhaven-d88d53.png;
     "Pictures/Wallpapers/wallhaven-yq8w67.jpg".source = ./dotfiles/Pictures/Wallpapers/wallhaven-yq8w67.jpg;
