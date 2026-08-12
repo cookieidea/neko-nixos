@@ -157,9 +157,29 @@
   programs.steam.enable = true;         # steam
   virtualisation.libvirtd.enable = true;  # virt-manager 后端
 
-  # ── 可选：btrfs + snapper 快照（对应 00-btrfs-init / 03c）──
-  # services.snapper.snapshotRootOnSubvol = true;
-  # 配合 boot 用 btrfs 子卷时启用
+  # ── btrfs + snapper 快照 / 回滚（已默认启用；无 LUKS）──────
+  # / 本身是 @ 子卷，让 snapper 正确处理 .snapshots 目录与快照子卷。
+  # 快照默认存到 /.snapshots（即独立挂载的 @snapshots 子卷，回滚根时不带快照、更稳）。
+  services.snapper = {
+    snapshotRootOnSubvol = true;
+    configs."root" = {
+      subvolume = "/";
+      timelineCreate = true;          # 按时线自动快照
+      timelineLimitHourly = 24;       # 保留最近 24 个每小时
+      timelineLimitDaily = 7;         # 保留最近 7 个每天
+      timelineLimitWeekly = 4;        # 保留最近 4 个每周
+      timelineLimitMonthly = 0;
+      timelineLimitYearly = 0;
+      emptyPrePostCleanup = true;     # 清掉空的 pre-post 快照对
+      numberLimit = 0;                # 0 = 不按数量限制，只按时线保留
+    };
+  };
+  # GRUB 启动菜单显示快照（grub-btrfs 模块，nixpkgs 自带）：
+  # 生成「Snapshots」子菜单，可在此选历史快照启动；启动失败时自动进 GRUB 菜单。
+  services.grub-btrfs = {
+    enable = true;
+    bootsToGrubMenu = true;           # 异常断电/内核崩溃后自动回到 GRUB 菜单，便于选快照
+  };
 
   # ── 用户（必须存在，否则 home-manager 报错）──────────────
   users.users.${username} = {

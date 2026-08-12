@@ -62,7 +62,7 @@ umount /mnt
 
 子卷说明：
 - `@` 根；`@home` 家目录；`@nix` 单独的 nix store（回滚根时不带 nix，省空间也更稳）；
-- `@log` 日志独立（避免日志把快照撑爆）；`@snapshots` 给 snapper 存快照。
+- `@log` 日志独立（避免日志把快照撑爆）；`@snapshots` 挂到 `/.snapshots`，snapper 存快照用。
 
 ---
 
@@ -75,12 +75,14 @@ EFI=/dev/sda1
 # compress=zstd：zstd 压缩（btrfs 默认级别 3，可写 compress=zstd:1~:15 调档；
 #   :1 最快体积略大，:15 最压但最慢。日常用默认或 zstd:1 即可）。
 mount -o subvol=@,compress=zstd $ROOT /mnt
-mkdir -p /mnt/{home,nix,var/log,snapshots,boot}
+mkdir -p /mnt/{home,nix,var/log,.snapshots,boot}
 
 mount -o subvol=@home,compress=zstd   $ROOT /mnt/home
 mount -o subvol=@nix,compress=zstd     $ROOT /mnt/nix
 mount -o subvol=@log,compress=zstd     $ROOT /mnt/var/log
-mount -o subvol=@snapshots            $ROOT /mnt/snapshots
+# @snapshots 挂到 /.snapshots：snapper 默认把快照存在 /.snapshots，
+# 用独立子卷装它，回滚 @ 时不会把快照一起滚掉，也更省空间。
+mount -o subvol=@snapshots            $ROOT /mnt/.snapshots
 
 mount $EFI /mnt/boot
 
@@ -176,11 +178,16 @@ reboot
   mount | grep ' / '                    # 挂载项应含 compress=zstd
   sudo compsize / 2>/dev/null | head    # 看实际压缩比（/nix 占大头，压缩收益高）
   ```
-- 后续想加**快照/回滚**（snapper + grub-btrfs）见 README「可选」与下方说明。
+- **确认快照在跑**：`sudo snapper -c root list` 应有按时线生成的快照；GRUB 菜单里
+  应出现「Snapshots」子菜单（装后首次重启才会生成引导项）。
+- 快照/回滚用法见文末「快照 / 回滚」一节。
 
 ---
 
-## 可选：LUKS 全盘加密变体（第 1 步替换）
+## （本次不使用）LUKS 全盘加密变体 —— 留作备用
+
+> 本次安装**不加密**（按需求）。以下仅保留以便将来需要时启用，当前无需执行。
+
 
 仅把「格式化 + 挂载」换成加密层（其余分区/子卷/安装步骤不变）：
 
@@ -200,23 +207,53 @@ initrd 负责解 LUKS 挂根，无需 GRUB 读加密盘。
 
 ---
 
-## 可选：snapper 快照 + grub-btrfs 回滚菜单
+## 快照 / 回滚（snapper + grub-btrfs，已默认启用）
 
-1. 在 `configuration.nix` 启用（子卷 `@snapshots` 已预留）：
-   ```nix
-   services.snapper.snapshotRootOnSubvol = true;
-   services.snapper.configs."root" = {
-     inherit (config.fileSystems."/".options) subvol;  # 指向 @
-     timely = [ { Interval = "hourly"; Limit = 24; }
-                { Interval = "daily";  Limit = 7;  }
-                { Interval = "weekly"; Limit = 4;  } ];
-   };
-   boot.loader.grub = { ...; configurationLimit = 20; };  # 已有
-   # 启动菜单显示快照（需装 grub-btrfs，nixpkgs 有）：
-   #   environment.systemPackages += [ pkgs.grub-btrfs ];
-   #   services.grub-btrfs.enable = true;   # 若 nixpkgs 提供该选项
-   ```
-2. 重启后 `sudo snapper -c root create --description "after install"` 试一把。
+`configuration.nix` 里已经配好，无需再改：
 
-> 注：本仓库当前未启用 snapper；按需开启，开启后建议配套 grub-btrfs 才能在
-> 启动菜单选快照回滚。
+```nix
+services.snapper = {
+  snapshotRootOnSubvol = true;        # / 本身是 @ 子卷
+  configs."root" = {
+    subvolume = "/";
+    timelineCreate = true;
+    timelineLimitHourly = 24;
+    timelineLimitDaily = 7;
+    timelineLimitWeekly = 4;
+    timelineLimitMonthly = 0;
+    timelineLimitYearly = 0;
+    emptyPrePostCleanup = true;
+    numberLimit = 0;
+  };
+};
+services.grub-btrfs = {                # 启动菜单加「Snapshots」子菜单
+  enable = true;
+  bootsToGrubMenu = true;              # 异常断电/崩溃后自动回 GRUB 菜单
+};
+```
+
+> 快照存哪：snapper 的 `root` 配置把快照写到 `/.snapshots`，也就是前面独立挂载的
+> `@snapshots` 子卷。这样回滚 `@` 时不会把快照一起滚掉，也更省空间。
+> 也正因为 `snapshotRootOnSubvol = true`，snapper 会自己管理 `/.snapshots` 的权限与子卷。
+
+**两种回滚场景（重点）**
+- **系统配置回滚**：NixOS 自带 generation 机制——GRUB 菜单本就列出多个 NixOS
+  generation（靠 `boot.loader.grub.configurationLimit = 20`），直接选旧 generation 启动即可；
+  或进系统后 `sudo nixos-rebuild switch --rollback`。这条最稳，优先用。
+- **数据 / dotfiles 回滚**：靠 snapper 快照。从 GRUB「Snapshots」子菜单选一个快照启动
+  （它是只读的，仅用于**查看/抢救文件**）；要真正变成当前系统，启动后执行：
+  ```bash
+  sudo snapper -c root list                       # 看快照号
+  sudo snapper -c root rollback <快照号>           # 基于快照生成一个可写的新根并设为默认
+  sudo reboot                                      # 重启即回到该快照状态
+  ```
+  > ⚠️ 直接启动只读快照后**不要**长期在上面跑（根只读，服务会报错）。它只用于抢救，
+  > 真正回退请用上面的 `snapper rollback` 或 NixOS generation。
+
+**日常用法**
+```bash
+sudo snapper -c root list                         # 列快照
+sudo snapper -c root create --description "手动快照"   # 手动打点
+sudo snapper -c root delete <快照号>              # 删快照
+```
+偷装完第一把建议：`sudo snapper -c root create --description "fresh install"`。
