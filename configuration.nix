@@ -116,8 +116,8 @@
     path = [ pkgs.flatpak ];
     script = ''
       flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
-      # 自动安装 Flatpak 应用（幂等）：微信 / QQ / Flatseal
-      flatpak install --noninteractive --or-update flathub com.tencent.WeChat com.qq.QQ com.github.tchx84.Flatseal
+      # 自动安装 Flatpak 应用（幂等）：微信 / QQ / Flatseal / Bazaar 应用商店
+      flatpak install --noninteractive --or-update flathub com.tencent.WeChat com.qq.QQ com.github.tchx84.Flatseal io.github.kolunmi.Bazaar
     '';
     serviceConfig = {
       Type = "oneshot";
