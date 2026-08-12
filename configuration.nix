@@ -157,12 +157,13 @@
   # （services.displayManager.sessionPackages）+ 官方 portal / gnome-keyring 推荐配置。
   # 注意：26.05 已移除 services.displayManager.session，注册会话要用这个模块。
   programs.niri.enable = true;
-  # 自动登录 cookie → 直接进 niri（ly 模块自动配 ly-autologin PAM）
+  # ly 显示登录界面（用户列表 + 密码框），默认会话 niri；
+  # 如需恢复自动登录，取消下面注释即可（ly 模块自动配 ly-autologin PAM）
   services.displayManager.defaultSession = "niri";
-  services.displayManager.autoLogin = {
-    enable = true;
-    user = username;
-  };
+  # services.displayManager.autoLogin = {
+  #   enable = true;
+  #   user = username;
+  # };
   # ly 的 PAM 服务（ly / ly-autologin）由 displayManager.ly 模块自动配置
 
   # GNOME（原 04d-gnome.sh，已弃用，保留以便回退）
