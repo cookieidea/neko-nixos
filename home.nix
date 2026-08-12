@@ -42,7 +42,8 @@
     obs-studio                                # obs-studio
     upscaler                                  # upscaler
     yazi                                      # yazi
-    flatseal                                  # flatseal
+    # flatseal 已在 nixpkgs 26.05 移除 → 需要时用 flatpak 装：
+    #   flatpak install flathub com.github.tchx84.Flatseal
     pavucontrol                               # pavucontrol
     mousepad                                  # mousepad
     easyeffects                               # easyeffects
