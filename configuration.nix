@@ -17,8 +17,6 @@
   nix.settings.extra-substituters = [ "https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store" ];
   nixpkgs.config = {
     allowUnfree = true;   # steam / wechat-uos / 部分驱动需要
-    # animeko 因 JetBrains JCEF 变更被 nixpkgs 标 broken（运行期风险，构建一般能过）；放行评估
-    problems.handlers.animeko.broken = "warn";
   };
   security.polkit.enable = true;        # polkit 认证（Noctalia / 系统设置需要）
 
