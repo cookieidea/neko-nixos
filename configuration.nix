@@ -21,6 +21,15 @@
   nixpkgs.config.allowUnfree = true;   # steam / wechat-uos / 部分驱动需要
   security.polkit.enable = true;        # polkit 认证（Noctalia / 系统设置需要）
 
+  # ── 自动垃圾回收 / store 去重（防滚版本撑爆 /）────────────
+  nix.gc.automatic = true;
+  nix.gc.dates = "weekly";
+  nix.optimise.automatic = true;              # 定期硬链接去重，省空间
+  nix.settings.auto-optimise-store = true;    # 写入 store 时即时去重
+
+  # ── 系统版本锁定（避免大版本升级触发意外的状态迁移）────────
+  system.stateVersion = "26.05";
+
   # ── 引导 / 磁盘 ───────────────────────────────────────────
   # 用 GRUB（UEFI）。纯 EFI 安装：efiSupport + device="nodev"（不写 MBR）。
   # 如需双系统引导 Windows，可加 boot.loader.grub.useOSProber = true;
@@ -29,6 +38,7 @@
     efiSupport = true;
     device = "nodev";
     configurationLimit = 20;
+    efiInstallAsRemovable = true;   # 兜底：复制到 fallback EFI 路径，板子 UEFI 抽风也能启动
   };
   # LUKS 加密（原脚本建议）：取消下面注释并填设备
   # boot.initrd.luks.devices."luks-root".device = "/dev/disk/by-uuid/XXXX";
@@ -88,7 +98,8 @@
 
   # ── XDG 桌面门户 ──────────────────────────────────────────
   xdg.portal.enable = true;
-  xdg.portal.extraPortals = with pkgs; [ xdg-desktop-portal-gtk xdg-desktop-portal-gnome ];
+  # hyprland portal 作为兜底：部分 Wayland App（微信/会议）屏幕共享只认它
+  xdg.portal.extraPortals = with pkgs; [ xdg-desktop-portal-gtk xdg-desktop-portal-gnome xdg-desktop-portal-hyprland ];
   xdg.portal.config.common.default = "gtk";
 
   # ── 显示服务器 + 登录管理器 + 桌面（niri + Noctalia）─────
@@ -97,6 +108,10 @@
   services.greetd = lib.mkIf (desktop == "niri") {
     enable = true;
     settings = {
+      autoLogin = {
+        enable = true;
+        user = username;
+      };
       default_session = {
         # tuigreet 列出可用 Wayland 会话；--cmd 直接指定 niri
         command = "${pkgs.greetd.tuigreet}/bin/tuigreet --cmd ${pkgs.niri}/bin/niri --remember --user-menu";
