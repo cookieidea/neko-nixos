@@ -38,6 +38,9 @@
     device = "nodev";
     configurationLimit = 20;
     efiInstallAsRemovable = true;   # 兜底：复制到 fallback EFI 路径，板子 UEFI 抽风也能启动
+    # BlueArchive GRUB 主题（opendesktop p/2329987，游戏开发部全员 5 款配色）：
+    #   柚子 / 桃 / 渚 / 爱丽丝 / 绿 —— 想换配色改这里即可（绿 主题目录无子目录，其余为 <名>/Alice）
+    theme = ./grub-theme/柚子/Alice;
   };
   # ── 文件系统支持（btrfs 根分区 + initrd 挂载）────────────
   boot.supportedFilesystems = [ "btrfs" ];
