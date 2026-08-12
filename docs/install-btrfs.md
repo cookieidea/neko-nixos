@@ -1,12 +1,13 @@
-# 实体机安装指南（NixOS 26.05 + btrfs 子卷 + GRUB/UEFI + 自动 swapfile + snapper）
+# 实体机安装指南（NixOS 26.05 + btrfs 子卷 + GRUB/UEFI + 独立 SWAP 分区(休眠) + snapper）
 
 本仓库是 NixOS 26.05 + Home Manager 的 flake 配置。本指南给**全新安装**用，
-分区/子卷/swap 步骤参考社区 btrfs 安装笔记（fcsha/nixos-config），并结合本仓库实际：
+分区/子卷步骤参考社区 btrfs 安装笔记（fcsha/nixos-config），并结合本仓库实际：
 
 - 引导用 **GRUB (UEFI)**（非 systemd-boot）
 - 桌面用 **niri + noctalia-shell**
 - 已默认启用 **snapper + grub-btrfs** 快照回滚
 - 配置通过 **flake** 安装（`nixos-install --flake .#nixos`）
+- **休眠用独立 SWAP 分区**：btrfs 上的 swapfile 官方不支持休眠恢复，故休眠走独立分区
 
 ---
 
@@ -14,15 +15,18 @@
 
 - 分区表：GPT
 - EFI 分区：`1G`，FAT32，卷标 `BOOT` → 挂 `/boot`（GRUB 与内核都在这里）
+- SWAP 分区：`建议 ≥ 物理内存`（如 16G），linux-swap，卷标 `SWAP` → 作 swap + 休眠镜像
 - Root 分区：剩余空间，Btrfs，卷标 `nixos`
-- Swap：Btrfs **swapfile**，路径 `/swap/swapfile`，由 flake 的 `configuration.nix`（`swapDevices`）自动创建
-- 子卷：`@`（根）/ `@home` / `@nix` / `@swap` / `@snapshots`（snapper 用）
+- 子卷：`@`（根）/ `@home` / `@nix` / `@snapshots`（snapper 用）
 
 ```text
-/dev/nvme0n1p1  1G    vfat   BOOT   → /boot
-/dev/nvme0n1p2  剩余   btrfs  nixos  → /（子卷 @ / @home / @nix / @swap / @snapshots）
+/dev/nvme0n1p1  1G      vfat       BOOT   → /boot
+/dev/nvme0n1p2  ≥RAM    linux-swap SWAP   → swap + 休眠（label=SWAP）
+/dev/nvme0n1p3  剩余    btrfs      nixos  → /（子卷 @ / @home / @nix / @snapshots）
 ```
 
+> SWAP 分区大小：休眠镜像约等于当前**已用内存**，所以 SWAP 分区建议 **≥ 物理内存**
+> （如 32G 内存就给 32G+）。日常 swap 也用它，不必另开 btrfs swapfile。
 > 下面命令里的 `/dev/nvme0n1` 只是示例，实际操作前必须用 `lsblk` 确认目标磁盘。
 > EFI 用 1G（参考笔记值）；若想保留很多 generation，可加到 2G 更稳。
 
@@ -58,8 +62,9 @@ cfdisk /dev/nvme0n1
 
 ```text
 Label type: gpt
-New 1G    -> Type: EFI System
-New rest  -> Type: Linux filesystem
+New 1G     -> Type: EFI System
+New 16G    -> Type: Linux swap        # ← 休眠分区，大小建议 ≥ 物理内存
+New rest   -> Type: Linux filesystem
 Write -> yes
 Quit
 ```
@@ -70,7 +75,8 @@ Quit
 
 ```bash
 mkfs.fat -F32 -n BOOT /dev/nvme0n1p1
-mkfs.btrfs -f -L nixos /dev/nvme0n1p2
+mkswap -L SWAP /dev/nvme0n1p2        # 格式化并打卷标 SWAP（休眠分区）
+mkfs.btrfs -f -L nixos /dev/nvme0n1p3
 ```
 
 ---
@@ -84,7 +90,6 @@ mount /dev/disk/by-label/nixos /mnt
 btrfs subvolume create /mnt/@
 btrfs subvolume create /mnt/@home
 btrfs subvolume create /mnt/@nix
-btrfs subvolume create /mnt/@swap
 btrfs subvolume create /mnt/@snapshots
 umount /mnt
 ```
@@ -97,26 +102,22 @@ umount /mnt
 
 ```bash
 mount -o subvol=@,compress=zstd,noatime /dev/disk/by-label/nixos /mnt
-mkdir -p /mnt/{boot,home,nix,swap,.snapshots}
+mkdir -p /mnt/{boot,home,nix,.snapshots}
 
 mount -o subvol=@home,compress=zstd,noatime /dev/disk/by-label/nixos /mnt/home
 mount -o subvol=@nix,compress=zstd,noatime   /dev/disk/by-label/nixos /mnt/nix
-mount -o subvol=@swap,noatime                /dev/disk/by-label/nixos /mnt/swap
 # @snapshots 挂到 /.snapshots：snapper 默认把快照写在 /.snapshots，
 # 用独立子卷装它，回滚 @ 时不会把快照一起卷走，也更省空间。
 mount -o subvol=@snapshots,noatime           /dev/disk/by-label/nixos /mnt/.snapshots
 
 mount /dev/disk/by-label/BOOT /mnt/boot
+# SWAP 分区无需手动挂载，nixos-generate-config 会自动识别并启用（见第 6 步）。
 ```
-
-> ⚠️ `@swap` **不要**加 `compress`（swapfile 不能被压缩），这里只给 `noatime`。
-> 这里**不要**手动创建 swapfile，后面交给 NixOS 配置（`swapDevices`）自动创建。
 
 ### zstd 双保险（推荐）
 
 仅靠挂载选项的 `compress` 不够稳（`nixos-generate-config` 有时只保留 `subvol`、
-丢 `compress`）。给数据子卷打上 btrfs 默认压缩属性，即使挂载选项丢失也照样压缩
-（`@swap` 故意跳过，swapfile 不能压缩）：
+丢 `compress`）。给数据子卷打上 btrfs 默认压缩属性，即使挂载选项丢失也照样压缩：
 
 ```bash
 for mp in /mnt /mnt/home /mnt/nix; do
@@ -135,6 +136,7 @@ btrfs property get /mnt compression      # 应返回 compression=zstd
 ## 5. 生成 NixOS 配置
 
 ```bash
+swapon /dev/disk/by-label/SWAP          # 先启用 swap，确保 generate-config 能识别并写入
 nixos-generate-config --root /mnt
 ```
 
@@ -145,13 +147,16 @@ nixos-generate-config --root /mnt
 /mnt/etc/nixos/hardware-configuration.nix
 ```
 
+> 关键点：第 2 步已 `mkswap`，这里再 `swapon` 一下，generate-config 才会把 SWAP 分区
+> 自动写进 `hardware-configuration.nix` 的 `swapDevices`（partition 类型）。否则要手动加。
+
 ---
 
 ## 6. 修改硬件配置（关键）
 
 编辑 `/mnt/etc/nixos/hardware-configuration.nix`，把 `fileSystems` 改成 **by-label 挂载 +
-显式子卷选项**（swapfile 由 flake 的 `configuration.nix` 里的 `swapDevices` 自动创建，
-**无需在此配置**）。把 `fileSystems` 相关部分替换为：
+显式子卷选项**（SWAP 分区已由 generate-config 自动加入 `swapDevices`，**无需在此配置**）。
+把 `fileSystems` 相关部分替换为：
 
 ```nix
 fileSystems."/" = {
@@ -172,12 +177,6 @@ fileSystems."/nix" = {
   options = [ "subvol=@nix" "compress=zstd" "noatime" ];
 };
 
-fileSystems."/swap" = {
-  device = "/dev/disk/by-label/nixos";
-  fsType = "btrfs";
-  options = [ "subvol=@swap" "noatime" ];     # 注意：不压缩
-};
-
 fileSystems."/.snapshots" = {
   device = "/dev/disk/by-label/nixos";
   fsType = "btrfs";
@@ -190,16 +189,15 @@ fileSystems."/boot" = {
   options = [ "umask=0077" ];                 # EFI 分区仅 root 可访问
 };
 
-# 注意：swapfile 不用在 hardware-configuration.nix 里配，它由 flake 的 configuration.nix
-# 里的 swapDevices 自动创建（见上方「说明」）。
+# 注意：SWAP 分区（/dev/disk/by-label/SWAP）由 nixos-generate-config 自动写入
+# swapDevices（partition 类型），此处无需配置。
+# 休眠的 boot.resumeDevice 已写在 flake 的 configuration.nix（指向 /dev/disk/by-label/SWAP）。
 ```
 
 > 说明：
 > - `compress=zstd` + `noatime` 是 btrfs root/home/nix 的常见组合；`noatime` 减少元数据写入。
-> - `/swap` **不压缩**（swapfile 不能被压缩）。
-> - **swapfile 不用在这里配** —— `swapDevices` 已写在 flake 的 `configuration.nix`
->   （size 单位 MiB，`8 * 1024` = 8 GiB），NixOS 首次 switch 时自动 `dd` + `chattr +C`(NOCOW)
->   + `mkswap` 生成 `/swap/swapfile`。这里只需保证 `/swap` 子卷挂上来即可。
+> - 若 generate-config **没**捕获 SWAP 分区（例如装完系统后才补的），在 hardware 文件手动加：
+>   `swapDevices = [ { device = "/dev/disk/by-label/SWAP"; } ];`
 
 ---
 
@@ -255,16 +253,31 @@ reboot
   mount | grep ' / '                    # 挂载项含 compress=zstd
   sudo compsize / 2>/dev/null | head    # /nix 占大头，压缩收益高
   ```
-- **swapfile**（NixOS 自动建）：
+- **SWAP 分区 + 休眠**：
   ```bash
-  swapon --show                                   # 应见 /swap/swapfile，类型 file
-  sudo btrfs inspect-internal map-swapfile -r /swap/swapfile   # 应输出物理偏移
-  lsattr /swap/swapfile                           # 应有 C（NOCOW）
+  swapon --show                                   # 应见 /dev/disk/by-label/SWAP，类型 partition
+  cat /sys/power/resume                           # 应显示 SWAP 分区的设备路径
   ```
-  > `findmnt /swap` 可能仍显示 `compress=zstd`（同文件系统全局挂载项展示），但 swapfile 本身
-  > 未被压缩（`@swap` 子卷没开 compress，且 NixOS 已 `chattr +C`）。判断 swap 是否正确看上面三条。
 - **快照**（snapper 已默认启用）：`sudo snapper -c root list` 应有按时线快照；
   GRUB 菜单应出现「Snapshots」子菜单（首次重启后生成）。
+
+### 测试休眠
+
+> ⚠️ 测试前先保存所有工作。`systemctl hibernate` 会把内存写入 SWAP 分区并断电，
+> 下次开机自动从 SWAP 恢复（回到休眠前的桌面状态）。
+
+```bash
+systemctl hibernate
+```
+
+若恢复后黑屏/卡住，先确认 SWAP 分区 ≥ 内存、`boot.resumeDevice` 指向正确，并查日志
+`journalctl -b -1 | grep -i "resume\|hiber"`。
+
+> **可选：resume 后自动锁屏**
+> 休眠恢复后内存原样恢复，若休眠前未锁屏，他人可直接操作。可在 systemd
+> `post-resume.target` 上加一个服务触发 noctalia-shell 锁屏，或用
+> `powerManagement.resumeCommands` 调 `noctalia-shell ipc call ...`（需 noctalia-shell
+> 已运行）。可按需自行补充，本指南不默认启用。
 
 ---
 
@@ -323,15 +336,18 @@ sudo snapper -c root delete <快照号>                   # 删快照
 ## （本次不使用）LUKS 全盘加密变体 —— 留作备用
 
 > 本次安装**不加密**（按需求）。以下仅保留以便将来需要时启用，当前无需执行。
+> ⚠️ 若启用 LUKS，SWAP 分区也要纳入 LUKS 或单独处理，休眠配置会复杂化；本配置当前
+> 未加密，LUKS 变体仅作参考。
 
 ```bash
-cryptsetup luksFormat /dev/nvme0n1p2
-cryptsetup open /dev/nvme0n1p2 cryptroot
+cryptsetup luksFormat /dev/nvme0n1p3
+cryptsetup open /dev/nvme0n1p3 cryptroot
 mkfs.btrfs -f -L nixos /dev/mapper/cryptroot
 # 子卷创建/挂载同上，只是把 /dev/disk/by-label/nixos 换成 /dev/mapper/cryptroot
 # 并在 hardware-configuration.nix 打开：
 #   boot.initrd.luks.devices."cryptroot".device = "/dev/disk/by-uuid/<裸设备UUID>";
-# （UUID 用 `blkid /dev/nvme0n1p2` 查；注意是裸设备的 UUID，不是 mapper）
+# （UUID 用 `blkid /dev/nvme0n1p3` 查；注意是裸设备的 UUID，不是 mapper）
+# SWAP 分区若要也加密，需额外把 /dev/nvme0n1p2 纳入 LUKS，休眠恢复逻辑更复杂。
 ```
 
 GRUB 解密：UEFI + LUKS 时 GRUB 读取 `/boot`（vfat，单独分区，不加密）即可，

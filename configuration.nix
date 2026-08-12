@@ -47,13 +47,16 @@
   # LUKS 加密（原脚本建议）：取消下面注释并填设备
   # boot.initrd.luks.devices."luks-root".device = "/dev/disk/by-uuid/XXXX";
 
-  # ── swap（btrfs @swap 子卷 → /swap，由 NixOS 自动建 swapfile）──
-  # @swap 子卷在硬件配置里挂到 /swap（见 docs/install-btrfs.md 第 6 步）。
-  # NixOS 在首次 switch 时自动 dd + chattr +C（NOCOW）+ mkswap 生成 /swap/swapfile，
-  # 无需手动 dd / mkswap；btrfs 上 swapfile 必须 NOCOW 且不能压缩（@swap 子卷已不压缩）。
-  swapDevices = [
-    { device = "/swap/swapfile"; size = 8 * 1024; }  # size 单位 MiB → 8 GiB（按需调）
-  ];
+  # ── 休眠（hibernation）──
+  # ⚠️ btrfs 上的 swapfile **官方不支持休眠恢复**（内核 swsusp 在恢复早期无法可靠地把
+  #   btrfs 文件映射到块设备偏移）。因此休眠用**独立的 SWAP 分区**（不进 btrfs 子卷）。
+  # SWAP 分区在 docs/install-btrfs.md 第 1/2 步创建（linux-swap，label=SWAP），
+  # `nixos-generate-config` 会自动把它加入 swapDevices（partition 类型），无需手配。
+  # NixOS 26.05 的 initrd 默认启用 systemd，会自动检测 resume 设备并存 EFI 变量；
+  # 这里显式声明 boot.resumeDevice 作为兜底（非 EFI / 异常 EFI 主板也可靠）。
+  boot.resumeDevice = "/dev/disk/by-label/SWAP";
+  # 若已在装好的系统上**事后**补 SWAP 分区（未重新 generate-config），需在
+  # hardware-configuration.nix 手动加：swapDevices = [ { device = "/dev/disk/by-label/SWAP"; } ];
 
   # ── 网络 / 主机 ───────────────────────────────────────────
   networking.hostName = "nixos";
