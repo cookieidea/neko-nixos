@@ -1,12 +1,21 @@
 {
   description = "Shorin Arch Setup (shorin-arch-setup) → NixOS + Home Manager conversion";
 
+  # 国内二进制缓存（清华 TUNA）。仅加速「包下载」，不影响 flake 源码拉取。
+  # nixpkgs 源码走 TUNA git 镜像；home-manager/nixvim/opencode TUNA 未镜像，走 github
+  # （慢但可用；若 github 被墙可加代理或换镜像）。
+  nixConfig = {
+    extra-substituters = [ "https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store" ];
+    extra-trusted-public-keys = [ "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY=" ];
+  };
+
   inputs = {
-    # 国内镜像（清华 TUNA git 镜像，加速 nixpkgs / home-manager 源码拉取）
-    # 注意 TUNA git 镜像路径必须带所有者前缀：git/<owner>/<repo>.git
-    nixpkgs.url = "git+https://mirrors.tuna.tsinghua.edu.cn/git/NixOS/nixpkgs.git?ref=nixos-26.05";
+    # 国内镜像（清华 TUNA git 镜像）。注意 TUNA 对 nixpkgs 用无 owner 的别名
+    # 路径 git/nixpkgs.git（NixOS-CN 教程确认），shallow=1 浅克隆加速。
+    nixpkgs.url = "git+https://mirrors.tuna.tsinghua.edu.cn/git/nixpkgs.git?ref=nixos-26.05&shallow=1";
+    # home-manager TUNA 未镜像，用官方 github（慢但可用）
     home-manager = {
-      url = "git+https://mirrors.tuna.tsinghua.edu.cn/git/rycee/home-manager.git?ref=release-26.05";
+      url = "github:rycee/home-manager/release-26.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
