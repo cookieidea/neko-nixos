@@ -68,9 +68,9 @@
     # --- 已确认在 nixpkgs 26.05 存在的原 AUR 包 ---
     flclash                                   # flclash（代理 GUI）
     discord                                   # discord（语音/文字聊天，unfree）
-    # ayugram-desktop 已移除：其依赖 qtwebengine（Chromium 内核，本地编译极慢且构建失败）
-    # → 改用 ferdium（Electron 聚合客户端：Telegram/WhatsApp 等多合一，自带 Chromium 不引入 qtwebengine）
-    ferdium                                   # ferdium（多合一消息聚合客户端）
+    # Telegram 走 Flatpak（org.telegram.desktop，见 configuration.nix flatpak-repo 服务）：
+    # nixpkgs 的 Telegram 系（ayugram/kotatogram/telegram-desktop）都依赖 qtwebengine
+    # （Chromium 内核，本地编译极慢且易失败），flatpak 运行时自带引擎、无编译负担
     # wechat / qq —— nixpkgs 26.05 的 src 分别走 web.archive.org（429 限流）与腾讯 CDN
     # 旧版本链接（404），且 wechat 的 src 深埋在 appimageTools.extract 内部无法 override，
     # 故改走 Flatpak（flathub 官方维护），由 configuration.nix 的 flatpak-repo 服务启动时自动安装。
