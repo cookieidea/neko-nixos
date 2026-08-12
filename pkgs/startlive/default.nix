@@ -17,7 +17,8 @@ let
   };
 
   # 运行用 Python 环境（StartLive 要求 3.11 <= py <= 3.13）
-  py = pkgs.python311.withPackages (ps: with ps; [
+  # 用 python312：python311 下 keyring→secretstorage 依赖链的 sphinx-9.1.0 不支持 py311
+  py = pkgs.python312.withPackages (ps: with ps; [
     pyside6
     pillow
     qrcode
