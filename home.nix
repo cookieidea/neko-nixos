@@ -67,6 +67,8 @@
 
     # --- 已确认在 nixpkgs 26.05 存在的原 AUR 包 ---
     flclash                                   # flclash（代理 GUI）
+    discord                                   # discord（语音/文字聊天，unfree）
+    ayugram-desktop                           # ayugram-desktop（Telegram 第三方客户端，unfree）
     # wechat / qq —— nixpkgs 26.05 的 src 分别走 web.archive.org（429 限流）与腾讯 CDN
     # 旧版本链接（404），且 wechat 的 src 深埋在 appimageTools.extract 内部无法 override，
     # 故改走 Flatpak（flathub 官方维护），由 configuration.nix 的 flatpak-repo 服务启动时自动安装。
