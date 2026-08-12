@@ -20,6 +20,17 @@ pkgs.stdenv.mkDerivation {
 
   nativeBuildInputs = [ pkgs.autoPatchelfHook pkgs.makeWrapper ];
 
+  # skiko（Compose）与捆绑 JBR 运行时的原生库依赖
+  buildInputs = with pkgs; [
+    libX11 libXext libXi libXrender libXtst
+    fontconfig freetype
+    libxkbcommon
+    wayland
+    alsa-lib
+    zlib
+    stdenv.cc.cc.lib          # libstdc++
+  ];
+
   installPhase = ''
     runHook preInstall
     mkdir -p $out/lib/abdm $out/bin $out/share/applications $out/share/pixmaps
