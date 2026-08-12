@@ -31,7 +31,7 @@
     mission-center                            # mission-center
     gnome-font-viewer                         # gnome-font-viewer
     google-chrome                             # google-chrome (替代 firefox; unfree 已开启)
-    transmission-gtk                          # transmission-gtk
+    transmission_4-gtk                        # transmission_4-gtk（26.05 移除 transmission_3-gtk / transmission-gtk）
     localsend                                 # localsend
     gnome-calendar                            # gnome-calendar
     gnome-clocks                              # gnome-clocks

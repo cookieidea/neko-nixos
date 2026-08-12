@@ -135,7 +135,7 @@
       };
       default_session = {
         # tuigreet 列出可用 Wayland 会话；--cmd 直接指定 niri
-        command = "${pkgs.greetd.tuigreet}/bin/tuigreet --cmd ${pkgs.niri}/bin/niri --remember --user-menu";
+        command = "${pkgs.tuigreet}/bin/tuigreet --cmd ${pkgs.niri}/bin/niri --remember --user-menu";
         user = username;
       };
     };
@@ -158,7 +158,7 @@
     # 磁盘/文件系统工具（对应 kde-common-applist）
     gparted dosfstools exfatprogs f2fs-tools udftools xfsprogs
     # 登录管理器 greeter（niri 由 home.nix 的 programs.niri 安装）
-    greetd.tuigreet
+    tuigreet
     # X11 兼容层：xwayland-satellite（niri 25.08+ 开箱集成，binary 在 PATH 时
     # niri 自动按需拉起 Xwayland；微信/LinuxQQ 等 X11 应用因此可正常启动）
     xwayland-satellite
