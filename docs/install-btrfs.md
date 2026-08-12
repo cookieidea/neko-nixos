@@ -72,6 +72,8 @@ umount /mnt
 ROOT=/dev/sda2   # ← 同上
 EFI=/dev/sda1
 
+# compress=zstd：zstd 压缩（btrfs 默认级别 3，可写 compress=zstd:1~:15 调档；
+#   :1 最快体积略大，:15 最压但最慢。日常用默认或 zstd:1 即可）。
 mount -o subvol=@,compress=zstd $ROOT /mnt
 mkdir -p /mnt/{home,nix,var/log,snapshots,boot}
 
@@ -81,11 +83,20 @@ mount -o subvol=@log,compress=zstd     $ROOT /mnt/var/log
 mount -o subvol=@snapshots            $ROOT /mnt/snapshots
 
 mount $EFI /mnt/boot
+
+# ── zstd 兜底：给每个子卷设 btrfs 默认压缩属性 ──
+# 仅靠挂载选项的 compress 不够稳：nixos-generate-config 读 /proc/mounts 时
+# 可能只保留 subvol、丢 compress；且一旦某次重挂漏了选项，新文件就不压缩。
+# 给子卷打上默认压缩属性后，即使挂载选项丢失也照样压缩（不影响已存数据）。
+for mp in /mnt /mnt/home /mnt/nix /mnt/var/log; do
+  btrfs property set "$mp" compression zstd
+done
 ```
 
-确认：
+确认（应看到 `compress=zstd` 且 `btrfs property get` 返回 zstd）：
 ```bash
 mount | grep /mnt
+btrfs property get /mnt compression
 ```
 
 ---
@@ -97,6 +108,19 @@ nixos-generate-config --root /mnt
 ```
 这会在 `/mnt/etc/nixos/` 下生成 `configuration.nix` 和 `hardware-configuration.nix`。
 **保留 `hardware-configuration.nix`**（里面有你磁盘 UUID、btrfs 子卷挂载项）。
+
+> ⚠️ **检查 `compress` 是否被正确捕获**：`nixos-generate-config` 读 `/proc/mounts`
+> 生成的 `fileSystems."/".options` 里，确认有 `"compress=zstd"`（以及 `"subvol=@"`）。
+> 由于它有时只保留 `subvol` 而丢 `compress`，若发现缺了 `compress=zstd`，
+> 请手动补到 `hardware-configuration.nix` 对应每一项里，例如：
+> ```nix
+> fileSystems."/" = {
+>   device = "/dev/disk/by-uuid/<你的UUID>";
+>   fsType = "btrfs";
+>   options = [ "subvol=@" "compress=zstd" "x-systemd.mount-timeout=30" ];
+> };
+> ```
+> （因为上面已对子卷打了默认压缩属性，即便这里漏了也仍会压缩；补上只是让挂载选项表里一致。）
 
 ---
 
@@ -146,6 +170,12 @@ reboot
 - 启动应进 GRUB → 选 NixOS → 进 greetd 自动登录 niri。
 - 确认根真是 btrfs：`findmnt -n -o FSTYPE /` 应为 `btrfs`。
 - 子卷：`sudo btrfs subvolume list /`。
+- **确认 zstd 压缩在跑**（默认属性 + 挂载选项双保险）：
+  ```bash
+  btrfs property get / compression      # 应返回 compression=zstd
+  mount | grep ' / '                    # 挂载项应含 compress=zstd
+  sudo compsize / 2>/dev/null | head    # 看实际压缩比（/nix 占大头，压缩收益高）
+  ```
 - 后续想加**快照/回滚**（snapper + grub-btrfs）见 README「可选」与下方说明。
 
 ---
