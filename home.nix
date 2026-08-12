@@ -390,23 +390,24 @@
     gtk2.extraConfig = ''
       gtk-im-module="fcitx"
     '';
-    # 原 dotfiles gtk-3.0/settings.ini 的其余设置（去掉 gtk-im-module，Wayland 前端不需要）
-    gtk3.extraConfig = ''
-      gtk-toolbar-style=GTK_TOOLBAR_ICONS
-      gtk-toolbar-icon-size=GTK_ICON_SIZE_LARGE_TOOLBAR
-      gtk-button-images=0
-      gtk-menu-images=0
-      gtk-enable-event-sounds=1
-      gtk-enable-input-feedback-sounds=0
-      gtk-xft-antialias=1
-      gtk-xft-hinting=1
-      gtk-xft-hintstyle=hintslight
-      gtk-xft-rgba=rgb
-      gtk-application-prefer-dark-theme=1
-    '';
-    gtk4.extraConfig = ''
-      gtk-application-prefer-dark-theme=1
-    '';
+    # 原 dotfiles gtk-3.0/settings.ini 的其余设置（去掉 gtk-im-module，Wayland 前端不需要；
+    # 26.05 HM 的 gtk3.extraConfig 是 attrset 类型）
+    gtk3.extraConfig = {
+      gtk-toolbar-style = "GTK_TOOLBAR_ICONS";
+      gtk-toolbar-icon-size = "GTK_ICON_SIZE_LARGE_TOOLBAR";
+      gtk-button-images = "0";
+      gtk-menu-images = "0";
+      gtk-enable-event-sounds = "1";
+      gtk-enable-input-feedback-sounds = "0";
+      gtk-xft-antialias = "1";
+      gtk-xft-hinting = "1";
+      gtk-xft-hintstyle = "hintslight";
+      gtk-xft-rgba = "rgb";
+      gtk-application-prefer-dark-theme = "1";
+    };
+    gtk4.extraConfig = {
+      gtk-application-prefer-dark-theme = "1";
+    };
   };
 
   # ============================================================
