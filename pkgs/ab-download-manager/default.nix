@@ -27,8 +27,9 @@ pkgs.stdenv.mkDerivation {
     libxkbcommon
     wayland
     alsa-lib
+    libGL                       # skiko（Compose）OpenGL 渲染
     zlib
-    stdenv.cc.cc.lib          # libstdc++
+    stdenv.cc.cc.lib            # libstdc++
   ];
 
   installPhase = ''
