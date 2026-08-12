@@ -272,7 +272,7 @@
   };
 
   home.file = {
-    ".gtkrc-2.0".source = ./dotfiles/home/.gtkrc-2.0;
+    # 原 .gtkrc-2.0 内容已并入 gtk.gtk2.extraConfig（fcitx 输入法），不再手动部署避免模块冲突
     ".local/bin/random-anime-wallpaper-noctalia" = {
       source = ./dotfiles/local/bin/random-anime-wallpaper-noctalia;
       executable = true;
@@ -351,6 +351,10 @@
     theme = {
       name = "adwaita";
       package = pkgs.gnome-themes-extra;
+    };
+    # 原 dotfiles/home/.gtkrc-2.0 的 fcitx 输入法配置合并进模块（避免 .gtkrc-2.0 管理冲突）
+    gtk2.extraConfig = {
+      gtk-im-module = "fcitx";
     };
   };
 
