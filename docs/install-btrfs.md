@@ -282,22 +282,28 @@ systemctl hibernate
 ```nix
 services.snapper = {
   snapshotRootOnBoot = true;         # / 本身是 @ 子卷：开机时对根子卷打快照（26.05 由 snapshotRootOnSubvol 改名）
+  # 26.05 起 configs.<名> 选项全部用 snapper 配置键名（全大写，见 man snapper-configs）
   configs."root" = {
-    subvolume = "/";
-    timelineCreate = true;
-    timelineLimitHourly = 24;
-    timelineLimitDaily = 7;
-    timelineLimitWeekly = 4;
-    timelineLimitMonthly = 0;
-    timelineLimitYearly = 0;
-    emptyPrePostCleanup = true;
-    numberLimit = 0;
+    SUBVOLUME = "/";               # 26.05 由 subvolume 改名（全大写 SUBVOLUME）
+    TIMELINE_CREATE = true;
+    TIMELINE_LIMIT_HOURLY = 24;
+    TIMELINE_LIMIT_DAILY = 7;
+    TIMELINE_LIMIT_WEEKLY = 4;
+    TIMELINE_LIMIT_MONTHLY = 0;
+    TIMELINE_LIMIT_YEARLY = 0;
+    EMPTY_PRE_POST_CLEANUP = true;
+    NUMBER_LIMIT = 0;
   };
 };
 ```
 
 > ⚠️ 26.05 已移除 `services.grub-btrfs`，**GRUB 菜单不再有「Snapshots」子菜单**。
 > 快照仍由 snapper 按时线创建（写在 `/.snapshots`，即独立 `@snapshots` 子卷）。
+> ⚠️ 26.05 起 `configs.<名>` 里**必须用全大写键名**（对齐 snapper 配置文件）。旧 camelCase 键
+> （`timelineCreate` 等）已被移除：其中 `subvolume`/`fstype` 会直接报 assertion
+> （"has been renamed to ...SUBVOLUME"），其余旧键会被 freeform 静默收下、写出无效小写键，
+> **snapper 不认 → 快照静默不生效**。若装完 `sudo snapper -c root list` 一直是空的，先检查
+> `/etc/snapper/configs/root` 里键是不是全大写。
 
 **两种回滚场景（重点）**
 - **系统配置回滚（最稳，优先用）**：NixOS 自带 generation 机制 —— GRUB 菜单本就列出多个
@@ -374,3 +380,10 @@ sudo nixos-rebuild switch
 9. **`services.snapper.snapshotRootOnSubvol does not exist`**：26.05 把该 option
    **改名**为 `services.snapper.snapshotRootOnBoot`（根在 @ 子卷时改成开机对根子卷打快照）。
    仓库 `configuration.nix` 与本文第 10 节已同步改。
+10. **`services.snapper.configs.root.subvolume' has been renamed to ...SUBVOLUME`**：
+    26.05 把 `configs.<名>` 里的小写选项全部改成**全大写键名**（对齐 `man snapper-configs`：
+    `subvolume`→`SUBVOLUME`、`fstype`→`FSTYPE`；`timelineCreate`→`TIMELINE_CREATE`、
+    `timelineLimitHourly`→`TIMELINE_LIMIT_HOURLY`、`emptyPrePostCleanup`→`EMPTY_PRE_POST_CLEANUP`、
+    `numberLimit`→`NUMBER_LIMIT` …）。`subvolume`/`fstype` 残留会报 assertion；
+    其余旧 camelCase 键不报错但写出无效小写键，snapper 不认 → 快照静默不生效。
+    仓库已全部改成大写键（第 10 节）。

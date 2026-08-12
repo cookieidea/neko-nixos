@@ -182,16 +182,20 @@
   # 快照默认存到 /.snapshots（即独立挂载的 @snapshots 子卷，回滚根时不带快照、更稳）。
   services.snapper = {
     snapshotRootOnBoot = true;            # / 本身是 @ 子卷：开机时对根子卷打快照（26.05 由 snapshotRootOnSubvol 改名）
+    # ⚠️ 26.05 起 configs.<名> 的选项全部改用 snapper 配置文件键名（全大写，见 man snapper-configs）：
+    # subvolume→SUBVOLUME、timelineCreate→TIMELINE_CREATE、timelineLimitHourly→TIMELINE_LIMIT_HOURLY、
+    # emptyPrePostCleanup→EMPTY_PRE_POST_CLEANUP、numberLimit→NUMBER_LIMIT …
+    # 旧 camelCase 键不再声明，会被 freeformType 静默收下但写出无效小写键，snapper 不认 → 快照不生效。
     configs."root" = {
-      subvolume = "/";
-      timelineCreate = true;          # 按时线自动快照
-      timelineLimitHourly = 24;       # 保留最近 24 个每小时
-      timelineLimitDaily = 7;         # 保留最近 7 个每天
-      timelineLimitWeekly = 4;        # 保留最近 4 个每周
-      timelineLimitMonthly = 0;
-      timelineLimitYearly = 0;
-      emptyPrePostCleanup = true;     # 清掉空的 pre-post 快照对
-      numberLimit = 0;                # 0 = 不按数量限制，只按时线保留
+      SUBVOLUME = "/";              # 26.05 由 subvolume 改名（全大写 SUBVOLUME）
+      TIMELINE_CREATE = true;       # 按时线自动快照
+      TIMELINE_LIMIT_HOURLY = 24;   # 保留最近 24 个每小时
+      TIMELINE_LIMIT_DAILY = 7;     # 保留最近 7 个每天
+      TIMELINE_LIMIT_WEEKLY = 4;    # 保留最近 4 个每周
+      TIMELINE_LIMIT_MONTHLY = 0;
+      TIMELINE_LIMIT_YEARLY = 0;
+      EMPTY_PRE_POST_CLEANUP = true; # 清掉空的 pre-post 快照对
+      NUMBER_LIMIT = 0;             # 0 = 不按数量限制，只按时线保留
     };
   };
   # ⚠️ NixOS 26.05 已移除 services.grub-btrfs 模块（grub-btrfs 在 nixpkgs 中停止维护被删除）。
