@@ -52,6 +52,9 @@
 
       # 公共 Home Manager 集成模块（nixos 实体机配置用）
       hmModule = {
+        # 必须先 import home-manager 的 NixOS 模块，home-manager.* 选项才有定义
+        imports = [ home-manager.nixosModules.home-manager ];
+
         _module.args = { inherit desktop username; };
 
         # Home Manager 集成
