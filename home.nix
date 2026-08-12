@@ -353,9 +353,9 @@
       package = pkgs.gnome-themes-extra;
     };
     # 原 dotfiles/home/.gtkrc-2.0 的 fcitx 输入法配置合并进模块（避免 .gtkrc-2.0 管理冲突）
-    gtk2.extraConfig = {
-      gtk-im-module = "fcitx";
-    };
+    gtk2.extraConfig = ''
+      gtk-im-module="fcitx"
+    '';
   };
 
   # ============================================================
