@@ -68,7 +68,8 @@
     # --- 已确认在 nixpkgs 26.05 存在的原 AUR 包 ---
     flclash                                   # flclash（代理 GUI）
     wechat                                    # wechat（腾讯官方原生 Linux 版，unfree，需 allowUnfree）
-    qq                                        # qq（腾讯官方原生 Linux 版，unfree，需 allowUnfree）
+    # qq —— 26.05 pin 的 QQ 3.2.29 deb 已被腾讯 CDN 下架（404），装完系统用 flatpak 补：
+    #       flatpak install flathub org.tencent.qq
     gearlever                                 # gearlever（管理 AppImage/flatpak）
     lsfg-vk                                   # lsfg-vk（FSR 帧生成 vulkan 层）
     protonplus                                # protonplus（Proton 管理）
