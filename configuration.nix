@@ -40,6 +40,10 @@
     configurationLimit = 20;
     efiInstallAsRemovable = true;   # 兜底：复制到 fallback EFI 路径，板子 UEFI 抽风也能启动
   };
+  # ── 文件系统支持（btrfs 根分区 + initrd 挂载）────────────
+  boot.supportedFilesystems = [ "btrfs" ];
+  boot.initrd.supportedFilesystems = [ "btrfs" ];
+
   # LUKS 加密（原脚本建议）：取消下面注释并填设备
   # boot.initrd.luks.devices."luks-root".device = "/dev/disk/by-uuid/XXXX";
 
