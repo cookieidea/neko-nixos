@@ -87,12 +87,26 @@ mkfs.btrfs -f -L nixos /dev/nvme0n1p3
 
 ```bash
 mount /dev/disk/by-label/nixos /mnt
+# ↓ 防坑：确认 /mnt 真是 btrfs 再建子卷，否则会报
+#   "Could not create subvolume: Inappropriate ioctl for device"
+#   常见原因：① by-label 软链尚未就绪导致 mount 静默失败；
+#            ② 挂错分区（如把 EFI 的 vfat 挂到 /mnt）；
+#            ③ mkfs.btrfs 没成功（分区被占用/设备错）。
+findmnt -n -o FSTYPE /mnt        # 必须输出 btrfs；为空或 vfat 就先 umount /mnt 重挂
 btrfs subvolume create /mnt/@
 btrfs subvolume create /mnt/@home
 btrfs subvolume create /mnt/@nix
 btrfs subvolume create /mnt/@snapshots
 umount /mnt
 ```
+
+> 若 `findmnt` 看不到 /mnt，或输出不是 `btrfs`：
+> ```bash
+> umount /mnt 2>/dev/null
+> ls -l /dev/disk/by-label/ | grep nixos   # 确认 by-label 软链存在；不存在就直接用设备路径
+> mount /dev/nvme0n1p3 /mnt               # 用真实设备路径兜底（替换成你的 Root 分区）
+> findmnt -n -o FSTYPE /mnt               # 再确认是 btrfs 后才继续
+> ```
 
 ---
 
