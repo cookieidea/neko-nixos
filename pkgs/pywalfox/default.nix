@@ -12,6 +12,7 @@
 pkgs.python3Packages.buildPythonApplication {
   pname = "pywalfox";
   version = "2.9.0";
+  format = "setuptools";   # 26.05 起必须显式声明 format（不再自动检测）；该 sdist 是经典 setup.py
 
   src = pkgs.fetchPypi {
     pname = "pywalfox";
