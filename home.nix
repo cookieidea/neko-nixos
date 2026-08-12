@@ -160,6 +160,7 @@
     selfPackages.splayer-next     # SPlayer-Dev/SPlayer-Next（非 nixpkgs 的 splayer）
     selfPackages.startlive        # StartLive（B 站推流地址获取，PySide6 GUI；自构建）
     selfPackages.ab-download-manager  # AB Download Manager（多线程下载器，Compose Desktop；自构建）
+    selfPackages.tabby-terminal       # Tabby 终端（eugeny/tabby，Electron；自构建，nixpkgs 的 tabby 是 TabbyML AI 助手）
     # 走 flake 输入的包（不在 nixpkgs 核心，直接引用其 flake 构建产物）
     bili-danmaku-tui.packages.${pkgs.stdenv.hostPlatform.system}.default  # B 站直播间弹幕 TUI
   ];

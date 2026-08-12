@@ -24,4 +24,5 @@
   startlive      = import ./startlive      { inherit pkgs; };
   rime-wanxiang  = import ./rime-wanxiang  { inherit pkgs; };
   ab-download-manager = import ./ab-download-manager { inherit pkgs; };
+  tabby-terminal  = import ./tabby  { inherit pkgs; };
 }
