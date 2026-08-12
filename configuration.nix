@@ -91,7 +91,9 @@
         (fcitx5-rime.override {
           rimeDataPkgs = [ rime-data selfPackages.rime-wanxiang ];
         })
-        qt6Packages.fcitx5-chinese-addons   # 26.05 起从 pkgs 移到 qt6Packages
+        # fcitx5-chinese-addons 已移除：它硬依赖 qtwebengine（网页词典组件），
+        # 而 qtwebengine 6.11.1 在 GCC 15 下编译崩溃（gcc bug c/125349）；
+        # 中文输入走 rime-wanxiang，该包（原生拼音/五笔引擎）冗余
       ];
     };
   };
