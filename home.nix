@@ -220,6 +220,29 @@
   #  dotfiles（对应原仓库 noctalia-dotfiles 的 rice 配置）
   #  通过 xdg.configFile 部署到 ~/.config/
   # ============================================================
+
+  # ── AppImage wrap 包（tabby/splayer-next）的 desktop 入口 ──
+  # wrapType2 在 26.05 用 FHS env 输出，desktop 不在标准路径（包内 postInstall 无效），
+  # 改由 HM 直接生成到 ~/.local/share/applications（freedesktop 默认扫描，launcher 可见）。
+  xdg.desktopEntries = {
+    tabby = {
+      name = "Tabby";
+      comment = "Terminal emulator";
+      exec = "tabby-terminal";
+      icon = "tabby";
+      terminal = false;
+      categories = [ "System" "TerminalEmulator" ];
+    };
+    splayer-next = {
+      name = "SPlayer-Next";
+      comment = "Cross-platform desktop music player";
+      exec = "splayer-next";
+      icon = "splayer-next";
+      terminal = false;
+      categories = [ "AudioVideo" "Audio" "Player" ];
+    };
+  };
+
   xdg.configFile = {
     "MangoHud/MangoHud.conf".source = ./dotfiles/config/MangoHud/MangoHud.conf;
     "Thunar/accels.scm".source = ./dotfiles/config/Thunar/accels.scm;
