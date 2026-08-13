@@ -28,7 +28,7 @@
   - Flathub：官方 `dl.flathub.org`（国内 USTC/TUNA/阿里镜像 2026-08 起全部失效，见 docs 踩坑速查 18）
 - **AMD 显卡**：开启 `hardware.graphics.enable`（26.05 由 `hardware.opengl` 改名）+ `vulkan-loader`(RADV) + `libva`(VA-API)，videoDriver 设为 `amdgpu`。
 - **允许 unfree**：`qq` / `wechat` / `lunarclient` 等闭源包需要 `nixpkgs.config.allowUnfree = true;`（已在 `configuration.nix` 开启）。
-- **输入法**：fcitx5 `waylandFrontend = true`（Wayland 原生 text-input），中文走 **rime-wanxiang（GitHub amzxyz 版，自构建）**，无日文输入法。
+- **输入法**：fcitx5 `waylandFrontend = true`（Wayland 原生 text-input），中文走 **rime + rime-ice（雾凇拼音，nixpkgs 自带词库）**，无日文输入法。
 
 ---
 
@@ -66,7 +66,7 @@ neko-nixos/
 - **主题/图标**：`adwaita-icon-theme` `papirus-icon-theme` `hicolor-icon-theme` `adw-gtk3` `breeze(kdePackages)`——图标主题由 home-manager `gtk` 模块写入（Papirus），settings.ini 不手写部署
 - **flake 包（不在 nixpkgs 核心）**：`opencode`（AI 编程 Agent）、`bili-danmaku-tui`（B 站弹幕 TUI，自带 flake）。桌面 shell 用 nixpkgs 自带的 `noctalia-shell`。
 - **Flatpak 自动安装（flatpak-repo 服务）**：微信 / QQ / Flatseal / Bazaar 应用商店 / OpenOrpheus（网易云 Orpheus 宿主）
-- **自构建程序（`./pkgs` 派生，对应原 Arch 的 AUR `-git` / 私有仓库）**：`niri-sidebar` `pins` `pywalfox` `shorin-contrib` `proton-wrapper` `splayer-next` `startlive` `ab-download-manager` `tabby-terminal` `rime-wanxiang`
+- **自构建程序（`./pkgs` 派生，对应原 Arch 的 AUR `-git` / 私有仓库）**：`niri-sidebar` `pins` `pywalfox` `shorin-contrib` `proton-wrapper` `splayer-next` `startlive` `ab-download-manager` `tabby-terminal` `obs-vdoninja`
   - ⚠️ `splayer-next` 是 **SPlayer-Dev/SPlayer-Next**（Electron 音乐播放器），与 nixpkgs 里的 `splayer`（Simple Netease Cloud Music player）**不是同一个软件**，切勿混用。
   - ⚠️ `tabby-terminal` 是 **eugeny/tabby** 终端模拟器；nixpkgs 的 `tabby` 是 TabbyML AI 助手，同名不同项目。
 
@@ -108,7 +108,7 @@ Nix 里改用 **flake 内的 Nix 派生** 从源码/发布构建，集中在 `pk
 | `startlive` | Radekyspec/StartLive | Python + PySide6（wrapper，velopack stub） | startlive-git |
 | `ab-download-manager` | amir1376/ab-download-manager | jpackage（makeWrapper + autoPatchelf） | abdownloadmanager-bin |
 | `tabby-terminal` | eugeny/tabby | Electron（AppImage 包装） | — |
-| `rime-wanxiang` | amzxyz/rime-wanxiang | RIME 数据包（fetchGit → share/rime） | rime-wanxiang（GitHub 版） |
+| `obs-vdoninja` | steveseguin/ninja-obs-plugin | 预编译 .so（autoPatchelf + libdatachannel override） | vdoninja（手动） |
 
 - 这些包通过 `packages.<system>` 暴露成 flake 包，可单独构建：
   ```bash

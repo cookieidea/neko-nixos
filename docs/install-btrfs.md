@@ -280,7 +280,7 @@ reboot
   ls ~/.config/MangoHud                # 应有 MangoHud.conf
   ```
 - **输入法**：`fcitx5-diagnose` 不应再出现「推荐取消 GTK_IM_MODULE」提示
-  （`waylandFrontend = true` + GTK settings 已清理）；中文走 **rime-wanxiang（GitHub 版）**，
+  （`waylandFrontend = true` + GTK settings 已清理）；中文走 **rime + rime-ice（雾凇拼音）**，
   日文 mozc 已移除。
 - **微信/QQ/Flatseal/OpenOrpheus**：`flatpak list --system 2>/dev/null | grep -iE "wechat|qq|flatseal|orpheus"`——由
   `flatpak-repo.service` 启动时自动从官方 `dl.flathub.org` 安装（国内 flathub 镜像已全部失效，见踩坑速查 18）。
