@@ -31,9 +31,11 @@
       url = "git+https://github.com/nix-community/nixvim.git?ref=nixos-26.05";
     };
 
-    # ── opencode（AI 编程 Agent，用 flake 装，拿最新版）──
+    # ── opencode（AI 编程 Agent）──
+    # 官方 flake（github:sst/opencode，dev 分支持续构建最新版）；
+    # 之前用 GutMutCode/opencode-nix 第三方包装，其内部 pin 固定版本 → 版本太旧
     opencode = {
-      url = "git+https://github.com/GutMutCode/opencode-nix.git";
+      url = "github:sst/opencode";
     };
 
     # ── bili-danmaku-tui（B 站直播间弹幕 TUI，Go/bubbletea）──
