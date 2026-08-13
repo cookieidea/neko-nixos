@@ -2,7 +2,7 @@
   description = "Shorin Arch Setup (shorin-arch-setup) → NixOS + Home Manager conversion";
 
   # 国内二进制缓存（中科大 USTC 优先 + 清华 TUNA 兜底）。仅加速「包下载」，不影响 flake 源码拉取。
-  # nixpkgs 源码走 TUNA git 镜像；home-manager/nixvim/opencode TUNA 未镜像，走 github
+  # nixpkgs 源码走 TUNA git 镜像；home-manager/opencode TUNA 未镜像，走 github
   # （慢但可用；若 github 被墙可加代理或换镜像）。
   nixConfig = {
     extra-substituters = [
@@ -22,18 +22,6 @@
       url = "git+https://github.com/rycee/home-manager.git?ref=release-26.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-
-    # ── nixvim：Neovim 的配置框架（替代 neovim + lazyvim）──
-    # 用 nixos-26.05 分支以匹配下面的 nixpkgs 26.05。
-    # 官方建议不要 follows nixpkgs，让它用自己 pin 的 revision。
-    # git+https 直连 github，绕开 API 限流。
-    nixvim = {
-      url = "git+https://github.com/nix-community/nixvim.git?ref=nixos-26.05";
-    };
-
-    # ── Noctalia 桌面 shell 改用 nixpkgs 自带的 `noctalia-shell` ──
-    # （quickshell 配置 + qs 封装，见 home.nix 的 pkgs.noctalia-shell）。
-    # 不再用独立的 noctalia v4 应用 flake 输入。
 
     # ── opencode（AI 编程 Agent，用 flake 装，拿最新版）──
     opencode = {
@@ -55,7 +43,7 @@
     };
   };
 
-  outputs = { self, nixpkgs, home-manager, nixvim, opencode, bili-danmaku-tui, nix-cachyos-kernel, ... }:
+  outputs = { self, nixpkgs, home-manager, opencode, bili-danmaku-tui, nix-cachyos-kernel, ... }:
     let
       system = "x86_64-linux";
       # ── 改这里 ──────────────────────────────────────────────
@@ -79,8 +67,8 @@
         home-manager.useGlobalPkgs = true;
         home-manager.useUserPackages = true;
         home-manager.users.${username} = import ./home.nix;
-        # 把 nixvim / opencode / bili-danmaku-tui 三个 flake 输入，以及自构建包传给 home 配置
-        home-manager.extraSpecialArgs = { inherit desktop username nixvim opencode bili-danmaku-tui selfPackages; };
+        # 把 opencode / bili-danmaku-tui 两个 flake 输入，以及自构建包传给 home 配置
+        home-manager.extraSpecialArgs = { inherit desktop username opencode bili-danmaku-tui selfPackages; };
       };
     in {
       # 暴露自构建派生为 flake 包：可单独 `nix build .#<name>`
