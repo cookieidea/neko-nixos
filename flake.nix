@@ -95,9 +95,9 @@
             ./configuration.nix
             hmModule
             # CachyOS 内核 overlay（pinned：固定其 nixpkgs rev 以命中二进制缓存）
-            # + 移除 neovim 包自带的 nvim.desktop（Name=Neovim wrapper，Terminal=true，
-            #   图形启动器拉起时缺终端处理器打不开——用户要求删掉这个菜单条目，
-            #   nixvim 本体保留）
+            # + 修 neovim 包自带的 nvim.desktop（Name=Neovim wrapper）：
+            #   原版 Terminal=true + Exec=nvim，图形启动器拉起时缺终端处理器打不开
+            #   → 覆盖为 Terminal=false + Exec=kitty -e nvim %F（直接调 kitty 打开）
             {
               nixpkgs.overlays = [
                 nix-cachyos-kernel.overlays.pinned
@@ -105,11 +105,20 @@
                   neovim = prev.neovim.overrideAttrs (old: {
                     postInstall = (old.postInstall or "") + ''
                       rm -f "$out/share/applications/nvim.desktop"
-                    '';
-                  });
-                  neovim-unwrapped = prev.neovim-unwrapped.overrideAttrs (old: {
-                    postInstall = (old.postInstall or "") + ''
-                      rm -f "$out/share/applications/nvim.desktop"
+                      cat > "$out/share/applications/nvim.desktop" <<'DESKTOP'
+[Desktop Entry]
+Name=Neovim wrapper
+GenericName=Text Editor
+Comment=Edit text files
+TryExec=nvim
+Exec=kitty -e nvim %F
+Icon=nvim
+Type=Application
+Terminal=false
+Categories=Utility;TextEditor;Development;
+MimeType=text/plain;text/x-makefile;application/x-shellscript;text/x-c;text/x-c++src;
+StartupNotify=false
+DESKTOP
                     '';
                   });
                 })
