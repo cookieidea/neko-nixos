@@ -25,38 +25,33 @@ let
     pkgs.gtk4 pkgs.cairo pkgs.pango pkgs.glib pkgs.gdk-pixbuf
     pkgs.harfbuzz pkgs.fribidi pkgs.libthai pkgs.graphene
   ];
-  giLibPath = pkgs.lib.makeLibraryPath gtkLibPkgs;
+  giLibPath = pkgs.lib.concatStringsSep ":" (
+    map (p: allOutputDirs p "lib") gtkLibPkgs
+  );
 
   # ── typelib 搜索路径 ──
-  # ⚠️ 必须逐目录显式列出。之前用 makeSearchPath + makeWrapper --prefix 组合时，
-  #    超长冒号列表被拆得只剩最后一项（gdk-pixbuf-dev）→ 连环报错 Cairo→PangoCairo。
-  # 关键知识点：
-  # - Cairo-1.0.typelib 由 gobject-introspection 包生成（cairo 包不构建
+  # ⚠️ 核心坑：`${pkg}` 指向包的「第一个输出」，不一定是 out！
+  #    pango 的 outputs=[bin out dev] → ${pkgs.pango} = pango-…-bin，typelib 却在 out；
+  #    gdk-pixbuf 同理（第一输出是 dev）。必须逐输出遍历（out/bin/dev 全收）。
+  # 另：Cairo-1.0.typelib 由 gobject-introspection 包生成（cairo 包不构建
   #   introspection、不带 typelib！见 https://github.com/NixOS/nixpkgs/issues/34080）
-  # - 部分包（glib/pango/graphene/gdk-pixbuf/cairo/gtk4）的 .typelib 在 dev 输出
-  # - graphene 是 Gtk-4.0 typelib 的依赖（Graphene-1.0）
-  giTypelibPath = pkgs.lib.concatStringsSep ":" [
-    "${pkgs.gobject-introspection}/lib/girepository-1.0"
-    "${pkgs.gtk4}/lib/girepository-1.0"
-    "${pkgs.cairo}/lib/girepository-1.0"
-    "${pkgs.pango}/lib/girepository-1.0"
-    "${pkgs.glib}/lib/girepository-1.0"
-    "${pkgs.gdk-pixbuf}/lib/girepository-1.0"
-    "${pkgs.harfbuzz}/lib/girepository-1.0"
-    "${pkgs.fribidi}/lib/girepository-1.0"
-    "${pkgs.libthai}/lib/girepository-1.0"
-    "${pkgs.graphene}/lib/girepository-1.0"
-    # .typelib 在 dev 输出的包
-    "${pkgs.cairo.dev}/lib/girepository-1.0"
-    "${pkgs.gtk4.dev}/lib/girepository-1.0"
-    "${pkgs.pango.dev}/lib/girepository-1.0"
-    "${pkgs.glib.dev}/lib/girepository-1.0"
-    "${pkgs.graphene.dev}/lib/girepository-1.0"
-    "${pkgs.gdk-pixbuf.dev}/lib/girepository-1.0"
+  #   graphene 是 Gtk-4.0 typelib 的依赖（Graphene-1.0）
+  typelibPkgs = [
+    pkgs.gobject-introspection
+    pkgs.gtk4 pkgs.cairo pkgs.pango pkgs.glib pkgs.gdk-pixbuf
+    pkgs.harfbuzz pkgs.fribidi pkgs.libthai pkgs.graphene
   ];
+  allOutputDirs = p: sub: pkgs.lib.concatStringsSep ":" (
+    map (o: "${p.${o}}/${sub}") (p.outputs or [ "out" ])
+  );
+  giTypelibPath = pkgs.lib.concatStringsSep ":" (
+    map (p: allOutputDirs p "lib/girepository-1.0") typelibPkgs
+  );
 
-  # GTK4 数据目录（schemas/icons/themes）
-  giDataPath = pkgs.lib.makeSearchPath "share" (gtkLibPkgs ++ [ pkgs.gsettings-desktop-schemas ]);
+  # GTK4 数据目录（schemas/icons/themes）——同样逐输出遍历
+  giDataPath = pkgs.lib.concatStringsSep ":" (
+    map (p: allOutputDirs p "share") (gtkLibPkgs ++ [ pkgs.gsettings-desktop-schemas ])
+  );
 in
 pkgs.stdenv.mkDerivation {
   pname = "shorin-proton-wrapper";
