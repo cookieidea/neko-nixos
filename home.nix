@@ -175,6 +175,9 @@
       settings = {
         user.name = "cookieidea";
         user.email = "jhbhyvv@outlook.com";
+        # /etc/nixos 仓库是 root 所有，普通用户 git 操作会报 dubious ownership；
+        # ~/.config/git/config 是只读 store 链接没法 --add，必须写进托管配置
+        safe.directory = "/etc/nixos";
       };
     };
     starship.enable = true;       # starship
