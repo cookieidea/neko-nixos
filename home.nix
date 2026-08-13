@@ -282,6 +282,8 @@
   };
 
   home.file = {
+    # ── 用户头像（freedesktop 标准 ~/.face，ly 登录管理器 + noctalia 控制中心读取）──
+    ".face".source = ./dotfiles/avatar.png;
     # ── AppImage wrap 包（tabby/splayer-next）的 desktop 入口 ──
     # wrapType2 26.05 FHS 输出不带标准路径 desktop；xdg.desktopEntries 在
     # useUserPackages 下未落到 ~/.local/share/applications → 用 home.file 强制写文件
