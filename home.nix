@@ -20,6 +20,13 @@
   home.homeDirectory = "/home/${username}";
   home.stateVersion = "26.05";
 
+  # kitty 终端 terminfo：kitty 设 TERM=xterm-kitty，NixOS 上 ncurses 找不到该
+  # terminfo 文件 → nvim 等 ncurses 应用吐转义码乱码（^[[?69…）。指向 kitty 包自带的
+  # share/terminfo 即可（xterm 等其余条目用 ncurses 内建 fallback）。
+  home.sessionVariables = {
+    TERMINFO_DIRS = "${pkgs.kitty}/share/terminfo";
+  };
+
   # ============================================================
   #  软件包（home.packages）
   #  左 = Nixpkgs 属性名，括号内 = 原 Arch 包名
