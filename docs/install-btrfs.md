@@ -7,7 +7,7 @@
 - 引导用 **GRUB (UEFI)**（非 systemd-boot）
 - 桌面用 **niri + noctalia-shell**
 - 已默认启用 **snapper** 按时线快照
-- 配置通过 **flake** 安装（`nixos-install --flake .#nixos`）
+- 配置通过 **flake** 安装（`nixos-install --flake .#ATRI`）
 - **休眠用独立 SWAP 分区**：btrfs 上的 swapfile 官方不支持休眠恢复，故休眠走独立分区
 - ⚠️ NixOS 26.05 已**移除 `services.grub-btrfs` 模块**，GRUB 菜单不再列出快照子菜单；
   回滚走 NixOS generation（GRUB 本就列出多代）+ snapper 手动回滚（见第 10 节）
@@ -204,7 +204,7 @@ git add hardware-configuration.nix     # 无需 commit，脏树含暂存文件�
 ```
 
 > flake 里引导已是 **GRUB（UEFI，`device="nodev"`）**，SWAP 休眠、snapper 都已默认启用；
-> hostname 固定 `nixos`，用户 `cookie`。Live ISO 里临时要 git：`nix-shell -p git` 再 clone。
+> hostname 固定 `ATRI`，用户 `cookie`。Live ISO 里临时要 git：`nix-shell -p git` 再 clone。
 > flake 输入已配好：nixpkgs 走 TUNA 浅克隆、home-manager/nixvim/opencode 走官方 `git+https`、
 > 二进制缓存走 TUNA（见下条安装命令）。
 
@@ -214,7 +214,7 @@ git add hardware-configuration.nix     # 无需 commit，脏树含暂存文件�
 
 ```bash
 cd /mnt/etc/nixos
-nixos-install --flake .#nixos \
+nixos-install --flake .#ATRI \
   --option substituters "https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store https://cache.nixos.org" \
   --max-jobs 1
 ```
@@ -442,7 +442,7 @@ sudo nixos-rebuild switch
 16. **`git+file` flake 的 dirty 树源缓存坑**：`git pull` 后配置改动"不生效"（构建仍用旧文件，
     连 drv 名都不变）。dirty 树的源复制/缓存不可靠。解法：
     - 提交使树干净：`git add -A && git commit -m sync`（nix 用 HEAD rev 确定性内容）；
-    - 或绕过 git：`nixos-install --flake path:/mnt/etc/nixos#nixos`（直读文件系统）。
+    - 或绕过 git：`nixos-install --flake path:/mnt/etc/nixos#ATRI`（直读文件系统）。
     - merge 卡在 vi：live ISO 无 vi，先 `git config core.editor true` 再 `git commit --no-edit`。
 17. **分叉分支 pull 被拒（divergent branches）**：本地提交过 hardware-configuration.nix 后与
     origin 分叉。`git config pull.rebase false && git pull origin main`（无冲突会直接 merge）。
@@ -469,9 +469,9 @@ sudo nixos-rebuild switch
     sudo nixos-generate-config
     sudo git add -A && sudo git config user.email "you@example.com" && sudo git config user.name "you"
     sudo git commit -m "hardware-configuration"     # flake 只认 tracked 文件！
-    sudo nixos-rebuild switch --flake .#nixos --option substituters "..."
+    sudo nixos-rebuild switch --flake .#ATRI --option substituters "..."
     ```
-    之后日常更新：`sudo nixos-rebuild switch --flake github:cookieidea/neko-nixos#nixos`。
+    之后日常更新：`sudo nixos-rebuild switch --flake github:cookieidea/neko-nixos#ATRI`。
 24. **`services.displayManager.session does not exist`（26.05）**：该选项已移除。注册 niri 会话
     改用系统级 `programs.niri.enable = true`（自动挂 wayland-sessions desktop 文件 +
     portal/gnome-keyring 推荐配置）。仓库已改。

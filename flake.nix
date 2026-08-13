@@ -60,7 +60,7 @@
       system = "x86_64-linux";
       # ── 改这里 ──────────────────────────────────────────────
       username = "cookie";   # 你的用户名（也用于 home 目录 / autoLogin）
-      hostname = "nixos";
+      hostname = "ATRI";
       desktop  = "niri";       # 当前仅 "niri"（niri + Noctalia）
       # ───────────────────────────────────────────────────────
 

@@ -70,7 +70,7 @@
   # hardware-configuration.nix 手动加：swapDevices = [ { device = "/dev/disk/by-label/SWAP"; } ];
 
   # ── 网络 / 主机 ───────────────────────────────────────────
-  networking.hostName = "nixos";
+  networking.hostName = "ATRI";
   networking.networkmanager.enable = true;   # 对应 01c-nm-backend.sh
 
   # ── 时区 /  locale ────────────────────────────────────────

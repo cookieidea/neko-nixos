@@ -148,8 +148,8 @@ sudo bash install.sh [用户名]
 
 脚本会：
 - 把配置里的硬编码用户名 `cookie` 替换成你的用户名（含 `flake.nix` 与 `dotfiles/` 下的路径）；
-- 全新安装模式跑 `nixos-install --flake <挂载点>/etc/nixos/#nixos`；
-- 更新模式跑 `nixos-rebuild switch --flake /etc/nixos/#nixos`；
+- 全新安装模式跑 `nixos-install --flake <挂载点>/etc/nixos/#ATRI`；
+- 更新模式跑 `nixos-rebuild switch --flake /etc/nixos/#ATRI`；
 - 复制后清理 `.git`，不覆盖你 `generate` 出来的 `hardware-configuration.nix`；
 - **预构建自构建程序**（`pkgs/` 里的派生，对应原 Arch 的 AUR `-git` / 私有仓库），逐个 `nix build .#<name>`，提前暴露错误。
 
@@ -163,13 +163,13 @@ sudo -E bash -c "$(curl -fsSL https://raw.githubusercontent.com/cookieidea/neko-
 
 ```bash
 # 全新安装
-sudo nixos-install --flake /mnt/etc/nixos/#nixos
+sudo nixos-install --flake /mnt/etc/nixos/#ATRI
 
 # 已装系统
-sudo nixos-rebuild switch --flake /etc/nixos/#nixos
+sudo nixos-rebuild switch --flake /etc/nixos/#ATRI
 ```
 
-> 主机名默认 `nixos`，flake 输出名与之对应（`#nixos`）。要改主机名需同时改 `flake.nix` 的 `hostname` 与 `nixosConfigurations.${hostname}`。
+> 主机名默认 `ATRI`，flake 输出名与之对应（`#ATRI`）。要改主机名需同时改 `flake.nix` 的 `hostname` 与 `nixosConfigurations.${hostname}`。
 
 ---
 
@@ -186,10 +186,10 @@ sudo nixos-rebuild switch --flake /etc/nixos/#nixos
 
 ```bash
 # 改完配置后重新构建
-sudo nixos-rebuild switch --flake /etc/nixos/#nixos
+sudo nixos-rebuild switch --flake /etc/nixos/#ATRI
 
 # 仅更新用户层（Home Manager）
-home-manager switch --flake /etc/nixos/#nixos
+home-manager switch --flake /etc/nixos/#ATRI
 
 # 更新 flake 输入（nixpkgs / home-manager 等）
 nix flake update
