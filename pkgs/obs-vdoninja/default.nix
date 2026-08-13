@@ -26,6 +26,9 @@ pkgs.stdenv.mkDerivation {
 
   nativeBuildInputs = [ pkgs.autoPatchelfHook ];
 
+  # tar 平铺结构（lib/ share/ 直接在最外层，无单一根目录）
+  sourceRoot = ".";
+
   # 插件是 .so 库不是应用：qtbase 仅作链接依赖，不需要 Qt wrap
   dontWrapQtApps = true;
 
