@@ -16,6 +16,13 @@
 #   写 ~/.config/autostart 指向 bin/ABDownloadManager 原始路径）、浏览器集成。
 # 之前尝试的 -Dsun.awt.fontconfig 指向自定义 XML 的方案对 JDK 25 无效
 # （XML 被按 Java properties 解析 → getInitELC NPE 崩溃），已移除。
+#
+# ⚠️ 系统托盘修复（2026-08，已实测）：
+# ABDM 1.10+ 的托盘由 ComposeNativeTray 实现，运行时把 jar 内的
+# libLinuxTray.so 解压到 ~/.cache/composetray 后经 JNA 加载；该库 NEEDED
+# libsystemd.so.0，而 NixOS 无 ld.so.cache → 依赖解析失败 → 托盘静默失败
+# （SNI 上无 item）。修复：makeWrapper 注入 LD_LIBRARY_PATH 指向
+# systemdLibs（JNA 的 dlopen 会按 LD_LIBRARY_PATH 解析依赖）。
 { pkgs }:
 
 let
@@ -30,7 +37,7 @@ pkgs.stdenv.mkDerivation {
     sha256 = "daae532dfc07231dae02fce371a66b50e6c1ef4ca94a705bb3b5f2b996825ee7";
   };
 
-  nativeBuildInputs = [ pkgs.autoPatchelfHook ];
+  nativeBuildInputs = [ pkgs.autoPatchelfHook pkgs.makeWrapper ];
 
   # skiko（Compose）与捆绑 JBR 运行时的原生库依赖
   buildInputs = with pkgs; [
@@ -58,8 +65,10 @@ pkgs.stdenv.mkDerivation {
     ln -s "${pkgs.fontconfig.lib}/lib/libfontconfig.so.1" \
       "$out/lib/abdm/lib/runtime/lib/libfontconfig.so.1"
 
-    # 启动器（无环境变量需求；字体修复在 runtime/lib 层完成）
-    ln -s "$out/lib/abdm/bin/ABDownloadManager" "$out/bin/abdownloadmanager"
+    # 启动器：注入 systemd lib 路径，保证 ComposeNativeTray 的 libLinuxTray.so
+    # 能解析 libsystemd.so.0（见文件头"系统托盘修复"注释）
+    makeWrapper "$out/lib/abdm/bin/ABDownloadManager" "$out/bin/abdownloadmanager" \
+      --prefix LD_LIBRARY_PATH : "${pkgs.systemdLibs}/lib"
 
     # 图标 + desktop 文件（noctalia launcher / 应用列表可见）
     cp "$out/lib/abdm/lib/ABDownloadManager.png" "$out/share/pixmaps/abdownloadmanager.png"
