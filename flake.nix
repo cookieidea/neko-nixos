@@ -14,10 +14,12 @@
   };
 
   inputs = {
-    # nixpkgs 走官方 GitHub（浅克隆）。⚠️ 原用 TUNA git 镜像
-    # （mirrors.tuna.tsinghua.edu.cn/git/nixpkgs.git），实体机实测
-    # 2026-08-14 起该镜像 not found 不可达 → 回退官方，GitHub 可直连。
-    nixpkgs.url = "git+https://github.com/NixOS/nixpkgs.git?ref=nixos-26.05&shallow=1";
+    # nixpkgs 源码走中科大 USTC 通道 tarball（nix-channels 镜像，含 flake.nix 可作
+    # flake 输入；tarball 自动跟随 nixos-26.05 通道最新 rev）。
+    # ⚠️ 不要用 TUNA git 镜像（mirrors.tuna.tsinghua.edu.cn/git/nixpkgs.git 实体机
+    # 2026-08-14 实测 not found）；USTC 无 nixpkgs git 镜像，只有 nix-channels。
+    # 更新 nixpkgs：`nix flake update nixpkgs --accept-flake-config`（tarball 锁定 narHash）。
+    nixpkgs.url = "https://mirrors.ustc.edu.cn/nix-channels/nixos-26.05/nixexprs.tar.xz";
     # home-manager TUNA 未镜像，用 git+https 直连 github（绕开 GitHub REST API 限流 403）
     home-manager = {
       url = "git+https://github.com/rycee/home-manager.git?ref=release-26.05";
