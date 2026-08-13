@@ -251,7 +251,9 @@
     "fcitx5/config".source = ./dotfiles/config/fcitx5/config;
     "fcitx5/profile".source = ./dotfiles/config/fcitx5/profile;
     "fish/conf.d/shorin.fish".source = ./dotfiles/config/fish/conf.d/shorin.fish;
-    "fish/fish_variables".source = ./dotfiles/config/fish/fish_variables;
+    # ⚠️ fish/fish_variables 不能部署成 store 只读符号链接——fish 运行时写通用变量会
+    #   报 "无法创建临时文件 /nix/store/... (os error 30 EROFS)"。让 fish 自己生成
+    #   （原文件只是默认空壳，无重要变量）。
     "fish/functions/apt.fish".source = ./dotfiles/config/fish/functions/apt.fish;
     "fish/functions/f.fish".source = ./dotfiles/config/fish/functions/f.fish;
     "fish/functions/fwatch.fish".source = ./dotfiles/config/fish/functions/fwatch.fish;
