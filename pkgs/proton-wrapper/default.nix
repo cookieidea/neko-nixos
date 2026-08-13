@@ -16,12 +16,14 @@ pkgs.stdenv.mkDerivation {
 
   installPhase = ''
     runHook preInstall
-    mkdir -p "$out/bin" "$out/share/applications" "$out/share/icons/hicolor"
+    mkdir -p "$out/bin" "$out/share/applications" "$out/share/icons/hicolor/256x256/apps"
     for s in shorin-proton-wrapper shorin-proton-wrapper-configure shorin-proton-wrapper-manager; do
       install -Dm755 "$s" "$out/bin/$s"
     done
     install -Dm644 *.desktop -t "$out/share/applications/" 2>/dev/null || true
-    [ -d icons ] && cp -r icons/* "$out/share/icons/hicolor/" 2>/dev/null || true
+    # 图标必须放 hicolor/<size>/apps/ 结构才会被图标主题扫描；
+    # 之前 cp 到 hicolor/ 根目录（找不到，desktop Icon=shorin-proton 无图）
+    [ -d icons ] && cp icons/*.png "$out/share/icons/hicolor/256x256/apps/" 2>/dev/null || true
     runHook postInstall
   '';
 
