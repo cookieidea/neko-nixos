@@ -53,9 +53,17 @@
     nix-cachyos-kernel = {
       url = "git+https://github.com/xddxdd/nix-cachyos-kernel?ref=release";
     };
+
+    # ── nixpkgs unstable（仅用于 obs-studio 32.2+）──
+    # VDO.Ninja 插件（ninja-obs-plugin v1.1.65）用 libobs 32.2 编译，而 26.05
+    # 分支 obs-studio 停在 32.1.2（"compiled with newer libobs 32.2" 加载失败）。
+    # 用 overlay 只替换 obs-studio 一个包（含其依赖闭包），其余保持 26.05。
+    nixpkgs-unstable = {
+      url = "git+https://mirrors.tuna.tsinghua.edu.cn/git/nixpkgs.git?ref=nixos-unstable&shallow=1";
+    };
   };
 
-  outputs = { self, nixpkgs, home-manager, nixvim, opencode, bili-danmaku-tui, nix-cachyos-kernel, ... }:
+  outputs = { self, nixpkgs, home-manager, nixvim, opencode, bili-danmaku-tui, nix-cachyos-kernel, nixpkgs-unstable, ... }:
     let
       system = "x86_64-linux";
       # ── 改这里 ──────────────────────────────────────────────
@@ -97,8 +105,15 @@
             ./configuration.nix
             hmModule
             # CachyOS 内核 overlay（pinned：固定其 nixpkgs rev 以命中二进制缓存）
+            # + obs-studio 用 unstable 32.2（VDO.Ninja 插件 v1.1.65 需 libobs 32.2，
+            #   26.05 的 32.1.2 加载报 "compiled with newer libobs"）
             {
-              nixpkgs.overlays = [ nix-cachyos-kernel.overlays.pinned ];
+              nixpkgs.overlays = [
+                nix-cachyos-kernel.overlays.pinned
+                (final: prev: {
+                  obs-studio = nixpkgs-unstable.legacyPackages.${system}.obs-studio;
+                })
+              ];
             }
           ];
         };
