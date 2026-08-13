@@ -47,9 +47,11 @@ pkgs.stdenv.mkDerivation {
 
   inherit src;
 
+  nativeBuildInputs = [ pkgs.icoutils ];   # ico → png 图标转换
+
   installPhase = ''
     runHook preInstall
-    mkdir -p $out/bin $out/share/startlive
+    mkdir -p $out/bin $out/share/startlive $out/share/pixmaps $out/share/applications
     cp -r . "$out/share/startlive/"
     # nix store 源只读（444/555），cp 保留只读权限 → 先放开写权限再清理
     chmod -R u+w "$out/share/startlive/"
@@ -76,6 +78,26 @@ export PYTHONPATH="$out/share/startlive/velopack-stub:\$PYTHONPATH"
 exec ${py}/bin/python "$out/share/startlive/StartLive.py" "\$@"
 EOF
     chmod +x $out/bin/startlive
+
+    # ── 图标 + desktop 文件（noctalia launcher / fuzzel / 应用列表可见）──
+    # resources/icon_left.ico（项目自带，256x256）→ icotool 提取 png
+    tmpicons=$(mktemp -d)
+    icotool -x "$out/share/startlive/resources/icon_left.ico" -o "$tmpicons"
+    # 取最大尺寸 png 作为应用图标
+    big=$(find "$tmpicons" -name "*.png" -printf "%s %p\n" | sort -n | tail -1 | cut -d' ' -f2-)
+    cp "$big" "$out/share/pixmaps/startlive.png"
+    cat > $out/share/applications/startlive.desktop <<EOF
+[Desktop Entry]
+Type=Application
+Name=StartLive
+Name[zh_CN]=StartLive 推流地址
+Comment=Bilibili streaming address helper (bypass LiveHime)
+Exec=startlive
+Icon=startlive
+Terminal=false
+Categories=Network;AudioVideo;
+StartupWMClass=StartLive
+EOF
     runHook postInstall
   '';
 
