@@ -48,6 +48,7 @@
     pavucontrol                               # pavucontrol
     mousepad                                  # mousepad
     easyeffects                               # easyeffects
+    libreoffice                               # libreoffice（办公套件；默认含全部语言包，体积较大）
     # 日文输入法 fcitx5-mozc 已移除；输入法本体由 i18n.inputMethod 系统级配置
     # rime-wubi 已在 26.05 移除 → 中文输入走 rime + rime-ice（雾凇，见 configuration.nix）
 
