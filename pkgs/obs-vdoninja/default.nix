@@ -24,7 +24,7 @@ let
     version = "0.20.2";
     src = builtins.fetchGit {
       url = "https://github.com/paullouisageneau/libdatachannel";
-      rev = "v0.20.2";
+      rev = "0b1074a9effeb8d9d3f4eca704d3fe3d2f9bc7e5";  # v0.20.2
     };
   });
 in
