@@ -26,19 +26,6 @@
   nixpkgs.config = {
     allowUnfree = true;   # steam / wechat-uos / 部分驱动需要
   };
-  # ── qtwebengine 用 GCC 14 编译（26.05 默认 GCC 15.2 与 Chromium 140 不兼容，
-  #    编译崩溃：gcc bug c/125349；gcc14 是 nixpkgs 26.05 早期验证过的组合）──
-  # 引入者（如某 Qt 应用/插件）仍保留，只替换编译器；overlay 同时覆盖顶层与 qt6Packages。
-  nixpkgs.overlays = [
-    (final: prev: let
-      qtwebengine-gcc14 = prev.qt6Packages.qtwebengine.override {
-        stdenv = prev.gcc14Stdenv;
-      };
-    in {
-      qtwebengine = qtwebengine-gcc14;
-      qt6Packages = prev.qt6Packages // { qtwebengine = qtwebengine-gcc14; };
-    })
-  ];
   security.polkit.enable = true;        # polkit 认证（Noctalia / 系统设置需要）
 
   # ── 自动垃圾回收 / store 去重（防滚版本撑爆 /）────────────
