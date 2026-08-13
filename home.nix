@@ -299,6 +299,22 @@
       source = ./dotfiles/icons/hicolor/scalable/apps/application-exit.svg;
       force = true;
     };
+    # ── 应用图标 hicolor 兜底（256x256）──
+    # tabby/splayer-next（AppImage wrap 包自带 desktop 但图标不在标准路径）、
+    # lunarclient（nixpkgs 包 desktop Icon=lunarclient 但无对应图标文件）。
+    # 之前 VM 手动复制未固化 → 实体机重装后图标消失，收进仓库声明式部署。
+    ".local/share/icons/hicolor/256x256/apps/tabby.png" = {
+      source = ./dotfiles/icons/hicolor/256x256/apps/tabby.png;
+      force = true;
+    };
+    ".local/share/icons/hicolor/256x256/apps/splayer-next.png" = {
+      source = ./dotfiles/icons/hicolor/256x256/apps/splayer-next.png;
+      force = true;
+    };
+    ".local/share/icons/hicolor/256x256/apps/lunarclient.png" = {
+      source = ./dotfiles/icons/hicolor/256x256/apps/lunarclient.png;
+      force = true;
+    };
     # ── AppImage wrap 包（tabby/splayer-next）的 desktop 入口 ──
     # wrapType2 26.05 FHS 输出不带标准路径 desktop；xdg.desktopEntries 在
     # useUserPackages 下未落到 ~/.local/share/applications → 用 home.file 强制写文件
