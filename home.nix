@@ -282,6 +282,12 @@
   home.file = {
     # ── 用户头像（freedesktop 标准 ~/.face，ly 登录管理器 + noctalia 控制中心读取）──
     ".face".source = ./dotfiles/avatar.png;
+    # ── fcitx5 托盘/菜单图标 hicolor 兜底 ──
+    # fcitx5 SNI 图标名（notificationitem.cpp）：托盘=input-keyboard-symbolic、
+    # 菜单「重启」=view-refresh、「退出」=application-exit。Papirus 有这些图标，
+    # 但若宿主/Qt 对 Papirus 查找失败，hicolor 是 XDG 最终兜底主题必查。
+    # 不写用户级 index.theme（避免遮蔽系统 hicolor 的完整目录定义）。
+    ".local/share/icons/hicolor/scalable/apps".source = ./dotfiles/icons/hicolor/scalable/apps;
     # ── AppImage wrap 包（tabby/splayer-next）的 desktop 入口 ──
     # wrapType2 26.05 FHS 输出不带标准路径 desktop；xdg.desktopEntries 在
     # useUserPackages 下未落到 ~/.local/share/applications → 用 home.file 强制写文件
