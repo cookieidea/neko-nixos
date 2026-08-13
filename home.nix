@@ -127,6 +127,7 @@
 
     # ── 全量脚本审查补漏（04j-minimal-niri / 04k-noctalia 核对结果）──
     matugen                                    # 主题生成器（random-anime-wallpaper-noctalia 与 noctalia-shell 模板直接调用）
+    mpvpaper                                   # 视频壁纸（mpv 渲染 wlr-layer-shell，niri 启动项播放 hatsune-miku.mp4）
     imv                                        # 图片查看器（mimeapps.list 的 image/* 默认打开器）
     kdePackages.breeze                           # 光标主题 Breeze_Cursors（cursor.kdl 指定；breeze 包含光标，非独立 breeze-cursors 属性）
     xhost                                      # XWayland 授权（config.kdl spawn-at-startup "xhost"；26.05 xorg 包集移到顶层）
@@ -221,6 +222,11 @@
   # ============================================================
 
   xdg.configFile = {
+    # ── noctalia-shell 4.7.6 用户配置（quickshell 惯例路径）──
+    # 完整默认 settings（取自官方 Assets/settings-default.json）只改
+    # wallpaper.enabled=false + 默认 disableWallpaper=true → 壁纸组件不渲染，
+    # mpvpaper 独占背景层。完整结构部署避免最小化 JSON 导致 QML 崩溃。
+    "quickshell/noctalia/settings.json".source = ./dotfiles/config/noctalia/settings.json;
     "MangoHud/MangoHud.conf".source = ./dotfiles/config/MangoHud/MangoHud.conf;
     "Thunar/accels.scm".source = ./dotfiles/config/Thunar/accels.scm;
     "Thunar/uca.xml".source = ./dotfiles/config/Thunar/uca.xml;
@@ -341,6 +347,8 @@
     # ── 壁纸（原 resources/Wallpapers，noctalia 壁纸轮播/随机切换依赖 ~/Pictures/Wallpapers）──
     "Pictures/Wallpapers/wallhaven-d88d53.png".source = ./dotfiles/Pictures/Wallpapers/wallhaven-d88d53.png;
     "Pictures/Wallpapers/wallhaven-yq8w67.jpg".source = ./dotfiles/Pictures/Wallpapers/wallhaven-yq8w67.jpg;
+    # 视频壁纸（mpvpaper 播放；noctalia 壁纸组件已禁用，背景层由 mpvpaper 接管）
+    "Pictures/Wallpapers/hatsune-miku.mp4".source = ./dotfiles/Pictures/Wallpapers/hatsune-miku.mp4;
     # 原 .gtkrc-2.0 内容已并入 gtk.gtk2.extraConfig（fcitx 输入法），不再手动部署避免模块冲突
     ".local/bin/random-anime-wallpaper-noctalia" = {
       source = ./dotfiles/local/bin/random-anime-wallpaper-noctalia;
