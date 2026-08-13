@@ -62,7 +62,8 @@ pkgs.stdenv.mkDerivation {
     #   NixOS 的 /etc/fonts/fonts.conf（若仍解析失败再看 conf.d 完整性）。
     makeWrapper "$out/lib/abdm/bin/ABDownloadManager" "$out/bin/abdownloadmanager" \
       --set FONTCONFIG_FILE "${jvmFontsConf}" \
-      --set FONTCONFIG_PATH "/etc/fonts"
+      --set FONTCONFIG_PATH "/etc/fonts" \
+      --set JAVA_TOOL_OPTIONS "-Dsun.awt.fontconfig=${jvmFontsConf} -Dsun.font.fontconfig=${jvmFontsConf}"
 
     # 图标 + desktop 文件（noctalia launcher / 应用列表可见）
     cp "$out/lib/abdm/lib/ABDownloadManager.png" "$out/share/pixmaps/abdownloadmanager.png"
