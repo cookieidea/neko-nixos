@@ -77,7 +77,7 @@
   time.timeZone = "Asia/Shanghai";
   i18n.defaultLocale = "zh_CN.UTF-8";
 
-  # ── 输入法 fcitx5（仅中文 rime 默认词库；日文 mozc 与万象均不用）──
+  # ── 输入法 fcitx5（仅键盘英文；rime/万象/日文 mozc 均不用）──
   i18n.inputMethod = {
     enable = true;
     type = "fcitx5";
@@ -85,12 +85,9 @@
       # Wayland 原生输入法前端（niri 下 GTK/Qt 走 text-input-v3，不再导出
       # GTK_IM_MODULE/QT_IM_MODULE；XMODIFIERS 仍保留给 XWayland 的微信/QQ 用）
       waylandFrontend = true;
-      addons = with pkgs; [
-        # 万象（GitHub 版 + nixpkgs 版）已回滚 → fcitx5-rime 用默认 rime-data 词库
-        fcitx5-rime
-        # fcitx5-chinese-addons 已移除：它硬依赖 qtwebengine（网页词典组件），
-        # 而 qtwebengine 6.11.1 在 GCC 15 下编译崩溃（gcc bug c/125349）
-      ];
+      # rime 已删除（用户不需要中文输入）；fcitx5 默认自带键盘引擎即可。
+      # 若日后要中文：fcitx5-chinese-addons 依赖 qtwebengine 无法用（GCC15 编译崩溃），
+      # 只能回归 fcitx5-rime（加回 fcitx5-rime + profile 加回 rime 条目）。
     };
   };
 
