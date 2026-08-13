@@ -31,11 +31,15 @@ in
 
 pkgs.stdenv.mkDerivation {
   pname = "obs-vdoninja";
-  version = "1.1.65";
+  # v1.1.63：libobs 32.1 时代编译（导出 obs_module_ver 旧协议，无 libobs_api_ver），
+  # 与 26.05 的 obs-studio 32.1.2 兼容。
+  # ⚠️ 不要升 v1.1.65+：libobs 32.2 编译（OBS 32.1.2 报 "compiled with newer libobs 32.2"）；
+  # 升级 OBS 到 32.2 需 unstable nixpkgs，依赖闭包 3.8GB 超出 VM 磁盘（实测 No space）。
+  version = "1.1.63";
 
   src = pkgs.fetchurl {
-    url = "https://github.com/steveseguin/ninja-obs-plugin/releases/download/v1.1.65/obs-vdoninja-linux-x86_64.tar.gz";
-    sha256 = "sha256-ohguQy3Djqv234AC/CR2Us1aetIggZfyhac/z4T/wFk=";
+    url = "https://github.com/steveseguin/ninja-obs-plugin/releases/download/v1.1.63/obs-vdoninja-linux-x86_64.tar.gz";
+    sha256 = "sha256-GPYPmgcaUpXujiryQMKuYLcumx8QPcATSlTov/a1Kbk=";
   };
 
   nativeBuildInputs = [ pkgs.autoPatchelfHook ];
