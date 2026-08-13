@@ -95,8 +95,25 @@
             ./configuration.nix
             hmModule
             # CachyOS 内核 overlay（pinned：固定其 nixpkgs rev 以命中二进制缓存）
+            # + 移除 neovim 包自带的 nvim.desktop（Name=Neovim wrapper，Terminal=true，
+            #   图形启动器拉起时缺终端处理器打不开——用户要求删掉这个菜单条目，
+            #   nixvim 本体保留）
             {
-              nixpkgs.overlays = [ nix-cachyos-kernel.overlays.pinned ];
+              nixpkgs.overlays = [
+                nix-cachyos-kernel.overlays.pinned
+                (final: prev: {
+                  neovim = prev.neovim.overrideAttrs (old: {
+                    postInstall = (old.postInstall or "") + ''
+                      rm -f "$out/share/applications/nvim.desktop"
+                    '';
+                  });
+                  neovim-unwrapped = prev.neovim-unwrapped.overrideAttrs (old: {
+                    postInstall = (old.postInstall or "") + ''
+                      rm -f "$out/share/applications/nvim.desktop"
+                    '';
+                  });
+                })
+              ];
             }
           ];
         };
