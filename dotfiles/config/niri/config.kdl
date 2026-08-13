@@ -108,6 +108,10 @@ spawn-sh-at-startup "systemctl --user set-environment XDG_SESSION_CLASS=user"
 // spawn-sh-at-startup "dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP=niri & /usr/lib/xdg-desktop-portal-gnome"
 // 截图音效守护进程：SHORiN 私有脚本已迁移到 ~/.config/niri/scripts/screenshot-sound.sh
 spawn-at-startup "~/.config/niri/scripts/screenshot-sound.sh"
+// 视频壁纸（mpvpaper，初音未来；noctalia 壁纸已禁用不冲突）
+// -f 后台运行；-o 传 mpv 选项（无音频+循环+自动硬件解码）；ALL = 所有显示器
+// 若换壁纸：改视频路径即可；Mod+Shift+W 或改此路径后重登生效
+spawn-at-startup "mpvpaper" "-f" "-o" "no-audio loop hwdec=auto" "ALL" "/home/cookie/Pictures/Wallpapers/hatsune-miku.mp4"
 // 启动随机壁纸：依赖 qs；已由 Noctalia settings.json 的 wallpaper 配置替代
 // spawn-sh-at-startup "sleep 3 && noctalia-shell ipc call wallpaper random all"
 // linuxqq 剪贴板同步：依赖 linuxqq-clipsync 用户服务（NixOS 无），注释
