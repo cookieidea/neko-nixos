@@ -42,7 +42,13 @@ pkgs.stdenv.mkDerivation {
     chmod +x "$out/lib/abdm/bin/ABDownloadManager"
 
     # 启动器
-    makeWrapper "$out/lib/abdm/bin/ABDownloadManager" "$out/bin/abdownloadmanager"
+    # ⚠️ jpackage 捆绑的 JBR 启动时用 Java 侧解析器读 fontconfig XML
+    #   （sun.awt.FontConfiguration），FONTCONFIG_FILE 未设置时解析失败 →
+    #   "Fontconfig head is null" → 连锁 HeadlessException。显式指向
+    #   NixOS 的 /etc/fonts/fonts.conf（若仍解析失败再看 conf.d 完整性）。
+    makeWrapper "$out/lib/abdm/bin/ABDownloadManager" "$out/bin/abdownloadmanager" \
+      --set FONTCONFIG_FILE "/etc/fonts/fonts.conf" \
+      --set FONTCONFIG_PATH "/etc/fonts"
 
     # 图标 + desktop 文件（noctalia launcher / 应用列表可见）
     cp "$out/lib/abdm/lib/ABDownloadManager.png" "$out/share/pixmaps/abdownloadmanager.png"
