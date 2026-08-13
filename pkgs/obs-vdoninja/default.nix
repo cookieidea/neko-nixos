@@ -26,6 +26,9 @@ pkgs.stdenv.mkDerivation {
 
   nativeBuildInputs = [ pkgs.autoPatchelfHook ];
 
+  # 插件是 .so 库不是应用：qtbase 仅作链接依赖，不需要 Qt wrap
+  dontWrapQtApps = true;
+
   buildInputs = [
     pkgs.obs-studio          # libobs.so.30 / libobs-frontend-api.so.30
     pkgs.libdatachannel      # libdatachannel.so.0.20
