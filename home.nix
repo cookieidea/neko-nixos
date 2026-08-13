@@ -302,6 +302,24 @@
   home.file = {
     # ── 用户头像（freedesktop 标准 ~/.face，ly 登录管理器 + noctalia 控制中心读取）──
     ".face".source = ./dotfiles/avatar.png;
+    # ── Neovim wrapper 菜单条目修复 ──
+    # nixvim 构建的 neovim 自带 nvim.desktop（Terminal=true，图形启动器打不开）。
+    # flake overlay 覆盖不到 nixvim（它用自己 pin 的 nixpkgs 构建）→ 用用户级
+    # ~/.local/share/applications 覆盖（freedesktop 优先级最高，启动器优先读这里）。
+    ".local/share/applications/nvim.desktop".text = ''
+      [Desktop Entry]
+      Name=Neovim wrapper
+      GenericName=Text Editor
+      Comment=Edit text files
+      TryExec=nvim
+      Exec=kitty -e nvim %F
+      Icon=nvim
+      Type=Application
+      Terminal=false
+      Categories=Utility;TextEditor;Development;
+      MimeType=text/plain;text/x-makefile;application/x-shellscript;text/x-c;text/x-c++src;
+      StartupNotify=false
+    '';
     # ── fcitx5 托盘/菜单图标 hicolor 兜底 ──
     # fcitx5 SNI 图标名（notificationitem.cpp）：托盘=input-keyboard-symbolic、
     # 菜单「重启」=view-refresh、「退出」=application-exit。Papirus 有这些图标，
