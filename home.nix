@@ -286,26 +286,33 @@
     # ── AppImage wrap 包（tabby/splayer-next）的 desktop 入口 ──
     # wrapType2 26.05 FHS 输出不带标准路径 desktop；xdg.desktopEntries 在
     # useUserPackages 下未落到 ~/.local/share/applications → 用 home.file 强制写文件
-    ".local/share/applications/tabby.desktop".text = ''
-      [Desktop Entry]
-      Type=Application
-      Name=Tabby
-      Comment=Terminal emulator
-      Exec=tabby-terminal
-      Icon=tabby
-      Terminal=false
-      Categories=System;TerminalEmulator;
-    '';
-    ".local/share/applications/splayer-next.desktop".text = ''
-      [Desktop Entry]
-      Type=Application
-      Name=SPlayer-Next
-      Comment=Cross-platform desktop music player
-      Exec=splayer-next
-      Icon=splayer-next
-      Terminal=false
-      Categories=AudioVideo;Audio;Player;
-    '';
+    # force=true：更早的 xdg.desktopEntries 生成过普通文件，HM 拒绝覆盖
+    ".local/share/applications/tabby.desktop" = {
+      text = ''
+        [Desktop Entry]
+        Type=Application
+        Name=Tabby
+        Comment=Terminal emulator
+        Exec=tabby-terminal
+        Icon=tabby
+        Terminal=false
+        Categories=System;TerminalEmulator;
+      '';
+      force = true;
+    };
+    ".local/share/applications/splayer-next.desktop" = {
+      text = ''
+        [Desktop Entry]
+        Type=Application
+        Name=SPlayer-Next
+        Comment=Cross-platform desktop music player
+        Exec=splayer-next
+        Icon=splayer-next
+        Terminal=false
+        Categories=AudioVideo;Audio;Player;
+      '';
+      force = true;
+    };
     # ── OBS VDO.Ninja 插件（pkgs/obs-vdoninja，autoPatchelf 修好依赖）──
     # ⚠️ 不能裸拷 .so（RPATH 指向构建机，依赖全丢）；链接 Nix 包产物，
     #    autoPatchelf 后 .so 的 RPATH 指向 store 里的 libobs/libdatachannel/ffmpeg 等
