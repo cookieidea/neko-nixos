@@ -2,20 +2,24 @@
 #
 # amir1376/ab-download-manager（nixpkgs 无此包，AUR: abdownloadmanager-bin）
 # GitHub Releases 的 jpackage 打包（bin 启动脚本 + 捆绑 JBR 运行时 + 原生库）：
-#   - 解压保持目录结构，用 makeWrapper 包装 bin/ABDownloadManager
+#   - 解压保持目录结构，bin/abdownloadmanager 直接链接到捆绑启动器
 #   - autoPatchelfHook 处理 libapplauncher.so / libskiko 原生库
+#
+# ⚠️ 字体崩溃根因与修复（2026-08，已实测）：
+# 捆绑 JBR（JDK 25）的 sun.awt 在启动时 dlopen("libfontconfig.so.1") 加载
+# native fontconfig；NixOS 没有 ld.so.cache 且该库不在任何标准搜索路径 →
+# dlopen 失败 → 回退 Java 侧解析器 → "Fontconfig head is null" 崩溃。
+# LD_DEBUG 证实 JVM 的 dlopen 搜索路径（来自 libnio.so 的 RUNPATH）包含
+#   $java.home/lib 与 $java.home/lib/server
+# → 在 runtime/lib 放入 libfontconfig.so.1 的符号链接即可命中，无需任何
+#   环境变量。此修复覆盖所有入口：桌面启动、应用内"开机自启"（ABDM 自己
+#   写 ~/.config/autostart 指向 bin/ABDownloadManager 原始路径）、浏览器集成。
+# 之前尝试的 -Dsun.awt.fontconfig 指向自定义 XML 的方案对 JDK 25 无效
+# （XML 被按 Java properties 解析 → getInitELC NPE 崩溃），已移除。
 { pkgs }:
 
 let
   version = "1.10.1";
-  # JBR 启动时用 Java 侧解析器（sun.awt.FontConfiguration）读 fontconfig XML。
-  # 系统 /etc/fonts/fonts.conf 带 `<!DOCTYPE ... fonts.dtd>`，NixOS 上 fonts.dtd
-  # 未部署 → JVM XML 解析失败（Fontconfig head is null）。最小自建配置能解析但
-  # 缺结构（getInitELC NPE）。正确做法：系统 fonts.conf 去掉 DOCTYPE 行，
-  # 其余结构（dirs/alias/match）完整保留。
-  jvmFontsConf = pkgs.runCommand "jvm-fonts.conf" { } ''
-    sed '/<!DOCTYPE/d' ${pkgs.fontconfig.out}/etc/fonts/fonts.conf > $out
-  '';
 in
 pkgs.stdenv.mkDerivation {
   pname = "ab-download-manager";
@@ -26,7 +30,7 @@ pkgs.stdenv.mkDerivation {
     sha256 = "daae532dfc07231dae02fce371a66b50e6c1ef4ca94a705bb3b5f2b996825ee7";
   };
 
-  nativeBuildInputs = [ pkgs.autoPatchelfHook pkgs.makeWrapper ];
+  nativeBuildInputs = [ pkgs.autoPatchelfHook ];
 
   # skiko（Compose）与捆绑 JBR 运行时的原生库依赖
   buildInputs = with pkgs; [
@@ -49,15 +53,13 @@ pkgs.stdenv.mkDerivation {
     chmod -R u+w "$out/lib/abdm/"
     chmod +x "$out/lib/abdm/bin/ABDownloadManager"
 
-    # 启动器
-    # ⚠️ jpackage 捆绑的 JBR 启动时用 Java 侧解析器读 fontconfig XML
-    #   （sun.awt.FontConfiguration），FONTCONFIG_FILE 未设置时解析失败 →
-    #   "Fontconfig head is null" → 连锁 HeadlessException。显式指向
-    #   NixOS 的 /etc/fonts/fonts.conf（若仍解析失败再看 conf.d 完整性）。
-    makeWrapper "$out/lib/abdm/bin/ABDownloadManager" "$out/bin/abdownloadmanager" \
-      --set FONTCONFIG_FILE "${jvmFontsConf}" \
-      --set FONTCONFIG_PATH "/etc/fonts" \
-      --set JAVA_TOOL_OPTIONS "-Dsun.awt.fontconfig=${jvmFontsConf} -Dsun.font.fontconfig=${jvmFontsConf}"
+    # 字体修复：JVM 的 dlopen("libfontconfig.so.1") 搜索路径含 runtime/lib，
+    # 放入符号链接即可命中（见文件头注释）
+    ln -s "${pkgs.fontconfig.lib}/lib/libfontconfig.so.1" \
+      "$out/lib/abdm/lib/runtime/lib/libfontconfig.so.1"
+
+    # 启动器（无环境变量需求；字体修复在 runtime/lib 层完成）
+    ln -s "$out/lib/abdm/bin/ABDownloadManager" "$out/bin/abdownloadmanager"
 
     # 图标 + desktop 文件（noctalia launcher / 应用列表可见）
     cp "$out/lib/abdm/lib/ABDownloadManager.png" "$out/share/pixmaps/abdownloadmanager.png"
