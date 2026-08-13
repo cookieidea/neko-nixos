@@ -22,6 +22,10 @@ let
   # GTK4 typelib 搜索路径（manager 用 gi.require_version("Gtk","4.0")）
   # 缺了报 "Namespace Gtk not available"——需要 gtk4 及其依赖的 GIR 运行时库
   giTypelibPath = pkgs.lib.makeSearchPath "lib/girepository-1.0" ([ pkgs.gtk4 ] ++ pkgs.gtk4.propagatedBuildInputs);
+  # GTK4 动态库路径（typelib 加载后 dlopen libgtk-4.so 需要；NixOS PATH 无）
+  giLibPath = pkgs.lib.makeLibraryPath ([ pkgs.gtk4 ] ++ pkgs.gtk4.propagatedBuildInputs);
+  # GTK4 数据目录（schemas/icons/themes）
+  giDataPath = pkgs.lib.makeSearchPath "share" ([ pkgs.gtk4 pkgs.gsettings-desktop-schemas ] ++ pkgs.gtk4.propagatedBuildInputs);
 in
 pkgs.stdenv.mkDerivation {
   pname = "shorin-proton-wrapper";
@@ -50,7 +54,9 @@ pkgs.stdenv.mkDerivation {
     makeWrapper "${py}/bin/python3" "$out/bin/shorin-proton-wrapper-manager" \
       --add-flags "$out/bin/.shorin-proton-wrapper-manager-raw" \
       --prefix PATH : "${runtimePath}" \
-      --prefix GI_TYPELIB_PATH : "${giTypelibPath}"
+      --prefix GI_TYPELIB_PATH : "${giTypelibPath}" \
+      --prefix LD_LIBRARY_PATH : "${giLibPath}" \
+      --prefix XDG_DATA_DIRS : "${giDataPath}"
 
     install -Dm644 *.desktop -t "$out/share/applications/" 2>/dev/null || true
     # 图标放 hicolor/<size>/apps/（desktop Icon=shorin-proton 才能被主题扫描到）
