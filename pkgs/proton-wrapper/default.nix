@@ -19,13 +19,20 @@ let
     pkgs.xdg-utils            # xdg-open（管理器导出/打开）
     pkgs.desktop-file-utils   # update-desktop-database（导出到应用菜单）
   ];
-  # GTK4 typelib 搜索路径（manager 用 gi.require_version("Gtk","4.0")）
-  # 缺了报 "Namespace Gtk not available"——需要 gtk4 及其依赖的 GIR 运行时库
-  giTypelibPath = pkgs.lib.makeSearchPath "lib/girepository-1.0" ([ pkgs.gtk4 ] ++ pkgs.gtk4.propagatedBuildInputs);
+  # GTK4 全依赖链（gtk4 + 显式列出 typelib 提供者 + propagated 传递依赖）
+  # cairo 的 typelib 不在 gtk4.propagatedBuildInputs（Gtk 加载时缺 Cairo-1.0 报错）
+  gtkPkgs = [
+    pkgs.gtk4 pkgs.cairo pkgs.pango pkgs.glib pkgs.gdk-pixbuf
+    pkgs.harfbuzz pkgs.fribidi pkgs.libthai
+  ] ++ pkgs.gtk4.propagatedBuildInputs;
+  # typelib 搜索（含 .dev 输出，部分包的 .typelib 在 dev）
+  giTypelibPath = pkgs.lib.makeSearchPath "lib/girepository-1.0" (
+    gtkPkgs ++ [ pkgs.cairo.dev pkgs.gtk4.dev pkgs.pango.dev pkgs.glib.dev ]
+  );
   # GTK4 动态库路径（typelib 加载后 dlopen libgtk-4.so 需要；NixOS PATH 无）
-  giLibPath = pkgs.lib.makeLibraryPath ([ pkgs.gtk4 ] ++ pkgs.gtk4.propagatedBuildInputs);
+  giLibPath = pkgs.lib.makeLibraryPath gtkPkgs;
   # GTK4 数据目录（schemas/icons/themes）
-  giDataPath = pkgs.lib.makeSearchPath "share" ([ pkgs.gtk4 pkgs.gsettings-desktop-schemas ] ++ pkgs.gtk4.propagatedBuildInputs);
+  giDataPath = pkgs.lib.makeSearchPath "share" (gtkPkgs ++ [ pkgs.gsettings-desktop-schemas ]);
 in
 pkgs.stdenv.mkDerivation {
   pname = "shorin-proton-wrapper";
