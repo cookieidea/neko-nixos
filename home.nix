@@ -48,7 +48,7 @@
     mousepad                                  # mousepad
     easyeffects                               # easyeffects
     # 日文输入法 fcitx5-mozc 已移除；输入法本体由 i18n.inputMethod 系统级配置
-    # rime-wubi 已在 26.05 移除 → 中文输入回滚用 fcitx5-rime 默认词库（万象已不用）
+    # rime-wubi 已在 26.05 移除 → 中文输入走 rime + rime-ice（雾凇，见 configuration.nix）
 
     # --- Shell & Terminal (kde-applist.txt) ---
     fish                                      # fish
