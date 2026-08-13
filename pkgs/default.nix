@@ -25,4 +25,5 @@
   rime-wanxiang  = import ./rime-wanxiang  { inherit pkgs; };
   ab-download-manager = import ./ab-download-manager { inherit pkgs; };
   tabby-terminal  = import ./tabby  { inherit pkgs; };
+  obs-vdoninja    = import ./obs-vdoninja { inherit pkgs; };
 }

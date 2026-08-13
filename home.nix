@@ -304,11 +304,13 @@
       Terminal=false
       Categories=AudioVideo;Audio;Player;
     '';
-    # ── OBS VDO.Ninja 插件（steveseguin/ninja-obs-plugin v1.1.65，AGPL-3.0）──
-    # nixpkgs 无此包，用官方 Linux 预编译产物声明式部署到用户级插件目录
-    # （OBS 扫描 ~/.config/obs-studio/plugins/<name>/{bin/64bit,data}）
-    ".config/obs-studio/plugins/obs-vdoninja/bin/64bit".source = ./dotfiles/obs-plugins/bin/64bit;
-    ".config/obs-studio/plugins/obs-vdoninja/data".source = ./dotfiles/obs-plugins/data;
+    # ── OBS VDO.Ninja 插件（pkgs/obs-vdoninja，autoPatchelf 修好依赖）──
+    # ⚠️ 不能裸拷 .so（RPATH 指向构建机，依赖全丢）；链接 Nix 包产物，
+    #    autoPatchelf 后 .so 的 RPATH 指向 store 里的 libobs/libdatachannel/ffmpeg 等
+    ".config/obs-studio/plugins/obs-vdoninja/bin/64bit".source =
+      selfPackages.obs-vdoninja + "/lib/obs-plugins";
+    ".config/obs-studio/plugins/obs-vdoninja/data".source =
+      selfPackages.obs-vdoninja + "/share/obs/obs-plugins/obs-vdoninja/locale";
     # ── 壁纸（原 resources/Wallpapers，noctalia 壁纸轮播/随机切换依赖 ~/Pictures/Wallpapers）──
     "Pictures/Wallpapers/wallhaven-d88d53.png".source = ./dotfiles/Pictures/Wallpapers/wallhaven-d88d53.png;
     "Pictures/Wallpapers/wallhaven-yq8w67.jpg".source = ./dotfiles/Pictures/Wallpapers/wallhaven-yq8w67.jpg;
