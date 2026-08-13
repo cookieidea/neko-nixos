@@ -41,6 +41,9 @@ neko-nixos/
 ├── home.nix               # 用户层（Home Manager）：软件包、git/编辑器/主题等
 ├── pkgs/                 # 自构建程序派生（见下「自构建程序」一节）
 ├── install.sh             # 一键安装脚本（全新安装 / 已装系统更新 双模式）
+├── docs/
+│   ├── install-btrfs.md   # 全新安装教程（btrfs + GRUB + snapper + 休眠）
+│   └── keybindings.md     # 快捷键速查（niri + Noctalia + fcitx5）
 ├── dotfiles/              # 桌面与程序配置（niri、Noctalia、fcitx5、fish、kitty…）
 │   ├── config/            # ~/.config 下内容（xdg.configFile 部署）
 │   └── home/              # 家目录散文件（.vimrc、.gtkrc-2.0 等，home.file 部署）
