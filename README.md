@@ -43,6 +43,7 @@ neko-nixos/
 ├── install.sh             # 一键安装脚本（全新安装 / 已装系统更新 双模式）
 ├── docs/
 │   ├── install-btrfs.md   # 全新安装教程（btrfs + GRUB + snapper + 休眠）
+│   ├── dual-boot.md       # Windows + NixOS 双系统指南
 │   └── keybindings.md     # 快捷键速查（niri + Noctalia + fcitx5）
 ├── dotfiles/              # 桌面与程序配置（niri、Noctalia、fcitx5、fish、kitty…）
 │   ├── config/            # ~/.config 下内容（xdg.configFile 部署）
