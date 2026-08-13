@@ -8,12 +8,26 @@
 #
 # 依赖（.so soname 匹配）：
 #   libobs.so.30 / libobs-frontend-api.so.30  ← pkgs.obs-studio（OBS 32 soname=30）
-#   libdatachannel.so.0.20                    ← pkgs.libdatachannel（obs 32 同款）
+#   libdatachannel.so.0.20                    ← override 到 v0.20.2（nixpkgs 26.05 版本 soname 不匹配）
 #   libavcodec.so.60 等（ffmpeg 6）            ← pkgs.ffmpeg_6
 #   libQt6Widgets/Gui/Core.so.6               ← pkgs.qt6Packages.qtbase
 #   libcrypto.so.3                            ← pkgs.openssl
 #   libstdc++.so.6                            ← stdenv.cc.cc.lib
 { pkgs }:
+
+let
+  # VDO.Ninja v1.1.65 编译时链接 libdatachannel 0.20.x（soname .so.0.20），
+  # nixpkgs 26.05 的 libdatachannel 版本 soname 不匹配（autoPatchelf not found）。
+  # override 到 v0.20.2：fetchGit 免 hash（构建时由 Nix 拉取），保留 nixpkgs 定义的
+  # buildInputs/cmakeFlags（libsrtp/usrsctp 等），只换版本与源码。
+  libdatachannel-020 = pkgs.libdatachannel.overrideAttrs (old: {
+    version = "0.20.2";
+    src = builtins.fetchGit {
+      url = "https://github.com/paullouisageneau/libdatachannel";
+      rev = "v0.20.2";
+    };
+  });
+in
 
 pkgs.stdenv.mkDerivation {
   pname = "obs-vdoninja";
@@ -34,7 +48,7 @@ pkgs.stdenv.mkDerivation {
 
   buildInputs = [
     pkgs.obs-studio          # libobs.so.30 / libobs-frontend-api.so.30
-    pkgs.libdatachannel      # libdatachannel.so.0.20
+    libdatachannel-020       # libdatachannel.so.0.20（override v0.20.2）
     pkgs.ffmpeg_6            # libavcodec.so.60 / libavutil.so.58 / libswscale.so.7 / libswresample.so.4
     pkgs.qt6Packages.qtbase  # libQt6Widgets/Gui/Core.so.6
     pkgs.openssl             # libcrypto.so.3
