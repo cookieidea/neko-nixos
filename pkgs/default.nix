@@ -22,7 +22,6 @@
   proton-wrapper = import ./proton-wrapper { inherit pkgs; };
   splayer-next   = import ./splayer-next   { inherit pkgs; };
   startlive      = import ./startlive      { inherit pkgs; };
-  rime-wanxiang  = import ./rime-wanxiang  { inherit pkgs; };
   ab-download-manager = import ./ab-download-manager { inherit pkgs; };
   tabby-terminal  = import ./tabby  { inherit pkgs; };
   obs-vdoninja    = import ./obs-vdoninja { inherit pkgs; };

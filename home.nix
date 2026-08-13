@@ -48,7 +48,7 @@
     mousepad                                  # mousepad
     easyeffects                               # easyeffects
     # 日文输入法 fcitx5-mozc 已移除；输入法本体由 i18n.inputMethod 系统级配置
-    # rime-wubi 已在 26.05 移除 → 中文走万象 rime-wanxiang（GitHub 版，见 configuration.nix）
+    # rime-wubi 已在 26.05 移除 → 中文输入回滚用 fcitx5-rime 默认词库（万象已不用）
 
     # --- Shell & Terminal (kde-applist.txt) ---
     fish                                      # fish
@@ -76,7 +76,6 @@
     lsfg-vk                                   # lsfg-vk（FSR 帧生成 vulkan 层）
     protonplus                                # protonplus（Proton 管理）
     mangojuice                                # mangojuice（GTK 文件管理器）
-    rime-wanxiang                             # rime-wanxiang（万象输入法词库）
 
     # --- 游戏 / 影音客户端（用户新增，已在 nixpkgs 26.05 核实存在）---
     hmcl                                      # hmcl（Minecraft 启动器，开源 GPL）
