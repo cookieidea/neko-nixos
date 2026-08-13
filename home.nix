@@ -287,7 +287,11 @@
     # 菜单「重启」=view-refresh、「退出」=application-exit。Papirus 有这些图标，
     # 但若宿主/Qt 对 Papirus 查找失败，hicolor 是 XDG 最终兜底主题必查。
     # 不写用户级 index.theme（避免遮蔽系统 hicolor 的完整目录定义）。
-    ".local/share/icons/hicolor/scalable/apps".source = ./dotfiles/icons/hicolor/scalable/apps;
+    # force=true：目录已存在（手动复制/缓存工具生成）时 HM 拒绝覆盖
+    ".local/share/icons/hicolor/scalable/apps" = {
+      source = ./dotfiles/icons/hicolor/scalable/apps;
+      force = true;
+    };
     # ── AppImage wrap 包（tabby/splayer-next）的 desktop 入口 ──
     # wrapType2 26.05 FHS 输出不带标准路径 desktop；xdg.desktopEntries 在
     # useUserPackages 下未落到 ~/.local/share/applications → 用 home.file 强制写文件
