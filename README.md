@@ -36,7 +36,7 @@
 
 ```
 neko-nixos/
-├── flake.nix              # flake 入口：inputs（nixpkgs/home-manager/opencode/bili-danmaku-tui/cachyos-kernel）、username/hostname/desktop 变量
+├── flake.nix              # flake 入口：inputs（nixpkgs/home-manager/nixvim/opencode/bili-danmaku-tui/cachyos-kernel）、username/hostname/desktop 变量
 ├── configuration.nix      # 系统层：内核/显卡/网络/flatpak/登录管理器/桌面服务…
 ├── home.nix               # 用户层（Home Manager）：软件包、git/编辑器/主题等
 ├── pkgs/                 # 自构建程序派生（见下「自构建程序」一节）

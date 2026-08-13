@@ -2,7 +2,7 @@
   description = "Shorin Arch Setup (shorin-arch-setup) → NixOS + Home Manager conversion";
 
   # 国内二进制缓存（中科大 USTC 优先 + 清华 TUNA 兜底）。仅加速「包下载」，不影响 flake 源码拉取。
-  # nixpkgs 源码走 TUNA git 镜像；home-manager/opencode TUNA 未镜像，走 github
+  # nixpkgs 源码走 TUNA nix-channels；home-manager/nixvim/opencode TUNA 未镜像，走 github
   # （慢但可用；若 github 被墙可加代理或换镜像）。
   nixConfig = {
     extra-substituters = [
@@ -25,6 +25,12 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    # ── nixvim：Neovim 的配置框架 ──
+    # 用 nixos-26.05 分支匹配 nixpkgs 26.05；官方建议不 follows nixpkgs
+    nixvim = {
+      url = "git+https://github.com/nix-community/nixvim.git?ref=nixos-26.05";
+    };
+
     # ── opencode（AI 编程 Agent，用 flake 装，拿最新版）──
     opencode = {
       url = "git+https://github.com/GutMutCode/opencode-nix.git";
@@ -45,7 +51,7 @@
     };
   };
 
-  outputs = { self, nixpkgs, home-manager, opencode, bili-danmaku-tui, nix-cachyos-kernel, ... }:
+  outputs = { self, nixpkgs, home-manager, nixvim, opencode, bili-danmaku-tui, nix-cachyos-kernel, ... }:
     let
       system = "x86_64-linux";
       # ── 改这里 ──────────────────────────────────────────────
@@ -69,8 +75,8 @@
         home-manager.useGlobalPkgs = true;
         home-manager.useUserPackages = true;
         home-manager.users.${username} = import ./home.nix;
-        # 把 opencode / bili-danmaku-tui 两个 flake 输入，以及自构建包传给 home 配置
-        home-manager.extraSpecialArgs = { inherit desktop username opencode bili-danmaku-tui selfPackages; };
+        # 把 nixvim / opencode / bili-danmaku-tui 三个 flake 输入，以及自构建包传给 home 配置
+        home-manager.extraSpecialArgs = { inherit desktop username nixvim opencode bili-danmaku-tui selfPackages; };
       };
     in {
       # 暴露自构建派生为 flake 包：可单独 `nix build .#<name>`

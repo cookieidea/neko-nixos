@@ -4,13 +4,14 @@
 #   kde-applist.txt             (shell/终端 + KDE 应用)
 #   kde-common-applist.txt      (KDE 系统工具/磁盘/媒体)
 # 桌面：niri (Wayland 滚动平铺 compositor) + Noctalia (桌面 shell)
-# 编辑器：neovim（nixpkgs 包，配置走原 .vimrc）
+# 编辑器：nixvim（Neovim 配置框架，替代 neovim + lazyvim）
 # AUR-only 与 nixpkgs 差异见底部注释。
 
-{ config, pkgs, lib, desktop, username, opencode, bili-danmaku-tui, selfPackages, ... }:
+{ config, pkgs, lib, desktop, username, nixvim, opencode, bili-danmaku-tui, selfPackages, ... }:
 
 {
   imports = [
+    nixvim.homeModules.nixvim        # nixvim（Neovim 配置框架）
     # Noctalia 改用 flake 包（见 home.packages）+ settings.json（见 xdg.configFile），
     # 不再加载它的 HM 模块，避免 programs.noctalia.settings 和手写文件冲突。
   ];
@@ -185,13 +186,21 @@
       enable = true;
     };
 
-    # ── neovim：nixpkgs 包 + HM 模块（替代 nixvim 框架）──
-    # 配置走 dotfiles 部署的 ~/.vimrc（nvim 兼容读取，见下方 home.file）
-    neovim = {
+    # ── nixvim：Neovim 的配置框架 ─────────────────────
+    # 用 Nix 写 Neovim 配置（插件/配色/按键），替代 lazyvim。
+    nixvim = {
       enable = true;
-      defaultEditor = true;
-      vimAlias = true;
-      viAlias = true;
+      # catppuccin 配色 + lualine 状态栏
+      colorschemes.catppuccin.enable = true;
+      plugins.lualine.enable = true;
+      opts = {
+        number = true;
+        relativenumber = true;
+        shiftwidth = 2;
+        tabstop = 2;
+      };
+      # 想加插件：plugins.<name>.enable = true；
+      # 想加原生 lua：extraConfigLua = '' ... '';
     };
 
     # ── niri：Wayland 滚动平铺 compositor ────────────────
