@@ -222,6 +222,10 @@
   # ============================================================
 
   xdg.configFile = {
+    # ── noctalia-shell 4.7.6 用户配置（quickshell 惯例路径 ~/.config/quickshell/noctalia/）──
+    # ⚠️ 之前部署在 ~/.config/noctalia/（v4 路径）不被读取，noctalia 一直用包内默认
+    # （壁纸默认开启 → 覆盖 mpvpaper）。wallpaper.enabled=false 在这里才生效。
+    "quickshell/noctalia/settings.json".source = ./dotfiles/config/noctalia/settings.json;
     "MangoHud/MangoHud.conf".source = ./dotfiles/config/MangoHud/MangoHud.conf;
     "Thunar/accels.scm".source = ./dotfiles/config/Thunar/accels.scm;
     "Thunar/uca.xml".source = ./dotfiles/config/Thunar/uca.xml;
