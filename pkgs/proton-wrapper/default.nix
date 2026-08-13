@@ -90,7 +90,7 @@ export PATH="${runtimePath}:$PATH"
 export GI_TYPELIB_PATH="${giTypelibPath}:$GI_TYPELIB_PATH"
 export LD_LIBRARY_PATH="${giLibPath}:$LD_LIBRARY_PATH"
 export XDG_DATA_DIRS="${giDataPath}:$XDG_DATA_DIRS"
-exec "${py}/bin/python3" "${out}/bin/.shorin-proton-wrapper-manager-raw" "$@"
+exec "${py}/bin/python3" "${builtins.placeholder "out"}/bin/.shorin-proton-wrapper-manager-raw" "$@"
 WRAPPER_EOF
     chmod +x "$out/bin/shorin-proton-wrapper-manager"
 
