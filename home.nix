@@ -221,28 +221,6 @@
   #  通过 xdg.configFile 部署到 ~/.config/
   # ============================================================
 
-  # ── AppImage wrap 包（tabby/splayer-next）的 desktop 入口 ──
-  # wrapType2 在 26.05 用 FHS env 输出，desktop 不在标准路径（包内 postInstall 无效），
-  # 改由 HM 直接生成到 ~/.local/share/applications（freedesktop 默认扫描，launcher 可见）。
-  xdg.desktopEntries = {
-    tabby = {
-      name = "Tabby";
-      comment = "Terminal emulator";
-      exec = "tabby-terminal";
-      icon = "tabby";
-      terminal = false;
-      categories = [ "System" "TerminalEmulator" ];
-    };
-    splayer-next = {
-      name = "SPlayer-Next";
-      comment = "Cross-platform desktop music player";
-      exec = "splayer-next";
-      icon = "splayer-next";
-      terminal = false;
-      categories = [ "AudioVideo" "Audio" "Player" ];
-    };
-  };
-
   xdg.configFile = {
     "MangoHud/MangoHud.conf".source = ./dotfiles/config/MangoHud/MangoHud.conf;
     "Thunar/accels.scm".source = ./dotfiles/config/Thunar/accels.scm;
@@ -303,6 +281,29 @@
   };
 
   home.file = {
+    # ── AppImage wrap 包（tabby/splayer-next）的 desktop 入口 ──
+    # wrapType2 26.05 FHS 输出不带标准路径 desktop；xdg.desktopEntries 在
+    # useUserPackages 下未落到 ~/.local/share/applications → 用 home.file 强制写文件
+    ".local/share/applications/tabby.desktop".text = ''
+      [Desktop Entry]
+      Type=Application
+      Name=Tabby
+      Comment=Terminal emulator
+      Exec=tabby-terminal
+      Icon=tabby
+      Terminal=false
+      Categories=System;TerminalEmulator;
+    '';
+    ".local/share/applications/splayer-next.desktop".text = ''
+      [Desktop Entry]
+      Type=Application
+      Name=SPlayer-Next
+      Comment=Cross-platform desktop music player
+      Exec=splayer-next
+      Icon=splayer-next
+      Terminal=false
+      Categories=AudioVideo;Audio;Player;
+    '';
     # ── OBS VDO.Ninja 插件（steveseguin/ninja-obs-plugin v1.1.65，AGPL-3.0）──
     # nixpkgs 无此包，用官方 Linux 预编译产物声明式部署到用户级插件目录
     # （OBS 扫描 ~/.config/obs-studio/plugins/<name>/{bin/64bit,data}）
