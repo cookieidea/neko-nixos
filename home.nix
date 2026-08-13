@@ -40,6 +40,7 @@
     mangohud                                  # mangohud
     mpv                                       # mpv
     obs-studio                                # obs-studio
+    kdenlive                                  # kdenlive（KDE 视频剪辑）
     upscaler                                  # upscaler
     yazi                                      # yazi
     # flatseal 已在 nixpkgs 26.05 移除 → 需要时用 flatpak 装：
