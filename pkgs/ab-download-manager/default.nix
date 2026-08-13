@@ -10,17 +10,11 @@ let
   version = "1.10.1";
   # JBR 启动时用 Java 侧解析器（sun.awt.FontConfiguration）读 fontconfig XML。
   # 系统 /etc/fonts/fonts.conf 带 `<!DOCTYPE ... fonts.dtd>`，NixOS 上 fonts.dtd
-  # 常未 symlink 到 /etc/fonts → JVM XML 解析失败 → "Fontconfig head is null"
-  # （libfontconfig C 侧不解析 dtd 所以 GTK 等正常，只有 JVM 挂）。
-  # 用无 DOCTYPE 的最小配置（含系统字体目录），JVM 必能解析。
-  jvmFontsConf = pkgs.writeText "jvm-fonts.conf" ''
-    <?xml version="1.0"?>
-    <fontconfig>
-      <dir>/run/current-system/sw/share/fonts</dir>
-      <dir>/etc/profiles/per-user/cookie/share/fonts</dir>
-      <dir>~/.fonts</dir>
-      <cachedir>/tmp/fontconfig-cache</cachedir>
-    </fontconfig>
+  # 未部署 → JVM XML 解析失败（Fontconfig head is null）。最小自建配置能解析但
+  # 缺结构（getInitELC NPE）。正确做法：系统 fonts.conf 去掉 DOCTYPE 行，
+  # 其余结构（dirs/alias/match）完整保留。
+  jvmFontsConf = pkgs.runCommand "jvm-fonts.conf" { } ''
+    sed '/<!DOCTYPE/d' ${pkgs.fontconfig.out}/etc/fonts/fonts.conf > $out
   '';
 in
 pkgs.stdenv.mkDerivation {
