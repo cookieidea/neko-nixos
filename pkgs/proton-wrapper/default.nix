@@ -20,15 +20,20 @@ let
     pkgs.desktop-file-utils   # update-desktop-database（导出到应用菜单）
   ];
   # GTK4 全依赖链（gtk4 + 显式列出 typelib 提供者 + propagated 传递依赖）
-  # cairo 的 typelib 不在 gtk4.propagatedBuildInputs（Gtk 加载时缺 Cairo-1.0 报错）
   gtkPkgs = [
     pkgs.gtk4 pkgs.cairo pkgs.pango pkgs.glib pkgs.gdk-pixbuf
-    pkgs.harfbuzz pkgs.fribidi pkgs.libthai
+    pkgs.harfbuzz pkgs.fribidi pkgs.libthai pkgs.graphene
   ] ++ pkgs.gtk4.propagatedBuildInputs;
-  # typelib 搜索（含 .dev 输出，部分包的 .typelib 在 dev）
-  giTypelibPath = pkgs.lib.makeSearchPath "lib/girepository-1.0" (
-    gtkPkgs ++ [ pkgs.cairo.dev pkgs.gtk4.dev pkgs.pango.dev pkgs.glib.dev ]
-  );
+  # typelib 搜索路径：
+  # - ⚠️ Cairo-1.0.typelib 由 gobject-introspection 包生成（cairo 包本身不构建
+  #   introspection、不带 typelib！Gdk-4.0 加载时缺它报
+  #   "Typelib file for namespace 'cairo', version '1.0' not found"）
+  #   见 https://github.com/NixOS/nixpkgs/issues/34080
+  # - 部分包（glib/pango/graphene 等）的 .typelib 在 dev 输出 → 每个包收 out+dev
+  # - graphene 是 Gtk-4.0 typelib 的依赖（Graphene-1.0）
+  typelibPkgs = [ pkgs.gobject-introspection ] ++ gtkPkgs
+    ++ map (p: p.dev or p) [ pkgs.cairo pkgs.gtk4 pkgs.pango pkgs.glib pkgs.graphene pkgs.gdk-pixbuf ];
+  giTypelibPath = pkgs.lib.makeSearchPath "lib/girepository-1.0" typelibPkgs;
   # GTK4 动态库路径（typelib 加载后 dlopen libgtk-4.so 需要；NixOS PATH 无）
   giLibPath = pkgs.lib.makeLibraryPath gtkPkgs;
   # GTK4 数据目录（schemas/icons/themes）
