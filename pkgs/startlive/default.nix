@@ -18,8 +18,17 @@ let
 
   # 运行用 Python 环境（StartLive 要求 3.11 <= py <= 3.13）
   # 用 python312：python311 下 keyring→secretstorage 依赖链的 sphinx-9.1.0 不支持 py311
+  # ⚠️ pyside6 override 剔除 qtwebengine/qtwebview：PySide6 在 Linux 全量绑定
+  #    Qt 模块（packages ++ [qtwebengine]），会引入 qtwebengine 编译（GCC15 崩溃+OOM）。
+  #    StartLive 只用 QtWidgets/QtCore，缺 WebEngine 绑定无影响（pythonImportsCheck 只 import PySide6）。
+  pyside6-lite = pkgs.python312.pkgs.pyside6.overrideAttrs (old: {
+    buildInputs = builtins.filter
+      (p: !(builtins.elem (pkgs.lib.getName p) [ "qtwebengine" "qtwebview" ]))
+      old.buildInputs;
+  });
+
   py = pkgs.python312.withPackages (ps: with ps; [
-    pyside6
+    pyside6-lite
     pillow
     qrcode
     requests
