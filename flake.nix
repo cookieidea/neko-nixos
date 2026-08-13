@@ -14,9 +14,10 @@
   };
 
   inputs = {
-    # 国内镜像（清华 TUNA git 镜像）。注意 TUNA 对 nixpkgs 用无 owner 的别名
-    # 路径 git/nixpkgs.git（NixOS-CN 教程确认），shallow=1 浅克隆加速。
-    nixpkgs.url = "git+https://mirrors.tuna.tsinghua.edu.cn/git/nixpkgs.git?ref=nixos-26.05&shallow=1";
+    # nixpkgs 走官方 GitHub（浅克隆）。⚠️ 原用 TUNA git 镜像
+    # （mirrors.tuna.tsinghua.edu.cn/git/nixpkgs.git），实体机实测
+    # 2026-08-14 起该镜像 not found 不可达 → 回退官方，GitHub 可直连。
+    nixpkgs.url = "git+https://github.com/NixOS/nixpkgs.git?ref=nixos-26.05&shallow=1";
     # home-manager TUNA 未镜像，用 git+https 直连 github（绕开 GitHub REST API 限流 403）
     home-manager = {
       url = "git+https://github.com/rycee/home-manager.git?ref=release-26.05";
