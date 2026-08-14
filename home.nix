@@ -236,6 +236,25 @@
   };
 
   # ============================================================
+  #  systemd user 服务（登录图形会话后自启）
+  # ============================================================
+  systemd.user.services.abdm = {
+    Unit = {
+      Description = "AB Download Manager（开机自启）";
+      # 等图形会话就绪再启动（GUI 应用需要 DISPLAY/WAYLAND）
+      After = [ "graphical-session.target" ];
+      PartOf = [ "graphical-session.target" ];
+    };
+    Service = {
+      ExecStart = "${selfPackages.ab-download-manager}/bin/abdownloadmanager";
+      Restart = "on-failure";
+      RestartSec = 5;
+      # ABDM 是单实例应用，自启后启动器再点会显示已有实例（托盘），属正常
+    };
+    Install.WantedBy = [ "graphical-session.target" ];
+  };
+
+  # ============================================================
   #  Noctalia 桌面 shell（niri 之上的一层）
   #  运行方式：nixpkgs 自带的 `noctalia-shell`（quickshell 配置 + qs 封装），
   #  由 config.kdl 的 `spawn-sh-at-startup "noctalia-shell"` 拉起。
