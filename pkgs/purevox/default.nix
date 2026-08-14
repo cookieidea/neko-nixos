@@ -121,7 +121,8 @@ pkgs.buildFHSEnv {
     pkgs.xkeyboard_config
     # 音频（PipeWire 直用）
     pkgs.alsa-lib
-    pkgs.pipewire
+    pkgs.pipewire                     # pw-cli（创建虚拟麦克风 null-sink）
+    pkgs.pulseaudio                   # pactl（虚拟麦克风 remap-source/set-default-sink）
     pkgs.flac
     pkgs.speex
     pkgs.SDL2
