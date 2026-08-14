@@ -343,7 +343,12 @@
     "mpv/vs".source = ./dotfiles/mpv/vs;
     "mpv/fonts".source = ./dotfiles/mpv/fonts;
     "niri/animations.kdl".source = ./dotfiles/config/niri/animations.kdl;
-    "niri/binds.kdl".source = ./dotfiles/config/niri/binds.kdl;
+    # binds.kdl 实体机上存在非 HM 管理的旧文件（此前手动 sed 修过 Mod+P），
+    # HM 部署会报 "would be clobbered" → force = true 强制接管为 HM 链接。
+    "niri/binds.kdl" = {
+      source = ./dotfiles/config/niri/binds.kdl;
+      force = true;
+    };
     "niri/blur.kdl".source = ./dotfiles/config/niri/blur.kdl;
     # config.kdl 实体机上存在非 HM 管理的旧文件（此前手动/脚本写入），
     # HM 部署会报 "would be clobbered" → force = true 强制接管为 HM 链接。
