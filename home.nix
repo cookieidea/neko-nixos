@@ -285,6 +285,17 @@
   # ============================================================
 
   xdg.configFile = {
+    # ABDM 托盘兜底（systemd user unit drop-in）：ABDM 应用会把自己的
+    # autostart 重写为 bin/ABDownloadManager.bin（/proc/self/exe）→ 绕过
+    # makeWrapper → 无 systemdLibs → ComposeNativeTray 的 libLinuxTray.so
+    # 解析不到 libsystemd.so.0 → 开机自启的 ABDM 无托盘。
+    # systemd user 服务不经过 login shell（hm-session-vars.sh 不生效），
+    # 且本机 environment.d generator 缺失 → 用 unit drop-in 最可靠。
+    # 注：LD_LIBRARY_PATH 为覆盖语义，保留 pipewire-jack 路径。
+    "systemd/user/app-com.abdownloadmanager@autostart.service.d/10-abdm-tray.conf".text = ''
+      [Service]
+      Environment=LD_LIBRARY_PATH=${pkgs.systemdLibs}/lib:/nix/store/zcqp398mxlw62jl02sx0rsc7gvcl1qhc-pipewire-1.6.6-jack/lib
+    '';
     # ── noctalia-shell 4.7.6 用户配置（quickshell 惯例路径）──
     # 完整默认 settings（取自官方 Assets/settings-default.json）只改
     # wallpaper.enabled=false + 默认 disableWallpaper=true → 壁纸组件不渲染，
