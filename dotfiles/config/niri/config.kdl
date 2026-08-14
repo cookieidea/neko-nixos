@@ -110,9 +110,10 @@ spawn-sh-at-startup "systemctl --user set-environment XDG_SESSION_CLASS=user"
 // 截图音效守护进程：SHORiN 私有脚本已迁移到 ~/.config/niri/scripts/screenshot-sound.sh
 spawn-at-startup "~/.config/niri/scripts/screenshot-sound.sh"
 // 视频壁纸（mpvpaper 初音未来；noctalia 壁纸组件已禁用不冲突）
-// -f 后台；-o 传 mpv 选项（无音频+循环+自动硬件解码+禁 OSC/OSD 进度条）；ALL = 所有显示器
-// osc=no osd-level=0：壁纸层会读用户 mpv.conf，鼠标事件穿透时 OSC 进度条会被触发显示
-spawn-at-startup "mpvpaper" "-f" "-o" "no-audio loop hwdec=auto osc=no osd-level=0" "ALL" "/home/cookie/Pictures/Wallpapers/hatsune-miku.mp4"
+// -f 后台；-o 传 mpv 选项（无音频+循环+自动硬件解码+禁 OSC/OSD）；ALL = 所有显示器
+// osc=no osd-level=0 load-scripts=no：壁纸层会加载用户 mpv 脚本（uosc），
+// 其 timeline 进度条会被触发显示；禁脚本彻底消除进度条
+spawn-at-startup "mpvpaper" "-f" "-o" "no-audio loop hwdec=auto osc=no osd-level=0 load-scripts=no" "ALL" "/home/cookie/Pictures/Wallpapers/hatsune-miku.mp4"
 // 启动随机壁纸：依赖 qs；已由 Noctalia settings.json 的 wallpaper 配置替代
 // spawn-sh-at-startup "sleep 3 && noctalia-shell ipc call wallpaper random all"
 // linuxqq 剪贴板同步：依赖 linuxqq-clipsync 用户服务（NixOS 无），注释
