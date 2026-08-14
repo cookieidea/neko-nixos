@@ -28,6 +28,25 @@ pkgs.appimageTools.wrapType2 {
     sha256 = "cbae6a1ec0e5d29db8bd2cf87b0f5ff4cba76c79f08843132ccde83ad96b8892";
   };
 
+  # ⚠️ AppRun 覆盖：原版 AppRun 的 LD_LIBRARY_PATH 只含 usr/lib/purevox，不含
+  # 内嵌 python 的 lib 目录 → python3 加载 libpython3.8.so.1.0 失败
+  # （wrapType2 解包后无 AppImage runtime 的 usr/lib 兜底，且 extract 会 patchelf
+  # 二进制，rpath 不可靠）。这里用 find 动态收集解包产物内所有 lib 目录，
+  # 全部注入 LD_LIBRARY_PATH，一次性覆盖 python38/lib 等任意位置。
+  extraInstallCommands = ''
+    cat > $out/AppRun <<'EOF'
+    #!/bin/sh
+    HERE="$(dirname "$(readlink -f "$0")")"
+    export PYTHONHOME="$HERE/usr/python38"
+    LIBS=$(find "$HERE" -type d \( -name lib -o -name lib64 \) 2>/dev/null | tr '\n' ':')
+    export LD_LIBRARY_PATH="$LIBS''${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+    export PATH="$HERE/usr/python38/bin:$PATH"
+    cd "$HERE/usr/lib/purevox" || exit 1
+    exec "$HERE/usr/python38/bin/python3" run_pyside6.py "$@"
+    EOF
+    chmod +x $out/AppRun
+  '';
+
   meta = with pkgs.lib; {
     description = "实时 AI 音频降噪（降噪/TSE/AEC/EQ，本地麦克风或手机远程推流，PipeWire）";
     homepage = "https://github.com/a2heng/PureVox";
