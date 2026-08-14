@@ -246,8 +246,15 @@
       PartOf = [ "graphical-session.target" ];
     };
     Service = {
+      # systemd 用户服务不继承图形会话环境变量（即使 After=graphical-session.target），
+      # Compose/skiko 启动时连不上显示服务器 → HeadlessException。
+      # 必须显式注入 DISPLAY（XWayland :0）+ WAYLAND_DISPLAY（niri 默认 wayland-1）。
+      Environment = [
+        "DISPLAY=:0"
+        "WAYLAND_DISPLAY=wayland-1"
+      ];
       # --background：ABDM 官方自启参数（其 autoStartOnBoot 也是用它）——
-      # 无主窗口、静默进托盘（useSystemTray 需开启）、单实例/浏览器集成正常。
+      # startSilent=true 不打开主窗口但托盘/UI 运行时照常初始化（静默进托盘）。
       # 之后点托盘图标可打开主窗口；若托盘不可见，pkill -f ABDownloadManager 重开。
       ExecStart = "${selfPackages.ab-download-manager}/bin/abdownloadmanager --background";
       Restart = "on-failure";
