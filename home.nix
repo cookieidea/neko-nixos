@@ -46,6 +46,10 @@
     steam                                     # steam (系统服务在 configuration.nix)
     mangohud                                  # mangohud
     mpv                                       # mpv
+    opencc                                    # opencc（mpv opencc.lua 字幕繁简转换）
+    p7zip                                     # 7z（mpv auto_sub_fonts_dir 解压字幕字体包）
+    ffmpeg                                    # ffmpeg（mpv opencc.lua 提取字幕轨道）
+    yt-dlp                                    # yt-dlp（mpv 在线视频下载/播放）
     obs-studio                                # obs-studio
     kdePackages.kdenlive                         # kdenlive（KDE 视频剪辑；26.05 属 kdePackages 不在顶层）
     upscaler                                  # upscaler
@@ -272,7 +276,37 @@
     "kitty/themes/kitty.conf".source = ./dotfiles/config/kitty/themes/kitty.conf;
     # kitty/themes/noctalia.conf 由 noctalia 模板生成（matugen 写色），不部署
     "mimeapps.list".source = ./dotfiles/config/mimeapps.list;
-    "mpv/config".source = ./dotfiles/config/mpv/config;
+    # ── mpv（从 Windows mpv.lite portable_config 迁移；Linux 适配：去 nvidia、
+    #    opencc 路径改 ~/.config/mpv、TMPDIR、mkdir -p；并入原 hwdec=auto-safe）──
+    # 目录级（scripts/uosc 等只读内容）用目录 symlink；文件级 mpv 只读文件逐条链接，
+    # ~/.config/mpv 本体是真实目录（mpv 写 watch_later 需要）。
+    "mpv/mpv.conf".source = ./dotfiles/mpv/mpv.conf;
+    "mpv/input.conf".source = ./dotfiles/mpv/input.conf;
+    "mpv/contextmenu.conf".source = ./dotfiles/mpv/contextmenu.conf;
+    "mpv/t2s.json".source = ./dotfiles/mpv/t2s.json;
+    "mpv/s2t.json".source = ./dotfiles/mpv/s2t.json;
+    "mpv/script-opts/check_settings.conf".source = ./dotfiles/mpv/script-opts/check_settings.conf;
+    "mpv/script-opts/input_plus.conf".source = ./dotfiles/mpv/script-opts/input_plus.conf;
+    "mpv/script-opts/playlist_osd.conf".source = ./dotfiles/mpv/script-opts/playlist_osd.conf;
+    "mpv/script-opts/thumbfast.conf".source = ./dotfiles/mpv/script-opts/thumbfast.conf;
+    "mpv/script-opts/uosc.conf".source = ./dotfiles/mpv/script-opts/uosc.conf;
+    "mpv/script-opts/uosc_danmaku.conf".source = ./dotfiles/mpv/script-opts/uosc_danmaku.conf;
+    "mpv/scripts/auto_itm.lua".source = ./dotfiles/mpv/scripts/auto_itm.lua;
+    "mpv/scripts/auto_sub_fonts_dir.lua".source = ./dotfiles/mpv/scripts/auto_sub_fonts_dir.lua;
+    "mpv/scripts/check_settings.lua".source = ./dotfiles/mpv/scripts/check_settings.lua;
+    "mpv/scripts/contextmenu.lua".source = ./dotfiles/mpv/scripts/contextmenu.lua;
+    "mpv/scripts/input_plus.lua".source = ./dotfiles/mpv/scripts/input_plus.lua;
+    "mpv/scripts/opencc.lua".source = ./dotfiles/mpv/scripts/opencc.lua;
+    "mpv/scripts/playlist_osd.lua".source = ./dotfiles/mpv/scripts/playlist_osd.lua;
+    "mpv/scripts/shaders.lua".source = ./dotfiles/mpv/scripts/shaders.lua;
+    "mpv/scripts/ssdm.lua".source = ./dotfiles/mpv/scripts/ssdm.lua;
+    "mpv/scripts/thumbfast.lua".source = ./dotfiles/mpv/scripts/thumbfast.lua;
+    "mpv/scripts/vapoursynth.lua".source = ./dotfiles/mpv/scripts/vapoursynth.lua;
+    "mpv/scripts/uosc".source = ./dotfiles/mpv/scripts/uosc;
+    "mpv/scripts/uosc_danmaku".source = ./dotfiles/mpv/scripts/uosc_danmaku;
+    "mpv/shaders".source = ./dotfiles/mpv/shaders;
+    "mpv/vs".source = ./dotfiles/mpv/vs;
+    "mpv/fonts".source = ./dotfiles/mpv/fonts;
     "niri/animations.kdl".source = ./dotfiles/config/niri/animations.kdl;
     "niri/binds.kdl".source = ./dotfiles/config/niri/binds.kdl;
     "niri/blur.kdl".source = ./dotfiles/config/niri/blur.kdl;
