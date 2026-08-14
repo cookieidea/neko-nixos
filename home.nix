@@ -327,7 +327,12 @@
     "niri/animations.kdl".source = ./dotfiles/config/niri/animations.kdl;
     "niri/binds.kdl".source = ./dotfiles/config/niri/binds.kdl;
     "niri/blur.kdl".source = ./dotfiles/config/niri/blur.kdl;
-    "niri/config.kdl".source = ./dotfiles/config/niri/config.kdl;
+    # config.kdl 实体机上存在非 HM 管理的旧文件（此前手动/脚本写入），
+    # HM 部署会报 "would be clobbered" → force = true 强制接管为 HM 链接。
+    "niri/config.kdl" = {
+      source = ./dotfiles/config/niri/config.kdl;
+      force = true;
+    };
     "niri/cursor.kdl".source = ./dotfiles/config/niri/cursor.kdl;
     "niri/layout.kdl".source = ./dotfiles/config/niri/layout.kdl;
     "niri/noctalia.kdl".source = ./dotfiles/config/niri/noctalia.kdl;
