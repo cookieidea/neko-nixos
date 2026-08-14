@@ -353,7 +353,9 @@
     };
     "niri/cursor.kdl".source = ./dotfiles/config/niri/cursor.kdl;
     "niri/layout.kdl".source = ./dotfiles/config/niri/layout.kdl;
-    "niri/noctalia.kdl".source = ./dotfiles/config/niri/noctalia.kdl;
+    # ⚠️ niri/noctalia.kdl 不部署：由 Noctalia 配色模板生成（niri.kdl 模板写色）。
+    # 部署成只读 symlink → 模板写入 Read-only file system → 配色模板处理失败。
+    # niri 启动时若文件缺失仅 include 失败（可容忍）；模板生成后即有配色。
     "niri/outputs.kdl".source = ./dotfiles/config/niri/outputs.kdl;
     "niri/supertab.kdl".source = ./dotfiles/config/niri/supertab.kdl;
     "niri/windowrules.kdl".source = ./dotfiles/config/niri/windowrules.kdl;
