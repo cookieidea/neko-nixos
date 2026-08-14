@@ -147,7 +147,7 @@
     pipewire                                   # 提供 pw-play（截图/强杀音效脚本依赖；服务已在 configuration.nix 开启）
     qt6Packages.fcitx5-configtool              # fcitx5 配置 GUI（原 fcitx5-configtool；26.05 移到 qt6Packages）
     tumbler                                    # thunar 缩略图后端（图片/文档缩略图，原 04j/04k 必装）
-    xdg-terminal-exec                          # 终端选择器（xdg-open 按 xdg-terminials.list 选 kitty）
+    xdg-terminal-exec                          # 终端选择器（xdg-open 按 xdg-terminals.list 选 kitty）
     adw-gtk3                                     # libadwaita 主题 adw-gtk3-dark（nixpkgs 属性名 adw-gtk3，非 adw-gtk-theme）
     nwg-look                                   # GTK 主题设置（原脚本 + dotfiles 已部署 nwg-look/gsettings）
     libgsf                                     # ODF/Office 文档缩略图（thunar，原 FM_PKGS2）
@@ -326,7 +326,7 @@
     "satty/config.toml".source = ./dotfiles/config/satty/config.toml;
     "starship.toml".source = ./dotfiles/config/starship.toml;
     "xdg-desktop-portal/niri-portals.conf".source = ./dotfiles/config/xdg-desktop-portal/niri-portals.conf;
-    "xdg-terminials.list".source = ./dotfiles/config/xdg-terminials.list;
+    "xdg-terminals.list".source = ./dotfiles/config/xdg-terminals.list;
     "xfce4/helpers.rc".source = ./dotfiles/config/xfce4/helpers.rc;
     "xfce4/xfconf/xfce-perchannel-xml/thunar-volman.xml".source = ./dotfiles/config/xfce4/xfconf/xfce-perchannel-xml/thunar-volman.xml;
     "xfce4/xfconf/xfce-perchannel-xml/thunar.xml".source = ./dotfiles/config/xfce4/xfconf/xfce-perchannel-xml/thunar.xml;
