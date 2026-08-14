@@ -144,6 +144,7 @@
     power-profiles-daemon                      # 电源模式（平衡/省电/性能）
     cmatrix lolcat sl                          # 彩蛋趣味命令（原 02b 安装）
     wineWow64Packages.stable                   # wine（原 99-apps 的 wine 全家；26.05 弃用 wineWowPackages）
+    bottles                                    # bottles（Wine 容器管理 GUI；FHS 封装含 32 位支持）
 
     # ── 全量脚本审查补漏（04j-minimal-niri / 04k-noctalia 核对结果）──
     matugen                                    # 主题生成器（random-anime-wallpaper-noctalia 与 noctalia-shell 模板直接调用）
