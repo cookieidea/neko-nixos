@@ -29,7 +29,9 @@
     # （/proc/self/exe 检测实际二进制）→ 绕过 makeWrapper → 无 systemdLibs →
     # ComposeNativeTray 的 libLinuxTray.so 解析不到 libsystemd.so.0 → 托盘消失。
     # 会话级 LD_LIBRARY_PATH 让任何入口（autostart/菜单/浏览器）都带该路径。
-    LD_LIBRARY_PATH = "${pkgs.systemdLibs}/lib";
+    # 注意：sessionVariables 是覆盖语义，须保留用户会话原有的
+    # pipewire-jack 路径（JACK 音频应用依赖）。
+    LD_LIBRARY_PATH = "${pkgs.systemdLibs}/lib:/nix/store/zcqp398mxlw62jl02sx0rsc7gvcl1qhc-pipewire-1.6.6-jack/lib";
   };
 
   # ============================================================
