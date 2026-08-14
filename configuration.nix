@@ -148,6 +148,10 @@
       # → Xvfb 起不来 → 打不开。显式禁 fallback-x11 并给真 x11 socket（幂等）。
       flatpak override --user --nosocket=fallback-x11 --socket=x11 com.qq.QQ
       flatpak override --user --nosocket=fallback-x11 --socket=x11 com.tencent.WeChat
+      # Open Orpheus（Electron）的托盘要拥有 org.freedesktop.StatusNotifierItem-*
+      # 总线名，flatpak D-Bus 代理默认只允许 own 自己的命名空间 → SNI 注册失败
+      # （ServiceUnknown）→ 托盘消失。放开 session-bus 后正常注册。
+      flatpak override --user --socket=session-bus io.github.yucling.open-orpheus
     '';
     serviceConfig = {
       Type = "oneshot";

@@ -23,6 +23,11 @@
 # libsystemd.so.0，而 NixOS 无 ld.so.cache → 依赖解析失败 → 托盘静默失败
 # （SNI 上无 item）。修复：makeWrapper 注入 LD_LIBRARY_PATH 指向
 # systemdLibs（JNA 的 dlopen 会按 LD_LIBRARY_PATH 解析依赖）。
+# ⚠️ wrapper 必须放在原始路径 bin/ABDownloadManager 上（真二进制改名 .bin，
+# 配 .bin.cfg）：ABDM 的 auto-start 会把 ~/.config/autostart 的 Exec 写成
+# 自身启动路径（lib/abdm/bin/ABDownloadManager），若只包装 $out/bin/ 下的
+# 别名，开机自启会绕过 wrapper → LD_LIBRARY_PATH 缺失 → 托盘消失。
+# 原始路径包装覆盖所有入口：桌面菜单、应用内自启、浏览器集成。
 { pkgs }:
 
 let
@@ -66,9 +71,19 @@ pkgs.stdenv.mkDerivation {
       "$out/lib/abdm/lib/runtime/lib/libfontconfig.so.1"
 
     # 启动器：注入 systemd lib 路径，保证 ComposeNativeTray 的 libLinuxTray.so
-    # 能解析 libsystemd.so.0（见文件头"系统托盘修复"注释）
-    makeWrapper "$out/lib/abdm/bin/ABDownloadManager" "$out/bin/abdownloadmanager" \
+    # 能解析 libsystemd.so.0（见文件头"系统托盘修复"注释）。
+    # ⚠️ 直接在原始路径 bin/ABDownloadManager 上包装（真二进制移到 .bin）：
+    # ABDM 应用会自己重写 ~/.config/autostart 指向 /proc/self/exe（原始二进制
+    # 路径），若只在 $out/bin/abdownloadmanager 包装，autostart 会绕过它 →
+    # 无 LD_LIBRARY_PATH → 托盘消失。原始路径包装则覆盖所有入口。
+    mv "$out/lib/abdm/bin/ABDownloadManager" "$out/lib/abdm/bin/ABDownloadManager.bin"
+    # jpackage 启动器按 <launcher 名>.cfg 找配置：改名 .bin 后需配套 cfg
+    # （原始 cfg 在 ../lib/app/ 下，主启动器经 ../lib/app/ABDownloadManager.cfg 找到）
+    cp "$out/lib/abdm/lib/app/ABDownloadManager.cfg" \
+      "$out/lib/abdm/lib/app/ABDownloadManager.bin.cfg"
+    makeWrapper "$out/lib/abdm/bin/ABDownloadManager.bin" "$out/lib/abdm/bin/ABDownloadManager" \
       --prefix LD_LIBRARY_PATH : "${pkgs.systemdLibs}/lib"
+    ln -s "$out/lib/abdm/bin/ABDownloadManager" "$out/bin/abdownloadmanager"
 
     # 图标 + desktop 文件（noctalia launcher / 应用列表可见）
     cp "$out/lib/abdm/lib/ABDownloadManager.png" "$out/share/pixmaps/abdownloadmanager.png"
