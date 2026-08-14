@@ -18,8 +18,9 @@ environment {
     // qt 主题
     QT_QPA_PLATFORMTHEME "gtk3"
     QT_QPA_PLATFORMTHEME_QT6 "gtk3"
-    // 解决 quickshell 图标主题缺失问题（仅在使用 qs 时有用，保留无害）
-    QS_ICON_THEME "Adwaita"
+    // Noctalia(quickshell) 图标主题：用 Papirus（kcalc 等 desktop 引用
+    // accessories-calculator 等标准名，Adwaita 只有 -symbolic 变体会缺失）
+    QS_ICON_THEME "Papirus"
     // GTK 软件使用的渲染器，可以解决 n 卡双显卡导致的 GTK 应用启动缓慢问题，
     // AMD 或 Intel 单显卡不需要这行设置可以注释掉
     //GSK_RENDERER "gl"
