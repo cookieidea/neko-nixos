@@ -296,15 +296,12 @@
     # fuzzel/themes/noctalia 由 noctalia-shell 模板系统生成（matugen 写色），不可 home-manager 只读部署
     "gtk-3.0/bookmarks".source = ./dotfiles/config/gtk-3.0/bookmarks;
     "gtk-3.0/gtk.css".source = ./dotfiles/config/gtk-3.0/gtk.css;
-    # gtk-3.0/noctalia.css 本应由 noctalia 模板生成（matugen 写色），但当前系统从未
-    # 生成 → GTK3 应用报 "Failed to import noctalia.css" 警告（曾致 tabby 打不开）。
-    # 部署 dotfiles 静态快照（当前配色）消除警告；若日后用 matugen 换色需同时更新。
-    "gtk-3.0/noctalia.css".source = ./dotfiles/config/gtk-3.0/noctalia.css;
+    # ⚠️ gtk-3.0/noctalia.css 不部署：由 Noctalia 配色模板生成（template-processor
+    # 写色）。若部署成只读 symlink → 模板写入 PermissionError → "配色方案模板
+    # 处理失败"（toast.theming-processor-failed）。生成失败时才临时部署静态快照。
     # gtk-3.0/settings.ini 不部署：由下方 gtk 模块（home-manager）全权写入，避免只读 symlink 冲突
     "gtk-4.0/gtk.css".source = ./dotfiles/config/gtk-4.0/gtk.css;
-    # gtk-4.0/noctalia.css 同上（缺失致 Bottles 等 GTK4/libadwaita 应用报
-    # "Failed to import noctalia.css" 警告），部署静态快照。
-    "gtk-4.0/noctalia.css".source = ./dotfiles/config/gtk-4.0/noctalia.css;
+    # gtk-4.0/noctalia.css 同上：由 Noctalia 模板生成，不部署只读版本。
     # gtk-4.0/settings.ini 同上，由 gtk 模块写入
     "kitty/current-theme.conf".source = ./dotfiles/config/kitty/current-theme.conf;
     "kitty/kitty.conf".source = ./dotfiles/config/kitty/kitty.conf;
