@@ -32,6 +32,15 @@ let
     sha256 = "cbae6a1ec0e5d29db8bd2cf87b0f5ff4cba76c79f08843132ccde83ad96b8892";
   };
 
+  # 源码（补 AppImage 缺失文件用）。上游 pack_appimage.sh 的打包文件列表
+  # 漏了 dialog_virtual_mic_linux.py → AppImage 里没有 → 点"虚拟声卡"菜单
+  # import 失败（ModuleNotFoundError 被 Qt 吞掉，界面打不开）。从源码补进
+  # 解包产物。用 GitHub codeload tarball（稳定 hash，无子模块）。
+  srcGit = pkgs.fetchzip {
+    url = "https://github.com/cookieidea/purevox/archive/d020117dbe6b1ccc83181df3260af7fcbc8745dd.tar.gz";
+    sha256 = "sha256-rUXR7Rm5SQSHBeU9wSYnEbJ2PQhm4LV4l15gHbIwmk8=";
+  };
+
   extracted = pkgs.appimageTools.extract {
     pname = "purevox";
     inherit version src;
@@ -41,11 +50,16 @@ let
     pname = "purevox-app";
     inherit version;
     src = extracted;
+    # srcGit 经 `inherit` 进 derivation 输入（fetchgit 产物是已解包目录）
+    inherit srcGit;
     installPhase = ''
       runHook preInstall
       mkdir -p $out
       cp -a . $out/
       chmod -R u+w $out
+
+      # ── 补 AppImage 缺失的虚拟声卡对话框模块（上游打包脚本漏打包）──
+      cp "$srcGit/dialog_virtual_mic_linux.py" "$out/usr/lib/purevox/"
 
       # ── 覆盖 AppRun ──
       cat > $out/AppRun <<'EOF'
