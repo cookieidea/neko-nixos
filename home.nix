@@ -45,6 +45,7 @@
     # --- Standard (common-applist.txt) ---
     gdu                                       # gdu
     baobab                                    # baobab
+    file                                      # file 命令（random-anime-wallpaper-noctalia 壁纸脚本依赖）
     mission-center                            # mission-center
     gnome-font-viewer                         # gnome-font-viewer
     google-chrome                             # google-chrome (替代 firefox; unfree 已开启)
@@ -369,7 +370,7 @@
     # 配色/主题模板由 noctalia-shell 的 matugen 模板系统生成（可写真实文件）。
     # v4 配置（JSON）：settings.json / plugins.json / colors.json / user-templates.toml
     # user-templates.toml 随上方 4 个 v4 JSON 一起部署（不再塞进 v5 的 config.toml）
-    "qq-flags.conf".source = ./dotfiles/config/qq-flags.conf;
+    # （qq-flags.conf 已删：linuxqq 未装，QQ 走 flatpak 沙箱不读）
     "satty/config.toml".source = ./dotfiles/config/satty/config.toml;
     "starship.toml".source = ./dotfiles/config/starship.toml;
     "xdg-desktop-portal/niri-portals.conf".source = ./dotfiles/config/xdg-desktop-portal/niri-portals.conf;
@@ -529,7 +530,7 @@
     ".local/share/icons/Adwaita-Matugen-B/scalable/status/folder-open.svg".source = ./dotfiles/local/share/icons/Adwaita-Matugen-B/scalable/status/folder-open.svg;
     ".local/share/icons/Adwaita-Matugen-B/scalable/status/user-trash-full.svg".source = ./dotfiles/local/share/icons/Adwaita-Matugen-B/scalable/status/user-trash-full.svg;
     ".local/share/nwg-look/gsettings".source = ./dotfiles/local/share/nwg-look/gsettings;
-    ".vimrc".source = ./dotfiles/home/.vimrc;
+    # （.vimrc 已删：vim 未安装，编辑器 nvim=CookNixvim 不读 .vimrc）
 
     # ── SHORiN 私有 niri 脚本（配置迁移：从上游 noctalia-dotfiles 引入）──
     # 对应 binds.kdl 里直接调用 ~/.config/niri/scripts/* 的绑定：
