@@ -20,8 +20,12 @@ pkgs.appimageTools.wrapType2 {
   pname = "purevox";
   inherit version;
 
+  # 资产文件名里的日期是连字符格式（2026-08-14-1643），tag 是点格式
+  # （v2026.08.14.1643）——URL 里两处不能混用，否则 404。
+  assetDate = "2026-08-14-1643";
+
   src = pkgs.fetchurl {
-    url = "https://github.com/a2heng/PureVox/releases/download/v${version}/PureVox-Linux-x64-${version}-release.AppImage";
+    url = "https://github.com/a2heng/PureVox/releases/download/v${version}/PureVox-Linux-x64-${assetDate}-release.AppImage";
     sha256 = "cbae6a1ec0e5d29db8bd2cf87b0f5ff4cba76c79f08843132ccde83ad96b8892";
   };
 
