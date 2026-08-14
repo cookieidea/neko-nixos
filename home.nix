@@ -4,14 +4,14 @@
 #   kde-applist.txt             (shell/终端 + KDE 应用)
 #   kde-common-applist.txt      (KDE 系统工具/磁盘/媒体)
 # 桌面：niri (Wayland 滚动平铺 compositor) + Noctalia (桌面 shell)
-# 编辑器：nixvim（Neovim 配置框架，替代 neovim + lazyvim）
+# 编辑器：CookNixvim（Youthdreamer/CookNixvim，模块化 Neovim 配置框架产物，
+#        基于 nix-community/nixvim；用其 flake 构建的 nvim 替代裸 nixvim 配置）
 # AUR-only 与 nixpkgs 差异见底部注释。
 
-{ config, pkgs, lib, desktop, username, nixvim, opencode, bili-danmaku-tui, selfPackages, ... }:
+{ config, pkgs, lib, desktop, username, cooknixvim, opencode, bili-danmaku-tui, selfPackages, ... }:
 
 {
   imports = [
-    nixvim.homeModules.nixvim        # nixvim（Neovim 配置框架）
     # Noctalia 改用 flake 包（见 home.packages）+ settings.json（见 xdg.configFile），
     # 不再加载它的 HM 模块，避免 programs.noctalia.settings 和手写文件冲突。
   ];
@@ -196,6 +196,9 @@
     selfPackages.purevox              # PureVox（实时 AI 音频降噪，AppImage 捆绑内嵌 Python，PipeWire 直用）
     # 走 flake 输入的包（不在 nixpkgs 核心，直接引用其 flake 构建产物）
     bili-danmaku-tui.packages.${pkgs.stdenv.hostPlatform.system}.default  # B 站直播间弹幕 TUI
+    # CookNixvim：模块化 Neovim 配置（基于 nix-community/nixvim 的完整配置），
+    # 产物 packages.<sys>.default 提供 nvim 命令（替代原 programs.nixvim 简易配置）
+    cooknixvim.packages.${pkgs.stdenv.hostPlatform.system}.default        # nvim（CookNixvim）
   ];
 
   # ============================================================
@@ -219,23 +222,6 @@
     fzf.enable = true;            # fzf（脚本里也装了）
     fish = {
       enable = true;
-    };
-
-    # ── nixvim：Neovim 的配置框架 ─────────────────────
-    # 用 Nix 写 Neovim 配置（插件/配色/按键），替代 lazyvim。
-    nixvim = {
-      enable = true;
-      # catppuccin 配色 + lualine 状态栏
-      colorschemes.catppuccin.enable = true;
-      plugins.lualine.enable = true;
-      opts = {
-        number = true;
-        relativenumber = true;
-        shiftwidth = 2;
-        tabstop = 2;
-      };
-      # 想加插件：plugins.<name>.enable = true；
-      # 想加原生 lua：extraConfigLua = '' ... '';
     };
 
     # ── niri：Wayland 滚动平铺 compositor ────────────────

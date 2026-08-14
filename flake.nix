@@ -25,10 +25,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # ── nixvim：Neovim 的配置框架 ──
-    # 用 nixos-26.05 分支匹配 nixpkgs 26.05；官方建议不 follows nixpkgs
-    nixvim = {
-      url = "git+https://github.com/nix-community/nixvim.git?ref=nixos-26.05";
+    # ── CookNixvim：模块化 Neovim 配置（基于 nix-community/nixvim）──
+    # 用其 flake 构建产物 packages.<sys>.default 作为 nvim（配置内嵌在它仓库的 config/）。
+    # 注意：它自带 nixpkgs-unstable 与 nixvim（unstable）输入，首次构建会拉 GitHub 大包。
+    cooknixvim = {
+      url = "github:Youthdreamer/CookNixvim";
     };
 
     # ── opencode（AI 编程 Agent）──
@@ -53,7 +54,7 @@
     };
   };
 
-  outputs = { self, nixpkgs, home-manager, nixvim, opencode, bili-danmaku-tui, nix-cachyos-kernel, ... }:
+  outputs = { self, nixpkgs, home-manager, cooknixvim, opencode, bili-danmaku-tui, nix-cachyos-kernel, ... }:
     let
       system = "x86_64-linux";
       # ── 改这里 ──────────────────────────────────────────────
@@ -77,8 +78,8 @@
         home-manager.useGlobalPkgs = true;
         home-manager.useUserPackages = true;
         home-manager.users.${username} = import ./home.nix;
-        # 把 nixvim / opencode / bili-danmaku-tui 三个 flake 输入，以及自构建包传给 home 配置
-        home-manager.extraSpecialArgs = { inherit desktop username nixvim opencode bili-danmaku-tui selfPackages; };
+        # 把 cooknixvim / opencode / bili-danmaku-tui 三个 flake 输入，以及自构建包传给 home 配置
+        home-manager.extraSpecialArgs = { inherit desktop username cooknixvim opencode bili-danmaku-tui selfPackages; };
       };
     in {
       # 暴露自构建派生为 flake 包：可单独 `nix build .#<name>`
