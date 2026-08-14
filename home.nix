@@ -52,6 +52,7 @@
     yt-dlp                                    # yt-dlp（mpv 在线视频下载/播放）
     obs-studio                                # obs-studio
     kdePackages.kdenlive                         # kdenlive（KDE 视频剪辑；26.05 属 kdePackages 不在顶层）
+    kdePackages.kcalc                            # kcalc（KDE 计算器；26.05 属 kdePackages，gear 区）
     upscaler                                  # upscaler
     yazi                                      # yazi
     # flatseal 已在 nixpkgs 26.05 移除 → 需要时用 flatpak 装：
@@ -74,6 +75,8 @@
     timg                                      # timg
     bat                                       # bat
     btop                                      # btop（DE 无关，常驻）
+    ripgrep                                   # ripgrep（原 LazyVim/neovim 生态搜索工具）
+    fd                                        # fd（find 替代，neovim/telescope 生态常用）
 
     # --- 编辑器（替代 visual-studio-code-bin，AUR）---
     vscodium                                  # visual-studio-code-bin → 用 vscodium 去遥测
@@ -98,6 +101,10 @@
 
     # --- 原清单里有、之前漏加的 ---
     virt-manager                              # virt-manager（KVM 虚拟机 GUI，libvirtd 已在 configuration.nix 开）
+    virt-viewer                               # virt-viewer（QEMU/SPICE 客户端，virt-manager 配套）
+    gnome-disk-utility                        # gnome-disk-utility（磁盘管理 GUI，mainProgram=gnome-disks；原 kde-common-applist）
+    # ksystemlog —— nixpkgs 26.05 已移除（KDE 上游停止维护，KDE Gear 不再打包）；
+    # 系统日志用 journalctl / journalctl -f，或 GNOME 系可用 flatpak 的 org.gnome.Logs
     video-downloader                          # video-downloader（yt-dlp 图形前端）
 
     # --- niri 桌面生态依赖（config.kdl / binds.kdl 里用到的程序）---
