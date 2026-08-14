@@ -25,7 +25,8 @@ binds {
     Mod+F3 hotkey-overlay-title="录屏 Screen record" { spawn-sh "shorin-screenrec-menu";}
     Mod+F5 hotkey-overlay-title="快速存档 Quick save" { spawn-sh "quicksave";}
     Mod+F8 hotkey-overlay-title="快速读档 Quick load" { spawn-sh "quickload";}
-    Mod+P hotkey-overlay-title="提取窗口信息 Pick information" { spawn-sh "~/.config/niri/scripts/niri-pick" "focus"; }
+    // spawn-sh 只接受单个 shell 命令字符串；多参数用 spawn（niri-pick focus 恢复 spawn 多参数格式）
+    Mod+P hotkey-overlay-title="提取窗口信息 Pick information" { spawn "~/.config/niri/scripts/niri-pick" "focus"; }
 
     // 临时开一个浮动终端
     Mod+Slash hotkey-overlay-title="临时终端 Quick Terminal" {spawn "kitty" "--single-instance" "--class" "quickterminal";}
