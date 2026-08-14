@@ -20,10 +20,12 @@ binds {
     // 特殊功能
     Mod+F1 hotkey-overlay-title="开关输入法 Toggle fcitx" {spawn-sh "pkill fcitx5 || fcitx5 ";}
     Mod+F2 hotkey-overlay-title="设置 Settings" { spawn-sh "noctalia-shell ipc call settings toggle";}
-    Mod+F3 hotkey-overlay-title="录屏 Screen record" { spawn "shorin-screenrec-menu";}
-    Mod+F5 hotkey-overlay-title="快速存档 Quick save" { spawn "quicksave";}
-    Mod+F8 hotkey-overlay-title="快速读档 Quick load" { spawn "quickload";}
-    Mod+P hotkey-overlay-title="提取窗口信息 Pick information" { spawn "~/.config/niri/scripts/niri-pick" "focus"; }
+    // 录屏/快存/快读/窗口信息：私有脚本在 ~/.local/bin 与 ~/.config/niri/scripts，
+    // 用 spawn-sh 走 shell 展开 ~ 并查 PATH（home.sessionPath 已加 ~/.local/bin）
+    Mod+F3 hotkey-overlay-title="录屏 Screen record" { spawn-sh "shorin-screenrec-menu";}
+    Mod+F5 hotkey-overlay-title="快速存档 Quick save" { spawn-sh "quicksave";}
+    Mod+F8 hotkey-overlay-title="快速读档 Quick load" { spawn-sh "quickload";}
+    Mod+P hotkey-overlay-title="提取窗口信息 Pick information" { spawn-sh "~/.config/niri/scripts/niri-pick" "focus"; }
 
     // 临时开一个浮动终端
     Mod+Slash hotkey-overlay-title="临时终端 Quick Terminal" {spawn "kitty" "--single-instance" "--class" "quickterminal";}
@@ -43,8 +45,8 @@ binds {
     Mod+Alt+W hotkey-overlay-title="壁纸切换 Wallpaper" { spawn-sh "noctalia-shell ipc call wallpaper toggle";}
     // 随机切换壁纸
     Mod+F10 hotkey-overlay-title="随机切换壁纸 Random wallpaper" { spawn-sh "noctalia-shell ipc call wallpaper random all";}
-    // 随机下载壁纸
-    Mod+Shift+F10 hotkey-overlay-title="随机下载壁纸 Random Download wallpaper" { spawn "~/.local/bin/random-anime-wallpaper-noctalia";}
+    // 随机下载壁纸（spawn-sh：shell 展开 ~，spawn 不经 shell 的 ~ 不展开会失败）
+    Mod+Shift+F10 hotkey-overlay-title="随机下载壁纸 Random Download wallpaper" { spawn-sh "~/.local/bin/random-anime-wallpaper-noctalia";}
 
     Mod+O hotkey-overlay-title="切换总览界面 toggle overview" repeat=false { toggle-overview; }
     Mod+G repeat=false { toggle-overview; }

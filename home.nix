@@ -23,6 +23,9 @@
   # kitty 终端 terminfo：kitty 设 TERM=xterm-kitty，NixOS 上 ncurses 找不到该
   # terminfo 文件 → nvim 等 ncurses 应用吐转义码乱码（^[[?69…）。指向 kitty 包自带的
   # share/terminfo 即可（xterm 等其余条目用 ncurses 内建 fallback）。
+  # ~/.local/bin 进 PATH：shorin-screenrec-menu / quicksave / quickload 等
+  # 私有脚本部署在这里（binds.kdl 裸命令调用靠 PATH 查找）。
+  home.sessionPath = [ "$HOME/.local/bin" ];
   home.sessionVariables = {
     TERMINFO_DIRS = "${pkgs.kitty}/share/terminfo";
     # ABDM 托盘兜底：ABDM 应用会把自己的 autostart 重写为 bin/ABDownloadManager.bin
