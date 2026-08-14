@@ -245,30 +245,12 @@
   # ============================================================
   #  systemd user 服务（登录图形会话后自启）
   # ============================================================
-  systemd.user.services.abdm = {
-    Unit = {
-      Description = "AB Download Manager（开机自启）";
-      # 等图形会话就绪再启动（GUI 应用需要 DISPLAY/WAYLAND）
-      After = [ "graphical-session.target" ];
-      PartOf = [ "graphical-session.target" ];
-    };
-    Service = {
-      # systemd 用户服务不继承图形会话环境变量（即使 After=graphical-session.target），
-      # Compose/skiko 启动时连不上显示服务器 → HeadlessException。
-      # 必须显式注入 DISPLAY（XWayland :0）+ WAYLAND_DISPLAY（niri 默认 wayland-1）。
-      Environment = [
-        "DISPLAY=:0"
-        "WAYLAND_DISPLAY=wayland-1"
-      ];
-      # --background：ABDM 官方自启参数（其 autoStartOnBoot 也是用它）——
-      # startSilent=true 不打开主窗口但托盘/UI 运行时照常初始化（静默进托盘）。
-      # 之后点托盘图标可打开主窗口；若托盘不可见，pkill -f ABDownloadManager 重开。
-      ExecStart = "${selfPackages.ab-download-manager}/bin/abdownloadmanager --background";
-      Restart = "on-failure";
-      RestartSec = 5;
-    };
-    Install.WantedBy = [ "graphical-session.target" ];
-  };
+  # ⚠️ ABDM 不自启在此定义（原 systemd.user.services.abdm 已移除）：
+  # ABDM 应用自身有开机自启机制（设置 autoStartOnBoot=true 默认），启动时会
+  # 自动写 ~/.config/autostart/com.abdownloadmanager.desktop（Exec 指向
+  # bin/ABDownloadManager.bin --background）。若再配 systemd 服务会双重启动，
+  # 第二次实例经单实例转发唤醒聚焦第一个实例的窗口 → 开机弹窗。
+  # 托盘环境问题由下方 xdg.configFile 的 systemd drop-in 兜底。
 
   # ============================================================
   #  Noctalia 桌面 shell（niri 之上的一层）
