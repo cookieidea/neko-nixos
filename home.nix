@@ -45,6 +45,7 @@
     # --- Standard (common-applist.txt) ---
     gdu                                       # gdu
     baobab                                    # baobab
+    file                                      # file 命令（random-anime-wallpaper-noctalia 壁纸脚本依赖）
     mission-center                            # mission-center
     gnome-font-viewer                         # gnome-font-viewer
     google-chrome                             # google-chrome (替代 firefox; unfree 已开启)

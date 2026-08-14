@@ -22,11 +22,12 @@ binds {
     Mod+F2 hotkey-overlay-title="设置 Settings" { spawn-sh "noctalia-shell ipc call settings toggle";}
     // 录屏/快存/快读/窗口信息：私有脚本在 ~/.local/bin 与 ~/.config/niri/scripts，
     // 用 spawn-sh 走 shell 展开 ~ 并查 PATH（home.sessionPath 已加 ~/.local/bin）
-    Mod+F3 hotkey-overlay-title="录屏 Screen record" { spawn-sh "shorin-screenrec-menu";}
-    Mod+F5 hotkey-overlay-title="快速存档 Quick save" { spawn-sh "quicksave";}
-    Mod+F8 hotkey-overlay-title="快速读档 Quick load" { spawn-sh "quickload";}
-    // spawn-sh 只接受单个 shell 命令字符串；多参数用 spawn（niri-pick focus 恢复 spawn 多参数格式）
-    Mod+P hotkey-overlay-title="提取窗口信息 Pick information" { spawn "~/.config/niri/scripts/niri-pick" "focus"; }
+    // 用绝对路径：niri 是 systemd 用户服务，PATH 不含 ~/.local/bin
+    // （home.sessionPath 只经 login shell 生效）；spawn-sh 走 shell 展开 ~
+    Mod+F3 hotkey-overlay-title="录屏 Screen record" { spawn-sh "~/.local/bin/shorin-screenrec-menu";}
+    Mod+F5 hotkey-overlay-title="快速存档 Quick save" { spawn-sh "~/.local/bin/quicksave";}
+    Mod+F8 hotkey-overlay-title="快速读档 Quick load" { spawn-sh "~/.local/bin/quickload";}
+    Mod+P hotkey-overlay-title="提取窗口信息 Pick information" { spawn-sh "~/.config/niri/scripts/niri-pick focus"; }
 
     // 临时开一个浮动终端
     Mod+Slash hotkey-overlay-title="临时终端 Quick Terminal" {spawn "kitty" "--single-instance" "--class" "quickterminal";}
