@@ -246,10 +246,12 @@
       PartOf = [ "graphical-session.target" ];
     };
     Service = {
-      ExecStart = "${selfPackages.ab-download-manager}/bin/abdownloadmanager";
+      # --background：ABDM 官方自启参数（其 autoStartOnBoot 也是用它）——
+      # 无主窗口、静默进托盘（useSystemTray 需开启）、单实例/浏览器集成正常。
+      # 之后点托盘图标可打开主窗口；若托盘不可见，pkill -f ABDownloadManager 重开。
+      ExecStart = "${selfPackages.ab-download-manager}/bin/abdownloadmanager --background";
       Restart = "on-failure";
       RestartSec = 5;
-      # ABDM 是单实例应用，自启后启动器再点会显示已有实例（托盘），属正常
     };
     Install.WantedBy = [ "graphical-session.target" ];
   };
