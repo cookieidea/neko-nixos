@@ -273,10 +273,13 @@
     # 解析不到 libsystemd.so.0 → 开机自启的 ABDM 无托盘。
     # systemd user 服务不经过 login shell（hm-session-vars.sh 不生效），
     # 且本机 environment.d generator 缺失 → 用 unit drop-in 最可靠。
+    # ExecStartPre 补建 ~/.abdm/system/log/（ABDM 启动要写 crash.log，
+    # 目录缺失会 FileNotFoundException 崩溃退出，开机时序下不自动创建）。
     # 注：LD_LIBRARY_PATH 为覆盖语义，保留 pipewire-jack 路径。
     "systemd/user/app-com.abdownloadmanager@autostart.service.d/10-abdm-tray.conf".text = ''
       [Service]
       Environment=LD_LIBRARY_PATH=${pkgs.systemdLibs}/lib:/nix/store/zcqp398mxlw62jl02sx0rsc7gvcl1qhc-pipewire-1.6.6-jack/lib
+      ExecStartPre=${pkgs.coreutils}/bin/mkdir -p %h/.abdm/system/log
     '';
     # ── noctalia-shell 4.7.6 用户配置（quickshell 惯例路径）──
     # 完整默认 settings（取自官方 Assets/settings-default.json）只改
@@ -604,7 +607,9 @@
       gtk-application-prefer-dark-theme = "1";
     };
     gtk4.extraConfig = {
-      gtk-application-prefer-dark-theme = "1";
+      # 注：不再设 gtk-application-prefer-dark-theme —— libadwaita 不支持该
+      # 设置（启动报 "Using GtkSettings:gtk-application-prefer-dark-theme with
+      # libadwaita is unsupported" 警告），暗色由 noctalia 主题/GTK3 处理。
     };
   };
 
