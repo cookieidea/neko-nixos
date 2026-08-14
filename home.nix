@@ -25,6 +25,11 @@
   # share/terminfo 即可（xterm 等其余条目用 ncurses 内建 fallback）。
   home.sessionVariables = {
     TERMINFO_DIRS = "${pkgs.kitty}/share/terminfo";
+    # ABDM 托盘兜底：ABDM 应用会把自己的 autostart 重写为 bin/ABDownloadManager.bin
+    # （/proc/self/exe 检测实际二进制）→ 绕过 makeWrapper → 无 systemdLibs →
+    # ComposeNativeTray 的 libLinuxTray.so 解析不到 libsystemd.so.0 → 托盘消失。
+    # 会话级 LD_LIBRARY_PATH 让任何入口（autostart/菜单/浏览器）都带该路径。
+    LD_LIBRARY_PATH = "${pkgs.systemdLibs}/lib";
   };
 
   # ============================================================
