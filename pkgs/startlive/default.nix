@@ -75,6 +75,11 @@ STUB
     cat > $out/bin/startlive <<EOF
 #!${pkgs.runtimeShell}
 export PYTHONPATH="$out/share/startlive/velopack-stub:\$PYTHONPATH"
+# Qt SVG 图标：StartLive 侧边栏图标是 SVG（dark-*.svg / light-*.svg），
+# 而 PySide6 的 qtbase imageformats 插件缺 libqsvg.so（qtsvg 独立输出）。
+# 不补插件 → QIcon(SVG) 返回空 → 软件内图标空白。把 qtsvg 的插件目录
+# 加进 QT_PLUGIN_PATH（内容镜像，重启 Qt 应用生效）。
+export QT_PLUGIN_PATH=${pkgs.qt6.qtsvg}/lib/qt-6/plugins:''${QT_PLUGIN_PATH:+:$QT_PLUGIN_PATH}
 exec ${py}/bin/python "$out/share/startlive/StartLive.py" "\$@"
 EOF
     chmod +x $out/bin/startlive
