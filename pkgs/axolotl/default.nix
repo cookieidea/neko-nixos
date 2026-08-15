@@ -1,0 +1,59 @@
+# Axolotl —— Minecraft Java 版启动器（替代 Prism Launcher / HMCL）
+#
+# Mystic-Stars/Axolotl
+# 功能：游戏实例管理、CurseForge/Modrinth 整合包、Mod/数据包/资源包管理、
+#       联机（红石/陶瓦）、离线/Mojang 认证（镜像/换源）、Discord 状态等。
+# 发布：GitHub Releases，Linux 资产为 AppImage（自包含，前后端分离架构）。
+#
+# 打包：appimageTools.extract + buildFHSEnv（同 bedrockboot/purevox 方案）。
+#   AppImage 自包含运行时，原版 AppRun 直接用；buildFHSEnv 提供宿主库兜底。
+#
+# ⚠️ 更新：发版频繁（如 v1.8.0），升级改 version + 下方 sha256。
+{ pkgs }:
+
+let
+  version = "1.8.0";
+
+  src = pkgs.fetchurl {
+    url = "https://github.com/Mystic-Stars/Axolotl/releases/download/v${version}/Axolotl.Launcher_${version}_amd64.AppImage";
+    sha256 = "a77219f2968384d8a25d3d7b03bc6d9f4995a0582dd0a2d46540d4cc79d8bd47";
+  };
+
+  extracted = pkgs.appimageTools.extract {
+    pname = "axolotl";
+    inherit version src;
+  };
+in
+pkgs.buildFHSEnv {
+  name = "axolotl";
+  runScript = "${extracted}/AppRun";
+
+  targetPkgs = pkgs: [
+    # 基础 C 库
+    pkgs.glibc
+    pkgs.stdenv.cc.cc.lib
+    pkgs.zlib
+    pkgs.openssl
+    pkgs.icu
+    # 图形 / 字体 / X11 / Wayland
+    pkgs.fontconfig
+    pkgs.freetype
+    pkgs.libx11
+    pkgs.libxext
+    pkgs.libxcb
+    pkgs.libxkbcommon
+    pkgs.wayland
+    pkgs.libGL
+    pkgs.dbus
+    pkgs.glib
+    pkgs.gsettings-desktop-schemas
+  ];
+
+  meta = with pkgs.lib; {
+    description = "Minecraft Java 版启动器（Modrinth/CurseForge 整合包、联机、多账户）";
+    homepage = "https://github.com/Mystic-Stars/Axolotl";
+    license = licenses.unfreeRedistributable;
+    mainProgram = "axolotl";
+    platforms = platforms.linux;
+  };
+}

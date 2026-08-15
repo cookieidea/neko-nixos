@@ -26,4 +26,6 @@
   tabby-terminal  = import ./tabby  { inherit pkgs; };
   obs-vdoninja    = import ./obs-vdoninja { inherit pkgs; };
   purevox         = import ./purevox { inherit pkgs; };
+  bedrockboot     = import ./bedrockboot { inherit pkgs; };
+  axolotl         = import ./axolotl { inherit pkgs; };
 }
