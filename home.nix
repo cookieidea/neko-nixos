@@ -105,7 +105,7 @@
     mangojuice                                # mangojuice（GTK 文件管理器）
 
     # --- 游戏 / 影音客户端（用户新增，已在 nixpkgs 26.05 核实存在）---
-    selfPackages.hmcl                              # hmcl（Minecraft 启动器，VM 下强制 JavaFX ES2 渲染，见 pkgs/hmcl）
+    prismlauncher                             # Prism Launcher（Minecraft 启动器，Qt；替代 hmcl）
     kazumi                                     # kazumi（B 站第三方客户端，Flutter；替代构建失败的 animeko）
     lunar-client                               # lunar-client（Minecraft 客户端，unfree；26.05 由 lunarclient 改名）
     taterclient-ddnet                         # taterclient-ddnet（DDNet Teeworlds 修改版客户端，Apache-2.0）

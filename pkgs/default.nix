@@ -26,5 +26,4 @@
   tabby-terminal  = import ./tabby  { inherit pkgs; };
   obs-vdoninja    = import ./obs-vdoninja { inherit pkgs; };
   purevox         = import ./purevox { inherit pkgs; };
-  hmcl            = import ./hmcl { inherit pkgs; };
 }
