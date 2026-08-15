@@ -60,13 +60,13 @@ neko-nixos/
 - **Standard（common-applist）**：`gdu` `baobab` `mission-center` `gnome-font-viewer` `google-chrome` `transmission_4-gtk` `localsend` `gnome-calendar` `gnome-clocks` `lutris` `steam` `mangohud` `mpv` `obs-studio` `upscaler` `yazi` `pavucontrol` `mousepad` `easyeffects`
 - **Shell & Terminal（kde-applist）**：`fish` `starship` `eza` `zoxide` `fastfetch` `imagemagick` `jq` `timg` `bat` `btop`
 - **编辑器**：`vscodium`（替代 AUR 的 `visual-studio-code-bin`，去遥测）
-- **原 AUR 包（已在 nixpkgs 26.05 核实存在）**：`flclash` `discord` `ayugram-desktop` `gearlever` `lsfg-vk` `protonplus` `mangojuice`
+- **原 AUR 包（已在 nixpkgs 26.05 核实存在）**：`flclash` `ayugram-desktop` `gearlever` `lsfg-vk` `protonplus` `mangojuice`（`discord` 因 nixpkgs 包需从 discordapp.net 下载被墙，改走 Flatpak，见下）
 - **游戏 / 影音客户端（用户新增）**：`hmcl` `kazumi`（替代 animeko）`lunar-client` `taterclient-ddnet`
 - **原清单遗漏补回**：`virt-manager` `video-downloader`
 - **niri 生态依赖**：`niri` `kitty` `fuzzel` `thunar` `nautilus` `satty` `cliphist` `wl-clipboard` `xsettingsd` `gpu-screen-recorder` `btrfs-assistant` `matugen` `imv`
 - **主题/图标**：`adwaita-icon-theme` `papirus-icon-theme` `hicolor-icon-theme` `adw-gtk3` `breeze(kdePackages)`——图标主题由 home-manager `gtk` 模块写入（Papirus），settings.ini 不手写部署
 - **flake 包（不在 nixpkgs 核心）**：`opencode`（AI 编程 Agent）、`bili-danmaku-tui`（B 站弹幕 TUI，自带 flake）、`cooknixvim`（模块化 Neovim 配置，基于 nixvim，取代原先直接用 nixvim）。桌面 shell 用 nixpkgs 自带的 `noctalia-shell`。
-- **Flatpak 自动安装（flatpak-repo 服务）**：微信 / QQ / Flatseal / Bazaar 应用商店 / OpenOrpheus（网易云 Orpheus 宿主）
+- **Flatpak 自动安装（flatpak-repo 服务）**：微信 / QQ / Discord / Flatseal / Bazaar 应用商店 / OpenOrpheus（网易云 Orpheus 宿主）
 - **自构建程序（`./pkgs` 派生，对应原 Arch 的 AUR `-git` / 私有仓库）**：`niri-sidebar` `pins` `pywalfox` `shorin-contrib` `proton-wrapper` `splayer-next` `startlive` `ab-download-manager` `tabby-terminal` `obs-vdoninja` `purevox` `bedrockboot` `axolotl`
   - ⚠️ `splayer-next` 是 **SPlayer-Dev/SPlayer-Next**（Electron 音乐播放器），与 nixpkgs 里的 `splayer`（Simple Netease Cloud Music player）**不是同一个软件**，切勿混用。
   - ⚠️ `tabby-terminal` 是 **eugeny/tabby** 终端模拟器；nixpkgs 的 `tabby` 是 TabbyML AI 助手，同名不同项目。
@@ -79,9 +79,9 @@ neko-nixos/
 - `configuration.nix` 里 `services.flatpak.enable = true;`，Flathub 仓库先 add 官方
   （flatpakrepo 文件），再把仓库 URL 切到**中科大镜像** `https://mirrors.ustc.edu.cn/flathub`
   （2026-08 实测仓库根 200 可用；各镜像的 `.flatpakrepo` 文件本身 404，故不能直接 remote-add 镜像）。
-- **微信 / QQ / Flatseal / Bazaar 应用商店 / OpenOrpheus** 由 `flatpak-repo` one-shot 服务在
+- **微信 / QQ / Discord / Flatseal / Bazaar 应用商店 / OpenOrpheus** 由 `flatpak-repo` one-shot 服务在
   启动时自动安装（幂等，见 `configuration.nix` 的 `systemd.services.flatpak-repo`）：
-  `com.tencent.WeChat`、`com.qq.QQ`、`com.github.tchx84.Flatseal`、`io.github.kolunmi.Bazaar`、
+  `com.tencent.WeChat`、`com.qq.QQ`、`com.discordapp.Discord`、`com.github.tchx84.Flatseal`、`io.github.kolunmi.Bazaar`、
   `io.github.yucling.open-orpheus`。
 - 想加其他 flatpak 应用，往该服务的 `flatpak install` 行追加 ID 即可。
 
