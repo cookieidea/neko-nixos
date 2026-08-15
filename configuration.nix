@@ -141,8 +141,8 @@
       flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
       # 切国内镜像：中科大（动态缓存 + 302 回源）；USTC 挂了就换官方（注释掉下行）
       flatpak remote-modify flathub --url=https://mirrors.ustc.edu.cn/flathub
-      # 自动安装 Flatpak 应用（幂等）：微信 / QQ / Discord / Flatseal / Bazaar / OpenOrpheus
-      flatpak install --noninteractive --or-update flathub com.tencent.WeChat com.qq.QQ com.discordapp.Discord com.github.tchx84.Flatseal io.github.kolunmi.Bazaar io.github.yucling.open-orpheus
+      # 自动安装 Flatpak 应用（幂等）：微信 / QQ / Flatseal / Bazaar / OpenOrpheus
+      flatpak install --noninteractive --or-update flathub com.tencent.WeChat com.qq.QQ com.github.tchx84.Flatseal io.github.kolunmi.Bazaar io.github.yucling.open-orpheus
       # QQ/微信 flatpak manifest 用 fallback-x11（仅 Wayland 不可用时才给 X11），
       # 会覆盖 x11 权限 → 沙箱内无 /tmp/.X11-unix → QQ 启动脚本走 xvfb-run 分支
       # → Xvfb 起不来 → 打不开。显式禁 fallback-x11 并给真 x11 socket（幂等）。
