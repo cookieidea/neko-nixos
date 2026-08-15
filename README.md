@@ -24,7 +24,7 @@
 - **CachyOS 内核**：`boot.kernelPackages = pkgs.cachyosKernels.linuxPackages-cachyos-rt-bore;`（flake 输入 `nix-cachyos-kernel` release 分支 + pinned overlay，二进制缓存 `attic.xuyh0120.win/lantian`）。
 - **国内镜像源**（全部已配置，不可达时自动回退官方源，不会硬失败）：
   - Nix 二进制缓存：`nix.settings.extra-substituters` → 清华 TUNA + attic.xuyh0120.win/lantian（CachyOS 内核）
-  - nixpkgs / home-manager 源码：flake 输入走清华 TUNA git 镜像
+  - nixpkgs 源码：flake 输入走清华 TUNA nix-channels **tarball**（`nixos-26.05/nixexprs.tar.xz`，⚠️ 可变 tarball——镜像同步后 narHash 会过期，需 `nix flake update` 刷新 lock，见 docs 踩坑 33）；home-manager / cooknixvim / opencode / bili-danmaku-tui / nix-cachyos-kernel 走 `git+https` / `github:` 直连
   - Flathub：官方 `dl.flathub.org`（国内 USTC/TUNA/阿里镜像 2026-08 起全部失效，见 docs 踩坑速查 18）
 - **AMD 显卡**：开启 `hardware.graphics.enable`（26.05 由 `hardware.opengl` 改名）+ `vulkan-loader`(RADV) + `libva`(VA-API)，videoDriver 设为 `amdgpu`。
 - **允许 unfree**：`qq` / `wechat` / `lunarclient` 等闭源包需要 `nixpkgs.config.allowUnfree = true;`（已在 `configuration.nix` 开启）。
@@ -178,6 +178,19 @@ sudo nixos-rebuild switch --flake /etc/nixos/#ATRI
 ```
 
 > 主机名默认 `ATRI`，flake 输出名与之对应（`#ATRI`）。要改主机名需同时改 `flake.nix` 的 `hostname` 与 `nixosConfigurations.${hostname}`。
+
+> ⚠️ **live ISO 安装的两个坑**（2026-08 实测，详见 docs/install-btrfs.md 踩坑 33）：
+> 1. **tarball narHash 过期**：TUNA 的 `nixexprs.tar.xz` 是可变 tarball，镜像一同步 lock 里的 hash 就失效，报 `mismatch in field 'narHash'`。修复：
+>    ```bash
+>    nix --extra-experimental-features "nix-command flakes" flake update   # live ISO 默认没开实验特性
+>    git add flake.lock && git commit -m "flake.lock: bump"
+>    ```
+>    或者 install 时用 `--flake path:/mnt/etc/nixos#ATRI` 绕过 git。装完记得把新 `flake.lock` push 上来。
+> 2. **CachyOS 内核必须显式传 attic 缓存**：`configuration.nix` 里的 substituters 配置**安装期不生效**，不带的话内核会本地源码编译（数小时）。安装命令加：
+>    ```bash
+>    --option substituters "https://attic.xuyh0120.win/lantian https://mirrors.ustc.edu.cn/nix-channels/store https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store https://cache.nixos.org" \
+>    --option trusted-public-keys "lantian:EeAUQ+W+6r7EtwnmYjeVwx5kOGEBpjlBfPlzGlTNvHc= cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
+>    ```
 
 ---
 

@@ -2,7 +2,7 @@
   description = "Shorin Arch Setup (shorin-arch-setup) → NixOS + Home Manager conversion";
 
   # 国内二进制缓存（中科大 USTC 优先 + 清华 TUNA 兜底）。仅加速「包下载」，不影响 flake 源码拉取。
-  # nixpkgs 源码走 TUNA nix-channels；home-manager/nixvim/opencode TUNA 未镜像，走 github
+  # nixpkgs 源码走 TUNA nix-channels；home-manager/cooknixvim/opencode TUNA 未镜像，走 github
   # （慢但可用；若 github 被墙可加代理或换镜像）。
   nixConfig = {
     extra-substituters = [
