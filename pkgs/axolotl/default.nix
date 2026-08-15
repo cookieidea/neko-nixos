@@ -25,15 +25,54 @@ let
   };
   fhsEnv = pkgs.buildFHSEnv {
     name = "axolotl";
-    runScript = "${extracted}/AppRun";
+    # runScript：注入 LD_LIBRARY_PATH 覆盖 rootfs 全部库目录。
+    # buildFHSEnv 的 ld.so.cache 未生成（bwrap 指向宿主空 cache）→
+    # 动态链接器找不到 rootfs /usr/lib64 的库 → 链式缺库。
+    # LD_LIBRARY_PATH 显式列出，绕过 cache（与 purevox 同思路）。
+    runScript = pkgs.writeShellScript "axolotl-run" ''
+      export LIBGL_ALWAYS_SOFTWARE=1
+      export GDK_BACKEND=x11
+      export WEBKIT_DISABLE_COMPOSITING_MODE=1
+      export LD_LIBRARY_PATH=/usr/lib64:/usr/lib:/usr/lib/x86_64-linux-gnu''${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
+      exec ${extracted}/AppRun "$@"
+    '';
 
-    targetPkgs = pkgs: [
+    multiPkgs = pkgs: [
       # 基础 C 库
       pkgs.glibc
       pkgs.stdenv.cc.cc.lib
       pkgs.zlib
       pkgs.openssl
       pkgs.icu
+      pkgs.fribidi
+      pkgs.harfbuzz
+      pkgs.expat
+      pkgs.gpgme                        # libgpg-error（WebKitGTK 依赖链）
+      pkgs.libgcrypt
+      pkgs.libgpg-error
+      pkgs.e2fsprogs        # libcom_err
+      pkgs.gmp              # libgmp
+      pkgs.libassuan
+      pkgs.libpng
+      pkgs.libjpeg
+      pkgs.libtiff
+      pkgs.libwebp
+      pkgs.libxml2
+      pkgs.sqlite
+      pkgs.nss
+      pkgs.nspr
+      pkgs.libsoup_3
+      # GTK3 / WebKitGTK 栈（axolotl-launcher 依赖）
+      pkgs.gtk3
+      pkgs.webkitgtk_4_1
+      pkgs.cairo
+      pkgs.gdk-pixbuf
+      pkgs.pango
+      pkgs.at-spi2-core
+      pkgs.gst_all_1.gstreamer
+      pkgs.gst_all_1.gst-plugins-base
+      pkgs.gst_all_1.gst-plugins-good
+      pkgs.gst_all_1.gst-plugins-bad
       # 图形 / 字体 / X11 / Wayland
       pkgs.fontconfig
       pkgs.freetype
@@ -46,6 +85,21 @@ let
       pkgs.dbus
       pkgs.glib
       pkgs.gsettings-desktop-schemas
+      # X11 运行时库
+      pkgs.libICE
+      pkgs.libSM
+      pkgs.libXrender
+      pkgs.libXrandr
+      pkgs.libXcursor
+      pkgs.libXi
+      pkgs.libXfixes
+      pkgs.libXdamage
+      pkgs.libXcomposite
+      pkgs.libxshmfence
+      pkgs.libXpresent
+      pkgs.libXinerama
+      pkgs.libgbm
+      pkgs.libdrm
     ];
   };
 in

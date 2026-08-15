@@ -6,12 +6,16 @@
 # 发布：GitHub Releases 自动构建，Linux 资产为 AppImage。
 #
 # 打包：appimageTools.extract 解包 + buildFHSEnv（同 purevox 方案）+ mkDerivation
-#   - AppImage 捆绑应用运行时（.NET/ICU 等）自包含，原版 AppRun 直接用
-#     （purevox 的 wrapType2 AppRun 修复不生效问题在此不适用——不改 AppRun）。
+#   - AppImage 捆绑应用运行时（.NET/ICU 等）自包含。
 #   - buildFHSEnv 提供 FHS 结构（/lib64/ld-linux 等）+ 宿主依赖库兜底，
 #     ld.so.cache 自动生成，dlopen 直接命中。
 #   - buildFHSEnv 产物只有 bin/，无 desktop/图标 → mkDerivation 补
 #     $out/share/applications + pixmaps（freedesktop 标准路径，应用列表可见）。
+#
+# ⚠️ AppRun 修复（2026-08）：extract 后直接跑 AppRun 时 $APPDIR 未设置
+#   （原版 AppImage runtime 才设）→ exec "$APPDIR/usr/bin/BedrockBoot"
+#   变成 /usr/bin/BedrockBoot → "没有那个文件或目录"。自定义入口脚本
+#   补设 APPDIR 再 exec 原 AppRun。
 #
 # ⚠️ 更新：CI 自动发版（tag 形如 v2.1.10.96），升级改 version + 下方 sha256。
 { pkgs }:
@@ -29,11 +33,21 @@ let
     inherit version src;
   };
 
+  appRun = pkgs.writeShellScript "bedrockboot-apprun" ''
+    export APPDIR=${extracted}
+    exec ${extracted}/AppRun "$@"
+  '';
+
   fhsEnv = pkgs.buildFHSEnv {
     name = "bedrockboot";
-    runScript = "${extracted}/AppRun";
+    runScript = pkgs.writeShellScript "bedrockboot-run" ''
+      export LIBGL_ALWAYS_SOFTWARE=1
+      export GDK_BACKEND=x11
+      export LD_LIBRARY_PATH=/usr/lib64:/usr/lib:/usr/lib/x86_64-linux-gnu''${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
+      exec ${appRun} "$@"
+    '';
 
-    targetPkgs = pkgs: [
+    multiPkgs = pkgs: [
       # 基础 C 库
       pkgs.glibc
       pkgs.stdenv.cc.cc.lib            # libstdc++
@@ -52,6 +66,21 @@ let
       pkgs.dbus
       pkgs.glib
       pkgs.gsettings-desktop-schemas
+      # Avalonia/X11 运行时库（实测逐个缺过：libICE/libSM/libXt/libXrender
+      # /libXrandr/libXcursor/libXi/libXinerama 等）
+      pkgs.libICE
+      pkgs.libSM
+      pkgs.libXt
+      pkgs.libXrender
+      pkgs.libXrandr
+      pkgs.libXcursor
+      pkgs.libXi
+      pkgs.libXinerama
+      pkgs.libXfixes
+      pkgs.libXdamage
+      pkgs.libXcomposite
+      pkgs.libxshmfence
+      pkgs.libXpresent
     ];
   };
 in
