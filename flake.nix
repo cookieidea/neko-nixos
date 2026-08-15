@@ -10,7 +10,10 @@
       "https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store"
       "https://attic.xuyh0120.win/lantian"
     ];
-    extra-trusted-public-keys = [ "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY=" ];
+    extra-trusted-public-keys = [
+      "lantian:EeAUQ+W+6r7EtwnmYjeVwx5kOGEBpjlBfPlzGlTNvHc="   # attic.xuyh0120.win/lantian（CachyOS 内核缓存）
+      "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
+    ];
   };
 
   inputs = {
