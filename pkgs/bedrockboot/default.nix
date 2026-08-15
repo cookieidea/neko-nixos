@@ -38,8 +38,38 @@ let
     exec ${extracted}/AppRun "$@"
   '';
 
+  # Xbox 登录需要打开系统浏览器(xdg-open/gio open)。buildFHSEnv rootfs
+  # 无 xdg-open 且无 mime handler → "不支持该操作" → 无法登录。
+  # extraBuildCommands 注入:宿主 xdg-open + mimeapps(https→chrome) + chrome desktop。
+  xdgOpenSupport = pkgs.stdenv.mkDerivation {
+    pname = "bedrockboot-xdg-support";
+    version = "1";
+    buildCommand = ''
+      mkdir -p $out/usr/bin $out/usr/share/applications $out/etc/xdg
+      cp ${pkgs.xdg-utils}/bin/xdg-open $out/usr/bin/
+      cat > $out/usr/share/applications/google-chrome.desktop <<EOF
+      [Desktop Entry]
+      Type=Application
+      Name=Google Chrome
+      Exec=${pkgs.google-chrome}/bin/google-chrome-stable %U
+      Terminal=false
+      EOF
+      cat > $out/etc/xdg/mimeapps.list <<'EOM'
+      [Default Applications]
+      x-scheme-handler/http=google-chrome.desktop
+      x-scheme-handler/https=google-chrome.desktop
+      EOM
+    '';
+  };
+
   fhsEnv = pkgs.buildFHSEnv {
     name = "bedrockboot";
+    extraBuildCommands = ''
+      mkdir -p $out/usr/bin $out/usr/share/applications $out/etc/xdg
+      cp -a ${xdgOpenSupport}/usr/bin/* $out/usr/bin/
+      cp -a ${xdgOpenSupport}/usr/share/applications/* $out/usr/share/applications/
+      cp -a ${xdgOpenSupport}/etc/xdg/* $out/etc/xdg/
+    '';
     runScript = pkgs.writeShellScript "bedrockboot-run" ''
       export LIBGL_ALWAYS_SOFTWARE=1
       export GDK_BACKEND=x11
