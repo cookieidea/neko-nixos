@@ -30,8 +30,9 @@ let
     # 动态链接器找不到 rootfs /usr/lib64 的库 → 链式缺库。
     # LD_LIBRARY_PATH 显式列出，绕过 cache（与 purevox 同思路）。
     runScript = pkgs.writeShellScript "axolotl-run" ''
-      export LIBGL_ALWAYS_SOFTWARE=1
-      export GDK_BACKEND=x11
+      export GDK_BACKEND=wayland,x11
+      export MESA_LOADER_DRIVER_OVERRIDE=llvmpipe
+      export GALLIUM_DRIVER=llvmpipe
       export GDK_RENDERING=image
       export WEBKIT_DISABLE_COMPOSITING_MODE=1
       export WEBKIT_DISABLE_DMABUF_RENDERER=1
