@@ -32,7 +32,9 @@ let
     runScript = pkgs.writeShellScript "axolotl-run" ''
       export LIBGL_ALWAYS_SOFTWARE=1
       export GDK_BACKEND=x11
+      export GDK_RENDERING=image
       export WEBKIT_DISABLE_COMPOSITING_MODE=1
+      export WEBKIT_DISABLE_DMABUF_RENDERER=1
       export LD_LIBRARY_PATH=/usr/lib64:/usr/lib:/usr/lib/x86_64-linux-gnu''${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
       exec ${extracted}/AppRun "$@"
     '';
@@ -82,6 +84,7 @@ let
       pkgs.libxkbcommon
       pkgs.wayland
       pkgs.libGL
+      pkgs.mesa            # EGL/GLX 渲染驱动(libEGL_mesa/libGLX_mesa),VM llvmpipe
       pkgs.dbus
       pkgs.glib
       pkgs.gsettings-desktop-schemas
