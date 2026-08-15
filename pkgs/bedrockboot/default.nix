@@ -80,6 +80,11 @@ let
     extraBuildCommands = ''
       mkdir -p $out/usr/bin
       cp -a ${xdgOpenSupport}/usr/bin/* $out/usr/bin/
+      # Wine/Proton:BedrockBoot 用 wineboot 初始化 Wine prefix 启动基岩版
+      # (NeoProton 链路)。宿主 wine-wow64 提供,链接进沙箱 /usr/bin。
+      for b in ${pkgs.wineWow64Packages.stable}/bin/*; do
+        ln -sf "$b" $out/usr/bin/$(basename "$b")
+      done
     '';
     runScript = pkgs.writeShellScript "bedrockboot-run" ''
       export LIBGL_ALWAYS_SOFTWARE=1
