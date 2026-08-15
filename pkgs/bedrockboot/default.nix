@@ -91,6 +91,10 @@ let
     runScript = pkgs.writeShellScript "bedrockboot-run" ''
       export LIBGL_ALWAYS_SOFTWARE=1
       export GDK_BACKEND=x11
+      # GDK-Proton 的 wine 是非 wow64 构建,但库是分离布局(x86_64-unix)。
+      # WINEDLLPATH 指向 x86_64-unix 让 wine 找到 ntdll.so(proton 脚本会保留
+      # 已有 WINEDLLPATH 并追加)。
+      export WINEDLLPATH="$HOME/.config/RoundStudio/BedrockBoot2/BedrockBoot.Linux/xuserProject/proton/GDK-Proton-xuser/files/lib/wine/x86_64-unix${WINEDLLPATH:+:$WINEDLLPATH}"
       export LD_LIBRARY_PATH=/usr/lib64:/usr/lib:/usr/lib/x86_64-linux-gnu''${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
       exec ${appRun} "$@"
     '';
@@ -98,6 +102,7 @@ let
     multiPkgs = pkgs: [
       # 基础 C 库
       pkgs.glibc
+      pkgs.libunwind      # ntdll.so 依赖
       pkgs.stdenv.cc.cc.lib            # libstdc++
       pkgs.zlib
       pkgs.openssl
