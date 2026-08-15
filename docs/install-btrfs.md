@@ -206,7 +206,7 @@ git add hardware-configuration.nix     # 无需 commit，脏树含暂存文件�
 > flake 里引导已是 **GRUB（UEFI，`device="nodev"`）**，SWAP 休眠、snapper 都已默认启用；
 > hostname 固定 `ATRI`，用户 `cookie`。Live ISO 里临时要 git：`nix-shell -p git` 再 clone。
 > flake 输入已配好：nixpkgs 走 TUNA nix-channels tarball、home-manager/cooknixvim/opencode 走 github、
-> 二进制缓存走 TUNA（见下条安装命令）。
+> 二进制缓存 attic（CachyOS 内核）+ USTC + TUNA + 官方（见下条安装命令，安装期必须显式传）。
 
 ---
 
@@ -214,15 +214,26 @@ git add hardware-configuration.nix     # 无需 commit，脏树含暂存文件�
 
 ```bash
 cd /mnt/etc/nixos
-nixos-install --flake .#ATRI \
-  --option substituters "https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store https://cache.nixos.org" \
-  --max-jobs 1
+nixos-install --flake .#ATRI --max-jobs 1 \
+  --option substituters "https://attic.xuyh0120.win/lantian https://mirrors.ustc.edu.cn/nix-channels/store https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store https://cache.nixos.org" \
+  --option trusted-public-keys "lantian:EeAUQ+W+6r7EtwnmYjeVwx5kOGEBpjlBfPlzGlTNvHc= cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
 ```
 
-> ⚠️ 必须带 `--option substituters` 把 TUNA 二进制缓存显式传进去：26.05 的 `nixos-install`
+> ⚠️ 必须带 `--option substituters` 把二进制缓存显式传进去：26.05 的 `nixos-install`
 > 守护进程会**忽略** flake 内的 `accept-flake-config`（甚至不认 `--accept-flake-config` 这个
 > flag，给了直接 `unknown option`）。不传的话包下载直连官方源，国内很慢。
-> flake 源码拉取若遇 GitHub 403（共享 IP 限流），属正常，官方 `git+https` 会重试 / 走代理即可。
+> - **attic 放最前面**（CachyOS 内核缓存，命中直接拉二进制，跳过本地编译；`configuration.nix`
+>   里的 substituters 配置安装期不生效，必须显式传）。
+> - **lantian 公钥必须一起传**：substituter 没有对应信任公钥时签名校验不过、等于白配
+>   （flake.nix 的 `nixConfig` 已补该公钥，但安装期同样需要显式传）。
+> - flake 源码拉取若遇 GitHub 403（共享 IP 限流），属正常，官方 `git+https` 会重试 / 走代理即可。
+> - **Go 包（如 bili-danmaku-tui）构建失败、日志报 `proxy.golang.org ... connection refused`**：
+>   Go 模块代理被墙。nixpkgs `buildGoModule` 的 go-modules 固定输出派生把 `GOPROXY` 列为
+>   impureEnvVars，**构建命令前 export 即可透传进沙箱**（无需改配置）：
+>   ```bash
+>   export GOPROXY="https://goproxy.cn,direct"
+>   ```
+>   （备选：`https://mirrors.aliyun.com/goproxy/,direct`）
 >
 > **⚠️ 评估阶段 OOM（进程被 `Killed` 无任何报错）**：本配置（home-manager + cooknixvim + opencode
 > 同评）的 flake 评估峰值约 **6.6GB 匿名内存**，内存 <8G 的机器会被内核 OOM 杀掉（dmesg 可见
@@ -282,8 +293,9 @@ reboot
 - **输入法**：`fcitx5-diagnose` 不应再出现「推荐取消 GTK_IM_MODULE」提示
   （`waylandFrontend = true` + GTK settings 已清理）；中文走 **rime + rime-ice（雾凇拼音）**，
   日文 mozc 已移除。
-- **微信/QQ/Flatseal/OpenOrpheus**：`flatpak list --system 2>/dev/null | grep -iE "wechat|qq|flatseal|orpheus"`——由
+- **微信/QQ/Discord/Flatseal/OpenOrpheus**：`flatpak list --system 2>/dev/null | grep -iE "wechat|qq|discord|flatseal|orpheus"`——由
   `flatpak-repo.service` 启动时自动从官方 `dl.flathub.org` 安装（国内 flathub 镜像已全部失效，见踩坑速查 18）。
+  ⚠️ discord 走 Flatpak 而非 nixpkgs 包（nixpkgs 包需从 `stable.dl*.discordapp.net` 下载客户端，国内不可达，见踩坑速查 35）。
 
 ### 测试休眠
 
@@ -514,3 +526,26 @@ sudo nixos-rebuild switch
     ```
     根治方向：把 nixpkgs 输入改为 GitHub 固定 rev（`github:NixOS/nixpkgs/nixos-26.05`），
     镜像只作 substituters 用（源码哈希就不再受镜像同步影响）。
+    > live ISO 上 `git commit` 可能报 `Author identity unknown`：先
+    > `git config user.name "cookie" && git config user.email "cookie@nixos"` 再提交。
+    > ⚠️ lock 更新后要 `git add flake.lock && git commit`（flake 只认 git 跟踪内容，dirty
+    > 树虽能构建但 rev 不含改动）；装完把新 lock push 回远程，否则下次装机又踩。
+34. **Go 包构建失败，日志 `proxy.golang.org ... connection refused`（被墙）**：如
+    `bili-danmaku-tui`（Go/bubbletea 弹幕 TUI）。nixpkgs `buildGoModule` 的 go-modules
+    固定输出派生把 `GOPROXY` 列入 `impureEnvVars` → **构建命令前 `export GOPROXY="https://goproxy.cn,direct"`
+    即可透传进沙箱**（备选 `https://mirrors.aliyun.com/goproxy/,direct`），无需改配置。
+    这是构建期行为、不持久，以后 rebuild 遇 Go 包都要带。
+35. **`discord`（nixpkgs 包）构建失败，日志 `cannot download full.distro`**：nixpkgs 的
+    discord 构建时必须从 `stable.dl1/2/3.discordapp.net` 下载客户端文件（`full.distro`），
+    国内**必现**连不上（curl 重试 3 次全败），与网络抖动无关。仓库已改走 **Flatpak**
+    （`home.nix` 删 `discord`，`flatpak-repo` 服务装 `com.discordapp.Discord`，走 USTC
+    flathub 镜像，构建期零下载）。类似地，凡是「nixpkgs 包构建期从境外 CDN 拉二进制」
+    的包在国内都会挂，优先查包的下游 URL 是否可达，不可达就换 Flatpak 或自构建。
+36. **安装重跑仍用旧 rev**（日志 `building the flake ... rev=<旧 hash>`）：live USB 上
+    `git pull` 因**分叉分支**被拒（本地提交过 flake.lock/hardware 与 origin 分叉）后直接
+    install，会继续用本地旧提交构建。先解决分叉再装：
+    ```bash
+    git config pull.rebase false && git pull origin main   # 无冲突直接 merge
+    git log --oneline -3                                    # 确认拉到目标 commit
+    ```
+    判断安装用的对不对：看 `rev=` 是否是预期 hash、日志里是否还有已修包的报错。
