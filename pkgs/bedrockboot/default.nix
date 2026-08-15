@@ -54,6 +54,7 @@ let
       cat > $out/usr/bin/xdg-open <<'EOF'
       #!/bin/sh
       # 沙箱内 xdg-open:经宿主 xdg-desktop-portal 打开 URL(宿主浏览器)
+      echo "xdg-open called: $@" >> /home/cookie/.cache/bedrockboot-xdg-open.log
       export DBUS_SESSION_BUS_ADDRESS="${"unix:path=/run/user/1000/bus"}"
       for arg in "$@"; do
         case "$arg" in
