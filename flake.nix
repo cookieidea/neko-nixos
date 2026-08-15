@@ -64,7 +64,14 @@
       # ───────────────────────────────────────────────────────
 
       # 自构建程序（AUR `-git` / 私有仓库）的派生，见 ./pkgs
-      pkgs = nixpkgs.legacyPackages.${system};
+      # ⚠️ 不能用 legacyPackages（裸实例不带 nixpkgs.config）：unfree 包
+      #    （bedrockboot/axolotl 等标 unfreeRedistributable）评估会被拒。
+      #    用 import nixpkgs 显式带 config.allowUnfree（仅作用于 selfPackages，
+      #    不覆盖系统级配置——系统级仍由 configuration.nix 的 nixpkgs.config 管）。
+      pkgs = import nixpkgs {
+        inherit system;
+        config.allowUnfree = true;
+      };
       selfPackages = import ./pkgs { inherit pkgs; };
 
       # 公共 Home Manager 集成模块（nixos 实体机配置用）
