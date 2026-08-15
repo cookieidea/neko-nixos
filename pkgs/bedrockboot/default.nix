@@ -41,34 +41,44 @@ let
   # Xbox 登录需要打开系统浏览器(xdg-open/gio open)。buildFHSEnv rootfs
   # 无 xdg-open 且无 mime handler → "不支持该操作" → 无法登录。
   # extraBuildCommands 注入:宿主 xdg-open + mimeapps(https→chrome) + chrome desktop。
+  # Xbox 登录需要打开系统浏览器。沙箱内 chrome/portal-gio 均不可靠
+  # （chrome 沙箱内 ProcessSingleton socket 失败；gio portal 探测失败），
+  # 但沙箱可直连宿主 session bus → 注入自定义 xdg-open：直接调
+  # org.freedesktop.portal.OpenURI（宿主 xdg-desktop-portal 打开浏览器，
+  # 已验证宿主 chrome 正常启动）。
   xdgOpenSupport = pkgs.stdenv.mkDerivation {
     pname = "bedrockboot-xdg-support";
     version = "1";
     buildCommand = ''
-      mkdir -p $out/usr/bin $out/usr/share/applications $out/etc/xdg
-      cp ${pkgs.xdg-utils}/bin/xdg-open $out/usr/bin/
-      cat > $out/usr/share/applications/google-chrome.desktop <<EOF
-      [Desktop Entry]
-      Type=Application
-      Name=Google Chrome
-      Exec=${pkgs.google-chrome}/bin/google-chrome-stable %U
-      Terminal=false
+      mkdir -p $out/usr/bin
+      cat > $out/usr/bin/xdg-open <<'EOF'
+      #!/bin/sh
+      # 沙箱内 xdg-open:经宿主 xdg-desktop-portal 打开 URL(宿主浏览器)
+      export DBUS_SESSION_BUS_ADDRESS="${"unix:path=/run/user/1000/bus"}"
+      for arg in "$@"; do
+        case "$arg" in
+          http://*|https://*) 
+            ${pkgs.glib.dev}/bin/gdbus call --session --dest org.freedesktop.portal.Desktop \
+              --object-path /org/freedesktop/portal/desktop \
+              --method org.freedesktop.portal.OpenURI.OpenURI \
+              "bedrockboot" "$arg" "{}" >/dev/null 2>&1
+            exit 0
+            ;;
+        esac
+      done
+      exec /usr/bin/xdg-open-real "$@" 2>/dev/null || exit 0
       EOF
-      cat > $out/etc/xdg/mimeapps.list <<'EOM'
-      [Default Applications]
-      x-scheme-handler/http=google-chrome.desktop
-      x-scheme-handler/https=google-chrome.desktop
-      EOM
+      chmod +x $out/usr/bin/xdg-open
+      # 保留真实 xdg-open 为 xdg-open-real(用于非 URL 场景)
+      cp ${pkgs.xdg-utils}/bin/xdg-open $out/usr/bin/xdg-open-real
     '';
   };
 
   fhsEnv = pkgs.buildFHSEnv {
     name = "bedrockboot";
     extraBuildCommands = ''
-      mkdir -p $out/usr/bin $out/usr/share/applications $out/etc/xdg
+      mkdir -p $out/usr/bin
       cp -a ${xdgOpenSupport}/usr/bin/* $out/usr/bin/
-      cp -a ${xdgOpenSupport}/usr/share/applications/* $out/usr/share/applications/
-      cp -a ${xdgOpenSupport}/etc/xdg/* $out/etc/xdg/
     '';
     runScript = pkgs.writeShellScript "bedrockboot-run" ''
       export LIBGL_ALWAYS_SOFTWARE=1
