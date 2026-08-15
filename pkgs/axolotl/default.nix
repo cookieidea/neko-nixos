@@ -23,31 +23,59 @@ let
     pname = "axolotl";
     inherit version src;
   };
-in
-pkgs.buildFHSEnv {
-  name = "axolotl";
-  runScript = "${extracted}/AppRun";
+  fhsEnv = pkgs.buildFHSEnv {
+    name = "axolotl";
+    runScript = "${extracted}/AppRun";
 
-  targetPkgs = pkgs: [
-    # 基础 C 库
-    pkgs.glibc
-    pkgs.stdenv.cc.cc.lib
-    pkgs.zlib
-    pkgs.openssl
-    pkgs.icu
-    # 图形 / 字体 / X11 / Wayland
-    pkgs.fontconfig
-    pkgs.freetype
-    pkgs.libx11
-    pkgs.libxext
-    pkgs.libxcb
-    pkgs.libxkbcommon
-    pkgs.wayland
-    pkgs.libGL
-    pkgs.dbus
-    pkgs.glib
-    pkgs.gsettings-desktop-schemas
-  ];
+    targetPkgs = pkgs: [
+      # 基础 C 库
+      pkgs.glibc
+      pkgs.stdenv.cc.cc.lib
+      pkgs.zlib
+      pkgs.openssl
+      pkgs.icu
+      # 图形 / 字体 / X11 / Wayland
+      pkgs.fontconfig
+      pkgs.freetype
+      pkgs.libx11
+      pkgs.libxext
+      pkgs.libxcb
+      pkgs.libxkbcommon
+      pkgs.wayland
+      pkgs.libGL
+      pkgs.dbus
+      pkgs.glib
+      pkgs.gsettings-desktop-schemas
+    ];
+  };
+in
+pkgs.stdenv.mkDerivation {
+  pname = "axolotl";
+  inherit version;
+  src = extracted;   # 解包内容（找图标用）
+
+  installPhase = ''
+    runHook preInstall
+    mkdir -p $out/bin $out/share/applications $out/share/pixmaps
+    ln -s ${fhsEnv}/bin/axolotl $out/bin/axolotl
+
+    # 图标：从解包产物找（AppImage 内 usr/share/icons 或根目录 .png）
+    icon=$(find . -path "*icons*" -name "*.png" 2>/dev/null | head -1)
+    [ -n "$icon" ] && cp "$icon" "$out/share/pixmaps/axolotl.png" || true
+
+    cat > $out/share/applications/axolotl.desktop <<EOF
+[Desktop Entry]
+Type=Application
+Name=Axolotl
+Name[zh_CN]=Axolotl 启动器
+Comment=Minecraft Java 版启动器（Modrinth/CurseForge 整合包、联机、多账户）
+Exec=axolotl
+Icon=axolotl
+Terminal=false
+Categories=Game;Utility;
+EOF
+    runHook postInstall
+  '';
 
   meta = with pkgs.lib; {
     description = "Minecraft Java 版启动器（Modrinth/CurseForge 整合包、联机、多账户）";
