@@ -59,7 +59,7 @@ let
       for arg in "$@"; do
         case "$arg" in
           http://*|https://*) 
-            ${pkgs.glib.dev}/bin/gdbus call --session --dest org.freedesktop.portal.Desktop \
+            ${pkgs.glib.bin}/bin/gdbus call --session --dest org.freedesktop.portal.Desktop \
               --object-path /org/freedesktop/portal/desktop \
               --method org.freedesktop.portal.OpenURI.OpenURI \
               "bedrockboot" "$arg" "{}" >/dev/null 2>&1
