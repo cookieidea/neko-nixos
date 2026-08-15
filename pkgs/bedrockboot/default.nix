@@ -91,11 +91,21 @@ let
     runScript = pkgs.writeShellScript "bedrockboot-run" ''
       export LIBGL_ALWAYS_SOFTWARE=1
       export GDK_BACKEND=x11
-      # GDK-Proton 的 wine 是非 wow64 构建,但库是分离布局(x86_64-unix)。
-      # WINEDLLPATH 指向 x86_64-unix 让 wine 找到 ntdll.so(proton 脚本会保留
-      # 已有 WINEDLLPATH 并追加)。
-      export WINEDLLPATH="$HOME/.config/RoundStudio/BedrockBoot2/BedrockBoot.Linux/xuserProject/proton/GDK-Proton-xuser/files/lib/wine/x86_64-unix${WINEDLLPATH:+:$WINEDLLPATH}"
-      export LD_LIBRARY_PATH=/usr/lib64:/usr/lib:/usr/lib/x86_64-linux-gnu''${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
+      # ── GDK-Proton 自带 wine（wine 11.1，Wayland 驱动）替代宿主 wine 11.0 ──
+      # 宿主 wine 二进制与 GDK 库版本不匹配（11.0 vs 11.1）→ 游戏初始化崩溃、无窗口。
+      # GDK-Proton 的 wine 用 Wayland 后端（无 x11drv），需 WAYLAND_DISPLAY
+      # （niri 会话继承）；bin-wow64 无 wineboot/msiexec，宿主 /usr/bin 兜底。
+      export GDK_PROTON_DIR="$HOME/.config/RoundStudio/BedrockBoot2/BedrockBoot.Linux/xuserProject/proton/GDK-Proton-xuser"
+      export PATH="$GDK_PROTON_DIR/files/bin-wow64:$PATH"
+      # unix 库在 files/lib/wine/x86_64-unix（proton 脚本会保留已有 WINEDLLPATH 并追加）
+      export WINEDLLPATH="$GDK_PROTON_DIR/files/lib/wine/x86_64-unix''${WINEDLLPATH:+:$WINEDLLPATH}"
+      # GDK wine 依赖：files/lib/x86_64-linux-gnu（libunwind.so.8 等）+ 沙箱标准路径
+      export LD_LIBRARY_PATH="$GDK_PROTON_DIR/files/lib/x86_64-linux-gnu:/usr/lib64:/usr/lib:/usr/lib/x86_64-linux-gnu''${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+      # 沙箱 Vulkan ICD（llvmpipe/lavapipe 软件渲染）：wine loader 默认发现不到
+      export VK_DRIVER_FILES="/usr/share/vulkan/icd.d/lvp_icd.x86_64.json"
+      # 强制 wine 内置 D3D 栈：prefix 里 DXVK(dxgi) 与 wine 内置 vkd3d(d3d12) 混用
+      # 会导致 "Could not find Vulkan physical device for DXGI adapter" 白屏
+      export WINEDLLOVERRIDES="d3d12=b;d3d12core=b;dxgi=b"
       exec ${appRun} "$@"
     '';
 
@@ -137,6 +147,11 @@ let
       pkgs.libXcomposite
       pkgs.libxshmfence
       pkgs.libXpresent
+      # GDK-Proton wine（11.1）的 ntdll.so 依赖 liblzma.so.5（wine 沙箱缺则
+      # "could not load ntdll.so: liblzma.so.5"）；音频走 pulse/alsa（mmdevapi）
+      pkgs.xz
+      pkgs.libpulseaudio
+      pkgs.alsa-lib
     ];
   };
 in
