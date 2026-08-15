@@ -85,6 +85,8 @@ let
       for b in ${pkgs.wineWow64Packages.stable}/bin/*; do
         ln -sf "$b" $out/usr/bin/$(basename "$b")
       done
+      # GDK-Proton 是 python3 脚本(shebang env python3),沙箱需 python3
+      ln -sf ${pkgs.python3}/bin/python3 $out/usr/bin/python3
     '';
     runScript = pkgs.writeShellScript "bedrockboot-run" ''
       export LIBGL_ALWAYS_SOFTWARE=1
