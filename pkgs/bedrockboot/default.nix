@@ -103,6 +103,9 @@ let
       # 基础 C 库
       pkgs.glibc
       pkgs.libunwind      # ntdll.so 依赖
+      pkgs.mesa           # lavapipe 驱动(软件 Vulkan)
+      pkgs.vulkan-loader  # libvulkan.so.1 loader(wine dlopen 它)
+      pkgs.gnutls         # libgnutls(加密支持,Xbox 登录必需)
       pkgs.stdenv.cc.cc.lib            # libstdc++
       pkgs.zlib
       pkgs.openssl
