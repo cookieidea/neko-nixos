@@ -363,7 +363,11 @@
     "niri/layout.kdl".source = ./dotfiles/config/niri/layout.kdl;
     # ⚠️ niri/noctalia.kdl 不部署：由 Noctalia 配色模板生成（niri.kdl 模板写色）。
     # 部署成只读 symlink → 模板写入 Read-only file system → 配色模板处理失败。
-    # niri 启动时若文件缺失仅 include 失败（可容忍）；模板生成后即有配色。
+    # 注意：config.kdl 里的 `include "./noctalia.kdl"` 在文件缺失时是**致命**的——
+    # niri 整个配置解析失败（并非"可容忍"），spawn-at-startup 全部不执行 →
+    # noctalia-shell 永远起不来 → 模板永远不生成 → 死锁。
+    # 因此由下方 home.activation.noctaliaKdlSeed 首次部署一个可写占位 seed，
+    # 保证 include 首次启动即可解析；noctalia-shell 起来后自行覆盖为真实配色。
     "niri/outputs.kdl".source = ./dotfiles/config/niri/outputs.kdl;
     "niri/supertab.kdl".source = ./dotfiles/config/niri/supertab.kdl;
     "niri/windowrules.kdl".source = ./dotfiles/config/niri/windowrules.kdl;
@@ -382,6 +386,56 @@
     "xfce4/xfconf/xfce-perchannel-xml/thunar.xml".source = ./dotfiles/config/xfce4/xfconf/xfce-perchannel-xml/thunar.xml;
     "xsettingsd/xsettingsd.conf".source = ./dotfiles/config/xsettingsd/xsettingsd.conf;
   };
+
+  # ============================================================
+  #  niri/noctalia.kdl 可写 seed（修复"启动项全部不启动"死锁）
+  # ============================================================
+  # config.kdl 预写了 `include "./noctalia.kdl"`，而该文件由 noctalia-shell
+  # 模板系统生成（matugen 写色）。首次登录时文件尚不存在 → niri include 失败
+  # → 整个配置解析失败 → 以默认配置运行 → spawn-at-startup 全部失效 →
+  # noctalia-shell 起不来 → 模板永不生成（死锁）。见上方 xdg.configFile 注释。
+  # 这里在 activation 时仅当文件缺失才写入一个可写占位 seed（真实文件而非
+  # 只读 symlink），保证首次启动 include 可解析；noctalia-shell 起来后
+  # 覆盖为真实配色，后续 activation 不再动它。
+  home.activation.noctaliaKdlSeed = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    SEED="$HOME/.config/niri/noctalia.kdl"
+    if [ ! -f "$SEED" ]; then
+      $DRY_RUN_CMD mkdir -p "$HOME/.config/niri"
+      $DRY_RUN_CMD cat > "$SEED" <<'EOF'
+// 占位配色（Tokyo Night 色值），noctalia-shell 模板系统首次运行后会覆盖。
+layout {
+    focus-ring {
+        active-color   "#7aa2f7"
+        inactive-color "#1f2335"
+        urgent-color   "#f7768e"
+    }
+    border {
+        active-color   "#7aa2f7"
+        inactive-color "#1f2335"
+        urgent-color   "#f7768e"
+    }
+    shadow {
+        color "#00000070"
+    }
+    tab-indicator {
+        active-color   "#7aa2f7"
+        inactive-color "#414868"
+        urgent-color   "#f7768e"
+    }
+    insert-hint {
+        color "#7aa2f780"
+    }
+}
+
+recent-windows {
+    highlight {
+        active-color "#7aa2f7"
+        urgent-color "#f7768e"
+    }
+}
+EOF
+    fi
+  '';
 
   home.file = {
     # ── 用户头像（freedesktop 标准 ~/.face，ly 登录管理器 + noctalia 控制中心读取）──
