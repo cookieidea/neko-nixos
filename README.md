@@ -36,7 +36,7 @@
 
 ```
 neko-nixos/
-├── flake.nix              # flake 入口：inputs（nixpkgs/home-manager/nixvim/opencode/bili-danmaku-tui/cachyos-kernel）、username/hostname/desktop 变量
+├── flake.nix              # flake 入口：inputs（nixpkgs/home-manager/cooknixvim/opencode/bili-danmaku-tui/cachyos-kernel）、username/hostname/desktop 变量
 ├── configuration.nix      # 系统层：内核/显卡/网络/flatpak/登录管理器/桌面服务…
 ├── home.nix               # 用户层（Home Manager）：软件包、git/编辑器/主题等
 ├── pkgs/                 # 自构建程序派生（见下「自构建程序」一节）
@@ -47,7 +47,7 @@ neko-nixos/
 │   └── keybindings.md     # 快捷键速查（niri + Noctalia + fcitx5）
 ├── dotfiles/              # 桌面与程序配置（niri、Noctalia、fcitx5、fish、kitty…）
 │   ├── config/            # ~/.config 下内容（xdg.configFile 部署）
-│   └── home/              # 家目录散文件（.vimrc、.gtkrc-2.0 等，home.file 部署）
+│   └── home/              # 家目录散文件（home.file 部署）
 └── hardware-configuration.nix   # 全新安装时由 nixos-generate-config 生成（仓库不含）
 ```
 
@@ -65,11 +65,12 @@ neko-nixos/
 - **原清单遗漏补回**：`virt-manager` `video-downloader`
 - **niri 生态依赖**：`niri` `kitty` `fuzzel` `thunar` `nautilus` `satty` `cliphist` `wl-clipboard` `xsettingsd` `gpu-screen-recorder` `btrfs-assistant` `matugen` `imv`
 - **主题/图标**：`adwaita-icon-theme` `papirus-icon-theme` `hicolor-icon-theme` `adw-gtk3` `breeze(kdePackages)`——图标主题由 home-manager `gtk` 模块写入（Papirus），settings.ini 不手写部署
-- **flake 包（不在 nixpkgs 核心）**：`opencode`（AI 编程 Agent）、`bili-danmaku-tui`（B 站弹幕 TUI，自带 flake）。桌面 shell 用 nixpkgs 自带的 `noctalia-shell`。
+- **flake 包（不在 nixpkgs 核心）**：`opencode`（AI 编程 Agent）、`bili-danmaku-tui`（B 站弹幕 TUI，自带 flake）、`cooknixvim`（模块化 Neovim 配置，基于 nixvim，取代原先直接用 nixvim）。桌面 shell 用 nixpkgs 自带的 `noctalia-shell`。
 - **Flatpak 自动安装（flatpak-repo 服务）**：微信 / QQ / Flatseal / Bazaar 应用商店 / OpenOrpheus（网易云 Orpheus 宿主）
-- **自构建程序（`./pkgs` 派生，对应原 Arch 的 AUR `-git` / 私有仓库）**：`niri-sidebar` `pins` `pywalfox` `shorin-contrib` `proton-wrapper` `splayer-next` `startlive` `ab-download-manager` `tabby-terminal` `obs-vdoninja`
+- **自构建程序（`./pkgs` 派生，对应原 Arch 的 AUR `-git` / 私有仓库）**：`niri-sidebar` `pins` `pywalfox` `shorin-contrib` `proton-wrapper` `splayer-next` `startlive` `ab-download-manager` `tabby-terminal` `obs-vdoninja` `purevox` `bedrockboot` `axolotl`
   - ⚠️ `splayer-next` 是 **SPlayer-Dev/SPlayer-Next**（Electron 音乐播放器），与 nixpkgs 里的 `splayer`（Simple Netease Cloud Music player）**不是同一个软件**，切勿混用。
   - ⚠️ `tabby-terminal` 是 **eugeny/tabby** 终端模拟器；nixpkgs 的 `tabby` 是 TabbyML AI 助手，同名不同项目。
+  - ⚠️ MC 启动器用自构建 `bedrockboot`（基岩版，内嵌 Wine 沙箱）+ `axolotl`（Java 版）替代 `prismlauncher`；`purevox` 是 AI 音频降噪（AppImage 包装）。
 
 ---
 
@@ -110,6 +111,9 @@ Nix 里改用 **flake 内的 Nix 派生** 从源码/发布构建，集中在 `pk
 | `ab-download-manager` | amir1376/ab-download-manager | jpackage（makeWrapper + autoPatchelf） | abdownloadmanager-bin |
 | `tabby-terminal` | eugeny/tabby | Electron（AppImage 包装） | — |
 | `obs-vdoninja` | steveseguin/ninja-obs-plugin | 预编译 .so（autoPatchelf + libdatachannel override） | vdoninja（手动） |
+| `purevox` | PureVox（AI 音频降噪） | AppImage 包装（AppRun 注入库路径） | — |
+| `bedrockboot` | BedrockBoot（MC 基岩版启动器，Avalonia） | AppImage extract + buildFHSEnv（Wine 沙箱，注入 mesa/vulkan/gnutls 等）+ mkDerivation 补 desktop | — |
+| `axolotl` | Axolotl（MC Java 版启动器） | AppImage extract + buildFHSEnv + mkDerivation 补 desktop（替代 prismlauncher） | — |
 
 - 这些包通过 `packages.<system>` 暴露成 flake 包，可单独构建：
   ```bash
@@ -215,4 +219,4 @@ sudo nixos-rebuild switch --rollback
 
 ## License
 
-配置脚本与 dotfiles 遵循原项目 [shorin-arch-setup](https://github.com/SHORiN-KiWATA/shorin-arch-setup) 的许可证（见其 `LICENSE`）。Noctalia / nixvim / opencode 等上游项目各自遵循其自身许可证。
+配置脚本与 dotfiles 遵循原项目 [shorin-arch-setup](https://github.com/SHORiN-KiWATA/shorin-arch-setup) 的许可证（见其 `LICENSE`）。Noctalia / CookNixvim / opencode 等上游项目各自遵循其自身许可证。

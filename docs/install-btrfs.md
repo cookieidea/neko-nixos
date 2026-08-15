@@ -205,7 +205,7 @@ git add hardware-configuration.nix     # 无需 commit，脏树含暂存文件�
 
 > flake 里引导已是 **GRUB（UEFI，`device="nodev"`）**，SWAP 休眠、snapper 都已默认启用；
 > hostname 固定 `ATRI`，用户 `cookie`。Live ISO 里临时要 git：`nix-shell -p git` 再 clone。
-> flake 输入已配好：nixpkgs 走 TUNA 浅克隆、home-manager/nixvim/opencode 走官方 `git+https`、
+> flake 输入已配好：nixpkgs 走 TUNA nix-channels tarball、home-manager/cooknixvim/opencode 走 github、
 > 二进制缓存走 TUNA（见下条安装命令）。
 
 ---
@@ -224,7 +224,7 @@ nixos-install --flake .#ATRI \
 > flag，给了直接 `unknown option`）。不传的话包下载直连官方源，国内很慢。
 > flake 源码拉取若遇 GitHub 403（共享 IP 限流），属正常，官方 `git+https` 会重试 / 走代理即可。
 >
-> **⚠️ 评估阶段 OOM（进程被 `Killed` 无任何报错）**：本配置（home-manager + nixvim + opencode
+> **⚠️ 评估阶段 OOM（进程被 `Killed` 无任何报错）**：本配置（home-manager + cooknixvim + opencode
 > 同评）的 flake 评估峰值约 **6.6GB 匿名内存**，内存 <8G 的机器会被内核 OOM 杀掉（dmesg 可见
 > `Out of memory: Killed process ... (nix)`）。`--max-jobs` 只管构建期、对评估无效。兜底：
 > ```bash
@@ -503,3 +503,14 @@ sudo nixos-rebuild switch
     补丁匹配其 pin 的 nixpkgs）；overlay 用 `pinned` 以命中 `attic.xuyh0120.win/lantian`
     缓存（否则本地编译内核极慢/VM 易 OOM）；rebuild 命令的 `--option substituters`
     记得加 `https://attic.xuyh0120.win/lantian`。
+33. **`nixos-install` 报 `mismatch in field 'narHash'`（TUNA tarball 输入）**：nixpkgs 输入
+    指向镜像站的**可变 tarball**（`nix-channels/nixos-26.05/nixexprs.tar.xz`），镜像一同步
+    内容就变，`flake.lock` 里缓存的旧 narHash 对不上。修复（live ISO 的 `nix` 命令默认没开
+    实验特性，必须显式带 flag）：
+    ```bash
+    cd /mnt/etc/nixos
+    nix --extra-experimental-features "nix-command flakes" flake update
+    nixos-install --flake .#ATRI --max-jobs 1
+    ```
+    根治方向：把 nixpkgs 输入改为 GitHub 固定 rev（`github:NixOS/nixpkgs/nixos-26.05`），
+    镜像只作 substituters 用（源码哈希就不再受镜像同步影响）。
