@@ -29,18 +29,36 @@ let
     # buildFHSEnv 的 ld.so.cache 未生成（bwrap 指向宿主空 cache）→
     # 动态链接器找不到 rootfs /usr/lib64 的库 → 链式缺库。
     # LD_LIBRARY_PATH 显式列出，绕过 cache（与 purevox 同思路）。
+    #
+    # ⚠️ 不 exec AppRun（AppImage 自带 hook 强制 GDK_BACKEND=x11，见
+    #    linuxdeploy-plugin-gtk.sh：tauri#8541 时代的旧 workaround）。
+    #    X11→XWayland 下 WebKitGTK EGL DRI2 失败（EGL_BAD_PARAMETER）：
+    #    WebKitWebProcess 崩溃/空转 → 微软登录页卡死。
+    #    改为直接 exec AppRun.wrapped（保留其 LD_LIBRARY_PATH 注入），
+    #    自行提供等效 GTK/GStreamer 环境并强制 Wayland。
     runScript = pkgs.writeShellScript "axolotl-run" ''
       # AppImage 捆绑的旧 libwayland-client 与新 mesa libEGL 符号不匹配
       # → WebKitWebProcess 崩溃（EGL_BAD_PARAMETER）。预加载 FHS 系统库修复。
       export LD_PRELOAD=/usr/lib64/libwayland-client.so.0
-      export GDK_BACKEND=wayland,x11
-      export MESA_LOADER_DRIVER_OVERRIDE=llvmpipe
-      export GALLIUM_DRIVER=llvmpipe
-      export GDK_RENDERING=image
+      export GDK_BACKEND=wayland
       export WEBKIT_DISABLE_COMPOSITING_MODE=1
       export WEBKIT_DISABLE_DMABUF_RENDERER=1
+      # 等效 linuxdeploy-plugin-gtk.sh（去掉 x11 强制行）
+      export APPDIR="${extracted}"
+      export GTK_DATA_PREFIX="$APPDIR"
+      export GTK_THEME="Adwaita:dark"
+      export XDG_DATA_DIRS="$APPDIR/usr/share:/usr/share''${XDG_DATA_DIRS:+:$XDG_DATA_DIRS}"
+      export GSETTINGS_SCHEMA_DIR="$APPDIR/usr/share/glib-2.0/schemas"
+      export GTK_EXE_PREFIX="$APPDIR/usr"
+      export GTK_PATH="$APPDIR/usr/lib/x86_64-linux-gnu/gtk-3.0:/usr/lib64/gtk-3.0:/usr/lib/x86_64-linux-gnu/gtk-3.0"
+      export GTK_IM_MODULE_FILE="$APPDIR/usr/lib/x86_64-linux-gnu/gtk-3.0/3.0.0/immodules.cache"
+      export GDK_PIXBUF_MODULE_FILE="$APPDIR/usr/lib/x86_64-linux-gnu/gdk-pixbuf-2.0/2.10.0/loaders.cache"
+      export GIO_EXTRA_MODULES="$APPDIR/usr/lib/x86_64-linux-gnu/gio/modules"
+      # GStreamer：用 FHS rootfs 完整插件集（AppImage 捆绑版缺 appsink）
+      export GST_PLUGIN_SYSTEM_PATH_1_0=/usr/lib64/gstreamer-1.0
+      export GST_PLUGIN_SCANNER=/usr/libexec/gstreamer-1.0/gst-plugin-scanner
       export LD_LIBRARY_PATH=/usr/lib64:/usr/lib:/usr/lib/x86_64-linux-gnu''${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
-      exec ${extracted}/AppRun "$@"
+      exec ${extracted}/AppRun.wrapped "$@"
     '';
 
     multiPkgs = pkgs: [
@@ -88,10 +106,11 @@ let
       pkgs.libxkbcommon
       pkgs.wayland
       pkgs.libGL
-      pkgs.mesa            # EGL/GLX 渲染驱动(libEGL_mesa/libGLX_mesa),VM llvmpipe
+      pkgs.mesa            # EGL/GLX 渲染驱动（libEGL_mesa/libGLX_mesa）+ radeonsi
       pkgs.dbus
       pkgs.glib
       pkgs.gsettings-desktop-schemas
+      pkgs.xkeyboard-config          # /usr/share/X11/xkb（Wayland xkbcommon 必需，缺失则 gtk_init 崩溃）
       # X11 运行时库
       pkgs.libICE
       pkgs.libSM
