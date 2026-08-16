@@ -60,6 +60,20 @@ let
         chmod -R u+w "$APP_DIR"
         echo "${extracted}" > "$MARKER"
       fi
+      # Tauri 自更新会把 usr/bin/axolotl-launcher 替换成完整 AppImage
+      # （更新器按 AppImage 包处理：替换当前可执行文件）——FHS 无 FUSE 跑不了。
+      # 检测 AppImage 魔数（offset 8 = "AI"）后 --appimage-extract 并合并回副本。
+      LAUNCHER="$APP_DIR/usr/bin/axolotl-launcher"
+      if [ "$(dd if="$LAUNCHER" bs=1 skip=8 count=2 2>/dev/null)" = "AI" ]; then
+        EXTRACT_DIR="$APP_DIR/.extract-$$"
+        mkdir -p "$EXTRACT_DIR"
+        ( cd "$EXTRACT_DIR" && "$LAUNCHER" --appimage-extract >/dev/null 2>&1 )
+        if [ -d "$EXTRACT_DIR/squashfs-root" ]; then
+          cp -a "$EXTRACT_DIR/squashfs-root"/. "$APP_DIR"/
+        fi
+        rm -rf "$EXTRACT_DIR"
+        chmod -R u+w "$APP_DIR"
+      fi
       exec "$APP_DIR/usr/bin/axolotl-launcher" "$@"
     '';
 
