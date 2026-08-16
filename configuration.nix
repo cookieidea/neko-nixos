@@ -230,6 +230,10 @@
   # ── 应用级服务（对应 scripts 中的 enable 步骤）──────────
   services.lact.enable = true;          # lact（GPU 控制）；注意 nixpkgs 26.05 选项是 services.lact（非 programs.lact）
   programs.steam.enable = true;         # steam
+  # Steam UI 中文字体：FHS 环境的 fontconfig 默认只有 DejaVu，中文会变方块
+  # ⚠️ 不能用 noto-fonts-cjk-sans（VF 可变字体，Steam 自带 fontconfig 无法渲染 → 中文方块）；
+  #    用静态的 sarasa-gothic。见 nixpkgs#178121。
+  programs.steam.fontPackages = with pkgs; [ sarasa-gothic ];
   virtualisation.libvirtd.enable = true;  # virt-manager 后端
 
   # ── btrfs + snapper 快照 / 回滚（已默认启用；无 LUKS）──────
