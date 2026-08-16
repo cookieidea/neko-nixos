@@ -37,23 +37,27 @@ let
     #    改为直接 exec AppRun.wrapped（保留其 LD_LIBRARY_PATH 注入），
     #    自行提供等效 GTK/GStreamer 环境并强制 Wayland。
     runScript = pkgs.writeShellScript "axolotl-run" ''
-      # AppImage 捆绑的旧 libwayland-client 与新 mesa libEGL 符号不匹配
-      # → WebKitWebProcess 崩溃（EGL_BAD_PARAMETER）。预加载 FHS 系统库修复。
-      export LD_PRELOAD=/usr/lib64/libwayland-client.so.0
+      # 不 exec AppRun/AppRun.wrapped（linuxdeploy 会向 LD_LIBRARY_PATH 注入
+      # AppImage 捆绑的旧 libwayland/libwebkit(2.48)/libavif 等——与 rootfs 新库
+      # 混用导致符号不匹配：WebKit EGL_BAD_PARAMETER 崩溃、联机页 UIProcess
+      # SIGSEGV、libavif 缺 SharpYuvOptionsInitInternal）。
+      # 直接 exec 启动器二进制：LD_LIBRARY_PATH 全走 rootfs，库栈完全一致。
+      export LD_LIBRARY_PATH=/usr/lib64:/usr/lib:/usr/lib/x86_64-linux-gnu''${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
+      export WEBKIT_EXEC_PATH=/usr/libexec/webkit2gtk-4.1
+      exec ${extracted}/usr/bin/axolotl-launcher "$@"
       export GDK_BACKEND=wayland
       export WEBKIT_DISABLE_COMPOSITING_MODE=1
       export WEBKIT_DISABLE_DMABUF_RENDERER=1
-      # 等效 linuxdeploy-plugin-gtk.sh（去掉 x11 强制行）
+      # 等效 linuxdeploy-plugin-gtk.sh（去掉 x11 强制行），路径指向 rootfs
       export APPDIR="${extracted}"
-      export GTK_DATA_PREFIX="$APPDIR"
+      export GTK_DATA_PREFIX="/usr"
       export GTK_THEME="Adwaita:dark"
-      export XDG_DATA_DIRS="$APPDIR/usr/share:/usr/share''${XDG_DATA_DIRS:+:$XDG_DATA_DIRS}"
-      export GSETTINGS_SCHEMA_DIR="$APPDIR/usr/share/glib-2.0/schemas"
-      export GTK_EXE_PREFIX="$APPDIR/usr"
-      export GTK_PATH="$APPDIR/usr/lib/x86_64-linux-gnu/gtk-3.0:/usr/lib64/gtk-3.0:/usr/lib/x86_64-linux-gnu/gtk-3.0"
-      export GTK_IM_MODULE_FILE="$APPDIR/usr/lib/x86_64-linux-gnu/gtk-3.0/3.0.0/immodules.cache"
-      export GDK_PIXBUF_MODULE_FILE="$APPDIR/usr/lib/x86_64-linux-gnu/gdk-pixbuf-2.0/2.10.0/loaders.cache"
-      export GIO_EXTRA_MODULES="$APPDIR/usr/lib/x86_64-linux-gnu/gio/modules"
+      export XDG_DATA_DIRS="/usr/share:/usr/share''${XDG_DATA_DIRS:+:$XDG_DATA_DIRS}"
+      export GSETTINGS_SCHEMA_DIR="/usr/share/glib-2.0/schemas"
+      export GTK_EXE_PREFIX="/usr"
+      export GTK_PATH="/usr/lib64/gtk-3.0:/usr/lib/x86_64-linux-gnu/gtk-3.0"
+      export GTK_IM_MODULE_FILE="/usr/lib64/gtk-3.0/3.0.0/immodules.cache"
+      export GDK_PIXBUF_MODULE_FILE="/usr/lib64/gdk-pixbuf-2.0/2.10.0/loaders.cache"
       # GStreamer：用 FHS rootfs 完整插件集（AppImage 捆绑版缺 appsink）
       export GST_PLUGIN_SYSTEM_PATH_1_0=/usr/lib64/gstreamer-1.0
       export GST_PLUGIN_SCANNER=/usr/libexec/gstreamer-1.0/gst-plugin-scanner
