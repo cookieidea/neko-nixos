@@ -42,27 +42,25 @@ let
       # 混用导致符号不匹配：WebKit EGL_BAD_PARAMETER 崩溃、联机页 UIProcess
       # SIGSEGV、libavif 缺 SharpYuvOptionsInitInternal）。
       # 直接 exec 启动器二进制：LD_LIBRARY_PATH 全走 rootfs，库栈完全一致。
+      #
+      # Tauri 自更新：nix store 只读 → 更新器替换可执行文件失败（EROFS）。
+      # 首次运行时把解包目录复制到 ~/.local/share/red.ghs.axolotl-app（可写），
+      # 之后从副本运行；自更新会就地替换副本文件。nix 包版本变化（marker
+      # 路径不同）时重新复制，以 nix 包为准。
       export LD_LIBRARY_PATH=/usr/lib64:/usr/lib:/usr/lib/x86_64-linux-gnu''${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
       export WEBKIT_EXEC_PATH=/usr/libexec/webkit2gtk-4.1
-      exec ${extracted}/usr/bin/axolotl-launcher "$@"
-      export GDK_BACKEND=wayland
-      export WEBKIT_DISABLE_COMPOSITING_MODE=1
-      export WEBKIT_DISABLE_DMABUF_RENDERER=1
-      # 等效 linuxdeploy-plugin-gtk.sh（去掉 x11 强制行），路径指向 rootfs
-      export APPDIR="${extracted}"
-      export GTK_DATA_PREFIX="/usr"
-      export GTK_THEME="Adwaita:dark"
-      export XDG_DATA_DIRS="/usr/share:/usr/share''${XDG_DATA_DIRS:+:$XDG_DATA_DIRS}"
-      export GSETTINGS_SCHEMA_DIR="/usr/share/glib-2.0/schemas"
-      export GTK_EXE_PREFIX="/usr"
-      export GTK_PATH="/usr/lib64/gtk-3.0:/usr/lib/x86_64-linux-gnu/gtk-3.0"
-      export GTK_IM_MODULE_FILE="/usr/lib64/gtk-3.0/3.0.0/immodules.cache"
-      export GDK_PIXBUF_MODULE_FILE="/usr/lib64/gdk-pixbuf-2.0/2.10.0/loaders.cache"
-      # GStreamer：用 FHS rootfs 完整插件集（AppImage 捆绑版缺 appsink）
-      export GST_PLUGIN_SYSTEM_PATH_1_0=/usr/lib64/gstreamer-1.0
-      export GST_PLUGIN_SCANNER=/usr/libexec/gstreamer-1.0/gst-plugin-scanner
-      export LD_LIBRARY_PATH=/usr/lib64:/usr/lib:/usr/lib/x86_64-linux-gnu''${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
-      exec ${extracted}/AppRun.wrapped "$@"
+      APP_DIR="$HOME/.local/share/red.ghs.axolotl-app"
+      MARKER="$APP_DIR/.nix-source"
+      if [ "$(cat "$MARKER" 2>/dev/null)" != "${extracted}" ]; then
+        # nix store 文件全是只读位，cp -a 后副本仍只读 → 删除/更新/标记都写不进
+        chmod -R u+w "$APP_DIR" 2>/dev/null || true
+        rm -rf "$APP_DIR"
+        mkdir -p "$APP_DIR"
+        cp -a "${extracted}"/. "$APP_DIR"/
+        chmod -R u+w "$APP_DIR"
+        echo "${extracted}" > "$MARKER"
+      fi
+      exec "$APP_DIR/usr/bin/axolotl-launcher" "$@"
     '';
 
     multiPkgs = pkgs: [
