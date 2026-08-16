@@ -245,8 +245,22 @@
   # 第二次实例经单实例转发唤醒聚焦第一个实例的窗口 → 开机弹窗。
   # 托盘环境问题由下方 xdg.configFile 的 systemd drop-in 兜底。
 
-  # ============================================================
-  #  Noctalia 桌面 shell（niri 之上的一层）
+  # 开机随机壁纸（noctalia IPC）：等 noctalia-shell 就绪后跑一次下载脚本
+  systemd.user.services.noctalia-wallpaper = {
+    Unit = {
+      Description = "Set random anime wallpaper via noctalia";
+      After = [ "graphical-session.target" ];
+    };
+    Service = {
+      Type = "oneshot";
+      ExecStart = "%h/.config/scripts/noctalia-wallpaper-autostart.sh";
+      TimeoutStartSec = 300;
+      Restart = "on-failure";
+      RestartSec = 15;
+    };
+    Install.WantedBy = [ "graphical-session.target" ];
+  };
+
   #  运行方式：nixpkgs 自带的 `noctalia-shell`（quickshell 配置 + qs 封装），
   #  由 config.kdl 的 `spawn-sh-at-startup "noctalia-shell"` 拉起。
   #  下方 ~/.config/noctalia/*.json 等 v4 配置现已不再被 noctalia-shell 读取
@@ -526,6 +540,10 @@ EOF
     # ── OBS VDO.Ninja 插件（pkgs/obs-vdoninja，autoPatchelf 修好依赖）──
     # ⚠️ 不能裸拷 .so（RPATH 指向构建机，依赖全丢）；链接 Nix 包产物，
     #    autoPatchelf 后 .so 的 RPATH 指向 store 里的 libobs/libdatachannel/ffmpeg 等
+    ".config/scripts/noctalia-wallpaper-autostart.sh" = {
+      source = ./dotfiles/scripts/noctalia-wallpaper-autostart.sh;
+      executable = true;
+    };
     ".config/obs-studio/plugins/obs-vdoninja/bin/64bit".source =
       selfPackages.obs-vdoninja + "/lib/obs-plugins";
     ".config/obs-studio/plugins/obs-vdoninja/data".source =

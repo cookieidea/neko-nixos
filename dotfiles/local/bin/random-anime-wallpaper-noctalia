@@ -56,7 +56,7 @@ done
 send_notify() {
     if [ "$SILENT_MODE" = false ]; then
         # 选项放在摘要之前，避免部分 notify-send 实现拒绝正文后的选项
-        notify-send ${3:-} "$1" "$2"
+        notify-send ${3:-} "$1" "$2" || true
     fi
 }
 
