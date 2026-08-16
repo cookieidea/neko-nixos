@@ -30,6 +30,9 @@ let
     # 动态链接器找不到 rootfs /usr/lib64 的库 → 链式缺库。
     # LD_LIBRARY_PATH 显式列出，绕过 cache（与 purevox 同思路）。
     runScript = pkgs.writeShellScript "axolotl-run" ''
+      # AppImage 捆绑的旧 libwayland-client 与新 mesa libEGL 符号不匹配
+      # → WebKitWebProcess 崩溃（EGL_BAD_PARAMETER）。预加载 FHS 系统库修复。
+      export LD_PRELOAD=/usr/lib64/libwayland-client.so.0
       export GDK_BACKEND=wayland,x11
       export MESA_LOADER_DRIVER_OVERRIDE=llvmpipe
       export GALLIUM_DRIVER=llvmpipe
