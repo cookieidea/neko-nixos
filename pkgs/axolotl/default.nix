@@ -111,6 +111,10 @@ let
       pkgs.wayland
       pkgs.libGL
       pkgs.mesa            # EGL/GLX 渲染驱动（libEGL_mesa/libGLX_mesa）+ radeonsi
+      # 音频（MC 的 OpenAL 需要 dlopen 后端库，缺失则无声）
+      pkgs.pipewire        # libpipewire-0.3（OpenAL PipeWire 后端）
+      pkgs.libpulseaudio   # libpulse（OpenAL PulseAudio 后端兜底）
+      pkgs.alsa-lib        # libasound（OpenAL ALSA 后端兜底）
       pkgs.dbus
       pkgs.glib
       pkgs.gsettings-desktop-schemas

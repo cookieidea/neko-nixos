@@ -101,8 +101,9 @@ let
       export WINEDLLPATH="$GDK_PROTON_DIR/files/lib/wine/x86_64-unix''${WINEDLLPATH:+:$WINEDLLPATH}"
       # GDK wine 依赖：files/lib/x86_64-linux-gnu（libunwind.so.8 等）+ 沙箱标准路径
       export LD_LIBRARY_PATH="$GDK_PROTON_DIR/files/lib/x86_64-linux-gnu:/usr/lib64:/usr/lib:/usr/lib/x86_64-linux-gnu''${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
-      # 沙箱 Vulkan ICD（llvmpipe/lavapipe 软件渲染）：wine loader 默认发现不到
-      export VK_DRIVER_FILES="/usr/share/vulkan/icd.d/lvp_icd.x86_64.json"
+      # ⚠️ 不能强制 VK_DRIVER_FILES=lavapipe：该路径只在 FHS 沙箱内存在，
+      #    游戏经 umu 在沙箱外运行 → Vulkan 找不到任何 ICD → 白屏。
+      #    去掉后走宿主 RADV（/run/opengl-driver/share/vulkan/icd.d/radeon_icd）。
       # 强制 wine 内置 D3D 栈：prefix 里 DXVK(dxgi) 与 wine 内置 vkd3d(d3d12) 混用
       # 会导致 "Could not find Vulkan physical device for DXGI adapter" 白屏
       export WINEDLLOVERRIDES="d3d12=b;d3d12core=b;dxgi=b"
