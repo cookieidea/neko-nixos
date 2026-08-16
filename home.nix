@@ -54,7 +54,8 @@
     gnome-calendar                            # gnome-calendar
     gnome-clocks                              # gnome-clocks
     lutris                                    # lutris
-    steam                                     # steam (系统服务在 configuration.nix)
+    # steam —— 已从 home.packages 移除：home-manager 装的 pkgs.steam 不带
+    # fontPackages（FHS 环境缺 CJK 字体），且会遮蔽 programs.steam 的正确包。
     mangohud                                  # mangohud
     mpv                                       # mpv
     opencc                                    # opencc（mpv opencc.lua 字幕繁简转换）
