@@ -72,6 +72,18 @@
   # ── 网络 / 主机 ───────────────────────────────────────────
   networking.hostName = "ATRI";
   networking.networkmanager.enable = true;   # 对应 01c-nm-backend.sh
+  # 组播回环修复：IPv4 组播路由经 lo 才能本地投递（Axolotl 联机扫描本地端口依赖）。
+  # cachyos 内核下路由经物理网卡时 IP_MULTICAST_LOOP 不生效（TCP 单播正常）。
+  systemd.services.multicast-loopback = {
+    description = "Add IPv4 multicast route via lo for local loopback delivery";
+    wantedBy = [ "multi-user.target" ];
+    after = [ "network.target" ];
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+      ExecStart = "${pkgs.iproute2}/bin/ip route replace 224.0.0.0/4 dev lo";
+    };
+  };
 
   # ── 时区 /  locale ────────────────────────────────────────
   time.timeZone = "Asia/Shanghai";
@@ -215,6 +227,7 @@
     # X11 兼容层：xwayland-satellite（niri 25.08+ 开箱集成，binary 在 PATH 时
     # niri 自动按需拉起 Xwayland；微信/LinuxQQ 等 X11 应用因此可正常启动）
     xwayland-satellite
+    gamescope       # 基岩版鼠标修复：启动器 wrapperCommand 包装（--force-grab-cursor）
   ];
 
   # ── 字体（对应 ttf-jetbrains-mono-nerd / maple / noto-cjk）─
