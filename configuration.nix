@@ -136,7 +136,7 @@
     wantedBy = [ "multi-user.target" ];
     after = [ "network-online.target" ];
     wants = [ "network-online.target" ];
-    path = [ pkgs.flatpak ];
+    path = [ pkgs.flatpak pkgs.util-linux ];
     script = ''
       flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
       # 切国内镜像：中科大（动态缓存 + 302 回源）；USTC 挂了就换官方（注释掉下行）
@@ -146,12 +146,12 @@
       # QQ/微信 flatpak manifest 用 fallback-x11（仅 Wayland 不可用时才给 X11），
       # 会覆盖 x11 权限 → 沙箱内无 /tmp/.X11-unix → QQ 启动脚本走 xvfb-run 分支
       # → Xvfb 起不来 → 打不开。显式禁 fallback-x11 并给真 x11 socket（幂等）。
-      flatpak override --user --nosocket=fallback-x11 --socket=x11 com.qq.QQ
-      flatpak override --user --nosocket=fallback-x11 --socket=x11 com.tencent.WeChat
+      runuser -u cookie -- flatpak --user override --nosocket=fallback-x11 --socket=x11 com.qq.QQ
+      runuser -u cookie -- flatpak --user override --nosocket=fallback-x11 --socket=x11 com.tencent.WeChat
       # Open Orpheus（Electron）的托盘要拥有 org.freedesktop.StatusNotifierItem-*
       # 总线名，flatpak D-Bus 代理默认只允许 own 自己的命名空间 → SNI 注册失败
       # （ServiceUnknown）→ 托盘消失。放开 session-bus 后正常注册。
-      flatpak override --user --socket=session-bus io.github.yucling.open-orpheus
+      runuser -u cookie -- flatpak --user override --socket=session-bus io.github.yucling.open-orpheus
     '';
     serviceConfig = {
       Type = "oneshot";
