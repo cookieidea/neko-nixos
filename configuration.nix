@@ -212,9 +212,9 @@
     # 登录管理器 ly 由 displayManager.ly 模块自动装入（见上方登录管理器配置）
     # virt-manager/libvirtd 后端（原 99-apps 的 qemu-full + swtpm；libvirtd 已 enable）
     qemu swtpm
-    # X11 兼容层：niri 内置 XWayland（xwayland-satellite 对指针抓取类游戏
-    # 输入转发有缺陷——MC 基岩版等抓取指针的游戏鼠标无效；微信/LinuxQQ 等照常）
-    xwayland         # niri 内置 XWayland（指针抓取/游戏输入正常；xwayland-satellite 有抓取缺陷）
+    # X11 兼容层：xwayland-satellite（niri 25.08+ 开箱集成，binary 在 PATH 时
+    # niri 自动按需拉起 Xwayland；微信/LinuxQQ 等 X11 应用因此可正常启动）
+    xwayland-satellite
   ];
 
   # ── 字体（对应 ttf-jetbrains-mono-nerd / maple / noto-cjk）─

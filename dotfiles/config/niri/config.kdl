@@ -92,6 +92,12 @@ spawn-at-startup "xsettingsd"
 // 允许 root 通过用户的 xwayland 打开窗口
 spawn-at-startup "xhost" "+si:localuser:root"
 
+// X11 兼容层：xwayland-satellite（niri 25.08+ 开箱集成）。
+// binary 已由 configuration.nix 的 systemPackages 装进 PATH，niri 会在
+// X11 客户端连入时自动拉起 Xwayland（无需 spawn-at-startup / 设 DISPLAY）。
+xwayland-satellite {
+}
+
 // 设置会话类环境变量（NixOS 上 systemctl 可用）
 spawn-sh-at-startup "systemctl --user set-environment XDG_SESSION_CLASS=user"
 
