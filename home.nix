@@ -65,7 +65,10 @@ in
     # steam —— 已从 home.packages 移除：home-manager 装的 pkgs.steam 不带
     # fontPackages（FHS 环境缺 CJK 字体），且会遮蔽 programs.steam 的正确包。
     mangohud                                  # mangohud
-    mpv                                       # mpv
+    (mpv.override {
+      # thumbfast.lua 需要 LuaJIT 的 ffi 模块，默认 mpv 用 lua 5.2 没有 → 换 luajit 构建
+      mpv-unwrapped = mpv-unwrapped.override { lua = luajit; };
+    })                                    # mpv（luajit 构建，支持 thumbfast 缩略图）
     opencc                                    # opencc（mpv opencc.lua 字幕繁简转换）
     p7zip                                     # 7z（mpv auto_sub_fonts_dir 解压字幕字体包）
     ffmpeg                                    # ffmpeg（mpv opencc.lua 提取字幕轨道）

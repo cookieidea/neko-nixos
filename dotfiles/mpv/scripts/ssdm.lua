@@ -7,7 +7,7 @@ local sid = nil
 local key = nil
 local config_dir = mp.command_native({ "expand-path", "~~/" })
 local input_conf = io.open(config_dir .. '/input.conf', 'r')
-local ssdm_dm_path = utils.join_path(os.getenv("TEMP"), "ssdm-danmaku-" .. utils.getpid() .. ".ass")
+local ssdm_dm_path = utils.join_path(os.getenv("TEMP") or os.getenv("TMPDIR") or "/tmp", "ssdm-danmaku-" .. utils.getpid() .. ".ass")
 local uosc_danmaku_main_path = config_dir .. "/scripts/uosc_danmaku/main.lua"
 local uosc_danmaku_data = { enabled = false, comments = nil, options = nil }
 local updating_uosc_danmaku_data = false
