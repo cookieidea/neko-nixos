@@ -400,9 +400,11 @@ in
     # noctalia-config.toml 由 programs.noctalia.settings 部署，
     # 再经下方 home.activation 复制为可写真实文件（V5 设置面板会写）。
     # mpvpaper 插件已撤回（视频壁纸由 config.kdl 直接 spawn mpvpaper，禁 OSC），
-    # 故不再部署 mpv-hook.lua / mpvpaper-sync.sh。
+    # 故重新部署 mpv-hook.lua / mpvpaper-sync.sh（noctalia/mpvpaper 插件托管视频壁纸）。
     "noctalia/theme-sync.sh".source = ./dotfiles/config/noctalia/theme-sync.sh;
     "noctalia/wallpaper-hook.sh".source = ./dotfiles/config/noctalia/wallpaper-hook.sh;
+    "noctalia/mpvpaper-sync.sh".source = ./dotfiles/config/noctalia/mpvpaper-sync.sh;
+    "noctalia/mpv-hook.lua".source = ./dotfiles/config/noctalia/mpv-hook.lua;
     # ── kitty（迁移自 NyxNiri；current-theme.conf 由 Noctalia kitty 模板生成，
     #    不部署只读版，首次由 activation 种子写入）──
     "kitty/kitty.conf".source = ./dotfiles/config/kitty/kitty.conf;
@@ -575,7 +577,7 @@ in
     "Pictures/Wallpapers/wallhaven-d88d53.png".source = ./dotfiles/Pictures/Wallpapers/wallhaven-d88d53.png;
     "Pictures/Wallpapers/wallhaven-yq8w67.jpg".source = ./dotfiles/Pictures/Wallpapers/wallhaven-yq8w67.jpg;
     # 视频壁纸（mpvpaper 播放；noctalia 壁纸组件已禁用，背景层由 mpvpaper 接管）
-    "Pictures/Wallpapers/hatsune-miku.mp4".source = ./dotfiles/Pictures/Wallpapers/hatsune-miku.mp4;
+    "Pictures/Wallpapers/video/hatsune-miku.mp4".source = ./dotfiles/Pictures/Wallpapers/video/hatsune-miku.mp4;
     # 原 .gtkrc-2.0 内容已并入 gtk.gtk2.extraConfig（fcitx 输入法），不再手动部署避免模块冲突
     ".local/bin/random-anime-wallpaper-noctalia" = {
       source = ./dotfiles/local/bin/random-anime-wallpaper-noctalia;

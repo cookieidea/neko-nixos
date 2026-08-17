@@ -78,8 +78,9 @@ spawn-sh-at-startup "systemctl --user set-environment XDG_SESSION_CLASS=user"
 // 截图音效守护进程（SHORiN 私有脚本）
 spawn-at-startup "~/.config/niri/scripts/screenshot-sound.sh"
 
-// 视频壁纸（mpvpaper 初音未来；Noctalia V5 原生壁纸默认静图，mpvpaper 独占背景层）
-spawn-at-startup "mpvpaper" "-f" "-o" "no-audio loop hwdec=auto osc=no osd-level=0 load-scripts=no" "ALL" "/home/cookie/Pictures/Wallpapers/hatsune-miku.mp4"
+// 视频壁纸：由 Noctalia V5 的 noctalia/mpvpaper 插件管理（config.toml 里
+// video_directory 指向 ~/Pictures/Wallpapers/video），不再直接 spawn mpvpaper。
+// spawn-at-startup "mpvpaper" ... （已移除）
 
 // 取消启动 niri 时自动开启快捷键教程
 hotkey-overlay {

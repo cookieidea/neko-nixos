@@ -29,6 +29,7 @@ end = [
     "media",
     "tray",
     "wallpaper",
+    "mpvpaper",
     "volume",
     "notifications",
     "session",
@@ -131,6 +132,7 @@ nightlight = false
 font_family = "Noto Sans CJK SC"
 polkit_agent = true
 settings_show_advanced = true
+avatar_path = "~/.face"
 
 [shell.greeter_sync]
 auto_sync = true
@@ -222,7 +224,7 @@ fill_mode = "crop"
 
 
 [plugins]
-enabled = []
+enabled = ["noctalia/mpvpaper"]
 
 [widget.active_window]
 min_length = 0
@@ -236,3 +238,11 @@ drawer = true
 
 [widget."ray/echolyrics:echolyrics"]
 capsule = false
+
+[widget.mpvpaper]
+type = "noctalia/mpvpaper:mpvpaper"
+
+[plugin_settings."noctalia/mpvpaper"]
+mpv_options = "--script=~/.config/noctalia/mpv-hook.lua no-audio loop-file=inf hwdec=auto osc=no osd-level=0 load-scripts=no"
+picker_placement = "floating"
+video_directory = "/home/cookie/Pictures/Wallpapers/video"
