@@ -258,6 +258,8 @@ EOF
     # 登录管理器 greetd + Noctalia Greeter 由 programs.noctalia-greeter 模块自动装入（见上方）
     # virt-manager/libvirtd 后端（原 99-apps 的 qemu-full + swtpm；libvirtd 已 enable）
     qemu swtpm
+    # libvirt 默认 NAT 网络（default）依赖 dnsmasq，缺了 virt-manager 建网失败
+    dnsmasq
     # X11 兼容层：xwayland-satellite（niri 25.08+ 开箱集成，binary 在 PATH 时
     # niri 自动按需拉起 Xwayland；微信/LinuxQQ 等 X11 应用因此可正常启动）
     xwayland-satellite
