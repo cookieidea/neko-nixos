@@ -83,6 +83,11 @@
   # ── 网络 / 主机 ───────────────────────────────────────────
   networking.hostName = "ATRI";
   networking.networkmanager.enable = true;   # 对应 01c-nm-backend.sh
+  # DNS 改用腾讯 DNSPod：IPv4 119.29.29.29 / IPv6 2402:4e00::
+  # dns = "none"：NetworkManager 不再覆盖 /etc/resolv.conf，
+  # 由 networking.nameservers 静态写入，彻底替换 DHCP 下发的 DNS。
+  networking.networkmanager.dns = "none";
+  networking.nameservers = [ "119.29.29.29" "2402:4e00::" ];
   # 组播回环修复：IPv4 组播路由经 lo 才能本地投递（Axolotl 联机扫描本地端口依赖）。
   # cachyos 内核下路由经物理网卡时 IP_MULTICAST_LOOP 不生效（TCP 单播正常）。
   systemd.services.multicast-loopback = {
