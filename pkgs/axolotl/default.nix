@@ -192,7 +192,7 @@ EOF
   meta = with pkgs.lib; {
     description = "Minecraft Java 版启动器（Modrinth/CurseForge 整合包、联机、多账户）";
     homepage = "https://github.com/Mystic-Stars/Axolotl";
-    license = licenses.unfreeRedistributable;
+    license = licenses.gpl3Only;   # Axolotl 桌面包 GPL-3.0-only（开源）
     mainProgram = "axolotl";
     platforms = platforms.linux;
   };
