@@ -43,6 +43,11 @@ environment {
     QT_QPA_PLATFORM "wayland;xcb"
     QT_WAYLAND_DISABLE_WINDOWDECORATION "1"
     ELECTRON_OZONE_PLATFORM_HINT "auto"
+    // 回收站（gvfs）：会话的 GIO_EXTRA_MODULES 只有 dconf（greetd 会话未导入
+    // home-manager session-vars），GIO 认不出 trash:/// → 文件管理器回收站不可用。
+    // niri 的 environment 会设给所有它启动的应用。gvfs 模块用稳定的 profile 路径，
+    // dconf 模块用当前 store 路径（升级后若失效，更新为新路径即可）。
+    GIO_EXTRA_MODULES "/etc/profiles/per-user/cookie/lib/gio/modules:/nix/store/1p20bm5l636fkycak819yl6cbpkhj7ml-dconf-0.49.0-lib/lib/gio/modules"
     // 默认文本编辑器
     EDITOR "vim"
 
