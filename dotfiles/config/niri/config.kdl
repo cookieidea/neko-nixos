@@ -95,16 +95,26 @@ debug {
 }
 
 recent-windows {
+    // 恢复原 supertab.kdl 的窗口切换（带缩略图）：Mod+Tab / Mod+Shift+Tab
+    debounce-ms 750
+    open-delay-ms 150
     binds {
+        Mod+Tab         { next-window scope="workspace"; }
+        Mod+Shift+Tab   { previous-window scope="workspace"; }
         Alt+Tab         { next-window scope="output"; }
         Alt+Shift+Tab   { previous-window scope="output"; }
         Alt+grave       { next-window filter="app-id"; }
         Alt+Shift+grave { previous-window filter="app-id"; }
     }
     highlight {
+        padding 30
         corner-radius 12
         active-color "#b6c7e7"
         urgent-color "#ffb4ab"
+    }
+    previews {
+        max-height 480
+        max-scale 0.2
     }
 }
 
