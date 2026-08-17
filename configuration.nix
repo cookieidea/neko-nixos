@@ -27,6 +27,17 @@
     allowUnfree = true;   # steam / wechat-uos / 部分驱动需要
   };
   security.polkit.enable = true;        # polkit 认证（Noctalia / 系统设置需要）
+  # ── Noctalia Greeter 外观同步免密（wheel 组成员）──
+  # Noctalia 的 greeter_sync（auto_sync=true）每次登录用 pkexec 跑
+  # noctalia-greeter-apply-appearance，默认弹 root 密码。此规则放行 wheel。
+  security.polkit.extraConfig = ''
+    polkit.addRule(function(action, subject) {
+        if (action.id == "org.noctalia.greeter.apply-appearance" &&
+            subject.isInGroup("wheel")) {
+            return polkit.Result.YES;
+        }
+    });
+  '';
 
   # ── 自动垃圾回收 / store 去重（防滚版本撑爆 /）────────────
   nix.gc.automatic = true;
@@ -206,6 +217,19 @@
   # （services.displayManager.sessionPackages）+ 官方 portal / gnome-keyring 推荐配置。
   # 注意：26.05 已移除 services.displayManager.session，注册会话要用这个模块。
   programs.niri.enable = true;
+  # ── 登录界面头像（AccountsService / Noctalia Greeter）──
+  # greeter 从 AccountsService 读用户头像，声明式写入 /var/lib/AccountsService。
+  system.activationScripts.noctaliaGreeterAvatar = lib.stringAfter [ "users" ] ''
+    mkdir -p /var/lib/AccountsService/icons
+    cp -f ${builtins.toString ./dotfiles/avatar.png} /var/lib/AccountsService/icons/cookie
+    chmod 0644 /var/lib/AccountsService/icons/cookie
+    chown ${username}:${username} /var/lib/AccountsService/icons/cookie 2>/dev/null || true
+    cat > /var/lib/AccountsService/users/cookie <<'EOF'
+[User]
+SystemAccount=false
+Icon=/var/lib/AccountsService/icons/cookie
+EOF
+  '';
 
   # GNOME（原 04d-gnome.sh，已弃用，保留以便回退）
   # services.desktopManager.gnome.enable = lib.mkIf (desktop == "gnome") true;

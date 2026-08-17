@@ -60,9 +60,11 @@ fi
 set_gsettings color-scheme "$scheme_val"
 set_gsettings gtk-theme "$gtk_theme"
 
-# 2. Update GTK 3.0 settings.ini
-update_ini "$HOME/.config/gtk-3.0/settings.ini" "gtk-application-prefer-dark-theme" "$dark_pref"
-update_ini "$HOME/.config/gtk-3.0/settings.ini" "gtk-theme-name" "$gtk_theme"
+# 2. GTK settings.ini 由 home-manager gtk 模块声明式管理（只读 store symlink），
+#    ⚠️ 不在此处写入——sed -i 会把 symlink 替换成真实文件，下次 activation 报
+#    "would be clobbered"。GTK 主题/暗色偏好交由 gsettings + HM gtk 模块处理。
+# update_ini "$HOME/.config/gtk-3.0/settings.ini" "gtk-application-prefer-dark-theme" "$dark_pref"
+# update_ini "$HOME/.config/gtk-3.0/settings.ini" "gtk-theme-name" "$gtk_theme"
 
-# 3. Update GTK 4.0 settings.ini
-update_ini "$HOME/.config/gtk-4.0/settings.ini" "gtk-application-prefer-dark-theme" "$dark_pref"
+# 3. Update GTK 4.0 settings.ini（同上，不写入）
+# update_ini "$HOME/.config/gtk-4.0/settings.ini" "gtk-application-prefer-dark-theme" "$dark_pref"
