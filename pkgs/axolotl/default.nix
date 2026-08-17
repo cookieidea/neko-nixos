@@ -49,6 +49,13 @@ let
       # 路径不同）时重新复制，以 nix 包为准。
       export LD_LIBRARY_PATH=/usr/lib64:/usr/lib:/usr/lib/x86_64-linux-gnu''${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
       export WEBKIT_EXEC_PATH=/usr/libexec/webkit2gtk-4.1
+      # GIO 模块：FHS 里 glib-networking 的 TLS/代理模块在 /usr/lib64/gio/modules，
+      # GIO 默认只扫编译内建路径（nix store）找不到 → HTTPS 全失败 → 远程图片全破。
+      export GIO_EXTRA_MODULES=/usr/lib64/gio/modules
+      # WebKit 渲染降级：禁用 GPU 合成/DMABUF——RX 6600 + radeonsi 下 WebKit 的
+      # DMABUF/合成路径会崩（堆损坏 SIGABRT），图片渲染不出来。强制软件合成。
+      export WEBKIT_DISABLE_COMPOSITING_MODE=1
+      export WEBKIT_DISABLE_DMABUF_RENDERER=1
       APP_DIR="$HOME/.local/share/red.ghs.axolotl-app"
       MARKER="$APP_DIR/.nix-source"
       if [ "$(cat "$MARKER" 2>/dev/null)" != "${extracted}" ]; then
