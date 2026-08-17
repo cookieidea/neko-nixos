@@ -102,6 +102,11 @@ let
       pkgs.nss
       pkgs.nspr
       pkgs.libsoup_3
+      # HTTPS/TLS 后端（WebKit/GIO 加载远程图片必需）：
+      # glib-networking 提供 GIO 的 TLS 传输插件（gnutls），缺了所有 https 图片加载失败；
+      # cacert 提供 CA 证书（/etc/ssl/certs）。
+      pkgs.glib-networking
+      pkgs.cacert
       # GTK3 / WebKitGTK 栈（axolotl-launcher 依赖）
       pkgs.gtk3
       pkgs.webkitgtk_4_1
