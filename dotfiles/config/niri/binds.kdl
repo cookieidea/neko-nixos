@@ -97,7 +97,7 @@ binds {
     Mod+Ctrl+D { move-column-right; }
        // mod+S/W 上下切换窗口聚焦
     Mod+W     { focus-window-up; }
-    Mod+S      { focus-window-down; }
+    Mod+S      hotkey-overlay-title="星环菜单 Star-Ring Menu" repeat=false { spawn-sh "niri-scratch-menu"; }
     // 移动窗口
     Mod+Ctrl+S { move-window-down; }
     Mod+Ctrl+W { move-window-up; }
@@ -216,9 +216,12 @@ binds {
     Mod+V   hotkey-overlay-title="切换浮动 Toggle floating"    { toggle-window-floating; }
     // 在浮动模式和非浮动模式之间切换聚焦
     Mod+Shift+V hotkey-overlay-title=null { switch-focus-between-floating-and-tiling; }
-    Mod+N hotkey-overlay-title="切换浮动聚焦 Change focus to floating" { switch-focus-between-floating-and-tiling; }
+    Mod+N hotkey-overlay-title="护眼模式 Eye Care" { spawn-sh "~/.config/niri/scripts/toggle-eyecare.sh"; }
     Alt+grave hotkey-overlay-title=null { switch-focus-between-floating-and-tiling; }
     Mod+Alt+N hotkey-overlay-title=null { switch-focus-between-floating-and-tiling; }
+
+    // 切换 Kitty Scratchpad 浮动终端（NyxNiri）
+    Mod+Grave hotkey-overlay-title="Scratchpad 终端 Scratchpad Terminal" { spawn-sh "~/.config/niri/scripts/niri-scratch-toggle.sh kitty"; }
 
     // 截图相关
     Mod+Alt+A  hotkey-overlay-title="选取区域截图 Select screenshot"  {spawn-sh "niri msg action screenshot --show-pointer false && pkill -f -USR1 screenshot-sound.sh";}
