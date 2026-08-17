@@ -36,6 +36,9 @@ in
   home.sessionPath = [ "$HOME/.local/bin" ];
   home.sessionVariables = {
     TERMINFO_DIRS = "${pkgs.kitty}/share/terminfo";
+    # gvfs 的 GIO 模块：缺了它 GIO 认不出 trash:/// 等 gvfs URI，
+    # 文件管理器（Thunar/Nautilus）回收站不可用。保留 dconf 模块。
+    GIO_EXTRA_MODULES = "${pkgs.gvfs}/lib/gio/modules:${pkgs.dconf}/lib/gio/modules";
     # ABDM 托盘兜底：ABDM 应用会把自己的 autostart 重写为 bin/ABDownloadManager.bin
     # （/proc/self/exe 检测实际二进制）→ 绕过 makeWrapper → 无 systemdLibs →
     # ComposeNativeTray 的 libLinuxTray.so 解析不到 libsystemd.so.0 → 托盘消失。
@@ -688,6 +691,26 @@ in
   # polkit 认证代理：NixOS 上没有 Arch 的 /usr/lib/polkit-gnome，
   # 改用 Home Manager 的 polkit-gnome 用户服务拉起。
   services.polkit-gnome.enable = true;
+
+  # ── gvfs 守护（Thunar/Nautilus 的回收站/挂载/远程文件支持）──
+  # 本版 home-manager 无 services.gvfs 模块，改用 systemd.user 显式启用 gvfs 单元。
+  systemd.user.services = {
+    gvfs-daemon = {
+      Unit = { Description = "Virtual filesystem service"; PartOf = [ "graphical-session.target" ]; };
+      Service = { ExecStart = "${pkgs.gvfs}/libexec/gvfsd"; Type = "dbus"; BusName = "org.gtk.vfs.Daemon"; };
+      Install.WantedBy = [ "graphical-session.target" ];
+    };
+    gvfs-udisks2-volume-monitor = {
+      Unit = { Description = "Virtual filesystem service - disk device monitor"; PartOf = [ "graphical-session.target" ]; };
+      Service = { ExecStart = "${pkgs.gvfs}/libexec/gvfs-udisks2-volume-monitor"; };
+      Install.WantedBy = [ "graphical-session.target" ];
+    };
+    gvfs-metadata = {
+      Unit = { Description = "Virtual filesystem metadata service"; PartOf = [ "graphical-session.target" ]; };
+      Service = { ExecStart = "${pkgs.gvfs}/libexec/gvfsd-metadata"; };
+      Install.WantedBy = [ "graphical-session.target" ];
+    };
+  };
 
   # ── GTK 主题/图标（noctalia launcher、GTK 应用图标解析依赖 freedesktop 主题）──
   # 由 home-manager gtk 模块全权写 settings.ini（不部署 dotfiles 的 settings.ini，
