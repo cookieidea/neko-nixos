@@ -1,16 +1,38 @@
 // =============================================================
-// niri 配置（基于 SHORiN-KiWATA/shorin-arch-setup 的 noctalia-dotfiles）
-// 已针对 NixOS 适配：原 Arch 专用路径与 qs(quickshell) 依赖已改写/注释。
-// 完整原始版本见 SHORiN 仓库；本文件为可在 NixOS 上直接启动的适配版。
-// 通过 home.nix 的 xdg.configFile 部署到 ~/.config/niri/
+// niri 配置（迁移自 NyxNiri ech678/NyxNiri，v2/niri）
+// 已针对 NixOS 适配：保留原 Shorin 的 fcitx5/xsettingsd/xhost/mpvpaper 等自启，
+// 桌面 shell 改用 Noctalia V5（nixpkgs/flake 的 noctalia 包）。
+// 快捷键绑定保留本机原有的 binds.kdl（仅 IPC 命令适配 V5）。
 // =============================================================
 
-// 截图保存位置
-screenshot-path "~/Pictures/Screenshots/Niri-screenshots/%Y-%m-%d_%H-%M-%S.png"
+// 引入由 nwg-displays 生成的显示器配置（本机手写 monitor.kdl）
+include "monitor.kdl"
+// 动态引入视觉特效样式 (普通模式 vs 护眼模式)
+include "effects.kdl"
+// 引入输入设备与手势配置
+include optional=true "input__custom__.kdl"
+// 引入布局设置
+include "layout.kdl"
+// 引入动画配置
+include "animations.kdl"
+// 引入窗口与图层规则
+include "rules.kdl"
+// 引入快捷键绑定配置
+include "binds.kdl"
+// 光标配置
+include "cursor.kdl"
 
-// 环境变量
+overview {
+    backdrop-color "#4c566a90"
+    workspace-shadow {
+        off
+    }
+}
+
 environment {
-    // 设置界面语言
+    XDG_CURRENT_DESKTOP "niri"
+    XDG_SESSION_TYPE "wayland"
+    // 界面语言
     LANGUAGE "zh_CN:en"
     LANG "zh_CN.UTF-8"
     // 输入法环境变量
@@ -18,70 +40,24 @@ environment {
     // qt 主题
     QT_QPA_PLATFORMTHEME "gtk3"
     QT_QPA_PLATFORMTHEME_QT6 "gtk3"
-    // Noctalia(quickshell) 图标主题：用 Papirus（kcalc 等 desktop 引用
-    // accessories-calculator 等标准名，Adwaita 只有 -symbolic 变体会缺失）
-    QS_ICON_THEME "Papirus"
-    // GTK 软件使用的渲染器，可以解决 n 卡双显卡导致的 GTK 应用启动缓慢问题，
-    // AMD 或 Intel 单显卡不需要这行设置可以注释掉
-    //GSK_RENDERER "gl"
+    QT_QPA_PLATFORM "wayland;xcb"
+    QT_WAYLAND_DISABLE_WINDOWDECORATION "1"
+    ELECTRON_OZONE_PLATFORM_HINT "auto"
     // 默认文本编辑器
     EDITOR "vim"
+
+    // NVIDIA environment variables（本机为 AMD/核显时保持注释）
+    // GBM_BACKEND "nvidia-drm"
+    // __GLX_VENDOR_LIBRARY_NAME "nvidia"
+    // LIBVA_DRIVER_NAME "nvidia"
 }
 
-input {
-    keyboard {
-        xkb {
-        }
-        repeat-delay 250
-        repeat-rate 35
-    }
+// ── 自动启动 ──
+// Noctalia V5 桌面 shell（原生 C++，替代 v4 noctalia-shell）
+spawn-at-startup "noctalia"
 
-    touchpad {
-        // off
-        tap
-        // dwt
-        // dwtp
-        // drag false
-        // drag-lock
-        // nautural-scroll 可以翻转触摸板滚动的方向
-        natural-scroll
-        //accel-speed -0.5
-        // accel-profile "flat"
-        // scroll-method "two-finger"
-        // disabled-on-external-mouse
-    }
-
-    mouse {
-        // off
-        // natural-scroll
-        // 鼠标速度
-        accel-speed -0.15
-        // 禁用鼠标加速
-        accel-profile "flat"
-        // scroll-method "no-scroll"
-        //speed of scroll,like:
-        //scroll-factor horizontal=2.0 vertical=-5.0
-    }
-
-    trackpoint {
-        // off
-        // natural-scroll
-        // accel-speed 0.2
-        // accel-profile "flat"
-        // scroll-method "on-button-down"
-        // scroll-button 273
-        // scroll-button-lock
-        // middle-emulation
-    }
-}
-
-// ===================== 自动启动 =====================
-// Noctalia 桌面 shell：用 nixpkgs 自带的 noctalia-shell（quickshell 配置 + qs 封装）启动。
-// 下方 ~/.config/niri/scripts/* 等 SHORiN 私有脚本已在本次配置迁移中部署，
-// 因此截图音效、快捷键菜单、窗口强杀、取窗口信息等绑定现可直接使用。
-// 启动器/设置/壁纸/电源菜单/锁屏/音量/亮度等则通过 noctalia-shell 的 IPC
-// （binds.kdl 里统一用 `noctalia-shell ipc call ...`）控制，现已生效。
-spawn-sh-at-startup "noctalia-shell"
+// 护眼模式同步（对齐 effects.kdl 软链接状态）
+spawn-at-startup "~/.config/niri/scripts/toggle-eyecare.sh" "--sync"
 
 // 输入法
 spawn-at-startup "fcitx5"
@@ -92,49 +68,46 @@ spawn-at-startup "xsettingsd"
 // 允许 root 通过用户的 xwayland 打开窗口
 spawn-at-startup "xhost" "+si:localuser:root"
 
-// X11 兼容层：xwayland-satellite（niri 25.08+ 开箱集成）。
-// binary 已由 configuration.nix 的 systemPackages 装进 PATH，niri 会在
-// X11 客户端连入时自动拉起 Xwayland（无需 spawn-at-startup / 设 DISPLAY）。
+// X11 兼容层：xwayland-satellite（niri 25.08+ 开箱集成，binary 在 PATH 时按需拉起）
 xwayland-satellite {
 }
 
 // 设置会话类环境变量（NixOS 上 systemctl 可用）
 spawn-sh-at-startup "systemctl --user set-environment XDG_SESSION_CLASS=user"
 
-// --- 以下为原 Arch 专用 / 依赖缺失项，已注释，保留以便对照 ---
-// polkit 认证代理：在 NixOS 改用 home.nix 的 services.polkit-gnome.enable = true
-// spawn-at-startup "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1"
-// xdg-desktop-portal：NixOS 由 configuration.nix 的 services.xdg.portal 自动管理
-// spawn-sh-at-startup "dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP=niri & /usr/lib/xdg-desktop-portal-gnome"
-// 截图音效守护进程：SHORiN 私有脚本已迁移到 ~/.config/niri/scripts/screenshot-sound.sh
+// 截图音效守护进程（SHORiN 私有脚本）
 spawn-at-startup "~/.config/niri/scripts/screenshot-sound.sh"
-// 视频壁纸（mpvpaper 初音未来；noctalia 壁纸组件已禁用不冲突）
-// -f 后台；-o 传 mpv 选项（无音频+循环+自动硬件解码+禁 OSC/OSD）；ALL = 所有显示器
-// osc=no osd-level=0 load-scripts=no：壁纸层会加载用户 mpv 脚本（uosc），
-// 其 timeline 进度条会被触发显示；禁脚本彻底消除进度条
+
+// 视频壁纸（mpvpaper 初音未来；Noctalia V5 原生壁纸默认静图，mpvpaper 独占背景层）
 spawn-at-startup "mpvpaper" "-f" "-o" "no-audio loop hwdec=auto osc=no osd-level=0 load-scripts=no" "ALL" "/home/cookie/Pictures/Wallpapers/hatsune-miku.mp4"
-// 启动随机壁纸：依赖 qs；已由 Noctalia settings.json 的 wallpaper 配置替代
-// spawn-sh-at-startup "sleep 3 && noctalia-shell ipc call wallpaper random all"
-// linuxqq 剪贴板同步：依赖 linuxqq-clipsync 用户服务（NixOS 无），注释
-// spawn-at-startup "systemctl" "--user" "start" "linuxqq-clipsync"
 
 // 取消启动 niri 时自动开启快捷键教程
 hotkey-overlay {
-    // Uncomment this line to disable the "Important Hotkeys" pop-up at startup.
     skip-at-startup
 }
 
-// 隐藏窗口标题栏
 prefer-no-csd
+screenshot-path "~/Pictures/Screenshots/Screenshot from %Y-%m-%d %H-%M-%S.png"
 
-// 自 25.11 版本起，niri 的配置文件支持了拆分，每一条 include 都代表把
-// 已经拆分出去的配置文件嵌入进来。
-include "layout.kdl"
-include "animations.kdl"
-include "binds.kdl"
-include "supertab.kdl"
-include "windowrules.kdl"
-include "cursor.kdl"
-include "outputs.kdl"
-include "blur.kdl"
-include "./noctalia.kdl"
+debug {
+    honor-xdg-activation-with-invalid-serial
+}
+
+recent-windows {
+    binds {
+        Alt+Tab         { next-window scope="output"; }
+        Alt+Shift+Tab   { previous-window scope="output"; }
+        Alt+grave       { next-window filter="app-id"; }
+        Alt+Shift+grave { previous-window filter="app-id"; }
+    }
+    highlight {
+        corner-radius 12
+        active-color "#b6c7e7"
+        urgent-color "#ffb4ab"
+    }
+}
+
+// ==========================================================
+// 用户自定义配置（更新时自动保留）
+// ==========================================================
+include "__custom__.kdl"

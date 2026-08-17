@@ -9,10 +9,13 @@
       "https://mirrors.ustc.edu.cn/nix-channels/store"
       "https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store"
       "https://attic.xuyh0120.win/lantian"
+      # Noctalia V5 官方 Cachix 缓存（github 源从主仓库拉，二进制约几百 MB）
+      "https://noctalia.cachix.org"
     ];
     extra-trusted-public-keys = [
       "lantian:EeAUQ+W+6r7EtwnmYjeVwx5kOGEBpjlBfPlzGlTNvHc="   # attic.xuyh0120.win/lantian（CachyOS 内核缓存）
       "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
+      "noctalia.cachix.org-1:pCOR47nnMEo5thcxNDtzWpOxNFQsBRglJzxWPp3dkU4="
     ];
   };
 
@@ -55,9 +58,16 @@
     nix-cachyos-kernel = {
       url = "git+https://github.com/xddxdd/nix-cachyos-kernel?ref=release";
     };
+
+    # ── Noctalia V5（原生 C++ Wayland 桌面 shell，替代 v4 noctalia-shell）──
+    # 用 cachix 分支：始终指向官方 Cachix 已缓存的最新 commit，避免本地编译。
+    # ⚠️ 不要 follows nixpkgs：改了输入 hash 会失去二进制缓存命中。
+    noctalia = {
+      url = "github:noctalia-dev/noctalia/cachix";
+    };
   };
 
-  outputs = { self, nixpkgs, home-manager, cooknixvim, opencode, bili-danmaku-tui, nix-cachyos-kernel, ... }:
+  outputs = { self, nixpkgs, home-manager, cooknixvim, opencode, bili-danmaku-tui, nix-cachyos-kernel, noctalia, ... }:
     let
       system = "x86_64-linux";
       # ── 改这里 ──────────────────────────────────────────────
@@ -89,7 +99,7 @@
         home-manager.useUserPackages = true;
         home-manager.users.${username} = import ./home.nix;
         # 把 cooknixvim / opencode / bili-danmaku-tui 三个 flake 输入，以及自构建包传给 home 配置
-        home-manager.extraSpecialArgs = { inherit desktop username cooknixvim opencode bili-danmaku-tui selfPackages; };
+        home-manager.extraSpecialArgs = { inherit desktop username cooknixvim opencode bili-danmaku-tui selfPackages noctalia; };
       };
     in {
       # 暴露自构建派生为 flake 包：可单独 `nix build .#<name>`

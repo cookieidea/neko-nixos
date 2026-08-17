@@ -8,12 +8,20 @@
 #        基于 nix-community/nixvim；用其 flake 构建的 nvim 替代裸 nixvim 配置）
 # AUR-only 与 nixpkgs 差异见底部注释。
 
-{ config, pkgs, lib, desktop, username, cooknixvim, opencode, bili-danmaku-tui, selfPackages, ... }:
+{ config, pkgs, lib, desktop, username, cooknixvim, opencode, bili-danmaku-tui, selfPackages, noctalia, ... }:
+
+let
+  # 可写种子源（store 路径，供 activation 脚本复制出可写真实文件）
+  seedKittyTheme    = builtins.toString ./dotfiles/config/kitty/themes/noctalia.conf;
+  seedNoctaliaConfig = builtins.toString ./dotfiles/config/noctalia/config.toml;
+  seedStarship      = builtins.toString ./dotfiles/config/starship.toml;
+in
 
 {
   imports = [
-    # Noctalia 改用 flake 包（见 home.packages）+ settings.json（见 xdg.configFile），
-    # 不再加载它的 HM 模块，避免 programs.noctalia.settings 和手写文件冲突。
+    # Noctalia V5（原生 C++ shell）HM 模块：提供 programs.noctalia 声明式配置
+    # （设置/壁纸/主题模板等），替代 v4 noctalia-shell。
+    noctalia.homeModules.default
   ];
 
   home.username = username;
@@ -165,6 +173,11 @@
     # ── 全量脚本审查补漏（04j-minimal-niri / 04k-noctalia 核对结果）──
     matugen                                    # 主题生成器（random-anime-wallpaper-noctalia 与 noctalia-shell 模板直接调用）
     mpvpaper                                   # 视频壁纸（mpv 渲染 wlr-layer-shell，niri 启动项播放 hatsune-miku.mp4）
+    # ── NyxNiri 迁移新增依赖 ──
+    tmux                                       # tmux（scratchpad 终端，Super+~）
+    wlsunset                                   # wlsunset（护眼模式色温 Super+N）
+    inotify-tools                              # inotifywait（noctalia mpvpaper-sync 监听 assignments）
+    ddcutil                                    # ddcutil（外接显示器亮度，XF86 亮度键）
     imv                                        # 图片查看器（mimeapps.list 的 image/* 默认打开器）
     kdePackages.breeze                           # 光标主题 Breeze_Cursors（cursor.kdl 指定；breeze 包含光标，非独立 breeze-cursors 属性）
     xhost                                      # XWayland 授权（config.kdl spawn-at-startup "xhost"；26.05 xorg 包集移到顶层）
@@ -184,12 +197,12 @@
   # `noctalia-shell` 包，不再用独立的 noctalia v4 应用（见文末注释）。
 
     opencode.packages.${pkgs.stdenv.hostPlatform.system}.default
-    pkgs.noctalia-shell
   ]
 
   # 自构建程序（flake 包，见 ./pkgs；对应原 Arch 的 AUR `-git` / 私有仓库）
   ++ [
     selfPackages.niri-sidebar     # niri-sidebar-git
+    selfPackages.nyxniri-scratch-menu  # NyxNiri 星环菜单（GTK3+LayerShell，Super+A）
     selfPackages.pins             # pins-git
     selfPackages.pywalfox         # python-pywalfox
     selfPackages.shorin-contrib   # shorin-contrib-git
@@ -229,6 +242,15 @@
     fzf.enable = true;            # fzf（脚本里也装了）
     fish = {
       enable = true;
+    };
+
+    # ── Noctalia V5（原生 C++ Wayland 桌面 shell，替代 v4 noctalia-shell）──
+    # settings 指向 NyxNiri 移植的 config.toml（见 xdg.configFile 部署注释）。
+    # 不启用 systemd 服务：由 config.kdl 的 spawn-at-startup "noctalia" 拉起。
+    noctalia = {
+      enable = true;
+      systemd.enable = false;
+      settings = ./dotfiles/config/noctalia/config.toml;
     };
 
     # ── niri：Wayland 滚动平铺 compositor ────────────────
@@ -289,11 +311,6 @@
       Environment=LD_LIBRARY_PATH=${pkgs.systemdLibs}/lib:/nix/store/zcqp398mxlw62jl02sx0rsc7gvcl1qhc-pipewire-1.6.6-jack/lib
       ExecStartPre=${pkgs.coreutils}/bin/mkdir -p %h/.abdm/system/log
     '';
-    # ── noctalia-shell 4.7.6 用户配置（quickshell 惯例路径）──
-    # 完整默认 settings（取自官方 Assets/settings-default.json）只改
-    # wallpaper.enabled=false + 默认 disableWallpaper=true → 壁纸组件不渲染，
-    # mpvpaper 独占背景层。完整结构部署避免最小化 JSON 导致 QML 崩溃。
-    "quickshell/noctalia/settings.json".source = ./dotfiles/config/noctalia/settings.json;
     "MangoHud/MangoHud.conf".source = ./dotfiles/config/MangoHud/MangoHud.conf;
     "Thunar/accels.scm".source = ./dotfiles/config/Thunar/accels.scm;
     "Thunar/uca.xml".source = ./dotfiles/config/Thunar/uca.xml;
@@ -305,7 +322,7 @@
     "fcitx5/conf/punctuation.conf".source = ./dotfiles/config/fcitx5/conf/punctuation.conf;
     "fcitx5/config".source = ./dotfiles/config/fcitx5/config;
     "fcitx5/profile".source = ./dotfiles/config/fcitx5/profile;
-    "fish/conf.d/shorin.fish".source = ./dotfiles/config/fish/conf.d/shorin.fish;
+    # fish 的 conf.d/config.fish/completions 由下方 NyxNiri 块部署，这里只保留函数与生成说明
     # ⚠️ fish/fish_variables 不能部署成 store 只读符号链接——fish 运行时写通用变量会
     #   报 "无法创建临时文件 /nix/store/... (os error 30 EROFS)"。让 fish 自己生成
     #   （原文件只是默认空壳，无重要变量）。
@@ -324,10 +341,6 @@
     "gtk-4.0/gtk.css".source = ./dotfiles/config/gtk-4.0/gtk.css;
     # gtk-4.0/noctalia.css 同上：由 Noctalia 模板生成，不部署只读版本。
     # gtk-4.0/settings.ini 同上，由 gtk 模块写入
-    "kitty/current-theme.conf".source = ./dotfiles/config/kitty/current-theme.conf;
-    "kitty/kitty.conf".source = ./dotfiles/config/kitty/kitty.conf;
-    "kitty/themes/kitty.conf".source = ./dotfiles/config/kitty/themes/kitty.conf;
-    # kitty/themes/noctalia.conf 由 noctalia 模板生成（matugen 写色），不部署
     "mimeapps.list".source = ./dotfiles/config/mimeapps.list;
     # ── mpv（从 Windows mpv.lite portable_config 迁移；Linux 适配：去 nvidia、
     #    opencc 路径改 ~/.config/mpv、TMPDIR、mkdir -p；并入原 hwdec=auto-safe）──
@@ -360,40 +373,56 @@
     "mpv/shaders".source = ./dotfiles/mpv/shaders;
     "mpv/vs".source = ./dotfiles/mpv/vs;
     "mpv/fonts".source = ./dotfiles/mpv/fonts;
+    # ── Niri 配置（迁移自 NyxNiri v2/niri；快捷键 binds.kdl 保留本机键位）──
+    # effects.kdl 是软链接（正常/护眼模式切换），由 toggle-eyecare.sh 维护，
+    # 由下方 home.activation 首次创建种子，不直接部署只读文件。
     "niri/animations.kdl".source = ./dotfiles/config/niri/animations.kdl;
-    # binds.kdl 实体机上存在非 HM 管理的旧文件（此前手动 sed 修过 Mod+P），
-    # HM 部署会报 "would be clobbered" → force = true 强制接管为 HM 链接。
+    # binds.kdl 实体机上存在非 HM 管理的旧文件 → force = true 强制接管为 HM 链接。
     "niri/binds.kdl" = {
       source = ./dotfiles/config/niri/binds.kdl;
       force = true;
     };
-    "niri/blur.kdl".source = ./dotfiles/config/niri/blur.kdl;
-    # config.kdl 实体机上存在非 HM 管理的旧文件（此前手动/脚本写入），
-    # HM 部署会报 "would be clobbered" → force = true 强制接管为 HM 链接。
+    # config.kdl 实体机上存在非 HM 管理的旧文件 → force = true 强制接管为 HM 链接。
     "niri/config.kdl" = {
       source = ./dotfiles/config/niri/config.kdl;
       force = true;
     };
     "niri/cursor.kdl".source = ./dotfiles/config/niri/cursor.kdl;
     "niri/layout.kdl".source = ./dotfiles/config/niri/layout.kdl;
-    # ⚠️ niri/noctalia.kdl 不部署：由 Noctalia 配色模板生成（niri.kdl 模板写色）。
-    # 部署成只读 symlink → 模板写入 Read-only file system → 配色模板处理失败。
-    # 注意：config.kdl 里的 `include "./noctalia.kdl"` 在文件缺失时是**致命**的——
-    # niri 整个配置解析失败（并非"可容忍"），spawn-at-startup 全部不执行 →
-    # noctalia-shell 永远起不来 → 模板永远不生成 → 死锁。
-    # 因此由下方 home.activation.noctaliaKdlSeed 首次部署一个可写占位 seed，
-    # 保证 include 首次启动即可解析；noctalia-shell 起来后自行覆盖为真实配色。
-    "niri/outputs.kdl".source = ./dotfiles/config/niri/outputs.kdl;
-    "niri/supertab.kdl".source = ./dotfiles/config/niri/supertab.kdl;
-    "niri/windowrules.kdl".source = ./dotfiles/config/niri/windowrules.kdl;
-    # v4 版 noctalia 配置（settings/plugins/colors/user-templates/templates/*）已全部移除：
-    # 不读取且 colors.json 等与 noctalia-shell 模板输出冲突（只读 symlink 无法写入）；
-    # 配色/主题模板由 noctalia-shell 的 matugen 模板系统生成（可写真实文件）。
-    # v4 配置（JSON）：settings.json / plugins.json / colors.json / user-templates.toml
-    # user-templates.toml 随上方 4 个 v4 JSON 一起部署（不再塞进 v5 的 config.toml）
-    # （qq-flags.conf 已删：linuxqq 未装，QQ 走 flatpak 沙箱不读）
-    "satty/config.toml".source = ./dotfiles/config/satty/config.toml;
+    "niri/monitor.kdl".source = ./dotfiles/config/niri/monitor.kdl;
+    "niri/rules.kdl".source = ./dotfiles/config/niri/rules.kdl;
+    "niri/effects_normal.kdl".source = ./dotfiles/config/niri/effects_normal.kdl;
+    "niri/effects_eyecare.kdl".source = ./dotfiles/config/niri/effects_eyecare.kdl;
+    "niri/__custom__.kdl".source = ./dotfiles/config/niri/__custom__.kdl;
+    "niri/input__custom__.kdl".source = ./dotfiles/config/niri/input__custom__.kdl;
+    "niri/scratchpad-items__custom__.toml".source = ./dotfiles/config/niri/scratchpad-items__custom__.toml;
+    # ── Noctalia V5 配置脚本（hook 脚本只读即可，由 noctalia 执行）──
+    # noctalia-config.toml 由 programs.noctalia.settings 部署，
+    # 再经下方 home.activation 复制为可写真实文件（V5 设置面板会写）。
+    "noctalia/theme-sync.sh".source = ./dotfiles/config/noctalia/theme-sync.sh;
+    "noctalia/wallpaper-hook.sh".source = ./dotfiles/config/noctalia/wallpaper-hook.sh;
+    "noctalia/mpvpaper-sync.sh".source = ./dotfiles/config/noctalia/mpvpaper-sync.sh;
+    "noctalia/mpv-hook.lua".source = ./dotfiles/config/noctalia/mpv-hook.lua;
+    # ── kitty（迁移自 NyxNiri；current-theme.conf 由 Noctalia kitty 模板生成，
+    #    不部署只读版，首次由 activation 种子写入）──
+    "kitty/kitty.conf".source = ./dotfiles/config/kitty/kitty.conf;
+    "kitty/__custom__.conf".source = ./dotfiles/config/kitty/__custom__.conf;
+    "kitty/themes/noctalia.conf" = {
+      source = ./dotfiles/config/kitty/themes/noctalia.conf;
+      force = true;
+    };
+    # ── fish（NyxNiri conf 文件 + 保留原 shorin 私有配置；config.fish 由
+    #    programs.fish 模块生成，NyxNiri 的函数以 conf.d/nyxniri.fish 形式注入）──
+    "fish/conf.d/nyxniri-path.fish".source = ./dotfiles/config/fish/conf.d/nyxniri-path.fish;
+    "fish/conf.d/nyxniri.fish".source = ./dotfiles/config/fish/conf.d/nyxniri.fish;
+    "fish/conf.d/__custom__.fish".source = ./dotfiles/config/fish/conf.d/__custom__.fish;
+    "fish/conf.d/shorin.fish".source = ./dotfiles/config/fish/conf.d/shorin.fish;
+    "fish/completions/nyxniri.fish".source = ./dotfiles/config/fish/completions/nyxniri.fish;
+    # fastfetch / starship（starship.toml 的 palette 段由 Noctalia 生成，只读部署 base 版）
+    "fastfetch/config.jsonc".source = ./dotfiles/config/fastfetch/config.jsonc;
     "starship.toml".source = ./dotfiles/config/starship.toml;
+    # v4 版 noctalia 配置已全部移除（V5 用 config.toml，见 programs.noctalia 与上方 noctalia 部署）
+    "satty/config.toml".source = ./dotfiles/config/satty/config.toml;
     "xdg-desktop-portal/niri-portals.conf".source = ./dotfiles/config/xdg-desktop-portal/niri-portals.conf;
     "xdg-terminals.list".source = ./dotfiles/config/xdg-terminals.list;
     "xfce4/helpers.rc".source = ./dotfiles/config/xfce4/helpers.rc;
@@ -403,52 +432,44 @@
   };
 
   # ============================================================
-  #  niri/noctalia.kdl 可写 seed（修复"启动项全部不启动"死锁）
+  #  Noctalia V5 迁移所需的可写 seed
   # ============================================================
-  # config.kdl 预写了 `include "./noctalia.kdl"`，而该文件由 noctalia-shell
-  # 模板系统生成（matugen 写色）。首次登录时文件尚不存在 → niri include 失败
-  # → 整个配置解析失败 → 以默认配置运行 → spawn-at-startup 全部失效 →
-  # noctalia-shell 起不来 → 模板永不生成（死锁）。见上方 xdg.configFile 注释。
-  # 这里在 activation 时仅当文件缺失才写入一个可写占位 seed（真实文件而非
-  # 只读 symlink），保证首次启动 include 可解析；noctalia-shell 起来后
-  # 覆盖为真实配色，后续 activation 不再动它。
-  home.activation.noctaliaKdlSeed = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-    SEED="$HOME/.config/niri/noctalia.kdl"
-    if [ ! -f "$SEED" ]; then
-      $DRY_RUN_CMD mkdir -p "$HOME/.config/niri"
-      $DRY_RUN_CMD cat > "$SEED" <<'EOF'
-// 占位配色（Tokyo Night 色值），noctalia-shell 模板系统首次运行后会覆盖。
-layout {
-    focus-ring {
-        active-color   "#7aa2f7"
-        inactive-color "#1f2335"
-        urgent-color   "#f7768e"
-    }
-    border {
-        active-color   "#7aa2f7"
-        inactive-color "#1f2335"
-        urgent-color   "#f7768e"
-    }
-    shadow {
-        color "#00000070"
-    }
-    tab-indicator {
-        active-color   "#7aa2f7"
-        inactive-color "#414868"
-        urgent-color   "#f7768e"
-    }
-    insert-hint {
-        color "#7aa2f780"
-    }
-}
+  # 1) niri/effects.kdl 软链接：config.kdl `include "effects.kdl"`，由
+  #    toggle-eyecare.sh 在普通/护眼模式间切换。首次缺失时建为 Normal。
+  # 2) kitty/current-theme.conf：由 Noctalia kitty 模板生成（写色），只读
+  #    symlink 会挡住写入 → 首次缺失时种子写入一个可写真实文件。
+# 3) noctalia-config.toml（V5 读 ~/.config/noctalia/config.toml）：programs.noctalia.settings
+    #    部署的是只读 store symlink，而 V5 设置面板会回写该文件 → 复制为可写真实文件。
+  # 4) starship.toml：palette 段由 Noctalia starship 模板重写 → 复制为可写。
+  # 均仅在文件缺失/是 store 链接时执行，不覆盖用户运行期修改。
+  home.activation.noctaliaV5Seed = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    NIRI_DIR="$HOME/.config/niri"
+    KITTY_DIR="$HOME/.config/kitty"
+    NOCT_DIR="$HOME/.config/noctalia"
 
-recent-windows {
-    highlight {
-        active-color "#7aa2f7"
-        urgent-color "#f7768e"
-    }
-}
-EOF
+    # effects.kdl 软链接（指向 Normal 效果）
+    if [ ! -e "$NIRI_DIR/effects.kdl" ]; then
+      $DRY_RUN_CMD mkdir -p "$NIRI_DIR"
+      $DRY_RUN_CMD ln -sfn "effects_normal.kdl" "$NIRI_DIR/effects.kdl"
+    fi
+
+    # kitty current-theme.conf：Noctalia kitty 模板生成，缺失时种子写入 NyxNiri 主题
+    if [ ! -e "$KITTY_DIR/current-theme.conf" ]; then
+      $DRY_RUN_CMD mkdir -p "$KITTY_DIR"
+      $DRY_RUN_CMD cp -f "${seedKittyTheme}" "$KITTY_DIR/current-theme.conf"
+    fi
+
+    # noctalia-config.toml：覆盖 HM 的只读 symlink 为可写真实文件
+    if [ -L "$NOCT_DIR/config.toml" ] || [ ! -e "$NOCT_DIR/config.toml" ]; then
+      $DRY_RUN_CMD mkdir -p "$NOCT_DIR"
+      $DRY_RUN_CMD rm -f "$NOCT_DIR/config.toml" "$NOCT_DIR/noctalia-config.toml"
+      $DRY_RUN_CMD cp -f "${seedNoctaliaConfig}" "$NOCT_DIR/config.toml"
+    fi
+
+    # starship.toml：覆盖只读 symlink 为可写真实文件（Noctalia 会重写 palette 段）
+    if [ -L "$HOME/.config/starship.toml" ] || [ ! -e "$HOME/.config/starship.toml" ]; then
+      $DRY_RUN_CMD rm -f "$HOME/.config/starship.toml"
+      $DRY_RUN_CMD cp -f "${seedStarship}" "$HOME/.config/starship.toml"
     fi
   '';
 
@@ -544,6 +565,7 @@ EOF
     ".config/scripts/noctalia-wallpaper-autostart.sh" = {
       source = ./dotfiles/scripts/noctalia-wallpaper-autostart.sh;
       executable = true;
+      force = true;
     };
     ".config/obs-studio/plugins/obs-vdoninja/bin/64bit".source =
       selfPackages.obs-vdoninja + "/lib/obs-plugins";
@@ -627,6 +649,36 @@ EOF
     ".config/niri/scripts/screenshot-sound.sh" = {
       source = ./dotfiles/config/niri/scripts/screenshot-sound.sh;
       executable = true;
+    };
+    # ── NyxNiri 新增 niri 脚本（护眼模式 / Scratchpad 终端 / 星环菜单）──
+    # 对应 NyxNiri 绑定：Mod+N（护眼）、Mod+Grave（scratch 终端）、Mod+A（星环菜单）。
+    # 星环菜单本体由 selfPackages.nyxniri-scratch-menu 包装（提供 pygobject/GI 依赖）。
+    ".config/niri/scripts/toggle-eyecare.sh" = {
+      source = ./dotfiles/config/niri/scripts/toggle-eyecare.sh;
+      executable = true;
+    };
+    ".config/niri/scripts/niri-scratch-toggle.sh" = {
+      source = ./dotfiles/config/niri/scripts/niri-scratch-toggle.sh;
+      executable = true;
+    };
+    ".config/niri/scripts/niri-scratch-menu.py" = {
+      source = ./dotfiles/config/niri/scripts/niri-scratch-menu.py;
+      executable = true;
+    };
+    # NyxNiri fish 缓存清理脚本（星环菜单 clean-cache 入口）
+    ".config/fish/clean-cache" = {
+      source = ./dotfiles/config/fish/clean-cache;
+      executable = true;
+    };
+    # ── NyxMellow fcitx5 动态皮肤模板（Noctalia V5 模板输入，渲染到 themes/nyxmellow/）──
+    ".local/share/fcitx5/themes/nyxmellow/templates/theme.conf" = {
+      source = ./dotfiles/local/share/fcitx5/themes/nyxmellow/templates/theme.conf;
+    };
+    ".local/share/fcitx5/themes/nyxmellow/templates/panel.svg" = {
+      source = ./dotfiles/local/share/fcitx5/themes/nyxmellow/templates/panel.svg;
+    };
+    ".local/share/fcitx5/themes/nyxmellow/templates/highlight.svg" = {
+      source = ./dotfiles/local/share/fcitx5/themes/nyxmellow/templates/highlight.svg;
     };
   };
 

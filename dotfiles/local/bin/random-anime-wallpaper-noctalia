@@ -140,8 +140,8 @@ rm -f "$RAW_PATH"
 
 # 使用 noctalia-shell（quickshell 封装）的 ipc 设置壁纸，monitor 参数设为 all
 # 显式处理失败：避免 set -e 静默中止且无任何错误反馈
-if ! noctalia-shell ipc call wallpaper set "$FINAL_PATH" all; then
-    send_notify "Wallpaper Error" "noctalia-shell IPC 调用失败（桌面 shell 未运行或参数不符）"
+if ! noctalia msg wallpaper-set "$FINAL_PATH"; then
+    send_notify "Wallpaper Error" "noctalia IPC 调用失败（桌面 shell 未运行或参数不符）"
     exit 1
 fi
 

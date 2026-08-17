@@ -28,4 +28,5 @@
   purevox         = import ./purevox { inherit pkgs; };
   bedrockboot     = import ./bedrockboot { inherit pkgs; };
   axolotl         = import ./axolotl { inherit pkgs; };
+  nyxniri-scratch-menu = import ./nyxniri-scratch-menu.nix { inherit pkgs; };
 }

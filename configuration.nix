@@ -121,6 +121,9 @@
 
   # ── 蓝牙 ──────────────────────────────────────────────────
   hardware.bluetooth.enable = true;
+  # Noctalia V5 推荐服务（电池/电源档案 widget 依赖）
+  services.upower.enable = true;
+  services.power-profiles-daemon.enable = true;
   services.blueman.enable = true;
 
   # ── GPU 驱动（AMD Radeon RX 6750 GRE 10G，RDNA2 / Navi 22；CPU i5-12400F 无核显）──
@@ -218,6 +221,11 @@
   # ── 系统级包（少量，其余都在 home.nix）──────────────────
   environment.systemPackages = with pkgs; [
     git
+    # NyxNiri 迁移新增依赖（系统级；tmux 供 scratchpad、wlsunset 护眼、inotifywait 壁纸同步、ddcutil 显示器亮度）
+    tmux
+    wlsunset
+    inotify-tools
+    ddcutil
     # nm-connection-editor 已在 26.05 移除 → 用自带的 nmtui / nmcli 编辑连接
     # 磁盘/文件系统工具（对应 kde-common-applist）
     gparted dosfstools exfatprogs f2fs-tools udftools xfsprogs
