@@ -1,6 +1,6 @@
 # Shorin Arch Setup → NixOS system config
 # 对应原仓库 scripts/ 中的系统级步骤（base / nm-backend / gpu-driver / musthave 等）
-{ config, pkgs, lib, desktop, username, selfPackages, ... }:
+{ config, pkgs, lib, desktop, username, selfPackages, noctalia-greeter, ... }:
 
 {
   # ⚠️ hardware-configuration.nix 的 import 已移到 flake.nix 的实体机配置里——
@@ -185,30 +185,27 @@
 
   # ── 显示服务器 + 登录管理器 + 桌面（niri + Noctalia）─────
   # niri 是纯 Wayland 滚动平铺 compositor，不需要 X server。
-  # 登录管理器用 ly（nixpkgs 官方 displayManager 模块，PAM/systemd/config 全自动）。
-  services.displayManager.ly = {
+  # 登录管理器改用 Noctalia Greeter（greetd greeter，与 Noctalia V5 视觉一致），
+  # 替代原 ly。模块由 flake 输入 noctalia-greeter 提供（见 flake.nix）。
+  imports = [
+    noctalia-greeter.nixosModules.default
+  ];
+  programs.noctalia-greeter = {
     enable = true;
-    # 纯 Wayland（niri），ly 不需要管理 X server → 去掉 libxcb 依赖
-    x11Support = false;
+    # 默认会话 niri（会话选择器里其它会话也可选）
+    greeter-args = "--session niri";
     settings = {
-      # ly 内部 PATH：加上 home-manager 用户 profile，
-      # 否则 niri 里启动的 fuzzel/foot 等找不到（home-manager useGlobalPkgs 下可留 sw/bin）
-      path = "/run/current-system/sw/bin:/home/${username}/.nix-profile/bin:/home/${username}/.nix-profile/sbin";
-      animation = "none";
+      cursor = {
+        theme = "Adwaita";
+        size = 24;
+      };
+      keyboard.layout = "us";
     };
   };
   # niri 系统模块：装 niri 包 + 自动注册 niri.desktop 到 wayland-sessions
   # （services.displayManager.sessionPackages）+ 官方 portal / gnome-keyring 推荐配置。
   # 注意：26.05 已移除 services.displayManager.session，注册会话要用这个模块。
   programs.niri.enable = true;
-  # ly 显示登录界面（用户列表 + 密码框），默认会话 niri；
-  # 如需恢复自动登录，取消下面注释即可（ly 模块自动配 ly-autologin PAM）
-  services.displayManager.defaultSession = "niri";
-  # services.displayManager.autoLogin = {
-  #   enable = true;
-  #   user = username;
-  # };
-  # ly 的 PAM 服务（ly / ly-autologin）由 displayManager.ly 模块自动配置
 
   # GNOME（原 04d-gnome.sh，已弃用，保留以便回退）
   # services.desktopManager.gnome.enable = lib.mkIf (desktop == "gnome") true;
@@ -229,7 +226,7 @@
     # nm-connection-editor 已在 26.05 移除 → 用自带的 nmtui / nmcli 编辑连接
     # 磁盘/文件系统工具（对应 kde-common-applist）
     gparted dosfstools exfatprogs f2fs-tools udftools xfsprogs
-    # 登录管理器 ly 由 displayManager.ly 模块自动装入（见上方登录管理器配置）
+    # 登录管理器 greetd + Noctalia Greeter 由 programs.noctalia-greeter 模块自动装入（见上方）
     # virt-manager/libvirtd 后端（原 99-apps 的 qemu-full + swtpm；libvirtd 已 enable）
     qemu swtpm
     # X11 兼容层：xwayland-satellite（niri 25.08+ 开箱集成，binary 在 PATH 时

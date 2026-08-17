@@ -65,9 +65,17 @@
     noctalia = {
       url = "github:noctalia-dev/noctalia/cachix";
     };
+
+    # ── Noctalia Greeter（greetd 登录界面，与 Noctalia V5 视觉一致）──
+    # follows nixpkgs 复用本机 nixpkgs（greeter 无二进制缓存，避免双份 nixpkgs）。
+    # 用 git+https 直连 github（绕开 GitHub REST API 限流 403，与 home-manager 同理）。
+    noctalia-greeter = {
+      url = "git+https://github.com/noctalia-dev/noctalia-greeter?ref=main";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, nixpkgs, home-manager, cooknixvim, opencode, bili-danmaku-tui, nix-cachyos-kernel, noctalia, ... }:
+  outputs = { self, nixpkgs, home-manager, cooknixvim, opencode, bili-danmaku-tui, nix-cachyos-kernel, noctalia, noctalia-greeter, ... }:
     let
       system = "x86_64-linux";
       # ── 改这里 ──────────────────────────────────────────────
@@ -111,6 +119,7 @@
         # 需 `git add hardware-configuration.nix` 后才会被 flake 包含。
         ${hostname} = nixpkgs.lib.nixosSystem {
           inherit system;
+          specialArgs = { inherit noctalia-greeter; };
           modules = [
             ./hardware-configuration.nix
             ./configuration.nix

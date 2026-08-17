@@ -128,7 +128,7 @@ in
     video-downloader                          # video-downloader（yt-dlp 图形前端）
 
     # --- niri 桌面生态依赖（config.kdl / binds.kdl 里用到的程序）---
-    niri                                       # niri 合成器本体（ly 直接调，也放这里保持 PATH 一致）
+    niri                                       # niri 合成器本体（greetd/Noctalia Greeter 会话拉起，也放这里保持 PATH 一致）
     kitty                                      # 终端（binds: Mod+Return / Mod+T / Mod+Slash / opencode）
     fuzzel                                     # 启动器兜底（binds: Mod+Z 失败回退 fuzzel）
     # 系统图标主题（noctalia 应用启动器/GTK 应用图标解析依赖 freedesktop 主题）
@@ -400,11 +400,9 @@ in
     # noctalia-config.toml 由 programs.noctalia.settings 部署，
     # 再经下方 home.activation 复制为可写真实文件（V5 设置面板会写）。
     # mpvpaper 插件已撤回（视频壁纸由 config.kdl 直接 spawn mpvpaper，禁 OSC），
-    # 故重新部署 mpv-hook.lua / mpvpaper-sync.sh（noctalia/mpvpaper 插件托管视频壁纸）。
+    # 故不再部署 mpv-hook.lua / mpvpaper-sync.sh（视频壁纸由 config.kdl 直接 spawn mpvpaper）。
     "noctalia/theme-sync.sh".source = ./dotfiles/config/noctalia/theme-sync.sh;
     "noctalia/wallpaper-hook.sh".source = ./dotfiles/config/noctalia/wallpaper-hook.sh;
-    "noctalia/mpvpaper-sync.sh".source = ./dotfiles/config/noctalia/mpvpaper-sync.sh;
-    "noctalia/mpv-hook.lua".source = ./dotfiles/config/noctalia/mpv-hook.lua;
     # ── kitty（迁移自 NyxNiri；current-theme.conf 由 Noctalia kitty 模板生成，
     #    不部署只读版，首次由 activation 种子写入）──
     "kitty/kitty.conf".source = ./dotfiles/config/kitty/kitty.conf;
@@ -476,7 +474,7 @@ in
   '';
 
   home.file = {
-    # ── 用户头像（freedesktop 标准 ~/.face，ly 登录管理器 + noctalia 控制中心读取）──
+    # ── 用户头像（freedesktop 标准 ~/.face，Noctalia Greeter 登录界面 + Noctalia 控制中心读取）──
     ".face".source = ./dotfiles/avatar.png;
     # ── Neovim wrapper 菜单条目修复 ──
     # nixvim 构建的 neovim 自带 nvim.desktop（Terminal=true，图形启动器打不开）。

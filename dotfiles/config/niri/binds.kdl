@@ -67,6 +67,12 @@ binds {
     // 例如 ctrl+c居中。此时按下此键可以重新排列）
     Mod+Alt+R hotkey-overlay-title="重置侧边栏 Reorder Sidebar"  { spawn "niri-sidebar" "reorder"; }
 
+    // niri-sidebar 四键配置（Mod+X / Mod+Shift+X / Mod+Ctrl+X / Mod+Alt+X）
+    Mod+X hotkey-overlay-title="收起窗口 Move to Sidebar" { spawn "niri-sidebar" "toggle-window"; }
+    Mod+Shift+X hotkey-overlay-title="展开/收起侧边栏 Toggle Sidebar" { spawn "niri-sidebar" "toggle-visibility"; }
+    Mod+Ctrl+X hotkey-overlay-title="重排侧边栏 Reorder Sidebar" { spawn "niri-sidebar" "reorder"; }
+    // Mod+Alt+X = flip 已在上面定义
+
     
     // mod+鼠标中键 关闭窗口
     Mod+MouseMiddle  { close-window; }
@@ -181,8 +187,8 @@ binds {
     Mod+Shift+A  { consume-window-into-column; }
     Mod+Shift+D { expel-window-from-column; }
     
-    // 开启colume的标签页模式
-    Mod+Shift+X { toggle-column-tabbed-display; }
+    // 开启colume的标签页模式（原 Mod+Shift+X 已改为 niri-sidebar 显隐）
+    //Mod+Shift+X { toggle-column-tabbed-display; }
     //Mod+X { toggle-column-tabbed-display; }
     // mod+鼠标侧键 上下切换聚焦
     Mod+MouseForward { focus-window-up; }

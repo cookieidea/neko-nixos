@@ -314,6 +314,27 @@
         "type": "github"
       }
     },
+    "noctalia-greeter": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1786882377,
+        "narHash": "sha256-NfnY22tYDrXfIuyexYyqB+jkO6IK23AqmhcNixkU7pw=",
+        "ref": "main",
+        "rev": "10d2c9074d3a9219e03b55b2c97f1cc743447af5",
+        "revCount": 206,
+        "type": "git",
+        "url": "https://github.com/noctalia-dev/noctalia-greeter"
+      },
+      "original": {
+        "ref": "main",
+        "type": "git",
+        "url": "https://github.com/noctalia-dev/noctalia-greeter"
+      }
+    },
     "opencode": {
       "inputs": {
         "nixpkgs": "nixpkgs_6"
@@ -340,6 +361,7 @@
         "nix-cachyos-kernel": "nix-cachyos-kernel",
         "nixpkgs": "nixpkgs_4",
         "noctalia": "noctalia",
+        "noctalia-greeter": "noctalia-greeter",
         "opencode": "opencode"
       }
     },
