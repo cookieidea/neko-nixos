@@ -77,6 +77,8 @@
   # NixOS 26.05 的 initrd 默认启用 systemd，会自动检测 resume 设备并存 EFI 变量；
   # 这里显式声明 boot.resumeDevice 作为兜底（非 EFI / 异常 EFI 主板也可靠）。
   boot.resumeDevice = "/dev/disk/by-label/SWAP";
+  # LACT / AMD 超频解锁：ppfeaturemask 全开（默认 0xfff7bfff 不含超频控制位）
+  boot.kernelParams = [ "amdgpu.ppfeaturemask=0xffffffff" ];
   # 若已在装好的系统上**事后**补 SWAP 分区（未重新 generate-config），需在
   # hardware-configuration.nix 手动加：swapDevices = [ { device = "/dev/disk/by-label/SWAP"; } ];
 

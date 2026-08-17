@@ -85,6 +85,7 @@ export PATH="${runtimePath}:$PATH"
 export GI_TYPELIB_PATH="${giTypelibPath}:$GI_TYPELIB_PATH"
 export LD_LIBRARY_PATH="${giLibPath}:$LD_LIBRARY_PATH"
 export XDG_DATA_DIRS="${giDataPath}:$XDG_DATA_DIRS"
+export GSETTINGS_SCHEMA_DIR="${pkgs.gtk4}/share/gsettings-schemas/gtk4-${pkgs.gtk4.version}/glib-2.0/schemas"
 exec "${py}/bin/python3" "${builtins.placeholder "out"}/bin/.shorin-proton-wrapper-manager-raw" "$@"
 WRAPPER_EOF
     chmod +x "$out/bin/shorin-proton-wrapper-manager"
