@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Get current theme mode (from env, or fallback to CLI)
 THEME_MODE="${NOCTALIA_THEME_MODE}"

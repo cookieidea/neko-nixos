@@ -717,7 +717,7 @@ class ScratchpadRadialMenu(Gtk.Window):
         if not os.path.isfile(script_path):
             script_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "niri-scratch-toggle.sh")
         try:
-            subprocess.Popen(["/bin/bash", script_path, cmd])
+            subprocess.Popen(["/usr/bin/env", "bash", script_path, cmd])
         except Exception as e:
             print(f"Error launching scratchpad: {e}", file=sys.stderr)
         self.dismiss_menu()

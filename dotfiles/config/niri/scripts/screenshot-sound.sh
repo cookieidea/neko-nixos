@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # =================配置区域=================
 # 兼容 NixOS：/usr/share/sounds 在 NixOS 上不存在，这里自动在

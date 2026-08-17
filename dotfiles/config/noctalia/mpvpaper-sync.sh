@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Hook to synchronize mpvpaper's video wallpaper with Noctalia's native wallpaper and theme.
 
 # Check dependencies

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # NyxNiri EyeCare One-shot Self-Healing Toggle & Sync Script
 # Zero background process besides wlsunset itself. Runs in < 2ms then exits.
 #

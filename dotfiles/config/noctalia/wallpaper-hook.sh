@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Ensure noctalia is available
 if ! command -v noctalia >/dev/null 2>&1; then
