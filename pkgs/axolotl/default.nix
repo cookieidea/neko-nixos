@@ -56,6 +56,12 @@ let
       # DMABUF/合成路径会崩（堆损坏 SIGABRT），图片渲染不出来。强制软件合成。
       export WEBKIT_DISABLE_COMPOSITING_MODE=1
       export WEBKIT_DISABLE_DMABUF_RENDERER=1
+      # 游戏（SDL）强制原生 Wayland：niri 缺 fifo-v1 协议时 SDL 默认回退 XWayland，
+      # 显式指定 wayland 驱动（Vulkan 交换链自己管 vsync，不影响帧率）。
+      export SDL_VIDEO_DRIVER=wayland
+      # 朗读（flite）经 JNA 加载：Theseus 会重置游戏 LD_LIBRARY_PATH，
+      # 但 jna.library.path 由 JVM 属性读取、独立生效 → FHS 的 /usr/lib64 直接可寻。
+      export JAVA_TOOL_OPTIONS="''${JAVA_TOOL_OPTIONS:+$JAVA_TOOL_OPTIONS }-Djna.library.path=/usr/lib64:/usr/lib:/usr/lib/x86_64-linux-gnu"
       APP_DIR="$HOME/.local/share/red.ghs.axolotl-app"
       MARKER="$APP_DIR/.nix-source"
       if [ "$(cat "$MARKER" 2>/dev/null)" != "${extracted}" ]; then
@@ -158,6 +164,11 @@ let
       pkgs.libXinerama
       pkgs.libgbm
       pkgs.libdrm
+      # 游戏进程运行时库：flite（朗读器 libflite.so）、eudev（libudev.so.1，
+      # SDL 手柄/外设检测；游戏 LD_LIBRARY_PATH 被 Theseus 重置，但 FHS /usr/lib64
+      # 经 jna.library.path 与 dlopen 兜底路径可寻）。
+      pkgs.flite
+      pkgs.eudev
     ];
   };
 in
