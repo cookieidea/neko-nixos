@@ -286,6 +286,8 @@ EOF
   #    用静态的 sarasa-gothic。见 nixpkgs#178121。
   programs.steam.fontPackages = with pkgs; [ sarasa-gothic ];
   virtualisation.libvirtd.enable = true;  # virt-manager 后端
+  # udisks2：USB/U盘自动挂载（gvfs-udisks2 监视器需要该系统服务才能识别/挂载）
+  services.udisks2.enable = true;
 
   # ── btrfs + snapper 快照 / 回滚（已默认启用；无 LUKS）──────
   # / 本身是 @ 子卷，让 snapper 正确处理 .snapshots 目录与快照子卷。
