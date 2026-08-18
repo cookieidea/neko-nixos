@@ -120,7 +120,7 @@ in
     mangojuice                                # mangojuice（GTK 文件管理器）
 
     # --- 游戏 / 影音客户端（用户新增，已在 nixpkgs 26.05 核实存在）---
-    # prismlauncher 已替换为 Axolotl（selfPackages，AppImage+FHS；见 pkgs/axolotl）
+    # prismlauncher 已替换为 Axolotl（selfPackages，上游 PR #298 nix 源码构建；见 pkgs/axolotl）
     kazumi                                     # kazumi（B 站第三方客户端，Flutter；替代构建失败的 animeko）
     lunar-client                               # lunar-client（Minecraft 客户端，unfree；26.05 由 lunarclient 改名）
     taterclient-ddnet                         # taterclient-ddnet（DDNet Teeworlds 修改版客户端，Apache-2.0）
@@ -219,7 +219,7 @@ in
     selfPackages.tabby-terminal       # Tabby 终端（eugeny/tabby，Electron；自构建，nixpkgs 的 tabby 是 TabbyML AI 助手）
     selfPackages.purevox              # PureVox（实时 AI 音频降噪，AppImage 捆绑内嵌 Python，PipeWire 直用）
     selfPackages.bedrockboot          # BedrockBoot（MC 基岩版启动器，Avalonia；AppImage+FHS）
-    selfPackages.axolotl              # Axolotl（MC Java 版启动器，替代 Prism/HMCL；AppImage+FHS）
+    selfPackages.axolotl              # Axolotl（MC Java 版启动器，替代 Prism/HMCL；nix 源码构建）
     # 走 flake 输入的包（不在 nixpkgs 核心，直接引用其 flake 构建产物）
     bili-danmaku-tui.packages.${pkgs.stdenv.hostPlatform.system}.default  # B 站直播间弹幕 TUI
     # CookNixvim：模块化 Neovim 配置（基于 nix-community/nixvim 的完整配置），

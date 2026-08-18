@@ -53,7 +53,7 @@
     };
 
     # ── CachyOS 内核（xddxdd/nix-cachyos-kernel）──
-    # release 分支带二进制缓存（attic.xuyh0120.win/lantian，国内快）；
+    # release 分支带二进制缓存（attic.xuyh0120.wan/lantian，国内快）；
     # ⚠️ 官方明确不要 follows nixpkgs（补丁与内核版本需匹配其 pin 的 nixpkgs）
     nix-cachyos-kernel = {
       url = "git+https://github.com/xddxdd/nix-cachyos-kernel?ref=release";
@@ -66,6 +66,16 @@
       url = "github:noctalia-dev/noctalia/cachix";
     };
 
+    # ── rust-overlay（Axolotl 源码构建的 Rust 1.95 工具链）──
+    # 仓库 rust-toolchain.toml 要求 channel 1.95.0，NixOS 26.05 nixpkgs 的
+    # 默认 rustc 较旧 → 用 rust-overlay 提供（fromRustupToolchainFile）。
+    # 仅用于 selfPackages 的 pkgs 实例（下方 import nixpkgs overlays），
+    # 不影响系统级 nixpkgs。
+    rust-overlay = {
+      url = "github:oxalica/rust-overlay";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     # ── Noctalia Greeter（greetd 登录界面，与 Noctalia V5 视觉一致）──
     # follows nixpkgs 复用本机 nixpkgs（greeter 无二进制缓存，避免双份 nixpkgs）。
     # 用 git+https 直连 github（绕开 GitHub REST API 限流 403，与 home-manager 同理）。
@@ -75,7 +85,7 @@
     };
   };
 
-  outputs = { self, nixpkgs, home-manager, cooknixvim, opencode, bili-danmaku-tui, nix-cachyos-kernel, noctalia, noctalia-greeter, ... }:
+  outputs = { self, nixpkgs, home-manager, cooknixvim, opencode, bili-danmaku-tui, nix-cachyos-kernel, noctalia, noctalia-greeter, rust-overlay, ... }:
     let
       system = "x86_64-linux";
       # ── 改这里 ──────────────────────────────────────────────
@@ -92,8 +102,12 @@
       pkgs = import nixpkgs {
         inherit system;
         config.allowUnfree = true;
+        # rust-overlay 仅作用于 selfPackages 实例（Axolotl 源码构建需要 Rust 1.95）
+        overlays = [ rust-overlay.overlays.default ];
       };
-      selfPackages = import ./pkgs { inherit pkgs; };
+      # Axolotl 构建工具链（仓库 rust-toolchain.toml：channel 1.95.0）
+      rustToolchain = pkgs.rust-bin.fromRustupToolchainFile ./pkgs/axolotl/rust-toolchain.toml;
+      selfPackages = import ./pkgs { inherit pkgs rustToolchain; };
 
       # 公共 Home Manager 集成模块（nixos 实体机配置用）
       hmModule = {
