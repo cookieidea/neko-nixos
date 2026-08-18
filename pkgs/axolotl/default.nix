@@ -12,11 +12,11 @@
 { pkgs }:
 
 let
-  version = "1.8.0";
+  version = "1.8.2";
 
   src = pkgs.fetchurl {
     url = "https://github.com/Mystic-Stars/Axolotl/releases/download/v${version}/Axolotl.Launcher_${version}_amd64.AppImage";
-    sha256 = "a77219f2968384d8a25d3d7b03bc6d9f4995a0582dd0a2d46540d4cc79d8bd47";
+    sha256 = "sha256-lCfeBHoql9VOlX7HiPwkeJ6PcuL+6s074vupCzNzDaM=";
   };
 
   extracted = pkgs.appimageTools.extract {
