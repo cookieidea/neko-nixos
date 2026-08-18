@@ -292,8 +292,6 @@ in
 
   #  运行方式：nixpkgs 自带的 `noctalia-shell`（quickshell 配置 + qs 封装），
   #  由 config.kdl 的 `spawn-sh-at-startup "noctalia-shell"` 拉起。
-  #  下方 ~/.config/noctalia/*.json 等 v4 配置现已不再被 noctalia-shell 读取
-  #  （那是独立 noctalia v4 应用的配置，已弃用）；保留仅作参考，可随时删除。
   #  IPC 绑定见 binds.kdl：统一用 `noctalia-shell ipc call ...`（见文末说明）。
   # ============================================================
 
