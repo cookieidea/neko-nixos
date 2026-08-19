@@ -1,6 +1,6 @@
 # Shorin Arch Setup → NixOS system config
 # 对应原仓库 scripts/ 中的系统级步骤（base / nm-backend / gpu-driver / musthave 等）
-{ config, pkgs, lib, desktop, username, selfPackages, noctalia-greeter, ... }:
+{ config, pkgs, lib, desktop, username, selfPackages, noctalia-greeter, amberPmPkg, amber-pm, ... }:
 
 {
   # ⚠️ hardware-configuration.nix 的 import 已移到 flake.nix 的实体机配置里——
@@ -78,12 +78,13 @@
   # 这里显式声明 boot.resumeDevice 作为兜底（非 EFI / 异常 EFI 主板也可靠）。
   boot.resumeDevice = "/dev/disk/by-label/SWAP";
   # LACT / AMD 超频解锁：ppfeaturemask 全开（默认 0xfff7bfff 不含超频控制位）
-  boot.kernelParams = [ "amdgpu.ppfeaturemask=0xffffffff" ];
+  boot.kernelParams = [ "amdgpu.ppfeaturemask=0xffffffff" "clearcpuid=514" ];
   # 若已在装好的系统上**事后**补 SWAP 分区（未重新 generate-config），需在
   # hardware-configuration.nix 手动加：swapDevices = [ { device = "/dev/disk/by-label/SWAP"; } ];
 
   # ── 网络 / 主机 ───────────────────────────────────────────
   networking.hostName = "ATRI";
+  networking.firewall.enable = false;   # 关闭防火墙
   networking.networkmanager.enable = true;   # 对应 01c-nm-backend.sh
   # DNS 改用腾讯 DNSPod：IPv4 119.29.29.29 / IPv6 2402:4e00::
   # dns = "none"：NetworkManager 不再覆盖 /etc/resolv.conf，
@@ -224,6 +225,15 @@
   # （services.displayManager.sessionPackages）+ 官方 portal / gnome-keyring 推荐配置。
   # 注意：26.05 已移除 services.displayManager.session，注册会话要用这个模块。
   programs.niri.enable = true;
+  # ── 星火应用商店的 APM 兼容层（AmberPM）──
+  # 模块由 flake 输入 amber-pm 提供（nixosModules.default，已在 flake.nix 的 modules 里引入）。
+  # 作用：初始化 /var/lib/apm/apm（首次重建时解压内置 Debian 根文件系统）、
+  #       注册 APM 应用的 XDG_DATA_DIRS、开启 nix-ld（跑 deb 沙箱内二进制）、
+  #       放行非特权 userns（bwrap 需要）。spark-store 客户端本身在 home.packages。
+  programs.amber-pm = {
+    enable = true;
+    package = amberPmPkg;
+  };
   # ── 登录界面头像（AccountsService / Noctalia Greeter）──
   # greeter 从 AccountsService 读用户头像，声明式写入 /var/lib/AccountsService。
   system.activationScripts.noctaliaGreeterAvatar = lib.stringAfter [ "users" ] ''

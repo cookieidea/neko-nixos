@@ -12,7 +12,7 @@
 # NOTE: noctalia-shell is intentionally NOT here — it now comes from nixpkgs
 # (pkgs.noctalia-shell, a quickshell config + qs wrapper) and is added in
 # home.nix directly, replacing the standalone `noctalia` v4 app flake input.
-{ pkgs, rustToolchain }:
+{ pkgs, rustToolchain, sparkStorePkg }:
 
 {
   niri-sidebar   = import ./niri-sidebar   { inherit pkgs; };
@@ -29,4 +29,6 @@
   bedrockboot     = import ./bedrockboot { inherit pkgs; };
   axolotl         = import ./axolotl { inherit pkgs rustToolchain; };
   nyxniri-scratch-menu = import ./nyxniri-scratch-menu.nix { inherit pkgs; };
+  # 星火应用商店（官方 nix/package.nix 打包，在 flake.nix 里 callPackage 好传进来）
+  spark-store     = sparkStorePkg;
 }

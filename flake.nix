@@ -52,6 +52,24 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    # ── 星火应用商店（spark-store）＋ AmberPM（APM 兼容层）──
+    # amber-pm：bwrap + fuse-overlayfs 的 deb 应用容器化兼容层（星火跨平台包管理器），
+    #   flake 自带 packages / overlays / nixosModules；follows nixpkgs 复用本地镜像源。
+    # ⚠️ 它 nix/package.nix 的顶层参数叫 `src`（带默认值），而 nixpkgs 26.05 的
+    #   pkgs.src 已 rename 成 simple-revision-control（别名 throw）→ callPackage 自动
+    #   填充会炸，因此下面 outputs 里显式传 src（见 amberPmPkg）。
+    amber-pm = {
+      url = "git+https://gitee.com/amber-ce/amber-pm.git";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    # spark-store：官方仓库没有 flake.nix（只有 nix/package.nix，nix 打包在默认分支
+    #   Erotica 上），用 flake=false 拉源码树，在 outputs 里 callPackage 打包
+    #   （Electron + Vite，需要 node/npm 联网拉依赖，构建较慢）。
+    spark-store = {
+      url = "git+https://gitee.com/spark-store-project/spark-store.git?ref=Erotica";
+      flake = false;
+    };
+
     # ── CachyOS 内核（xddxdd/nix-cachyos-kernel）──
     # release 分支带二进制缓存（attic.xuyh0120.wan/lantian，国内快）；
     # ⚠️ 官方明确不要 follows nixpkgs（补丁与内核版本需匹配其 pin 的 nixpkgs）
@@ -85,7 +103,7 @@
     };
   };
 
-  outputs = { self, nixpkgs, home-manager, cooknixvim, opencode, bili-danmaku-tui, nix-cachyos-kernel, noctalia, noctalia-greeter, rust-overlay, ... }:
+  outputs = { self, nixpkgs, home-manager, cooknixvim, opencode, bili-danmaku-tui, nix-cachyos-kernel, noctalia, noctalia-greeter, rust-overlay, amber-pm, spark-store, ... }:
     let
       system = "x86_64-linux";
       # ── 改这里 ──────────────────────────────────────────────
@@ -107,7 +125,24 @@
       };
       # Axolotl 构建工具链（仓库 rust-toolchain.toml：channel 1.95.0）
       rustToolchain = pkgs.rust-bin.fromRustupToolchainFile ./pkgs/axolotl/rust-toolchain.toml;
-      selfPackages = import ./pkgs { inherit pkgs rustToolchain; };
+
+      # ── 星火应用商店（spark-store）──────────────────────────
+      # amber-pm 的 nix/package.nix 顶层参数叫 `src`（有默认值），callPackage 会用
+      # `builtins.intersectAttrs (functionArgs f) pkgs` 自动填充可选参数 → 命中 26.05
+      # 的 pkgs.src 别名（已 rename 成 simple-revision-control，求值即 throw）。
+      # 这里显式传 src（cleanSourceWith 过滤 .git/result），绕开该别名。
+      amberPmPkg = pkgs.callPackage "${amber-pm}/nix/package.nix" {
+        src = pkgs.lib.cleanSourceWith {
+          src = amber-pm;
+          filter = path: type: !pkgs.lib.elem (builtins.baseNameOf path) [ ".git" "result" ];
+        };
+      };
+      # spark-store 的 nix/package.nix 需要 apm（amber-pm 的 apm 命令）作为依赖
+      sparkStorePkg = pkgs.callPackage "${spark-store}/nix/package.nix" {
+        apm = amberPmPkg;
+      };
+
+      selfPackages = import ./pkgs { inherit pkgs rustToolchain sparkStorePkg; };
 
       # 公共 Home Manager 集成模块（nixos 实体机配置用）
       hmModule = {
@@ -133,11 +168,15 @@
         # 需 `git add hardware-configuration.nix` 后才会被 flake 包含。
         ${hostname} = nixpkgs.lib.nixosSystem {
           inherit system;
-          specialArgs = { inherit noctalia-greeter; };
+          specialArgs = { inherit noctalia-greeter amberPmPkg amber-pm; };
           modules = [
             ./hardware-configuration.nix
             ./configuration.nix
             hmModule
+            # AmberPM 系统模块（星火应用商店运行 APM deb 应用需要）：
+            #   programs.amber-pm 启用 → 初始化 /var/lib/apm + 注册 XDG_DATA_DIRS
+            #   + 开 nix-ld（跑 deb 沙箱里的二进制）+ apparmor 放行非特权 userns（bwrap）
+            amber-pm.nixosModules.default
             # CachyOS 内核 overlay（pinned：固定其 nixpkgs rev 以命中二进制缓存）
             # + 修 neovim 包自带的 nvim.desktop（Name=Neovim wrapper）：
             #   原版 Terminal=true + Exec=nvim，图形启动器拉起时缺终端处理器打不开

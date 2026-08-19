@@ -1,5 +1,25 @@
 {
   "nodes": {
+    "amber-pm": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1783949192,
+        "narHash": "sha256-AmCop32igYD//8NrbeTO/dDjNaqfqeMJQGQW3OuF+5A=",
+        "ref": "refs/heads/master",
+        "rev": "068d91329fa1e9b1c661a7b3f6cc8ac6d20b48a8",
+        "revCount": 247,
+        "type": "git",
+        "url": "https://gitee.com/amber-ce/amber-pm.git"
+      },
+      "original": {
+        "type": "git",
+        "url": "https://gitee.com/amber-ce/amber-pm.git"
+      }
+    },
     "bili-danmaku-tui": {
       "inputs": {
         "nixpkgs": [
@@ -355,6 +375,7 @@
     },
     "root": {
       "inputs": {
+        "amber-pm": "amber-pm",
         "bili-danmaku-tui": "bili-danmaku-tui",
         "cooknixvim": "cooknixvim",
         "home-manager": "home-manager",
@@ -363,7 +384,8 @@
         "noctalia": "noctalia",
         "noctalia-greeter": "noctalia-greeter",
         "opencode": "opencode",
-        "rust-overlay": "rust-overlay"
+        "rust-overlay": "rust-overlay",
+        "spark-store": "spark-store"
       }
     },
     "rust-overlay": {
@@ -384,6 +406,23 @@
         "owner": "oxalica",
         "repo": "rust-overlay",
         "type": "github"
+      }
+    },
+    "spark-store": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1787041600,
+        "narHash": "sha256-yGteIyw8f5JYqw6u22gOeDA3ywwhC6Fp0l44vJY7quo=",
+        "ref": "Erotica",
+        "rev": "018dac3d218093be32699b7515cbc7ad45b88eef",
+        "revCount": 537,
+        "type": "git",
+        "url": "https://gitee.com/spark-store-project/spark-store.git"
+      },
+      "original": {
+        "ref": "Erotica",
+        "type": "git",
+        "url": "https://gitee.com/spark-store-project/spark-store.git"
       }
     },
     "systems": {
