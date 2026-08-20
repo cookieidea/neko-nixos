@@ -136,7 +136,7 @@ window-rule {
 window-rule {
     match app-id="org.kde.kdenlive"
     match app-id="mpv"
-    match app-id="kazumi"
+    match app-id="io.github.Predidit.Kazumi"
     match app-id="celluloid"
     match app-id="virt-manager"
     opacity 1.0

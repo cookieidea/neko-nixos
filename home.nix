@@ -121,7 +121,6 @@ in
 
     # --- 游戏 / 影音客户端（用户新增，已在 nixpkgs 26.05 核实存在）---
     # prismlauncher 已替换为 Axolotl（selfPackages，上游 PR #298 nix 源码构建；见 pkgs/axolotl）
-    kazumi                                     # kazumi（B 站第三方客户端，Flutter；替代构建失败的 animeko）
     lunar-client                               # lunar-client（Minecraft 客户端，unfree；26.05 由 lunarclient 改名）
     taterclient-ddnet                         # taterclient-ddnet（DDNet Teeworlds 修改版客户端，Apache-2.0）
 
