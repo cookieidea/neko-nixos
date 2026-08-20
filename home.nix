@@ -87,6 +87,7 @@ in
     kdePackages.kdenlive                         # kdenlive（KDE 视频剪辑；26.05 属 kdePackages 不在顶层）
     kdePackages.kcalc                            # kcalc（KDE 计算器；26.05 属 kdePackages，gear 区）
     upscaler                                  # upscaler
+    gimp                                      # gimp（图像编辑；3.x GTK3）
     yazi                                      # yazi
     # flatseal 已在 nixpkgs 26.05 移除 → 需要时用 flatpak 装：
     #   flatpak install flathub com.github.tchx84.Flatseal
