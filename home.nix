@@ -48,6 +48,11 @@ in
     LD_LIBRARY_PATH = "${pkgs.systemdLibs}/lib:/nix/store/zcqp398mxlw62jl02sx0rsc7gvcl1qhc-pipewire-1.6.6-jack/lib";
     # ── 开发工具链环境 ──
     JAVA_HOME = "${pkgs.jdk21}";              # JDK 21 (LTS) 的 home（含 bin/java、lib）
+    # GSettings schema 修复：本系统 gtk3 用 Flatpak 式 gsettings-schemas 路径，
+    # 会话默认不扫描 → GTK 文件选择器读 org.gtk.Settings.FileChooser 失败
+    # （kdenlive 启动即 abort：g_settings_set_property→_g_log_abort）。
+    # 显式指到 gtk3 编译好的 schema 目录（GSETTINGS_SCHEMA_DIR 为追加语义，不覆盖默认）。
+    GSETTINGS_SCHEMA_DIR = "${pkgs.gtk3}/share/gsettings-schemas/${pkgs.gtk3.name}/glib-2.0/schemas";
     CARGO_HOME = "$HOME/.cargo";              # cargo 全局目录（registry / 已安装二进制）
   };
   # ============================================================
