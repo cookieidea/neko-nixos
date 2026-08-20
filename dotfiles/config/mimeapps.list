@@ -16,6 +16,11 @@ text/plain=vim.desktop
 application/vnd.microsoft.portable-executable=shorin-proton-wrapper-run-windows-program.desktop
 application/x-ms-dos-executable=shorin-proton-wrapper-run-windows-program.desktop
 application/x-msdownload=shorin-proton-wrapper-run-windows-program.desktop
+x-scheme-handler/celemod=cele-mod-handler.desktop
+x-scheme-handler/spk=spark-store.desktop
+x-scheme-handler/apt=spark-store.desktop
+x-scheme-handler/lunarclient=lunarclient.desktop
+x-scheme-handler/discord-562286213059444737=lunarclient.desktop
 
 [Added Associations]
 image/png=imv.desktop;
