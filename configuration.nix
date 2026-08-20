@@ -296,6 +296,13 @@ EOF
   #    用静态的 sarasa-gothic。见 nixpkgs#178121。
   programs.steam.fontPackages = with pkgs; [ sarasa-gothic ];
   virtualisation.libvirtd.enable = true;  # virt-manager 后端
+  virtualisation.docker.enable = true;    # docker（wiki: https://wiki.nixos.org/wiki/Docker）
+  # Docker Hub 国内镜像源（2026-08 实测可用：1ms.run / 轩辕 / DaoCloud，自动挑最快可用）
+  virtualisation.docker.daemon.settings.registry-mirrors = [
+    "https://docker.1ms.run"
+    "https://docker.xuanyuan.me"
+    "https://docker.m.daocloud.io"
+  ];
   # udisks2：USB/U盘自动挂载（gvfs-udisks2 监视器需要该系统服务才能识别/挂载）
   services.udisks2.enable = true;
 
@@ -330,7 +337,7 @@ EOF
   users.users.${username} = {
     isNormalUser = true;
     description = username;
-    extraGroups = [ "networkmanager" "wheel" "libvirtd" "video" "audio" ];
+    extraGroups = [ "networkmanager" "wheel" "libvirtd" "video" "audio" "docker" ];
     # 设置密码（或安装后用 `passwd`）：
     # initialPassword = "changeme";
   };

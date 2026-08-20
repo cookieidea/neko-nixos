@@ -33,7 +33,7 @@ in
   # share/terminfo 即可（xterm 等其余条目用 ncurses 内建 fallback）。
   # ~/.local/bin 进 PATH：shorin-screenrec-menu / quicksave / quickload 等
   # 私有脚本部署在这里（binds.kdl 裸命令调用靠 PATH 查找）。
-  home.sessionPath = [ "$HOME/.local/bin" ];
+  home.sessionPath = [ "$HOME/.local/bin" "$HOME/.cargo/bin" ];
   home.sessionVariables = {
     TERMINFO_DIRS = "${pkgs.kitty}/share/terminfo";
     # gvfs 的 GIO 模块：缺了它 GIO 认不出 trash:/// 等 gvfs URI，
@@ -46,8 +46,10 @@ in
     # 注意：sessionVariables 是覆盖语义，须保留用户会话原有的
     # pipewire-jack 路径（JACK 音频应用依赖）。
     LD_LIBRARY_PATH = "${pkgs.systemdLibs}/lib:/nix/store/zcqp398mxlw62jl02sx0rsc7gvcl1qhc-pipewire-1.6.6-jack/lib";
+    # ── 开发工具链环境 ──
+    JAVA_HOME = "${pkgs.jdk21}";              # JDK 21 (LTS) 的 home（含 bin/java、lib）
+    CARGO_HOME = "$HOME/.cargo";              # cargo 全局目录（registry / 已安装二进制）
   };
-
   # ============================================================
   #  软件包（home.packages）
   #  左 = Nixpkgs 属性名，括号内 = 原 Arch 包名
@@ -106,6 +108,15 @@ in
 
     # --- 编辑器（替代 visual-studio-code-bin，AUR）---
     vscodium                                  # visual-studio-code-bin → 用 vscodium 去遥测
+
+    # --- 开发工具链（Java / Python / Rust）---
+    jdk21                                     # JDK 21 (LTS)；JAVA_HOME 见上方 sessionVariables
+    (python3.withPackages (ps: [ ps.pip ]))   # python3 + pip
+    uv                                        # uv（现代 Python 包/虚拟环境管理器）
+    rustc                                     # rust 编译器
+    cargo                                     # cargo 构建系统（CARGO_HOME=~/.cargo）
+    nodejs_22                                 # Node.js 22 LTS（含 npm）
+    docker-compose                            # docker compose（配合 virtualisation.docker）
 
     # --- 已确认在 nixpkgs 26.05 存在的原 AUR 包 ---
     flclash                                   # flclash（代理 GUI）
@@ -684,6 +695,33 @@ in
     ".local/share/fcitx5/themes/nyxmellow/templates/highlight.svg" = {
       source = ./dotfiles/local/share/fcitx5/themes/nyxmellow/templates/highlight.svg;
     };
+
+    # ── 开发工具链国内镜像源 ──
+    # npm → npmmirror（淘宝镜像）
+    ".npmrc".text = ''
+      registry=https://registry.npmmirror.com
+    '';
+    # cargo → 中科大 crates.io 稀疏索引
+    ".cargo/config.toml".text = ''
+      [source.crates-io]
+      replace-with = 'ustc'
+      [source.ustc]
+      registry = "sparse+https://mirrors.ustc.edu.cn/crates.io-index/"
+      [net]
+      git-fetch-with-cli = true
+    '';
+    # pip → 中科大 PyPI
+    ".config/pip/pip.conf".text = ''
+      [global]
+      index-url = https://mirrors.ustc.edu.cn/pypi/simple
+      trusted-host = mirrors.ustc.edu.cn
+    '';
+    # uv → 中科大 PyPI 作为默认源
+    ".config/uv/uv.toml".text = ''
+      [[index]]
+      url = "https://mirrors.ustc.edu.cn/pypi/simple"
+      default = true
+    '';
   };
 
   # polkit 认证代理：NixOS 上没有 Arch 的 /usr/lib/polkit-gnome，
