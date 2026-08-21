@@ -497,6 +497,8 @@ in
   home.file = {
     # ── 用户头像（freedesktop 标准 ~/.face，Noctalia Greeter 登录界面 + Noctalia 控制中心读取）──
     ".face".source = ./dotfiles/avatar.png;
+    # ── fastfetch logo 图片（kitty 图像协议；配置引用 ~/.local/share/fastfetch/NixOS.png）──
+    ".local/share/fastfetch/NixOS.png".source = ./dotfiles/config/fastfetch/NixOS.png;
     # ── Neovim wrapper 菜单条目修复 ──
     # nixvim 构建的 neovim 自带 nvim.desktop（Terminal=true，图形启动器打不开）。
     # flake overlay 覆盖不到 nixvim（它用自己 pin 的 nixpkgs 构建）→ 用用户级

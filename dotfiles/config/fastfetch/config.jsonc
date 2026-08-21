@@ -4,7 +4,7 @@
     "logo": {
         // 显示用户指定的图片（kitty 终端图像协议）
         "type": "kitty",
-        "source": "/home/cookie/Downloads/NixOS.png",
+        "source": "/home/cookie/.local/share/fastfetch/NixOS.png",
         "width": 30,
         "padding": {
             "top": 1,
