@@ -47,11 +47,11 @@
         "nixvim": "nixvim"
       },
       "locked": {
-        "lastModified": 1786280957,
-        "narHash": "sha256-QbJRrMDokWAbjVZIj5KpnSmCIFYvz34Ztqd82xE7XaM=",
+        "lastModified": 1786895287,
+        "narHash": "sha256-6Ks4L/RBrwAZqmpQMbORbaTU3bMl668ip79kx+09m1w=",
         "owner": "Youthdreamer",
         "repo": "CookNixvim",
-        "rev": "6f7736d445b1a1477de00b9f2e34786714ca59e7",
+        "rev": "5061dada3c454acca4fee774f6793deb2a01d61e",
         "type": "github"
       },
       "original": {
@@ -141,11 +141,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1785119570,
-        "narHash": "sha256-Rgs2xKnGLFWQscxUaXX07oyZeuMDOHEbqDOsgliLFGM=",
+        "lastModified": 1787146702,
+        "narHash": "sha256-YbRcLdU/yK4gWsQg7V8WTKZHfXL33g8+wSFUX3wyevs=",
         "ref": "release-26.05",
-        "rev": "d4fd24667c8cbef124bb70a20380cab75ec8474d",
-        "revCount": 6823,
+        "rev": "173b7e8d40fdc8c296a9c99854314f17a3a1704c",
+        "revCount": 6828,
         "type": "git",
         "url": "https://github.com/rycee/home-manager.git"
       },
@@ -162,11 +162,11 @@
         "nixpkgs": "nixpkgs_3"
       },
       "locked": {
-        "lastModified": 1785870829,
-        "narHash": "sha256-l+RTmz09TxwWJRLQuc+cKi3yY0K4PSz8tRPTbBUvaVo=",
+        "lastModified": 1787248950,
+        "narHash": "sha256-eq5FwprGyjytM68pitTTFT3fi0cSsF1M6v7h3rdcqj0=",
         "ref": "release",
-        "rev": "879f45ee15a3b06fdbbf9b6dc825c5fbca137fcd",
-        "revCount": 348,
+        "rev": "c69c33c24148defbcc34ab25456cc460bc33fdbb",
+        "revCount": 366,
         "type": "git",
         "url": "https://github.com/xddxdd/nix-cachyos-kernel"
       },
@@ -240,11 +240,11 @@
     },
     "nixpkgs_3": {
       "locked": {
-        "lastModified": 1785859399,
-        "narHash": "sha256-pY4X50au95QrTpAbEm08pURmeU3/Ud2oa0s2XzpDdz8=",
+        "lastModified": 1787234702,
+        "narHash": "sha256-kvsnFCG4T5dmUj7BMcmpuPZjZNSjOZfhXUdjiBQG2xk=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "85f62611fa3f3eacbcfe3bc7a6d6518b443ca442",
+        "rev": "5cca3a89405eb65d2adb43754c2af8dac7b6f2e1",
         "type": "github"
       },
       "original": {
@@ -257,13 +257,13 @@
     "nixpkgs_4": {
       "locked": {
         "lastModified": 315532800,
-        "narHash": "sha256-mB6w7h+UsvxLf3PY6U3hSDVWCfmn2Q6VtSw5JugbeY0=",
+        "narHash": "sha256-BA7sSNjLDuPGSOYBGpr6WQjke1MQ8AZpJ8GlYZM/mOc=",
         "type": "tarball",
-        "url": "https://mirrors.tuna.tsinghua.edu.cn/nix-channels/nixos-26.05/nixexprs.tar.xz"
+        "url": "https://mirrors.ustc.edu.cn/nix-channels/nixos-26.05/nixexprs.tar.xz"
       },
       "original": {
         "type": "tarball",
-        "url": "https://mirrors.tuna.tsinghua.edu.cn/nix-channels/nixos-26.05/nixexprs.tar.xz"
+        "url": "https://mirrors.ustc.edu.cn/nix-channels/nixos-26.05/nixexprs.tar.xz"
       }
     },
     "nixpkgs_5": {
@@ -320,11 +320,11 @@
         "nixpkgs": "nixpkgs_5"
       },
       "locked": {
-        "lastModified": 1786951251,
-        "narHash": "sha256-QQfBDYvPPaD1uVHlyM71qridwXoFyhGLcR5ZWaYcdy0=",
+        "lastModified": 1787272040,
+        "narHash": "sha256-YZxcF28MvmXOVt1sq0lXddgYVIj/5exDh0vztl/vIvw=",
         "owner": "noctalia-dev",
         "repo": "noctalia",
-        "rev": "ced2221ee68d33aa8862fdf0cd45a899a3cb0b31",
+        "rev": "791e557417ceeba0e57562af2ddcbd3d8b93f62a",
         "type": "github"
       },
       "original": {
@@ -360,11 +360,11 @@
         "nixpkgs": "nixpkgs_6"
       },
       "locked": {
-        "lastModified": 1786731806,
-        "narHash": "sha256-SDiLnKs6UVvd5MIVpz3aVnZGYKJy5PNmNW82XPh94k4=",
+        "lastModified": 1787272230,
+        "narHash": "sha256-OZQA5983bEIGA3GXvQVIbmt6Dhuqdem6VN7dD64n774=",
         "owner": "sst",
         "repo": "opencode",
-        "rev": "4643e65ad6334de3e4e68dedc201d5fbb828c9fe",
+        "rev": "e49772a8b4db867f638ffad9f7d188ccbbe05b58",
         "type": "github"
       },
       "original": {
@@ -395,11 +395,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1787022047,
-        "narHash": "sha256-wNlYM/obKOkkRELrOfto1JT5CRANR6hB/RjOELp223U=",
+        "lastModified": 1787246814,
+        "narHash": "sha256-pEd4/iPY3Zm/EhhHmeB1QnIWXJSLx7gJzD/05mm2MCo=",
         "owner": "oxalica",
         "repo": "rust-overlay",
-        "rev": "b32685dd7c5a965aa8273adb7ddaf7f5b40d0faa",
+        "rev": "c84e121aaede7ef8c7bd9fb5154ccc1599e07816",
         "type": "github"
       },
       "original": {
@@ -411,11 +411,11 @@
     "spark-store": {
       "flake": false,
       "locked": {
-        "lastModified": 1787041600,
-        "narHash": "sha256-yGteIyw8f5JYqw6u22gOeDA3ywwhC6Fp0l44vJY7quo=",
+        "lastModified": 1787193696,
+        "narHash": "sha256-mshKl0fWaE6j1UFjxAoCyroYrM2ZUrSqL9AtS9arhVA=",
         "ref": "Erotica",
-        "rev": "018dac3d218093be32699b7515cbc7ad45b88eef",
-        "revCount": 537,
+        "rev": "ae19c309df98f7952a0a76b4a7aa3a43483096f6",
+        "revCount": 541,
         "type": "git",
         "url": "https://gitee.com/spark-store-project/spark-store.git"
       },
