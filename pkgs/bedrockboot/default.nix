@@ -21,11 +21,11 @@
 { pkgs }:
 
 let
-  version = "2.1.10.96";
+  version = "2.1.10.100";
 
   src = pkgs.fetchurl {
     url = "https://github.com/Round-Studio/BedrockBoot/releases/download/v${version}/BedrockBoot-x86_64-linux.AppImage";
-    sha256 = "3729d04efc5531d73e06d2bb23ff053f35e498be999c825ba042474f8a55c525";
+    sha256 = "0pc40j7bjk2yf7js354pjvqjlbm941ikngc6lv45rkjf3z2pw924";
   };
 
   extracted = pkgs.appimageTools.extract {
