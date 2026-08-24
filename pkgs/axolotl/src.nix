@@ -30,6 +30,10 @@ let
   # 通过 JAVA_TOOL_OPTIONS 的 -Dsun.awt.fontconfig 传给游戏 JVM。
   # ⚠️ 属性名是 sun.awt.fontconfig（不是 sun.font.fontconfig）；Microsoft 版
   # libfontmanager 未内置原生 fontconfig 支持，必须提供该属性文件。
+  # 另外需 -Dsun.java2d.fontpath 直接注册字体目录为物理字体（DejaVu + Noto CJK），
+  # 否则逻辑字体找不到物理字体（"No physical fonts found" 崩溃）。
+  # 字体文件引用见下方 fontconfigProperties（pkgs.dejavu_fonts / noto-fonts-cjk-sans
+  # 已加入 runtimeDependencies 保证 GC 引用）。
   fontconfigProperties = pkgs.writeText "fontconfig.properties" ''
     # Minimal fontconfig.properties for Mojang JRE on NixOS
     version=1
@@ -229,7 +233,9 @@ let
       pkgs.libxrender
       pkgs.libxtst
       pkgs.libxi
-      pkgs.dejavu_fonts
+pkgs.dejavu_fonts
+      # 游戏 JVM 的 -Dsun.java2d.fontpath 需要 Noto CJK 目录（中文字体渲染）
+      pkgs.noto-fonts-cjk-sans
       pkgs.alsa-lib
       pkgs.libjack2
       pkgs.libpulseaudio
@@ -254,7 +260,7 @@ let
         --set WEBKIT_DISABLE_COMPOSITING_MODE 1
         --set WEBKIT_DISABLE_DMABUF_RENDERER 1
         #   Theseus 重置游戏 LD_LIBRARY_PATH，JVM 属性独立生效 → flite 可寻址
-        --set JAVA_TOOL_OPTIONS "-Djna.library.path=${pkgs.flite}/lib -Dsun.awt.fontconfig=${fontconfigProperties}"
+        --set JAVA_TOOL_OPTIONS "-Djna.library.path=${pkgs.flite}/lib -Dsun.awt.fontconfig=${fontconfigProperties} -Dsun.java2d.fontpath=${pkgs.dejavu_fonts}/share/fonts/truetype:${pkgs.noto-fonts-cjk-sans}/share/fonts/opentype/noto-cjk -Dsun.java2d.debugfonts=true"
       )
 
       glibPostInstallHook
