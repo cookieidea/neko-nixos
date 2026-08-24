@@ -24,6 +24,29 @@ let
   # 这里统一以实际 tag 版本为准：包名 / tauri.conf.json（About 页）都显示 1.8.9
   launcherVersion = "1.8.9";
 
+  # Mojang 自带 JRE 的 java.awt（ModernUI 初始化字体时触发）找不到
+  # fontconfig.properties → "Fontconfig head is null" 崩溃。
+  # 提供最小 Java 格式的 fontconfig 配置，指向 NixOS store 里的 DejaVu 字体，
+  # 通过 JAVA_TOOL_OPTIONS 的 -Dsun.font.fontconfig 传给游戏 JVM。
+  fontconfigProperties = pkgs.writeText "fontconfig.properties" ''
+    # Minimal fontconfig.properties for Mojang JRE on NixOS
+    version=1
+    componentFontMappings=serif-plain-latin-1:DejaVu_Serif,serif-bold-latin-1:DejaVu_Serif_Bold,serif-italic-latin-1:DejaVu_Serif_Italic,serif-bolditalic-latin-1:DejaVu_Serif_Bold_Italic,sansserif-plain-latin-1:DejaVu_Sans,sansserif-bold-latin-1:DejaVu_Sans_Bold,sansserif-italic-latin-1:DejaVu_Sans_Italic,sansserif-bolditalic-latin-1:DejaVu_Sans_Bold_Italic,monospaced-plain-latin-1:DejaVu_Sans_Mono,monospaced-bold-latin-1:DejaVu_Sans_Mono_Bold,monospaced-italic-latin-1:DejaVu_Sans_Mono_Italic,monospaced-bolditalic-latin-1:DejaVu_Sans_Mono_Bold_Italic,dialog-plain-latin-1:DejaVu_Sans,dialog-bold-latin-1:DejaVu_Sans_Bold,dialog-italic-latin-1:DejaVu_Sans_Italic,dialog-bolditalic-latin-1:DejaVu_Sans_Bold_Italic,dialoginput-plain-latin-1:DejaVu_Sans_Mono,dialoginput-bold-latin-1:DejaVu_Sans_Mono_Bold,dialoginput-italic-latin-1:DejaVu_Sans_Mono_Italic,dialoginput-bolditalic-latin-1:DejaVu_Sans_Mono_Bold_Italic
+    sequence.allfonts=latin-1
+    filename.DejaVu_Sans=${pkgs.dejavu_fonts}/share/fonts/truetype/DejaVuSans.ttf
+    filename.DejaVu_Serif=${pkgs.dejavu_fonts}/share/fonts/truetype/DejaVuSerif.ttf
+    filename.DejaVu_Sans_Mono=${pkgs.dejavu_fonts}/share/fonts/truetype/DejaVuSansMono.ttf
+    filename.DejaVu_Sans_Bold=${pkgs.dejavu_fonts}/share/fonts/truetype/DejaVuSans-Bold.ttf
+    filename.DejaVu_Serif_Bold=${pkgs.dejavu_fonts}/share/fonts/truetype/DejaVuSerif-Bold.ttf
+    filename.DejaVu_Sans_Mono_Bold=${pkgs.dejavu_fonts}/share/fonts/truetype/DejaVuSansMono-Bold.ttf
+    filename.DejaVu_Sans_Italic=${pkgs.dejavu_fonts}/share/fonts/truetype/DejaVuSans-Oblique.ttf
+    filename.DejaVu_Serif_Italic=${pkgs.dejavu_fonts}/share/fonts/truetype/DejaVuSerif-Italic.ttf
+    filename.DejaVu_Sans_Mono_Italic=${pkgs.dejavu_fonts}/share/fonts/truetype/DejaVuSansMono-Oblique.ttf
+    filename.DejaVu_Sans_Bold_Italic=${pkgs.dejavu_fonts}/share/fonts/truetype/DejaVuSans-BoldOblique.ttf
+    filename.DejaVu_Serif_Bold_Italic=${pkgs.dejavu_fonts}/share/fonts/truetype/DejaVuSerif-BoldItalic.ttf
+    filename.DejaVu_Sans_Mono_Bold_Italic=${pkgs.dejavu_fonts}/share/fonts/truetype/DejaVuSansMono-BoldOblique.ttf
+  '';
+
   rustPlatform = pkgs.makeRustPlatform {
     cargo = rustToolchain;
     rustc = rustToolchain;
@@ -78,6 +101,9 @@ let
     '';
 
     cargoHash = "sha256-KzX4hyUQXltDEEGyCIyUgQ7nWAm78lhk8YkPJhHZOmA=";
+
+    # 跳过 cargo test（checkPhase 约 3.5 分钟），加速每次源码升级的增量构建
+    doCheck = false;
 
     mitmCache = gradle.fetchDeps {
       pkg = finalAttrs.finalPackage;
@@ -196,6 +222,12 @@ let
       # （RPATH=$ORIGIN 只在 JRE lib/ 内找，而 JRE 不捆绑 freetype）→ 必须暴露在
       # LD_LIBRARY_PATH，否则 ModernUI 初始化 java.awt 字体时 UnsatisfiedLinkError 崩溃。
       pkgs.freetype
+      # libawt_xawt.so 需要 X11 渲染库（libXrender/libXtst/libXi），否则 java.awt
+      # X11 字体管理器 UnsatisfiedLinkError
+      pkgs.libxrender
+      pkgs.libxtst
+      pkgs.libxi
+      pkgs.dejavu_fonts
       pkgs.alsa-lib
       pkgs.libjack2
       pkgs.libpulseaudio
@@ -220,7 +252,7 @@ let
         --set WEBKIT_DISABLE_COMPOSITING_MODE 1
         --set WEBKIT_DISABLE_DMABUF_RENDERER 1
         #   Theseus 重置游戏 LD_LIBRARY_PATH，JVM 属性独立生效 → flite 可寻址
-        --set JAVA_TOOL_OPTIONS "-Djna.library.path=${pkgs.flite}/lib"
+        --set JAVA_TOOL_OPTIONS "-Djna.library.path=${pkgs.flite}/lib -Dsun.font.fontconfig=${fontconfigProperties}"
       )
 
       glibPostInstallHook
