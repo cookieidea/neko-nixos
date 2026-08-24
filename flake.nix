@@ -101,9 +101,18 @@
       url = "git+https://github.com/noctalia-dev/noctalia-greeter?ref=main";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    # ── Astral 组网客户端（Flutter GUI + Rust/EasyTier 核心）──
+    # 上游构建需联网（dart pub get + cargokit 编译 Rust），Nix 沙箱内无法完成，
+    # 因此用 build.sh（pkgs/astral/）手动联网构建产物，以本地 path 输入引用。
+    # ⚠️ path 输入不入 git；换机器需先跑 build.sh 再 nixos-rebuild。
+    astral-bundle = {
+      url = "path:/home/cookie/.cache/astral/bundle";
+      flake = false;
+    };
   };
 
-  outputs = { self, nixpkgs, home-manager, cooknixvim, opencode, bili-danmaku-tui, nix-cachyos-kernel, noctalia, noctalia-greeter, rust-overlay, amber-pm, spark-store, ... }:
+  outputs = { self, nixpkgs, home-manager, cooknixvim, opencode, bili-danmaku-tui, nix-cachyos-kernel, noctalia, noctalia-greeter, rust-overlay, amber-pm, spark-store, astral-bundle, ... }:
     let
       system = "x86_64-linux";
       # ── 改这里 ──────────────────────────────────────────────
@@ -142,7 +151,7 @@
         apm = amberPmPkg;
       };
 
-      selfPackages = import ./pkgs { inherit pkgs rustToolchain sparkStorePkg; };
+      selfPackages = import ./pkgs { inherit pkgs rustToolchain sparkStorePkg astral-bundle; };
 
       # 公共 Home Manager 集成模块（nixos 实体机配置用）
       hmModule = {

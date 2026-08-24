@@ -20,6 +20,19 @@
         "url": "https://gitee.com/amber-ce/amber-pm.git"
       }
     },
+    "astral-bundle": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1787571611,
+        "narHash": "sha256-T4gzHit7qUQSn78xhpb7EF02iao0zNBxRGit4MmmOHI=",
+        "path": "/home/cookie/.cache/astral/bundle",
+        "type": "path"
+      },
+      "original": {
+        "path": "/home/cookie/.cache/astral/bundle",
+        "type": "path"
+      }
+    },
     "bili-danmaku-tui": {
       "inputs": {
         "nixpkgs": [
@@ -376,6 +389,7 @@
     "root": {
       "inputs": {
         "amber-pm": "amber-pm",
+        "astral-bundle": "astral-bundle",
         "bili-danmaku-tui": "bili-danmaku-tui",
         "cooknixvim": "cooknixvim",
         "home-manager": "home-manager",

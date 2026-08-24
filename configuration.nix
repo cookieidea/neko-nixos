@@ -333,11 +333,22 @@ EOF
   # 若以后要 GRUB 里直接列快照，需自行用 grub-btrfs 包的 grub-btrfsd 接 systemd 服务，
   # 且必须与 NixOS 的 grub 配置生成协同（不能让 grub-btrfsd 覆盖 /boot/grub/grub.cfg 的代际条目）。
 
+  # ── Sunshine（Moonlight 游戏串流）──────────────────────
+  # Wayland（niri）需要 capSysAdmin 才能用 KMS 抓屏；
+  # uinput 组让 Sunshine 能模拟虚拟键鼠/手柄输入设备。
+  services.sunshine = {
+    enable = true;
+    autoStart = true;
+    capSysAdmin = true;
+    openFirewall = true;
+  };
+  hardware.uinput.enable = true;
+
   # ── 用户（必须存在，否则 home-manager 报错）──────────────
   users.users.${username} = {
     isNormalUser = true;
     description = username;
-    extraGroups = [ "networkmanager" "wheel" "libvirtd" "video" "audio" "docker" ];
+    extraGroups = [ "networkmanager" "wheel" "libvirtd" "video" "audio" "docker" "uinput" ];
     # 设置密码（或安装后用 `passwd`）：
     # initialPassword = "changeme";
   };

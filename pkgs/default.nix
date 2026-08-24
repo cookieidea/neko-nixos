@@ -12,7 +12,7 @@
 # NOTE: noctalia-shell is intentionally NOT here — it now comes from nixpkgs
 # (pkgs.noctalia-shell, a quickshell config + qs wrapper) and is added in
 # home.nix directly, replacing the standalone `noctalia` v4 app flake input.
-{ pkgs, rustToolchain, sparkStorePkg }:
+{ pkgs, rustToolchain, sparkStorePkg, astral-bundle }:
 
 {
   niri-sidebar   = import ./niri-sidebar   { inherit pkgs; };
@@ -31,4 +31,7 @@
   nyxniri-scratch-menu = import ./nyxniri-scratch-menu.nix { inherit pkgs; };
   # 星火应用商店（官方 nix/package.nix 打包，在 flake.nix 里 callPackage 好传进来）
   spark-store     = sparkStorePkg;
+  # Astral 组网客户端（Flutter+Rust；bundle 由 pkgs/astral/build.sh 联网构建，
+  # flake 输入 astral-bundle 以 path 引用，升级跑 build.sh 即可）
+  astral          = import ./astral { inherit pkgs; lib = pkgs.lib; src = astral-bundle; };
 }

@@ -236,6 +236,7 @@ in
     selfPackages.purevox              # PureVox（实时 AI 音频降噪，AppImage 捆绑内嵌 Python，PipeWire 直用）
     selfPackages.bedrockboot          # BedrockBoot（MC 基岩版启动器，Avalonia；AppImage+FHS）
     selfPackages.axolotl              # Axolotl（MC Java 版启动器，替代 Prism/HMCL；nix 源码构建）
+    selfPackages.astral               # Astral 组网客户端（Flutter+Rust；bundle 由 pkgs/astral/build.sh 联网构建）
     selfPackages.spark-store          # 星火应用商店（官方 nix 打包，Electron+Vite；需 APM 支持，见 configuration.nix 的 programs.amber-pm）
     # 走 flake 输入的包（不在 nixpkgs 核心，直接引用其 flake 构建产物）
     bili-danmaku-tui.packages.${pkgs.stdenv.hostPlatform.system}.default  # B 站直播间弹幕 TUI
