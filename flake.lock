@@ -49,15 +49,15 @@
       "locked": {
         "lastModified": 1786895287,
         "narHash": "sha256-6Ks4L/RBrwAZqmpQMbORbaTU3bMl668ip79kx+09m1w=",
-        "owner": "Youthdreamer",
-        "repo": "CookNixvim",
+        "ref": "refs/heads/main",
         "rev": "5061dada3c454acca4fee774f6793deb2a01d61e",
-        "type": "github"
+        "revCount": 65,
+        "type": "git",
+        "url": "https://github.com/Youthdreamer/CookNixvim"
       },
       "original": {
-        "owner": "Youthdreamer",
-        "repo": "CookNixvim",
-        "type": "github"
+        "type": "git",
+        "url": "https://github.com/Youthdreamer/CookNixvim"
       }
     },
     "flake-compat": {
@@ -141,11 +141,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1787146702,
-        "narHash": "sha256-YbRcLdU/yK4gWsQg7V8WTKZHfXL33g8+wSFUX3wyevs=",
+        "lastModified": 1787377438,
+        "narHash": "sha256-Sxu1NLTD/Ern6hFGLlZmtKCSct3YQXZI/lls8RE1XeM=",
         "ref": "release-26.05",
-        "rev": "173b7e8d40fdc8c296a9c99854314f17a3a1704c",
-        "revCount": 6828,
+        "rev": "65258d5c65a250189fde2e35f490d15e064c4c62",
+        "revCount": 6829,
         "type": "git",
         "url": "https://github.com/rycee/home-manager.git"
       },
@@ -162,11 +162,11 @@
         "nixpkgs": "nixpkgs_3"
       },
       "locked": {
-        "lastModified": 1787248950,
-        "narHash": "sha256-eq5FwprGyjytM68pitTTFT3fi0cSsF1M6v7h3rdcqj0=",
+        "lastModified": 1787507561,
+        "narHash": "sha256-7Hydh9RTatdMOVKgHno3ELWgsda1zeklSMGVWJqMiWs=",
         "ref": "release",
-        "rev": "c69c33c24148defbcc34ab25456cc460bc33fdbb",
-        "revCount": 366,
+        "rev": "dbae8dc454556968710401643aa2c6867d166440",
+        "revCount": 368,
         "type": "git",
         "url": "https://github.com/xddxdd/nix-cachyos-kernel"
       },
@@ -240,11 +240,11 @@
     },
     "nixpkgs_3": {
       "locked": {
-        "lastModified": 1787234702,
-        "narHash": "sha256-kvsnFCG4T5dmUj7BMcmpuPZjZNSjOZfhXUdjiBQG2xk=",
+        "lastModified": 1787441254,
+        "narHash": "sha256-/7oA/UPfrk0ubngvJjDleROuiNdA7y4d+5qNcDeQuCA=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "5cca3a89405eb65d2adb43754c2af8dac7b6f2e1",
+        "rev": "ae9396d21aa0dcfe9419f6bdc3bf415eba30a8b7",
         "type": "github"
       },
       "original": {
@@ -257,7 +257,7 @@
     "nixpkgs_4": {
       "locked": {
         "lastModified": 315532800,
-        "narHash": "sha256-BA7sSNjLDuPGSOYBGpr6WQjke1MQ8AZpJ8GlYZM/mOc=",
+        "narHash": "sha256-8FnH9CMQCQ9i7d7xrXK30SBjgODxlkltCa0thsRgrxg=",
         "type": "tarball",
         "url": "https://mirrors.ustc.edu.cn/nix-channels/nixos-26.05/nixexprs.tar.xz"
       },
@@ -268,11 +268,11 @@
     },
     "nixpkgs_5": {
       "locked": {
-        "lastModified": 1786599213,
-        "narHash": "sha256-yjGG65gA1jORt0hWxjzrnw3AYkIn8EWolp8vezwXZ3I=",
-        "rev": "0e251e24a4f24e036a084b6b4b2d2491af4167f4",
+        "lastModified": 1787360063,
+        "narHash": "sha256-95aJfHyQTLWslCXFVNB0odgmVkpdmDezQwTg9mhqV1E=",
+        "rev": "2c423e03bbafcff28bfadc6781a4a8257f205cb5",
         "type": "tarball",
-        "url": "https://releases.nixos.org/nixos/unstable/nixos-26.11pre1053317.0e251e24a4f2/nixexprs.tar.zst"
+        "url": "https://releases.nixos.org/nixos/unstable/nixos-26.11pre1059570.2c423e03bbaf/nixexprs.tar.zst"
       },
       "original": {
         "type": "tarball",
@@ -320,18 +320,18 @@
         "nixpkgs": "nixpkgs_5"
       },
       "locked": {
-        "lastModified": 1787272040,
-        "narHash": "sha256-YZxcF28MvmXOVt1sq0lXddgYVIj/5exDh0vztl/vIvw=",
-        "owner": "noctalia-dev",
-        "repo": "noctalia",
-        "rev": "791e557417ceeba0e57562af2ddcbd3d8b93f62a",
-        "type": "github"
+        "lastModified": 1787490503,
+        "narHash": "sha256-Iys/51B9mcbrFjy9KwgdKOCeKF4ryJLh+UJYb3Eapl8=",
+        "ref": "cachix",
+        "rev": "a9cd1c86bdd6a231fc2b07c3b7a2505175a864d3",
+        "revCount": 5316,
+        "type": "git",
+        "url": "https://github.com/noctalia-dev/noctalia.git"
       },
       "original": {
-        "owner": "noctalia-dev",
         "ref": "cachix",
-        "repo": "noctalia",
-        "type": "github"
+        "type": "git",
+        "url": "https://github.com/noctalia-dev/noctalia.git"
       }
     },
     "noctalia-greeter": {
@@ -341,11 +341,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1786882377,
-        "narHash": "sha256-NfnY22tYDrXfIuyexYyqB+jkO6IK23AqmhcNixkU7pw=",
+        "lastModified": 1787482410,
+        "narHash": "sha256-R32LF+S4NnmJwSnzt5xKjb15RjYemb/ZZRnDnP5lxfs=",
         "ref": "main",
-        "rev": "10d2c9074d3a9219e03b55b2c97f1cc743447af5",
-        "revCount": 206,
+        "rev": "5956c6f40249b2837bb260d25ea3953a2631fbdc",
+        "revCount": 209,
         "type": "git",
         "url": "https://github.com/noctalia-dev/noctalia-greeter"
       },
@@ -360,17 +360,17 @@
         "nixpkgs": "nixpkgs_6"
       },
       "locked": {
-        "lastModified": 1787272230,
-        "narHash": "sha256-OZQA5983bEIGA3GXvQVIbmt6Dhuqdem6VN7dD64n774=",
-        "owner": "sst",
-        "repo": "opencode",
-        "rev": "e49772a8b4db867f638ffad9f7d188ccbbe05b58",
-        "type": "github"
+        "lastModified": 1787505336,
+        "narHash": "sha256-sBDmXQcYZCvaTNsqkQEvcdZR7npcsiwl/IC7siGDZ60=",
+        "ref": "refs/heads/dev",
+        "rev": "03bba464d46f3eddf74195919b1344aa937f7b11",
+        "revCount": 15529,
+        "type": "git",
+        "url": "https://github.com/sst/opencode"
       },
       "original": {
-        "owner": "sst",
-        "repo": "opencode",
-        "type": "github"
+        "type": "git",
+        "url": "https://github.com/sst/opencode"
       }
     },
     "root": {
@@ -395,27 +395,27 @@
         ]
       },
       "locked": {
-        "lastModified": 1787246814,
-        "narHash": "sha256-pEd4/iPY3Zm/EhhHmeB1QnIWXJSLx7gJzD/05mm2MCo=",
-        "owner": "oxalica",
-        "repo": "rust-overlay",
-        "rev": "c84e121aaede7ef8c7bd9fb5154ccc1599e07816",
-        "type": "github"
+        "lastModified": 1787454509,
+        "narHash": "sha256-r4LDUF+zmJnkftvCVkCrUhSJazsf6EVJF+V2l4/MYbI=",
+        "ref": "refs/heads/master",
+        "rev": "f60c1b57ff805a46b5175c76fc981fb4f81efbcc",
+        "revCount": 2281,
+        "type": "git",
+        "url": "https://github.com/oxalica/rust-overlay"
       },
       "original": {
-        "owner": "oxalica",
-        "repo": "rust-overlay",
-        "type": "github"
+        "type": "git",
+        "url": "https://github.com/oxalica/rust-overlay"
       }
     },
     "spark-store": {
       "flake": false,
       "locked": {
-        "lastModified": 1787193696,
-        "narHash": "sha256-mshKl0fWaE6j1UFjxAoCyroYrM2ZUrSqL9AtS9arhVA=",
+        "lastModified": 1787495549,
+        "narHash": "sha256-Vp9q/YIXkX8UndSI61JOVbfUAmr+DZiK+d0l4EPKjgM=",
         "ref": "Erotica",
-        "rev": "ae19c309df98f7952a0a76b4a7aa3a43483096f6",
-        "revCount": 541,
+        "rev": "cfe8c87feaea65f79aec70a3cd23fe81fa785a83",
+        "revCount": 543,
         "type": "git",
         "url": "https://gitee.com/spark-store-project/spark-store.git"
       },

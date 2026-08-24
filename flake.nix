@@ -35,14 +35,14 @@
     # 用其 flake 构建产物 packages.<sys>.default 作为 nvim（配置内嵌在它仓库的 config/）。
     # 注意：它自带 nixpkgs-unstable 与 nixvim（unstable）输入，首次构建会拉 GitHub 大包。
     cooknixvim = {
-      url = "github:Youthdreamer/CookNixvim";
+      url = "git+https://github.com/Youthdreamer/CookNixvim";
     };
 
     # ── opencode（AI 编程 Agent）──
     # 官方 flake（github:sst/opencode，dev 分支持续构建最新版）；
     # 之前用 GutMutCode/opencode-nix 第三方包装，其内部 pin 固定版本 → 版本太旧
     opencode = {
-      url = "github:sst/opencode";
+      url = "git+https://github.com/sst/opencode";
     };
 
     # ── bili-danmaku-tui（B 站直播间弹幕 TUI，Go/bubbletea）──
@@ -81,7 +81,7 @@
     # 用 cachix 分支：始终指向官方 Cachix 已缓存的最新 commit，避免本地编译。
     # ⚠️ 不要 follows nixpkgs：改了输入 hash 会失去二进制缓存命中。
     noctalia = {
-      url = "github:noctalia-dev/noctalia/cachix";
+      url = "git+https://github.com/noctalia-dev/noctalia.git?ref=cachix";
     };
 
     # ── rust-overlay（Axolotl 源码构建的 Rust 1.95 工具链）──
@@ -90,7 +90,7 @@
     # 仅用于 selfPackages 的 pkgs 实例（下方 import nixpkgs overlays），
     # 不影响系统级 nixpkgs。
     rust-overlay = {
-      url = "github:oxalica/rust-overlay";
+      url = "git+https://github.com/oxalica/rust-overlay";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
