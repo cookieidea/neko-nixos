@@ -27,7 +27,9 @@ let
   # Mojang 自带 JRE 的 java.awt（ModernUI 初始化字体时触发）找不到
   # fontconfig.properties → "Fontconfig head is null" 崩溃。
   # 提供最小 Java 格式的 fontconfig 配置，指向 NixOS store 里的 DejaVu 字体，
-  # 通过 JAVA_TOOL_OPTIONS 的 -Dsun.font.fontconfig 传给游戏 JVM。
+  # 通过 JAVA_TOOL_OPTIONS 的 -Dsun.awt.fontconfig 传给游戏 JVM。
+  # ⚠️ 属性名是 sun.awt.fontconfig（不是 sun.font.fontconfig）；Microsoft 版
+  # libfontmanager 未内置原生 fontconfig 支持，必须提供该属性文件。
   fontconfigProperties = pkgs.writeText "fontconfig.properties" ''
     # Minimal fontconfig.properties for Mojang JRE on NixOS
     version=1
@@ -252,7 +254,7 @@ let
         --set WEBKIT_DISABLE_COMPOSITING_MODE 1
         --set WEBKIT_DISABLE_DMABUF_RENDERER 1
         #   Theseus 重置游戏 LD_LIBRARY_PATH，JVM 属性独立生效 → flite 可寻址
-        --set JAVA_TOOL_OPTIONS "-Djna.library.path=${pkgs.flite}/lib -Dsun.font.fontconfig=${fontconfigProperties}"
+        --set JAVA_TOOL_OPTIONS "-Djna.library.path=${pkgs.flite}/lib -Dsun.awt.fontconfig=${fontconfigProperties}"
       )
 
       glibPostInstallHook
