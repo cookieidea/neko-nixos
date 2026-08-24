@@ -20,6 +20,10 @@ let
 
   frontendPackage = builtins.fromJSON (builtins.readFile "${src}/apps/app-frontend/package.json");
 
+  # 上游 frontend package.json 版本号滞后于 tag（v1.8.9 仍是 1.8.1），
+  # 这里统一以实际 tag 版本为准：包名 / tauri.conf.json（About 页）都显示 1.8.9
+  launcherVersion = "1.8.9";
+
   rustPlatform = pkgs.makeRustPlatform {
     cargo = rustToolchain;
     rustc = rustToolchain;
@@ -52,7 +56,7 @@ let
 
   unwrapped = rustPlatform.buildRustPackage (finalAttrs: {
     pname = "axolotl-launcher-unwrapped";
-    version = frontendPackage.version;
+    version = launcherVersion;
     inherit src;
 
     patches = [
@@ -67,6 +71,10 @@ let
         --replace-fail \
           'pnpm contributors:sync && vue-tsc --noEmit && vite build' \
           'vue-tsc --noEmit && vite build'
+      # 上游未随 tag 同步 frontend 版本号（v1.8.9 的 package.json 仍是 1.8.1）→
+      # 替换为实际 tag 版本，使 tauri.conf.json（About 页 getVersion）一致
+      substituteInPlace apps/app-frontend/package.json \
+        --replace-fail '"version": "${frontendPackage.version}"' '"version": "${launcherVersion}"'
     '';
 
     cargoHash = "sha256-KzX4hyUQXltDEEGyCIyUgQ7nWAm78lhk8YkPJhHZOmA=";
