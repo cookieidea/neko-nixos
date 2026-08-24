@@ -1,6 +1,6 @@
 # Axolotl —— 官方源码构建（vendored 自上游 PR #298 bfmhno3 的 nix/package.nix）
 #
-# 源码固定官方仓库 v1.8.6 tag（rev = 61571dd...），含 cubiomes 子模块。
+# 源码固定官方仓库 v1.8.9 tag（rev = 3743063...），含 cubiomes 子模块。
 # 三段式构建：
 #   1. unwrapped：rustPlatform.buildRustPackage —— Rust/Tauri 核心 + pnpm 前端
 #      （apps/app-frontend，Vue3+Vite+turbo）+ Java 引擎（packages/app-lib/java，
@@ -33,12 +33,12 @@ let
     };
   });
 
-  # 官方仓库 v1.8.6（tag SHA，`git ls-remote --tags` 查询）
+  # 官方仓库 v1.8.9（tag SHA，`git ls-remote --tags` 查询）
   src = pkgs.fetchFromGitHub {
     owner = "Mystic-Stars";
     repo = "Axolotl";
-    rev = "61571dd1097ecd342100f55ce5e9f28f8e92986d";
-    sha256 = "sha256-YLfohyXts+rENt4b5qt0jnakScyEV/AE0uLB7MEb1YM=";
+    rev = "3743063b1b2dede811bf5dae88c0d1ff37741abd";
+    sha256 = "sha256-5wrC/A4A/oQR5+TH55R3N91k01HwgZjOFxQgcFV31rs=";
     fetchSubmodules = true;
   };
 
@@ -69,7 +69,7 @@ let
           'vue-tsc --noEmit && vite build'
     '';
 
-    cargoHash = "sha256-Uba0m3TpiX1/tHGHNWu7Jsnm3HSVqo7QC9LfrLHMTNc=";
+    cargoHash = "sha256-KzX4hyUQXltDEEGyCIyUgQ7nWAm78lhk8YkPJhHZOmA=";
 
     mitmCache = gradle.fetchDeps {
       pkg = finalAttrs.finalPackage;
@@ -82,7 +82,7 @@ let
       inherit (finalAttrs) pname src;
       inherit pnpm;
       fetcherVersion = 4;
-      hash = "sha256-Lebms4fNJK2VP3Ef/ExfhaIJSN2YEz7c1KqpDLZVziI=";
+      hash = "sha256-/eX/Vir0xTI/SLs1nh1X8T3sYgSiVg/qLI/n8M/+1i8=";
     };
 
     nativeBuildInputs = [
@@ -184,6 +184,10 @@ let
       pkgs.libxxf86vm
       (lib.getLib pkgs.stdenv.cc.cc)
       pkgs.flite
+      # 游戏 JVM 的 Mojang 自带 JRE libfontmanager.so 依赖系统 libfreetype.so.6
+      # （RPATH=$ORIGIN 只在 JRE lib/ 内找，而 JRE 不捆绑 freetype）→ 必须暴露在
+      # LD_LIBRARY_PATH，否则 ModernUI 初始化 java.awt 字体时 UnsatisfiedLinkError 崩溃。
+      pkgs.freetype
       pkgs.alsa-lib
       pkgs.libjack2
       pkgs.libpulseaudio
