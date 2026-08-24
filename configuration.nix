@@ -50,9 +50,9 @@
 
   # ── 引导 / 磁盘 ───────────────────────────────────────────
   # 用 GRUB（UEFI）。纯 EFI 安装：efiSupport + device="nodev"（不写 MBR）。
-  # 如需双系统引导 Windows，可加 boot.loader.grub.useOSProber = true;
   boot.loader.grub = {
     enable = true;
+    useOSProber = true;   # 双系统：自动检测 Windows (需 os-prober 检测 NTFS)
     efiSupport = true;
     device = "nodev";
     configurationLimit = 20;
