@@ -9,11 +9,11 @@
 # individual scripts you need and call them directly, e.g. `shorin-contrib/clean`.
 pkgs.stdenv.mkDerivation {
   pname = "shorin-contrib";
-  version = "unstable-2026-08-12";
+  version = "unstable-2026-08-24";
 
   src = builtins.fetchGit {
     url = "https://github.com/SHORiN-KiWATA/shorin-contrib";
-    rev = "1a7cc34c54dd734c64ed4fd202c74ffaf7c26ec1";
+    rev = "c6a768a045a512148f5d99f90190a503f9b5037f";
   };
 
   installPhase = ''

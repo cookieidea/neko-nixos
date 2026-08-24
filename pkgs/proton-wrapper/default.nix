@@ -55,11 +55,11 @@ let
 in
 pkgs.stdenv.mkDerivation {
   pname = "shorin-proton-wrapper";
-  version = "unstable-2026-08-12";
+  version = "unstable-2026-08-24";
 
   src = builtins.fetchGit {
     url = "https://github.com/SHORiN-KiWATA/proton-wrapper";
-    rev = "7e70126ecae420f00783d0375b72451c06956549";
+    rev = "027d2c85a51cf2e265380c953483e3ef656823f3";
   };
 
   nativeBuildInputs = [ pkgs.makeWrapper ];
