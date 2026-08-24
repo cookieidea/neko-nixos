@@ -259,11 +259,6 @@ pkgs.dejavu_fonts
         #   radeonsi 下 WebKit DMABUF/合成路径崩 → 强制软件合成（仅 WebKit）
         --set WEBKIT_DISABLE_COMPOSITING_MODE 1
         --set WEBKIT_DISABLE_DMABUF_RENDERER 1
-        #   启动器本体 WebKitGTK 在 radeonsi/niri 下 SEGV（AcceleratedBackingStore::update
-        #   空指针）→ 强制 GDK 走 X11（XWayland，避开 Wayland DMABUF 路径）+ GTK 软件渲染。
-        #   仅作用于 GDK 应用（启动器 UI），不影响游戏（游戏用 GLFW，不读 GDK 变量）。
-        --set GDK_BACKEND x11
-        --set GDK_RENDERING image
         #   Theseus 重置游戏 LD_LIBRARY_PATH，JVM 属性独立生效 → flite 可寻址
         --set JAVA_TOOL_OPTIONS "-Djna.library.path=${pkgs.flite}/lib -Dsun.awt.fontconfig=${fontconfigProperties} -Dsun.java2d.fontpath=${pkgs.dejavu_fonts}/share/fonts/truetype:${pkgs.noto-fonts-cjk-sans}/share/fonts/opentype/noto-cjk -Dsun.java2d.debugfonts=true"
       )
