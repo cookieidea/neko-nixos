@@ -276,6 +276,8 @@ EOF
     # niri 自动按需拉起 Xwayland；微信/LinuxQQ 等 X11 应用因此可正常启动）
     xwayland-satellite
     gamescope       # 基岩版鼠标修复：启动器 wrapperCommand 包装（--force-grab-cursor）
+    wl-clipboard    # Waydroid 剪贴板共享
+    android-tools   # adb（Waydroid GPS 转发）
   ];
 
   # ── 字体（对应 ttf-jetbrains-mono-nerd / maple / noto-cjk）─
@@ -296,6 +298,14 @@ EOF
   #    用静态的 sarasa-gothic。见 nixpkgs#178121。
   programs.steam.fontPackages = with pkgs; [ sarasa-gothic ];
   virtualisation.libvirtd.enable = true;  # virt-manager 后端
+  # ── Waydroid（Android LXC 容器，niri/Wayland 下运行）──
+  # wiki: https://wiki.nixos.org/wiki/Waydroid
+  # CachyOS 新内核已移除 iptables → 用 nftables 版
+  virtualisation.waydroid.enable = true;
+  virtualisation.waydroid.package = pkgs.waydroid-nftables;
+  # Waydroid GPS 转发（wiki: GPS/Location forwarding）
+  services.geoclue2.enable = true;
+  # 26.05 已移除 programs.adb（systemd 258 自动处理 uaccess）→ android-tools 已在上面 systemPackages 里
   virtualisation.docker.enable = true;    # docker（wiki: https://wiki.nixos.org/wiki/Docker）
   # Docker Hub 国内镜像源（2026-08 实测可用：1ms.run / 轩辕 / DaoCloud，自动挑最快可用）
   virtualisation.docker.daemon.settings.registry-mirrors = [
