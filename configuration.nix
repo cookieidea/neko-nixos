@@ -338,7 +338,7 @@ EOF
   # uinput 组让 Sunshine 能模拟虚拟键鼠/手柄输入设备。
   services.sunshine = {
     enable = true;
-    autoStart = true;
+    autoStart = false;
     capSysAdmin = true;
     openFirewall = true;
   };
