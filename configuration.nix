@@ -278,6 +278,10 @@ EOF
     gamescope       # 基岩版鼠标修复：启动器 wrapperCommand 包装（--force-grab-cursor）
     wl-clipboard    # Waydroid 剪贴板共享
     android-tools   # adb（Waydroid GPS 转发）
+    waydroid-helper # Waydroid 配置/扩展 GUI（机型伪装、Magisk、ARM 转译层）
+    # waydroid-helper 依赖：rclone（云盘挂载）+ bindfs（目录共享绑定）
+    rclone
+    bindfs
   ];
 
   # ── 字体（对应 ttf-jetbrains-mono-nerd / maple / noto-cjk）─
@@ -306,6 +310,9 @@ EOF
   # Waydroid GPS 转发（wiki: GPS/Location forwarding）
   services.geoclue2.enable = true;
   # 26.05 已移除 programs.adb（systemd 258 自动处理 uaccess）→ android-tools 已在上面 systemPackages 里
+  # waydroid-helper 的共享目录挂载服务（wiki: Mount host directories）
+  systemd.packages = [ pkgs.waydroid-helper ];
+  systemd.services.waydroid-mount.wantedBy = [ "multi-user.target" ];
   virtualisation.docker.enable = true;    # docker（wiki: https://wiki.nixos.org/wiki/Docker）
   # Docker Hub 国内镜像源（2026-08 实测可用：1ms.run / 轩辕 / DaoCloud，自动挑最快可用）
   virtualisation.docker.daemon.settings.registry-mirrors = [
