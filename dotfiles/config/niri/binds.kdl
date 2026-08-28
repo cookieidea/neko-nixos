@@ -4,7 +4,7 @@
 // 全部替换为 V5 的 `noctalia msg ...`。桌面 shell 由 config.kdl 的
 // `spawn-at-startup "noctalia"` 拉起。
 // 部分绑定依赖 SHORiN 私有脚本（~/.config/niri/scripts/ 下、
-// ~/.local/bin/random-anime-wallpaper-noctalia、shorin-screenrec-menu、
+// ~/.local/bin/random-anime-wallpaper-noctalia、
 // quicksave、quickload、niri-sidebar 等），未纳入迁移，相关绑定会静默失败。
 // =============================================================
 
@@ -21,7 +21,6 @@ binds {
     // 用 spawn-sh 走 shell 展开 ~ 并查 PATH（home.sessionPath 已加 ~/.local/bin）
     // 用绝对路径：niri 是 systemd 用户服务，PATH 不含 ~/.local/bin
     // （home.sessionPath 只经 login shell 生效）；spawn-sh 走 shell 展开 ~
-    Mod+F3 hotkey-overlay-title="录屏 Screen record" { spawn-sh "~/.local/bin/shorin-screenrec-menu";}
     Mod+F5 hotkey-overlay-title="快速存档 Quick save" { spawn-sh "~/.local/bin/quicksave";}
     Mod+F8 hotkey-overlay-title="快速读档 Quick load" { spawn-sh "~/.local/bin/quickload";}
     Mod+P hotkey-overlay-title="提取窗口信息 Pick information" { spawn-sh "~/.config/niri/scripts/niri-pick focus"; }

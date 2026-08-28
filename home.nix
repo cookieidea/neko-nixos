@@ -31,7 +31,7 @@ in
   # kitty 终端 terminfo：kitty 设 TERM=xterm-kitty，NixOS 上 ncurses 找不到该
   # terminfo 文件 → nvim 等 ncurses 应用吐转义码乱码（^[[?69…）。指向 kitty 包自带的
   # share/terminfo 即可（xterm 等其余条目用 ncurses 内建 fallback）。
-  # ~/.local/bin 进 PATH：shorin-screenrec-menu / quicksave / quickload 等
+  # ~/.local/bin 进 PATH：quicksave / quickload 等
   # 私有脚本部署在这里（binds.kdl 裸命令调用靠 PATH 查找）。
   home.sessionPath = [ "$HOME/.local/bin" "$HOME/.cargo/bin" ];
   home.sessionVariables = {
@@ -180,7 +180,6 @@ in
     libnotify                                 # notify-send（niri-pick / niri-force-kill-window / screenshot-sound.sh 的通知依赖）
     xsettingsd                                 # GTK 主题/字体经 XSETTINGS 注入应用（niri 无 DE 时需要）
     xprop                                       # xprop（26.05 起 xorg 属性集弃用，xorg.xprop 改为顶层 xprop；niri-force-kill-window 依赖）
-    gpu-screen-recorder                        # 录屏（shorin-screenrec-menu Mod+F3 用，noctalia-shell 也依赖）
     btrfs-assistant                            # btrfs 快照管理 CLI（quickload Mod+F8 的回滚后端）
     # ── 原 02b/99-apps 补充 ──
     power-profiles-daemon                      # 电源模式（平衡/省电/性能）
@@ -606,10 +605,6 @@ in
       executable = true;
     };
     # SHORiN 私有脚本迁移（对应 binds.kdl：Mod+F3 录屏菜单、Mod+F5 快存、Mod+F8 快读）
-    ".local/bin/shorin-screenrec-menu" = {
-      source = ./dotfiles/local/bin/shorin-screenrec-menu;
-      executable = true;
-    };
     ".local/bin/quicksave" = {
       source = ./dotfiles/local/bin/quicksave;
       executable = true;
@@ -834,7 +829,7 @@ in
   #       强杀窗口(Alt+F4)、截图音效等绑定现已可用；截图音效需 config.kdl 里
   #       的 `spawn-at-startup "~/.config/niri/scripts/screenshot-sound.sh"` 已启用。
   #    random-anime-wallpaper-noctalia 已在 .local/bin 部署；niri-sidebar 走 selfPackages。
-  #  • 仍依赖 AUR、本仓库未纳入的脚本（shorin-screenrec-menu / quicksave / quickload，
+  #  • 仍依赖 AUR、本仓库未纳入的脚本（quicksave / quickload，
   #    来自 AUR noctalia-shell / shorin-contrib）对应的绑定（Mod+F3/F5/F8）会静默失败，
   #    需要时可自行补充或打包。
   #  • 启动器/设置/壁纸/电源菜单/锁屏/音量/亮度等绑定现在走
