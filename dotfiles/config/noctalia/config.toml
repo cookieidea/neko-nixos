@@ -1,5 +1,9 @@
 [audio]
 enable_overdrive = true
+enable_sounds = true               # UI 反馈音效总开关（通知/音量提示）
+sound_volume = 0.5                 # 0.0 - 1.0
+notification_sound = "/run/current-system/sw/share/sounds/freedesktop/stereo/audio-volume-change.oga"
+volume_change_sound = "/run/current-system/sw/share/sounds/freedesktop/stereo/audio-volume-change.oga"
 
 [backdrop]
 blur_intensity = 0.68999998457729816
