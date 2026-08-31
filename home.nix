@@ -16,6 +16,8 @@ let
   seedNoctaliaConfig = builtins.toString ./dotfiles/config/noctalia/config.toml;
   seedStarship      = builtins.toString ./dotfiles/config/starship.toml;
   seedMangoHud      = builtins.toString ./dotfiles/config/MangoHud/MangoHud.conf;
+  seedWallpaperDir   = builtins.toString ./dotfiles/Pictures/Wallpapers;
+  seedWallpaperVideo = builtins.toString ./dotfiles/Pictures/Wallpapers/video/hatsune-miku.mp4;
 in
 
 {
@@ -185,11 +187,7 @@ in
     power-profiles-daemon                      # 电源模式（平衡/省电/性能）
     cmatrix lolcat sl                          # 彩蛋趣味命令（原 02b 安装）
     wineWow64Packages.stable                   # wine（原 99-apps 的 wine 全家；26.05 弃用 wineWowPackages）
-    # bottles（Wine 容器管理 GUI；FHS 封装含 32 位支持）
-    # removeWarningPopup=true：Bottles 官方只支持 Flatpak 沙箱，nixpkgs FHS 封装
-    # 启动会弹 "Unsupported Environment" 警告，官方提供此 override 关闭。
-    # （bottles 是可 override 的派生参数，非 wrapper，不会像 libreoffice 那样返回函数）
-    (bottles.override { removeWarningPopup = true; })
+    # bottles 改走 Flatpak（nixpkgs FHS 版连接检测端点失效无法下载 runner）
 
     # ── 全量脚本审查补漏（04j-minimal-niri / 04k-noctalia 核对结果）──
     matugen                                    # 主题生成器（random-anime-wallpaper-noctalia 与 noctalia-shell 模板直接调用）
@@ -501,6 +499,26 @@ in
     fi
   '';
 
+  # ── 壁纸真实文件（不用软链：GC 会删旧 store 路径导致断链）──
+  home.activation.wallpaperRealFiles = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    WP="$HOME/Pictures/Wallpapers"
+    for f in wallhaven-d88d53.png wallhaven-yq8w67.jpg; do
+      if [ -L "$WP/$f" ] || [ ! -e "$WP/$f" ]; then
+        $DRY_RUN_CMD mkdir -p "$WP"
+        $DRY_RUN_CMD rm -f "$WP/$f"
+        $DRY_RUN_CMD cp -f "${seedWallpaperDir}/$f" "$WP/$f"
+      fi
+    done
+    # 视频壁纸本体 + mpvpaper 插件赋值路径（assignments.json 指向 ~/Videos/wallpaper/）
+    for dest in "$WP/video/hatsune-miku.mp4" "$HOME/Videos/wallpaper/hatsune-miku.mp4"; do
+      if [ -L "$dest" ] || [ ! -e "$dest" ]; then
+        $DRY_RUN_CMD mkdir -p "$(dirname "$dest")"
+        $DRY_RUN_CMD rm -f "$dest"
+        $DRY_RUN_CMD cp -f "${seedWallpaperVideo}" "$dest"
+      fi
+    done
+  '';
+
   home.file = {
     # ── 用户头像（freedesktop 标准 ~/.face，Noctalia Greeter 登录界面 + Noctalia 控制中心读取）──
     ".face".source = ./dotfiles/avatar.png;
@@ -602,10 +620,9 @@ in
     ".config/obs-studio/plugins/obs-vdoninja/data".source =
       selfPackages.obs-vdoninja + "/share/obs/obs-plugins/obs-vdoninja/locale";
     # ── 壁纸（原 resources/Wallpapers，noctalia 壁纸轮播/随机切换依赖 ~/Pictures/Wallpapers）──
-    "Pictures/Wallpapers/wallhaven-d88d53.png".source = ./dotfiles/Pictures/Wallpapers/wallhaven-d88d53.png;
-    "Pictures/Wallpapers/wallhaven-yq8w67.jpg".source = ./dotfiles/Pictures/Wallpapers/wallhaven-yq8w67.jpg;
+    # ⚠️ 不用 home.file 软链（GC 后 store 路径失效会断链）→ 由下方
+    #    home.activation.wallpaperRealFiles 复制为真实文件。
     # 视频壁纸（mpvpaper 播放；noctalia 壁纸组件已禁用，背景层由 mpvpaper 接管）
-    "Pictures/Wallpapers/video/hatsune-miku.mp4".source = ./dotfiles/Pictures/Wallpapers/video/hatsune-miku.mp4;
     # 原 .gtkrc-2.0 内容已并入 gtk.gtk2.extraConfig（fcitx 输入法），不再手动部署避免模块冲突
     ".local/bin/random-anime-wallpaper-noctalia" = {
       source = ./dotfiles/local/bin/random-anime-wallpaper-noctalia;
