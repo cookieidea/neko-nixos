@@ -15,6 +15,7 @@ let
   seedKittyTheme    = builtins.toString ./dotfiles/config/kitty/themes/noctalia.conf;
   seedNoctaliaConfig = builtins.toString ./dotfiles/config/noctalia/config.toml;
   seedStarship      = builtins.toString ./dotfiles/config/starship.toml;
+  seedMangoHud      = builtins.toString ./dotfiles/config/MangoHud/MangoHud.conf;
 in
 
 {
@@ -131,8 +132,7 @@ in
     # wechat / qq —— nixpkgs 26.05 的 src 分别走 web.archive.org（429 限流）与腾讯 CDN
     # 旧版本链接（404），且 wechat 的 src 深埋在 appimageTools.extract 内部无法 override，
     # 故改走 Flatpak（flathub 官方维护），由 configuration.nix 的 flatpak-repo 服务启动时自动安装。
-    gearlever                                 # gearlever（管理 AppImage/flatpak）
-    lsfg-vk                                   # lsfg-vk（FSR 帧生成 vulkan 层）
+    distrobox                                 # distrobox（容器化发行版环境，需 docker/podman 后端）
     protonplus                                # protonplus（Proton 管理）
     mangojuice                                # mangojuice（GTK 文件管理器）
 
@@ -236,7 +236,6 @@ in
     selfPackages.bedrockboot          # BedrockBoot（MC 基岩版启动器，Avalonia；AppImage+FHS）
     selfPackages.axolotl              # Axolotl（MC Java 版启动器，替代 Prism/HMCL；nix 源码构建）
     selfPackages.astral               # Astral 组网客户端（Flutter+Rust；bundle 由 pkgs/astral/build.sh 联网构建）
-    selfPackages.spark-store          # 星火应用商店（官方 nix 打包，Electron+Vite；需 APM 支持，见 configuration.nix 的 programs.amber-pm）
     # 走 flake 输入的包（不在 nixpkgs 核心，直接引用其 flake 构建产物）
     bili-danmaku-tui.packages.${pkgs.stdenv.hostPlatform.system}.default  # B 站直播间弹幕 TUI
     # CookNixvim：模块化 Neovim 配置（基于 nix-community/nixvim 的完整配置），
@@ -332,7 +331,6 @@ in
       Environment=LD_LIBRARY_PATH=${pkgs.systemdLibs}/lib:/nix/store/zcqp398mxlw62jl02sx0rsc7gvcl1qhc-pipewire-1.6.6-jack/lib
       ExecStartPre=${pkgs.coreutils}/bin/mkdir -p %h/.abdm/system/log
     '';
-    "MangoHud/MangoHud.conf".source = ./dotfiles/config/MangoHud/MangoHud.conf;
     "Thunar/accels.scm".source = ./dotfiles/config/Thunar/accels.scm;
     "Thunar/uca.xml".source = ./dotfiles/config/Thunar/uca.xml;
     "fcitx5/conf/cached_layouts".source = ./dotfiles/config/fcitx5/conf/cached_layouts;
@@ -492,6 +490,14 @@ in
     if [ -L "$HOME/.config/starship.toml" ] || [ ! -e "$HOME/.config/starship.toml" ]; then
       $DRY_RUN_CMD rm -f "$HOME/.config/starship.toml"
       $DRY_RUN_CMD cp -f "${seedStarship}" "$HOME/.config/starship.toml"
+    fi
+
+    # MangoHud.conf：mangojuice/GOverlay 保存设置时会写此文件 → 覆盖只读 symlink 为可写副本
+    if [ -L "$HOME/.config/MangoHud/MangoHud.conf" ] || [ ! -e "$HOME/.config/MangoHud/MangoHud.conf" ]; then
+      $DRY_RUN_CMD mkdir -p "$HOME/.config/MangoHud"
+      $DRY_RUN_CMD rm -f "$HOME/.config/MangoHud/MangoHud.conf"
+      $DRY_RUN_CMD cp -f "${seedMangoHud}" "$HOME/.config/MangoHud/MangoHud.conf"
+      $DRY_RUN_CMD chmod 644 "$HOME/.config/MangoHud/MangoHud.conf"
     fi
   '';
 

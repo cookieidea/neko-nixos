@@ -1,6 +1,6 @@
 # Shorin Arch Setup → NixOS system config
 # 对应原仓库 scripts/ 中的系统级步骤（base / nm-backend / gpu-driver / musthave 等）
-{ config, pkgs, lib, desktop, username, selfPackages, noctalia-greeter, amberPmPkg, amber-pm, ... }:
+{ config, pkgs, lib, desktop, username, selfPackages, noctalia-greeter, ... }:
 
 {
   # ⚠️ hardware-configuration.nix 的 import 已移到 flake.nix 的实体机配置里——
@@ -225,15 +225,6 @@
   # （services.displayManager.sessionPackages）+ 官方 portal / gnome-keyring 推荐配置。
   # 注意：26.05 已移除 services.displayManager.session，注册会话要用这个模块。
   programs.niri.enable = true;
-  # ── 星火应用商店的 APM 兼容层（AmberPM）──
-  # 模块由 flake 输入 amber-pm 提供（nixosModules.default，已在 flake.nix 的 modules 里引入）。
-  # 作用：初始化 /var/lib/apm/apm（首次重建时解压内置 Debian 根文件系统）、
-  #       注册 APM 应用的 XDG_DATA_DIRS、开启 nix-ld（跑 deb 沙箱内二进制）、
-  #       放行非特权 userns（bwrap 需要）。spark-store 客户端本身在 home.packages。
-  programs.amber-pm = {
-    enable = true;
-    package = amberPmPkg;
-  };
   # ── 登录界面头像（AccountsService / Noctalia Greeter）──
   # greeter 从 AccountsService 读用户头像，声明式写入 /var/lib/AccountsService。
   system.activationScripts.noctaliaGreeterAvatar = lib.stringAfter [ "users" ] ''
@@ -282,6 +273,18 @@ EOF
     # waydroid-helper 依赖：rclone（云盘挂载）+ bindfs（目录共享绑定）
     rclone
     bindfs
+    # 常用 CLI 工具补全
+    libva-utils     # vainfo（VA-API 硬解诊断）
+    radeontop       # AMD 显卡占用监控
+    gamemode        # Feral GameMode（提供 gamemoderun 命令，Proton/游戏性能优化）
+    ripgrep
+    tree
+    htop
+    wget
+    unzip
+    zip
+    yq
+    b3sum
   ];
 
   # ── 字体（对应 ttf-jetbrains-mono-nerd / maple / noto-cjk）─

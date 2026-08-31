@@ -1,6 +1,6 @@
 # Axolotl —— 官方源码构建（vendored 自上游 PR #298 bfmhno3 的 nix/package.nix）
 #
-# 源码固定官方仓库 v1.8.9 tag（rev = 3743063...），含 cubiomes 子模块。
+# 源码固定官方仓库 v1.9.4 tag（rev = d9ce23bc...），含 cubiomes + blockbench 子模块。
 # 三段式构建：
 #   1. unwrapped：rustPlatform.buildRustPackage —— Rust/Tauri 核心 + pnpm 前端
 #      （apps/app-frontend，Vue3+Vite+turbo）+ Java 引擎（packages/app-lib/java，
@@ -22,7 +22,7 @@ let
 
   # 上游 frontend package.json 版本号滞后于 tag（v1.8.9 仍是 1.8.1），
   # 这里统一以实际 tag 版本为准：包名 / tauri.conf.json（About 页）都显示 1.8.9
-  launcherVersion = "1.8.9";
+  launcherVersion = "1.9.4";
 
   # Mojang 自带 JRE 的 java.awt（ModernUI 初始化字体时触发）找不到
   # fontconfig.properties → "Fontconfig head is null" 崩溃。
@@ -70,8 +70,8 @@ let
   src = pkgs.fetchFromGitHub {
     owner = "Mystic-Stars";
     repo = "Axolotl";
-    rev = "3743063b1b2dede811bf5dae88c0d1ff37741abd";
-    sha256 = "sha256-5wrC/A4A/oQR5+TH55R3N91k01HwgZjOFxQgcFV31rs=";
+    rev = "d9ce23bcc7b292901440f64a035fde81f51763c6";
+    sha256 = "sha256-OGoZsz4Ba1QtBCXW4RdPbeXr2/nD8KJnM85K1+iKmnY=";
     fetchSubmodules = true;
   };
 
@@ -104,9 +104,12 @@ let
       # 替换为实际 tag 版本，使 tauri.conf.json（About 页 getVersion）一致
       substituteInPlace apps/app-frontend/package.json \
         --replace-fail '"version": "${frontendPackage.version}"' '"version": "${launcherVersion}"'
+      # Blockbench 依赖离线预装（npm ci --offline，沙箱无网络）
+      export npm_config_cache=${finalAttrs.blockbenchNpmDeps}
+      npm ci --offline --ignore-scripts --no-audit --no-fund --prefix third-party/blockbench
     '';
 
-    cargoHash = "sha256-KzX4hyUQXltDEEGyCIyUgQ7nWAm78lhk8YkPJhHZOmA=";
+    cargoHash = "sha256-jsdywJl4EhhrI+37TfX8TeVuNolTNZGk51d2WtMXmxk=";
 
     # 跳过 cargo test（checkPhase 约 3.5 分钟），加速每次源码升级的增量构建
     doCheck = false;
@@ -123,6 +126,15 @@ let
       inherit pnpm;
       fetcherVersion = 4;
       hash = "sha256-/eX/Vir0xTI/SLs1nh1X8T3sYgSiVg/qLI/n8M/+1i8=";
+    };
+
+    # Blockbench 皮肤编辑器（third-party/blockbench 子模块）：v1.9.4 的
+    # apps/app/build.rs 会 `npm ci`（沙箱无网络必失败）→ 用 fetchNpmDeps 预取
+    # 依赖（FOD 阶段可联网），postPatch 里 --offline 装好 node_modules，
+    # build.rs 检测到 node_modules 存在就会跳过 npm ci，只跑 build-skin。
+    blockbenchNpmDeps = pkgs.fetchNpmDeps {
+      src = "${src}/third-party/blockbench";
+      hash = "sha256-EYtpxi9sTpn5Xpvf84UGAFkqJS+/p9vHwNUu/Vve4pg=";
     };
 
     nativeBuildInputs = [
@@ -241,6 +253,9 @@ pkgs.dejavu_fonts
       pkgs.libpulseaudio
       pkgs.pipewire
       pkgs.udev
+      # 1.9.4+ 系统托盘（libappindicator-sys dlopen；libdbusmenu 是 appindicator 依赖）
+      pkgs.libayatana-appindicator
+      pkgs.libdbusmenu-gtk3
     ];
 
     postBuild = ''
