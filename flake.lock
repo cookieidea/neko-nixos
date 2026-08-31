@@ -373,11 +373,11 @@
         "nixpkgs": "nixpkgs_6"
       },
       "locked": {
-        "lastModified": 1787505336,
-        "narHash": "sha256-sBDmXQcYZCvaTNsqkQEvcdZR7npcsiwl/IC7siGDZ60=",
+        "lastModified": 1788192091,
+        "narHash": "sha256-Q2jyPqR7ADQL3y/PzqY7BZNH+kvTgXD3RucvlnFiA/k=",
         "ref": "refs/heads/dev",
-        "rev": "03bba464d46f3eddf74195919b1344aa937f7b11",
-        "revCount": 15529,
+        "rev": "26ff3ed3d3e28830190ef53f2ff4b261852139a4",
+        "revCount": 15606,
         "type": "git",
         "url": "https://github.com/sst/opencode"
       },
@@ -409,11 +409,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1787454509,
-        "narHash": "sha256-r4LDUF+zmJnkftvCVkCrUhSJazsf6EVJF+V2l4/MYbI=",
+        "lastModified": 1788165049,
+        "narHash": "sha256-en4IoUeCqvq9F66YhwOrUFw1nc70OBhrJwrzfalezvY=",
         "ref": "refs/heads/master",
-        "rev": "f60c1b57ff805a46b5175c76fc981fb4f81efbcc",
-        "revCount": 2281,
+        "rev": "d03cd474bd97389dcc2e8cd3b3bb6b8c6e346b1a",
+        "revCount": 2289,
         "type": "git",
         "url": "https://github.com/oxalica/rust-overlay"
       },
