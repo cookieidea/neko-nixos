@@ -420,10 +420,11 @@ in
     # ── Noctalia V5 配置脚本（hook 脚本只读即可，由 noctalia 执行）──
     # noctalia-config.toml 由 programs.noctalia.settings 部署，
     # 再经下方 home.activation 复制为可写真实文件（V5 设置面板会写）。
-    # mpvpaper 插件已撤回（视频壁纸由 config.kdl 直接 spawn mpvpaper，禁 OSC），
-    # 故不再部署 mpv-hook.lua / mpvpaper-sync.sh（视频壁纸由 config.kdl 直接 spawn mpvpaper）。
+    # mpv-hook.lua 必须部署：noctalia/mpvpaper 插件的 mpv_options 引用它，
+    # 缺失会导致视频壁纸 mpvpaper 启动失败。
     "noctalia/theme-sync.sh".source = ./dotfiles/config/noctalia/theme-sync.sh;
     "noctalia/wallpaper-hook.sh".source = ./dotfiles/config/noctalia/wallpaper-hook.sh;
+    "noctalia/mpv-hook.lua".source = ./dotfiles/config/noctalia/mpv-hook.lua;
     # ── kitty（迁移自 NyxNiri；current-theme.conf 由 Noctalia kitty 模板生成，
     #    不部署只读版，首次由 activation 种子写入）──
     "kitty/kitty.conf".source = ./dotfiles/config/kitty/kitty.conf;
