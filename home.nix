@@ -225,9 +225,7 @@ in
     selfPackages.pins             # pins-git
     selfPackages.pywalfox         # python-pywalfox
     selfPackages.shorin-contrib   # shorin-contrib-git
-    selfPackages.proton-wrapper   # shorin-proton-wrapper-git
     selfPackages.splayer-next     # SPlayer-Dev/SPlayer-Next（非 nixpkgs 的 splayer）
-    selfPackages.startlive        # StartLive（B 站推流地址获取，PySide6 GUI；自构建）
     selfPackages.ab-download-manager  # AB Download Manager（多线程下载器，Compose Desktop；自构建）
     selfPackages.tabby-terminal       # Tabby 终端（eugeny/tabby，Electron；自构建，nixpkgs 的 tabby 是 TabbyML AI 助手）
     selfPackages.purevox              # PureVox（实时 AI 音频降噪，AppImage 捆绑内嵌 Python，PipeWire 直用）
@@ -863,6 +861,6 @@ in
   #
   # 不在 nixpkgs 的包，已用 ./pkgs 自构建派生解决（见 README「自构建程序」一节）：
   #   niri-sidebar-git / pins-git / python-pywalfox / shorin-contrib-git /
-  #   shorin-proton-wrapper-git / splayer-next
+  #   splayer-next
   # （miyu 已按需求移除。）flake 安装：opencode；桌面 shell 改为 nixpkgs 的 noctalia-shell（替代独立 noctalia v4.7.7 应用）。
 }
