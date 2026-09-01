@@ -70,7 +70,7 @@ function subprocess(args, async, callback)
         -- FIXME: figure out which exact env var needs to be stripped. (PR: #144, Issue: #106 and #139)
         local env = os_name == "darwin" and "PATH="..os.getenv("PATH") or nil
         if async then
-            return mp.command_native_async({name = "subprocess", playback_only = true, args = args, env = env}, callback)
+            return mp.command_native_async({name = "subprocess", playback_only = false, args = args, env = env}, callback)
         else
             return mp.command_native({name = "subprocess", playback_only = false, capture_stdout = true, args = args, env = env})
         end

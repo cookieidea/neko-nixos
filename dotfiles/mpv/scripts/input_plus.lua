@@ -26,6 +26,7 @@ local chap_skip = false
 local chap_keywords = split(opt.skip_chapters, ",")
 local original_speed = nil
 local original_shaders = nil
+local menu_data = {}
 local config_dir = mp.command_native({ "expand-path", "~~/" })
 
 local function toggle_vs(state)
@@ -77,9 +78,17 @@ end
 
 local function show_file_dialog(file_type)
     alive = true
+    local filter = "所有文件 *"
+    if file_type == "Media" then
+        filter = "视频文件 *.mkv *.mp4 *.avi *.flv *.webm *.mov *.wmv *.ts *.m2ts *.rmvb *.mpg *.mpeg"
+    elseif file_type == "AudioTrack" then
+        filter = "音频文件 *.mp3 *.flac *.wav *.aac *.ogg *.opus *.m4a *.wma"
+    elseif file_type == "Subtitle" then
+        filter = "字幕文件 *.srt *.ass *.ssa *.vtt *.sub"
+    end
     local res = utils.subprocess({
-        args = { "openfile", file_type },
-        cancellable = false
+        args = { "zenity", "--file-selection", "--multiple", "--file-filter=" .. filter },
+        playback_only = false
     })
     mp.add_timeout(0.125, function() alive = false end)
     return res
@@ -190,17 +199,23 @@ local function track_seek(id, num)
     end
 end
 
+local function show_ytdl_settings_menu()
+    local current_settings = mp.get_property_native("ytdl-raw-options")
+    menu_data = {
+        type = "ytdl_settings",
+        title = "ytdl设置",
+        callback = { mp.get_script_name(), "update_ytdl_settings_menu" },
+        items = {
+            { title = "代理地址", hint = current_settings.proxy or "" },
+            { title = "Cookies路径", hint = current_settings.cookies or "" },
+            { title = "手动更新Cookies" }
+        }
+    }
+    mp.commandv("script-message-to", "uosc", "open-menu", utils.format_json(menu_data))
+end
+
 local function update()
-    mp.command_native({
-        name = 'subprocess',
-        args = { "cmd", "/c", "start", '""', "cmd", "/c", config_dir .. "/../updater.bat" },
-        detach = true
-    })
-    mp.command_native_async({
-        name = 'subprocess',
-        args = { "taskkill", "/f", "/im", "mpv.exe", "/t" },
-        detach = true
-    })
+    mp.osd_message("Linux 版无自动更新：用 nix flake update 或 nixos-rebuild 升级", 3)
 end
 
 local function init(_, loaded)
@@ -239,6 +254,57 @@ local function init(_, loaded)
             end
         end)
     end
+    mp.register_script_message("update_ytdl_settings_menu", function(json)
+        local event = utils.parse_json(json)
+        local ytdl_settings = mp.get_property_native("ytdl-raw-options")
+        if event.type == "activate" then
+            local activity_item = menu_data.items[event.index]
+            menu_data.search_debounce = "submit"
+            menu_data.search_style = "palette"
+            menu_data.on_search = "callback"
+            if activity_item.title == "代理地址" then
+                menu_data.title = "输入代理服务器地址"
+            elseif activity_item.title == "Cookies路径" then
+                menu_data.title = "输入Cookies物理路径"
+            elseif activity_item.title == "手动更新Cookies" then
+                local cookies_path = ytdl_settings.cookies
+                if cookies_path and cookies_path ~= "" then
+                    mp.command_native_async({
+                        name = "subprocess",
+                        playback_only = false,
+                        args = { "kitty", "-e", "nvim", cookies_path }
+                    })
+                else
+                    mp.osd_message("未设置 Cookies 路径：先在设置里填写", 3)
+                end
+                mp.commandv("script-message-to", "uosc", "close-menu")
+            end
+            for _, item in ipairs(menu_data.items) do item.active = false end
+            activity_item.active = true
+            mp.commandv("script-message-to", "uosc", "update-menu", utils.format_json(menu_data))
+        elseif event.type == "search" then
+            local activity_item = nil
+            for _, item in ipairs(menu_data.items) do if item.active then activity_item = item end end
+            if activity_item then
+                if activity_item.title == "代理地址" then
+                    if event.query == '' then
+                        ytdl_settings.proxy = nil
+                    else
+                        ytdl_settings.proxy = event.query
+                    end
+                elseif activity_item.title == "Cookies路径" then
+                    if event.query == '' then
+                        ytdl_settings.cookies = nil
+                    else
+                        ytdl_settings.cookies = event.query
+                    end
+                end
+                mp.set_property_native("ytdl-raw-options", ytdl_settings)
+                activity_item.hint = event.query
+            end
+            mp.commandv("script-message-to", "uosc", "open-menu", utils.format_json(menu_data))
+        end
+    end)
     mp.add_key_binding(nil, "chap_skip_toggle", chap_skip_toggle)
     mp.add_key_binding(nil, "import_files", function() import("Media") end)
     mp.add_key_binding(nil, "import_append_aid", function() import("AudioTrack") end)
@@ -252,6 +318,7 @@ local function init(_, loaded)
     mp.add_key_binding(nil, "r_video", r_video)
     mp.add_key_binding(nil, "l_video", l_video)
     mp.add_key_binding(nil, "update", update)
+    mp.add_key_binding(nil, "show_ytdl_settings_menu", show_ytdl_settings_menu)
     mp.unobserve_property(init)
 end
 

@@ -97,6 +97,7 @@ in
     p7zip                                     # 7z（mpv auto_sub_fonts_dir 解压字幕字体包）
     ffmpeg                                    # ffmpeg（mpv opencc.lua 提取字幕轨道）
     yt-dlp                                    # yt-dlp（mpv 在线视频下载/播放）
+    vapoursynth                                # vapoursynth（mpv vapoursynth.lua 的 vspipe，Linux 版 VSPipe）
     obs-studio                                # obs-studio
     kdePackages.kdenlive                         # kdenlive（KDE 视频剪辑；26.05 属 kdePackages 不在顶层）
     kdePackages.kcalc                            # kcalc（KDE 计算器；26.05 属 kdePackages，gear 区）
@@ -171,6 +172,7 @@ in
     hicolor-icon-theme                          # hicolor 兜底主题（Flatpak 应用图标/桌面文件图标扫描依赖）
     thunar                                     # 文件管理器（binds: Mod+E 优先）
     nautilus                                    # nautilus（GNOME Files，binds: Mod+Alt+E / Mod+E 兜底）
+    zenity                                      # zenity（mpv input_plus 打开文件对话框，Linux 替代 openfile.exe）
     # ── 原 04k 脚本的文件管理器生态（全量迁移）──
     gnome-keyring                             # 密钥环（登录钥匙串，nautilus/远程/应用依赖）
     gvfs                                      # 虚拟文件系统（smb/mtp/gphoto2 挂载）
@@ -296,6 +298,15 @@ in
   # bin/ABDownloadManager.bin --background）。若再配 systemd 服务会双重启动，
   # 第二次实例经单实例转发唤醒聚焦第一个实例的窗口 → 开机弹窗。
   # 托盘环境问题由下方 xdg.configFile 的 systemd drop-in 兜底。
+
+  # nautilus-open-any-terminal：nautilus 由 niri（systemd 服务）spawn，
+  # 只继承 systemd 用户环境（home.sessionVariables 只进 login shell 的
+  # hm-session-vars.sh，进不了图形会话）→ 把 pygobject（gi）和 nautilus
+  # typelib 注入 systemd 用户环境，右键"打开终端"才不消失。
+  systemd.user.sessionVariables = {
+    PYTHONPATH = "${pkgs.python3Packages.pygobject3}/lib/python3.13/site-packages";
+    GI_TYPELIB_PATH = "${pkgs.nautilus}/lib/girepository-1.0";
+  };
 
   # 开机随机壁纸（noctalia IPC）：等 noctalia-shell 就绪后跑一次下载脚本
   systemd.user.services.noctalia-wallpaper = {
@@ -537,7 +548,9 @@ in
     # nixvim 构建的 neovim 自带 nvim.desktop（Terminal=true，图形启动器打不开）。
     # flake overlay 覆盖不到 nixvim（它用自己 pin 的 nixpkgs 构建）→ 用用户级
     # ~/.local/share/applications 覆盖（freedesktop 优先级最高，启动器优先读这里）。
-    ".local/share/applications/nvim.desktop".text = ''
+    ".local/share/applications/nvim.desktop" = {
+      force = true;
+      text = ''
       [Desktop Entry]
       Name=Neovim wrapper
       GenericName=Text Editor
@@ -550,7 +563,8 @@ in
       Categories=Utility;TextEditor;Development;
       MimeType=text/plain;text/x-makefile;application/x-shellscript;text/x-c;text/x-c++src;
       StartupNotify=false
-    '';
+      '';
+    };
     # ── fcitx5 托盘/菜单图标 hicolor 兜底 ──
     # fcitx5 SNI 图标名（notificationitem.cpp）：托盘=input-keyboard-symbolic、
     # 菜单「重启」=view-refresh、「退出」=application-exit。Papirus 有这些图标，

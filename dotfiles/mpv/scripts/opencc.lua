@@ -30,6 +30,7 @@ local function process_sub(is_ass, in_path, out_path, config_path, callback)
     if not is_ass then
         mp.command_native_async({
             name = 'subprocess',
+            playback_only = false,
             args = { "opencc", "-i", in_path, "-o", out_path, "-c", config_path }
         }, function() callback() end)
         return
@@ -56,6 +57,7 @@ local function process_sub(is_ass, in_path, out_path, config_path, callback)
     end
     mp.command_native_async({
         name = 'subprocess',
+        playback_only = false,
         args = { "opencc", "-i", tmp_txt, "-o", tmp_txt, "-c", config_path }
     }, function()
         local f_txt = io.open(tmp_txt, "r")
@@ -107,9 +109,10 @@ local function convert_subtitles(sid)
         { "ffmpeg", "-y", "-i", video_path, "-map", "0:" .. track["ff-index"], "-c:s", spec.codec, tmp_src }
     mp.command_native_async({
         name = 'subprocess',
+        playback_only = false,
         args = args
     }, function()
-        local opencc_conf = config_dir .. (state == 1 and "t2s.json" or "s2t.json")
+        local opencc_conf = config_dir .. "/../" .. (state == 1 and "t2s.json" or "s2t.json")
         local out_path = utils.join_path(os.getenv("TMPDIR") or "/tmp", "opencc-sub" .. utils.getpid() .. spec.ext)
         process_sub(spec.is_ass, tmp_src, out_path, opencc_conf, function()
             os.remove(tmp_src)

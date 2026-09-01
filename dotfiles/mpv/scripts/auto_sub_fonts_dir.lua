@@ -126,7 +126,7 @@ local function update_fonts_dir()
             local dst = utils.join_path(dir, name:gsub("%.[^.]+$", ""))
             mp.command_native_async({
                 name = "subprocess",
-                args = { "mkdir", "-p", dst }
+                args = { "cmd", "/c", "mkdir", dst }
             }, function(_, _, err)
                 if err then return end
                 extract_archive(arc, dst, function(ok)

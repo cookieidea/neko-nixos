@@ -7,7 +7,8 @@ local sid = nil
 local key = nil
 local config_dir = mp.command_native({ "expand-path", "~~/" })
 local input_conf = io.open(config_dir .. '/input.conf', 'r')
-local ssdm_dm_path = utils.join_path(os.getenv("TEMP") or os.getenv("TMPDIR") or "/tmp", "ssdm-danmaku-" .. utils.getpid() .. ".ass")
+local ssdm_tmp = os.getenv("TMPDIR") or "/tmp"
+local ssdm_dm_path = utils.join_path(ssdm_tmp, "ssdm-danmaku-" .. utils.getpid() .. ".ass")
 local uosc_danmaku_main_path = config_dir .. "/scripts/uosc_danmaku/main.lua"
 local uosc_danmaku_data = { enabled = false, comments = nil, options = nil }
 local updating_uosc_danmaku_data = false
@@ -106,7 +107,7 @@ local function assprocess()
     if AP then AP:kill() end
     if not enabled then return end
     updating_uosc_danmaku_data = true
-    mp.command("script-message update_uosc_danmaku_data")
+    mp.commandv("script-message-to", "uosc_danmaku", "send_data")
     set_uosc_danmaku(true, function()
         AP = mp.add_timeout(0.2, function()
             if mp.get_property_native("user-data/uosc_danmaku/has-danmaku") then
@@ -191,7 +192,7 @@ local function init(_, loaded)
         if not support then
             mp.msg.info("检测到uosc_danmaku脚本未注入ssdm支持，开始注入...")
             script:write(
-                '\n-- ssdm support --\nlocal _options = options\noptions = {}\nsetmetatable(options, {\n    __index = function(_, k)\n        return _options[k]\n    end,\n    __newindex = function(_, k, v)\n        _options[k] = v\n        mp.command("script-message refresh_ssdm")\n    end\n})\nmp.register_script_message("update_uosc_danmaku_data", function()\n    local data = { enabled = ENABLED, comments = COMMENTS, options = _options }\n    mp.commandv("script-message", "uosc_danmaku_data_to_ssdm", utils.format_json(data))\nend)\n'
+                '\n-- ssdm support --\nlocal _options = options\noptions = {}\nsetmetatable(options, {\n    __index = function(_, k)\n        return _options[k]\n    end,\n    __newindex = function(_, k, v)\n        _options[k] = v\n        mp.commandv("script-message-to", "ssdm", "danmaku_refresh")\n    end\n})\nmp.register_script_message("send_data", function()\n    local data = { enabled = ENABLED, comments = COMMENTS, options = _options }\n    mp.commandv("script-message-to", "ssdm", "receive_data", utils.format_json(data))\nend)\n'
             )
             mp.msg.info("ssdm支持注入成功，重启后即可使用次字幕弹幕相关功能")
         end
@@ -207,13 +208,13 @@ local function init(_, loaded)
         auto_pad = true
     end
     updating_uosc_danmaku_data = true
-    mp.command("script-message update_uosc_danmaku_data")
+    mp.commandv("script-message-to", "uosc_danmaku", "send_data")
     mp.set_property_native("secondary-sub-ass-override", "yes")
     mp.observe_property("osd-dimensions", nil, smart_pad)
     mp.register_event("file-loaded", assprocess)
     mp.register_event("shutdown", function() os.remove(ssdm_dm_path) end)
-    mp.register_script_message("refresh_ssdm", assprocess)
-    mp.register_script_message("uosc_danmaku_data_to_ssdm", function(data)
+    mp.register_script_message("danmaku_refresh", assprocess)
+    mp.register_script_message("receive_data", function(data)
         uosc_danmaku_data = utils.parse_json(data)
         updating_uosc_danmaku_data = false
     end)
