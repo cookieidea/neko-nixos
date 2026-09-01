@@ -279,7 +279,6 @@ EOF
     gamemode        # Feral GameMode（提供 gamemoderun 命令，Proton/游戏性能优化）
     ripgrep
     tree
-    htop
     wget
     unzip
     zip

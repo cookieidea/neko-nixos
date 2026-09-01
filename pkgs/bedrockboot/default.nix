@@ -89,7 +89,6 @@ let
       ln -sf ${pkgs.python3}/bin/python3 $out/usr/bin/python3
     '';
     runScript = pkgs.writeShellScript "bedrockboot-run" ''
-      export LIBGL_ALWAYS_SOFTWARE=1
       export GDK_BACKEND=x11
       # ── GDK-Proton 自带 wine（wine 11.1，Wayland 驱动）替代宿主 wine 11.0 ──
       # 宿主 wine 二进制与 GDK 库版本不匹配（11.0 vs 11.1）→ 游戏初始化崩溃、无窗口。
