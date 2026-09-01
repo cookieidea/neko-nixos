@@ -1,12 +1,14 @@
 { pkgs }:
 
-# shorin-contrib — SHORiN's collection of helper shell scripts.
+# shorin-contrib — helper shell scripts（筛选安装通用部分）
 # Upstream: https://github.com/SHORiN-KiWATA/shorin-contrib
-# Arch AUR: shorin-contrib-git
 #
-# NOTE: the `shorin link` meta-command referenced by the original Arch setup is
-# NOT part of this repo (there is no `shorin` script in it). Install the
-# individual scripts you need and call them directly, e.g. `shorin-contrib/clean`.
+# 只安装 NixOS 上可用的通用脚本：
+#   - others/*（battery-care / compressvideos / video2gif / media-info /
+#     getown / searchmodels / vir）+ terminal/lsi + system/procusage + timer
+# 排除 Arch 专用（pacman/paru/yay 系：pac pacd pacr pacrrr checkallupdates
+#   mirror-update sysup clean）与 snapshot/quicksave、quickload
+#   （已在 dotfiles/local/bin 有独立副本，Mod+F5/F8 走它们）。
 pkgs.stdenv.mkDerivation {
   pname = "shorin-contrib";
   version = "unstable-2026-08-24";
@@ -19,18 +21,16 @@ pkgs.stdenv.mkDerivation {
   installPhase = ''
     runHook preInstall
     mkdir -p "$out/bin" "$out/share/shorin-contrib"
-    find . -type f -not -path './.git/*' | while read -r f; do
-      rel="''${f#./}"
-      if head -c2 "$f" | grep -q '#!'; then
-        install -Dm755 "$f" "$out/share/shorin-contrib/$rel"
-        ln -sf "$out/share/shorin-contrib/$rel" "$out/bin/$(basename "$rel")"
-      fi
+    for f in others/* terminal/lsi system/procusage system/timer; do
+      [ -f "$f" ] || continue
+      install -Dm755 "$f" "$out/share/shorin-contrib/$f"
+      ln -sf "$out/share/shorin-contrib/$f" "$out/bin/$(basename "$f")"
     done
     runHook postInstall
   '';
 
   meta = {
-    description = "SHORiN's contribute scripts";
+    description = "SHORiN's contribute scripts (generic subset for NixOS)";
     homepage    = "https://github.com/SHORiN-KiWATA/shorin-contrib";
     license     = "see https://github.com/SHORiN-KiWATA/shorin-contrib";
     platforms   = pkgs.lib.platforms.linux;

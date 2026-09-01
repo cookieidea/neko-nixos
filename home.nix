@@ -855,9 +855,6 @@ in
   #       强杀窗口(Alt+F4)、截图音效等绑定现已可用；截图音效需 config.kdl 里
   #       的 `spawn-at-startup "~/.config/niri/scripts/screenshot-sound.sh"` 已启用。
   #    random-anime-wallpaper-noctalia 已在 .local/bin 部署；niri-sidebar 走 selfPackages。
-  #  • 仍依赖 AUR、本仓库未纳入的脚本（quicksave / quickload，
-  #    来自 AUR noctalia-shell / shorin-contrib）对应的绑定（Mod+F3/F5/F8）会静默失败，
-  #    需要时可自行补充或打包。
   #  • 启动器/设置/壁纸/电源菜单/锁屏/音量/亮度等绑定现在走
   #    `noctalia-shell ipc call ...`（binds.kdl 已全部改用 nixpkgs 的
   #    noctalia-shell 封装，不再写 `qs -c noctalia-shell`）。桌面 shell 由

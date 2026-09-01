@@ -1,7 +1,7 @@
 # 快捷键速查（niri + Noctalia + 应用）
 
 > `Mod` = **Super / Win 键**（桌面徽标键）。
-> 来源：`dotfiles/config/niri/binds.kdl`（SHORiN noctalia-dotfiles verbatim）+ fcitx5 配置。
+> 来源：`dotfiles/config/niri/binds.kdl` + fcitx5 配置。
 > 按 `Mod+Shift+/` 可查看 niri 内置的快捷键教程浮层。
 
 ## 应用 / 启动
@@ -109,8 +109,8 @@
 | `Mod+Alt+Z` | 展开/收起侧边栏 |
 | `Mod+Alt+X` | 侧边栏反向排序 |
 | `Mod+Alt+R` | 重置侧边栏排列 |
-| `Mod+F3` | 录屏菜单（shorin-screenrec-menu，未纳入转换则静默失败） |
-| `Mod+F5` / `Mod+F8` | 快速存档 / 快速读档（quicksave/quickload，未纳入则静默失败） |
+| `Mod+F3` | 录屏菜单 |
+| `Mod+F5` / `Mod+F8` | 快速存档 / 快速读档 |
 
 ## 媒体 / 硬件
 
