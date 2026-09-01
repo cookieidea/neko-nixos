@@ -45,6 +45,34 @@
   nix.optimise.automatic = true;              # 定期硬链接去重，省空间
   nix.settings.auto-optimise-store = true;    # 写入 store 时即时去重
 
+  # ── zram 压缩内存交换（15G 内存，省物理内存高负载体验）──
+  zramSwap = {
+    enable = true;
+    algorithm = "zstd";
+    memoryPercent = 50;
+  };
+  # ── 每周自动清理旧系统代际（保留最近 5 个）+ 垃圾回收 ──
+  systemd.services.nix-generation-cleanup = {
+    description = "Prune old NixOS/Home-Manager generations";
+    serviceConfig = {
+      Type = "oneshot";
+      ExecStart = "${pkgs.writeShellScript "nix-generation-cleanup" ''
+        set -euo pipefail
+        ${pkgs.nix}/bin/nix-env --delete-generations +5 -p /nix/var/nix/profiles/system
+        ${pkgs.nix}/bin/nix-env --delete-generations +5 -p /nix/var/nix/profiles/per-user/cookie/home-manager 2>/dev/null || true
+        ${pkgs.nix}/bin/nix-store --gc
+      ''}";
+    };
+  };
+  systemd.timers.nix-generation-cleanup = {
+    description = "Weekly Nix generation cleanup";
+    wantedBy = [ "timers.target" ];
+    timerConfig = {
+      OnCalendar = "weekly";
+      Persistent = true;
+    };
+  };
+
   # ── 系统版本锁定（避免大版本升级触发意外的状态迁移）────────
   system.stateVersion = "26.05";
 
@@ -65,9 +93,6 @@
   # ── 文件系统支持（btrfs 根分区 + initrd 挂载）────────────
   boot.supportedFilesystems = [ "btrfs" ];
   boot.initrd.supportedFilesystems = [ "btrfs" ];
-
-  # LUKS 加密（原脚本建议）：取消下面注释并填设备
-  # boot.initrd.luks.devices."luks-root".device = "/dev/disk/by-uuid/XXXX";
 
   # ── 休眠（hibernation）──
   # ⚠️ btrfs 上的 swapfile **官方不支持休眠恢复**（内核 swsusp 在恢复早期无法可靠地把
@@ -242,14 +267,6 @@ SystemAccount=false
 Icon=/var/lib/AccountsService/icons/cookie
 EOF
   '';
-
-  # GNOME（原 04d-gnome.sh，已弃用，保留以便回退）
-  # services.desktopManager.gnome.enable = lib.mkIf (desktop == "gnome") true;
-  # services.xserver.displayManager.gdm.enable = lib.mkIf (desktop == "gnome") true;
-
-  # KDE Plasma 6（原 04b-kdeplasma-setup.sh，已弃用）
-  # services.desktopManager.plasma6.enable = lib.mkIf (desktop == "kde") true;
-  # services.displayManager.sddm.enable = lib.mkIf (desktop == "kde") true;
 
   # ── 系统级包（少量，其余都在 home.nix）──────────────────
   environment.systemPackages = with pkgs; [

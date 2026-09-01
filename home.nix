@@ -106,7 +106,6 @@ in
     # flatseal 已在 nixpkgs 26.05 移除 → 需要时用 flatpak 装：
     #   flatpak install flathub com.github.tchx84.Flatseal
     pavucontrol                               # pavucontrol
-    mousepad                                  # mousepad
     easyeffects                               # easyeffects
     libreoffice                               # libreoffice（办公套件；默认 27 种语言含 zh-CN。⚠️ 不要对它 .override { langs=... }——pkgs.libreoffice 是带 unwrapped 的 wrapper，直接 override 会返回函数导致 home.packages 类型错误；真要减语言包需 override unwrapped）
     # 日文输入法 fcitx5-mozc 已移除；输入法本体由 i18n.inputMethod 系统级配置
@@ -843,13 +842,6 @@ in
   #   com.tencent.WeChat（微信）/ com.qq.QQ（QQ）/ com.github.tchx84.Flatseal（Flatpak 管理）
   # 其他缺失的闭源 App 同样可走 Flatpak（flathub 已配 USTC 镜像），手动：
   #   flatpak install flathub <应用ID>
-  #   services.flatpak.packages = [
-  #     "flathub:com.qq.QQ"
-  #   ];
-  #
-  # niri / Noctalia 以及其余 SHORiN rice 配置已落到 dotfiles/ 并通过 xdg.configFile / home.file 部署：
-  #   - dotfiles/config/niri/*.kdl   （config.kdl + 9 个 include 拆分文件）
-  #   - dotfiles/config/noctalia/{settings,plugins,colors}.json + user-templates.toml   （独立 v4 应用配置，已被 noctalia-shell 取代、不再被读取，保留作参考）
   # 已针对 NixOS 适配：桌面 shell 用 nixpkgs 自带的 noctalia-shell（quickshell 配置封装），
   # 由 config.kdl 的 `spawn-sh-at-startup "noctalia-shell"` 拉起，还原了 SHORiN 原版
   # `qs -c noctalia-shell` 的写法；注释掉了 Arch 专用的 /usr/lib/polkit-gnome、
