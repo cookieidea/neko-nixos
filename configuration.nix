@@ -225,6 +225,10 @@
   # （services.displayManager.sessionPackages）+ 官方 portal / gnome-keyring 推荐配置。
   # 注意：26.05 已移除 services.displayManager.session，注册会话要用这个模块。
   programs.niri.enable = true;
+  programs.nautilus-open-any-terminal = {
+    enable = true;
+    terminal = "kitty";
+  };
   # ── 登录界面头像（AccountsService / Noctalia Greeter）──
   # greeter 从 AccountsService 读用户头像，声明式写入 /var/lib/AccountsService。
   system.activationScripts.noctaliaGreeterAvatar = lib.stringAfter [ "users" ] ''

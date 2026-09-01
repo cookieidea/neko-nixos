@@ -18,6 +18,16 @@ let
   seedMangoHud      = builtins.toString ./dotfiles/config/MangoHud/MangoHud.conf;
   seedWallpaperDir   = builtins.toString ./dotfiles/Pictures/Wallpapers;
   seedWallpaperVideo = builtins.toString ./dotfiles/Pictures/Wallpapers/video/hatsune-miku.mp4;
+  xdgOpenWithGio = pkgs.writeShellScriptBin "xdg-open" ''
+    for arg in "$@"; do
+      case "$arg" in
+        trash://*|computer://*|network://*|smb://*|sftp://*|ftp://*|mtp://*|gphoto2://*)
+          exec ${pkgs.glib}/bin/gio open "$arg"
+          ;;
+      esac
+    done
+    exec ${pkgs.xdg-utils}/bin/xdg-open "$@"
+  '';
 in
 
 {
@@ -42,6 +52,8 @@ in
     # gvfs 的 GIO 模块：缺了它 GIO 认不出 trash:/// 等 gvfs URI，
     # 文件管理器（Thunar/Nautilus）回收站不可用。保留 dconf 模块。
     GIO_EXTRA_MODULES = "${pkgs.gvfs}/lib/gio/modules:${pkgs.dconf}/lib/gio/modules";
+    # nautilus-open-any-terminal：Nautilus 内置 Python 宿主需要 gi/pygobject
+    PYTHONPATH = "${pkgs.python3Packages.pygobject3}/lib/python3.13/site-packages";
     # ABDM 托盘兜底：ABDM 应用会把自己的 autostart 重写为 bin/ABDownloadManager.bin
     # （/proc/self/exe 检测实际二进制）→ 绕过 makeWrapper → 无 systemdLibs →
     # ComposeNativeTray 的 libLinuxTray.so 解析不到 libsystemd.so.0 → 托盘消失。
@@ -72,7 +84,6 @@ in
     google-chrome                             # google-chrome (替代 firefox; unfree 已开启)
     transmission_4-gtk                        # transmission_4-gtk（26.05 移除 transmission_3-gtk / transmission-gtk）
     localsend                                 # localsend
-    gnome-calendar                            # gnome-calendar
     gnome-clocks                              # gnome-clocks
     lutris                                    # lutris
     # steam —— 已从 home.packages 移除：home-manager 装的 pkgs.steam 不带
@@ -204,6 +215,7 @@ in
     qt6Packages.fcitx5-configtool              # fcitx5 配置 GUI（原 fcitx5-configtool；26.05 移到 qt6Packages）
     tumbler                                    # thunar 缩略图后端（图片/文档缩略图，原 04j/04k 必装）
     xdg-terminal-exec                          # 终端选择器（xdg-open 按 xdg-terminals.list 选 kitty）
+    xdgOpenWithGio                             # trash:// 等 gvfs URI 正确交给 gio
     adw-gtk3                                     # libadwaita 主题 adw-gtk3-dark（nixpkgs 属性名 adw-gtk3，非 adw-gtk-theme）
     nwg-look                                   # GTK 主题设置（原脚本 + dotfiles 已部署 nwg-look/gsettings）
     libgsf                                     # ODF/Office 文档缩略图（thunar，原 FM_PKGS2）
