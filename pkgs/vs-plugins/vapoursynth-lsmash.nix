@@ -14,8 +14,26 @@ stdenv.mkDerivation rec {
   nativeBuildInputs = [ pkg-config which ];
   buildInputs = [ vapoursynth ffmpeg_6 ];
 
-  preConfigure = ''
+  hardeningDisable = [ "all" ];
+
+  # 两阶段：根目录编 liblsmash → VapourSynth 插件
+  buildPhase = ''
+    runHook preBuild
+    # 1) lsmash core
+    ./configure --prefix=$TMPDIR/lsmash
+    make -j$NIX_BUILD_CORES -C lsmash
+    make -C lsmash install
+    # 2) VapourSynth 插件
     cd VapourSynth
+    ./configure --prefix=$out --extra-cflags="-I$TMPDIR/lsmash/include" --extra-ldflags="-L$TMPDIR/lsmash/lib"
+    make -j$NIX_BUILD_CORES
+    runHook postBuild
+  '';
+
+  installPhase = ''
+    runHook preInstall
+    make install
+    runHook postInstall
   '';
 
   meta = with lib; {
