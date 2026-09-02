@@ -11,6 +11,11 @@
 { pkgs, rustToolchain, astral-bundle }:
 
 {
+  # VapourSynth 插件（RIFE 补帧链路；放 selfPackages 供 vs-python 环境引用）
+  vapoursynth-lsmash    = import ./vs-plugins/vapoursynth-lsmash    { inherit pkgs; };
+  vapoursynth-akarin    = import ./vs-plugins/vapoursynth-akarin    { inherit pkgs; };
+  vapoursynth-rife-ncnn = import ./vs-plugins/vapoursynth-rife-ncnn { inherit pkgs; };
+
   niri-sidebar   = import ./niri-sidebar   { inherit pkgs; };
   pins           = import ./pins           { inherit pkgs; };
   shorin-contrib = import ./shorin-contrib { inherit pkgs; };
