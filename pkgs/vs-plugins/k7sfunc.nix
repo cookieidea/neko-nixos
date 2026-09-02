@@ -1,4 +1,4 @@
-{ lib, buildPythonPackage, fetchPypi, vapoursynth }:
+{ lib, buildPythonPackage, fetchPypi, vapoursynth, setuptools }:
 
 buildPythonPackage rec {
   pname = "k7sfunc";
@@ -9,6 +9,8 @@ buildPythonPackage rec {
     inherit pname version;
     hash = "sha256-yvLPniEQqcrq3F6BMf/gWlo3qEfVEsxeg7qwccl+6Hc=";
   };
+
+  build-system = [ setuptools ];
 
   propagatedBuildInputs = [ vapoursynth ];
 
