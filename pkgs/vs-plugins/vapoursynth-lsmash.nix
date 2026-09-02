@@ -19,6 +19,7 @@ stdenv.mkDerivation rec {
 
   preConfigure = ''
     patchShebangs configure
+    export NIX_CFLAGS_COMPILE="$NIX_CFLAGS_COMPILE -Wno-error=implicit-function-declaration"
   '';
 
   meta = with lib; {
