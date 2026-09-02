@@ -7,7 +7,7 @@ buildPythonPackage rec {
 
   src = fetchPypi {
     inherit pname version;
-    hash = "";
+    hash = "sha256-yvLPniEQqcrq3F6BMf/gWlo3qEfVEsxeg7qwccl+6Hc=";
   };
 
   propagatedBuildInputs = [ vapoursynth ];
