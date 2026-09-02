@@ -333,6 +333,11 @@ in
     "mpv/scripts/thumbfast.lua".source = ./dotfiles/mpv/scripts/thumbfast.lua;
     "mpv/scripts/vapoursynth.lua".source = ./dotfiles/mpv/scripts/vapoursynth.lua;
     "mpv/scripts/uosc".source = ./dotfiles/mpv/scripts/uosc;
+    # ziggy 辅助二进制：目录 symlink 到 store 会丢执行位 → 单独部署补 executable
+    ".config/mpv/scripts/uosc/bin/ziggy-linux" = {
+      source = ./dotfiles/mpv/scripts/uosc/bin/ziggy-linux;
+      force = true;
+    };
     "mpv/scripts/uosc_danmaku".source = ./dotfiles/mpv/scripts/uosc_danmaku;
     "mpv/shaders".source = ./dotfiles/mpv/shaders;
     "mpv/vs".source = ./dotfiles/mpv/vs;
