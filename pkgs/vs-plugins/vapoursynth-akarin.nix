@@ -15,6 +15,9 @@ stdenv.mkDerivation rec {
   buildInputs = [ vapoursynth ];
 
 
+  # meson 默认装到 vapoursynth 的插件目录（store 只读）→ 改装到自己
+  mesonInstallDir = "lib/vapoursynth-akarin";
+
   postPatch = ''
     # 用内置 asmjit 后端（此版本硬编码 false；llvm>=10,<16 的依赖在 nixpkgs 已不可用）
     substituteInPlace meson.build --replace-fail "use_asmjit = false" "use_asmjit = true"
