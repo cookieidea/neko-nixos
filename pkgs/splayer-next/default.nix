@@ -1,9 +1,7 @@
 { pkgs }:
 
-# SPlayer-Next — cross-platform desktop music player (Electron + Vue3 + Rust).
-# Upstream: https://github.com/SPlayer-Dev/SPlayer-Next
-#
-# IMPORTANT: this is NOT the nixpkgs `splayer` package (which is the unrelated
+# SPlayer-Next（跨平台音乐播放器，Electron + Vue3 + Rust）
+# ⚠️ 非 nixpkgs 的 `splayer`（同名的另一个项目）
 # "Simple Netease Cloud Music player"). This is SPlayer-Dev/SPlayer-Next, the
 # real app the original Arch setup intended via the AUR `splayer-next-git`.
 #

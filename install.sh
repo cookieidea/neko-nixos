@@ -1,21 +1,9 @@
 #!/usr/bin/env bash
 #
-# neko-nixos 一键安装脚本
-#
-# 两种模式：
-#   1) 全新安装（minimal / 无图形界面 ISO）：
-#        sudo bash install.sh <用户名> <挂载点>
-#        例：sudo bash install.sh cookie /mnt
-#      —— 会部署配置并跑 nixos-install --flake <挂载点>/etc/nixos/#nixos
-#      —— 前置：先把磁盘分区格式化并挂载到 <挂载点>，再 nixos-generate-config --root <挂载点>
-#   2) 已装系统应用 / 更新：
-#        sudo bash install.sh [用户名]
-#      —— 会部署到 /etc/nixos 并跑 nixos-rebuild switch --flake /etc/nixos/#nixos
-#
-# 说明：
-#   - 配置里硬编码用户名 "cookie"，脚本会替换成你的用户名（默认 cookie）。
-#   - 替换范围：flake.nix 的 username 变量 + dotfiles 下所有文本文件里的 /home/cookie 路径。
-#   - 二进制文件自动跳过（本仓库目前无二进制资源）。
+# neko-nixos 一键安装/更新脚本
+#   全新安装： sudo bash install.sh <用户名> <挂载点>   （挂载点需已分区+generate-config）
+#   已装更新： sudo bash install.sh [用户名]
+# 会把配置里硬编码的用户名 cookie 与 /home/cookie 路径替换成你的用户名（默认 cookie）
 #
 set -euo pipefail
 
@@ -84,7 +72,7 @@ fi
 # 这些程序不在 nixpkgs 核心，由 ./pkgs 里的派生从源码 / 发布构建
 # 这些程序不在 nixpkgs 核心，由 ./pkgs 里的派生构建。这里先单独构建，便于提前暴露
 # 错误；后续 nixos-install / nixos-rebuild 会复用已构建的结果。
-SELF_PKGS=(niri-sidebar nyxniri-scratch-menu pins pywalfox shorin-contrib splayer-next ab-download-manager tabby-terminal obs-vdoninja purevox bedrockboot axolotl)
+SELF_PKGS=(niri-sidebar nyxniri-scratch-menu pins shorin-contrib splayer-next ab-download-manager tabby-terminal obs-vdoninja purevox bedrockboot axolotl)
 echo "==> 预构建自构建程序（flake 包）..."
 for p in "${SELF_PKGS[@]}"; do
   echo "    • 构建 $p ..."

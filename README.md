@@ -45,7 +45,7 @@ neko-nixos/
 - **主题 / 图标**：`adwaita-icon-theme` `papirus-icon-theme` `adw-gtk3` `breeze` —— 图标主题由 home-manager `gtk` 模块写入
 - **flake 包**：`opencode`、`bili-danmaku-tui`、`cooknixvim`、`noctalia-shell`
 - **Flatpak（flatpak-repo 服务自动装）**：微信 / QQ / Flatseal / Bazaar / OpenOrpheus
-- **自构建程序（`./pkgs`）**：`niri-sidebar` `nyxniri-scratch-menu` `pins` `pywalfox` `shorin-contrib` `splayer-next` `ab-download-manager` `tabby-terminal` `obs-vdoninja` `purevox` `bedrockboot` `axolotl` `astral`
+- **自构建程序（`./pkgs`）**：`niri-sidebar` `nyxniri-scratch-menu` `pins` `shorin-contrib` `splayer-next` `ab-download-manager` `tabby-terminal` `obs-vdoninja` `purevox` `bedrockboot` `axolotl` `astral`
 
 > ⚠️ `splayer-next` / `tabby-terminal` / `bedrockboot` / `axolotl` 与 nixpkgs 同名包不是同一个软件，勿混用。
 
@@ -65,7 +65,6 @@ neko-nixos/
 | `niri-sidebar` | Vigintillionn/niri-sidebar | Rust / cargo |
 | `nyxniri-scratch-menu` | — | Python + GTK3 / LayerShell |
 | `pins` | fabrialberio/Pins | GTK4/libadwaita, meson |
-| `pywalfox` | Frewacom/pywalfox | Python |
 | `shorin-contrib` | shorin-contrib | Shell 脚本 |
 | `splayer-next` | SPlayer-Dev/SPlayer-Next | Electron（AppImage 包装） |
 | `ab-download-manager` | amir1376/ab-download-manager | jpackage |

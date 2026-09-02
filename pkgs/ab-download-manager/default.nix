@@ -1,33 +1,12 @@
-# AB Download Manager —— 跨平台下载管理器（Kotlin/Compose Desktop）
-#
-# amir1376/ab-download-manager（nixpkgs 无此包，AUR: abdownloadmanager-bin）
-# GitHub Releases 的 jpackage 打包（bin 启动脚本 + 捆绑 JBR 运行时 + 原生库）：
-#   - 解压保持目录结构，bin/abdownloadmanager 直接链接到捆绑启动器
-#   - autoPatchelfHook 处理 libapplauncher.so / libskiko 原生库
-#
-# ⚠️ 字体崩溃根因与修复（2026-08，已实测）：
-# 捆绑 JBR（JDK 25）的 sun.awt 在启动时 dlopen("libfontconfig.so.1") 加载
-# native fontconfig；NixOS 没有 ld.so.cache 且该库不在任何标准搜索路径 →
-# dlopen 失败 → 回退 Java 侧解析器 → "Fontconfig head is null" 崩溃。
-# LD_DEBUG 证实 JVM 的 dlopen 搜索路径（来自 libnio.so 的 RUNPATH）包含
-#   $java.home/lib 与 $java.home/lib/server
-# → 在 runtime/lib 放入 libfontconfig.so.1 的符号链接即可命中，无需任何
-#   环境变量。此修复覆盖所有入口：桌面启动、应用内"开机自启"（ABDM 自己
-#   写 ~/.config/autostart 指向 bin/ABDownloadManager 原始路径）、浏览器集成。
-# 之前尝试的 -Dsun.awt.fontconfig 指向自定义 XML 的方案对 JDK 25 无效
-# （XML 被按 Java properties 解析 → getInitELC NPE 崩溃），已移除。
-#
-# ⚠️ 系统托盘修复（2026-08，已实测）：
-# ABDM 1.10+ 的托盘由 ComposeNativeTray 实现，运行时把 jar 内的
-# libLinuxTray.so 解压到 ~/.cache/composetray 后经 JNA 加载；该库 NEEDED
-# libsystemd.so.0，而 NixOS 无 ld.so.cache → 依赖解析失败 → 托盘静默失败
-# （SNI 上无 item）。修复：makeWrapper 注入 LD_LIBRARY_PATH 指向
-# systemdLibs（JNA 的 dlopen 会按 LD_LIBRARY_PATH 解析依赖）。
-# ⚠️ wrapper 必须放在原始路径 bin/ABDownloadManager 上（真二进制改名 .bin，
-# 配 .bin.cfg）：ABDM 的 auto-start 会把 ~/.config/autostart 的 Exec 写成
-# 自身启动路径（lib/abdm/bin/ABDownloadManager），若只包装 $out/bin/ 下的
-# 别名，开机自启会绕过 wrapper → LD_LIBRARY_PATH 缺失 → 托盘消失。
-# 原始路径包装覆盖所有入口：桌面菜单、应用内自启、浏览器集成。
+# AB Download Manager（Kotlin/Compose，jpackage 打包）
+# 解压保持目录结构，bin/abdownloadmanager 直接链接到捆绑启动器
+# 踩坑（已实测）：
+# 1) 字体崩溃 "Fontconfig head is null"：JVM dlopen libfontconfig.so.1 搜索路径含
+#    runtime/lib → 放符号链接命中（-Dsun.awt.fontconfig XML 方案对 JDK25 无效）
+# 2) 托盘消失：ComposeNativeTray 的 libLinuxTray.so NEEDED libsystemd.so.0，
+#    NixOS 无 ld.so.cache → makeWrapper 注入 LD_LIBRARY_PATH=systemdLibs
+# 3) wrapper 须放原始路径 bin/ABDownloadManager（真二进制改 .bin + 配 .bin.cfg）：
+#    否则应用自启重写的 autostart 会绕过 wrapper → 托盘仍消失
 { pkgs }:
 
 let

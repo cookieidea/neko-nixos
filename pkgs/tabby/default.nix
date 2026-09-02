@@ -1,7 +1,6 @@
-# Tabby — 可编程的现代化终端模拟器（Electron）
-# Upstream: https://github.com/Eugeny/tabby（注意：nixpkgs 的 `tabby` 是 TabbyML AI 助手，同名不同项目）
-#
-# Electron 应用从源码构建在 Nix 下脆弱，直接 wrap 官方 release 的 AppImage（与 splayer-next 同法）。
+# Tabby 终端（Electron）
+# ⚠️ nixpkgs 的 `tabby` 是 TabbyML AI 助手，同名不同项目
+# Electron 源码构建脆弱 → wrap 官方 release AppImage（同 splayer-next 法）
 #
 # wrapType2 会把 AppImage 解包到 $out/usr/share（desktop 在 usr/share/applications），
 # 而 launcher/freedesktop 扫描的是 $out/share/applications → 手动补一份并修正 Exec。

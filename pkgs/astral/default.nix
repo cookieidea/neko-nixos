@@ -1,8 +1,5 @@
-# Astral —— 组网（mesh networking）客户端
-#
-# 上游: https://github.com/AstralNext/Astral（Flutter GUI + Rust/EasyTier 核心）
-#
-# 打包方式：上游在 Nix 沙箱内无法联网构建（cargokit 构建 Rust 核心 + dart pub get
+# Astral 组网客户端（Flutter GUI + Rust/EasyTier 核心）
+# 上游在 Nix 沙箱内无法联网构建（cargokit + dart pub get
 # 都需网络），且上游无 release 产物，因此采用「手动联网构建一次 + 本地 bundle 打包」：
 #   - bundle 由 scripts/build-astral.sh 生成到 /home/cookie/.cache/astral/bundle
 #   - 这里用 builtins.path 把 bundle 拷进 store（内容哈希，改动即失效重建）

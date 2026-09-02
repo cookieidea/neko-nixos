@@ -1,93 +1,64 @@
 {
   description = "Shorin Arch Setup (shorin-arch-setup) → NixOS + Home Manager conversion";
 
-  # 国内二进制缓存（中科大 USTC 优先 + 清华 TUNA 兜底）。仅加速「包下载」，不影响 flake 源码拉取。
-  # nixpkgs 源码走 TUNA nix-channels；home-manager/cooknixvim/opencode TUNA 未镜像，走 github
-  # （慢但可用；若 github 被墙可加代理或换镜像）。
+  # 国内二进制缓存（USTC 优先 + TUNA 兜底）；nixpkgs 源码走 USTC tarball，其余输入走 github。
   nixConfig = {
     extra-substituters = [
       "https://mirrors.ustc.edu.cn/nix-channels/store"
       "https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store"
       "https://attic.xuyh0120.win/lantian"
-      # Noctalia V5 官方 Cachix 缓存（github 源从主仓库拉，二进制约几百 MB）
       "https://noctalia.cachix.org"
     ];
     extra-trusted-public-keys = [
-      "lantian:EeAUQ+W+6r7EtwnmYjeVwx5kOGEBpjlBfPlzGlTNvHc="   # attic.xuyh0120.win/lantian（CachyOS 内核缓存）
+      "lantian:EeAUQ+W+6r7EtwnmYjeVwx5kOGEBpjlBfPlzGlTNvHc="
       "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
       "noctalia.cachix.org-1:pCOR47nnMEo5thcxNDtzWpOxNFQsBRglJzxWPp3dkU4="
     ];
   };
 
   inputs = {
-    # nixpkgs 源码走中科大 USTC 通道 tarball（nix-channels 镜像，含 flake.nix 可作
-    # flake 输入）。⚠️ 2026-08-20 实测：TUNA 的 nixexprs.tar.xz 返回 403、USTC 正常
-    #   （206），故改用 USTC；TUNA git 镜像 git/nixpkgs.git 也不可用（not found）。
-    # 更新 nixpkgs：`nix flake update nixpkgs --accept-flake-config`（tarball 锁定 narHash）。
     nixpkgs.url = "https://mirrors.ustc.edu.cn/nix-channels/nixos-26.05/nixexprs.tar.xz";
-    # home-manager TUNA 未镜像，用 git+https 直连 github（绕开 GitHub REST API 限流 403）
+    # 更新：`nix flake update nixpkgs`
     home-manager = {
       url = "git+https://github.com/rycee/home-manager.git?ref=release-26.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # ── CookNixvim：模块化 Neovim 配置（基于 nix-community/nixvim）──
-    # 用其 flake 构建产物 packages.<sys>.default 作为 nvim（配置内嵌在它仓库的 config/）。
-    # 注意：它自带 nixpkgs-unstable 与 nixvim（unstable）输入，首次构建会拉 GitHub 大包。
     cooknixvim = {
       url = "git+https://github.com/Youthdreamer/CookNixvim";
     };
 
-    # ── opencode（AI 编程 Agent）──
-    # 官方 flake（github:sst/opencode，dev 分支持续构建最新版）；
-    # 之前用 GutMutCode/opencode-nix 第三方包装，其内部 pin 固定版本 → 版本太旧
     opencode = {
       url = "git+https://github.com/sst/opencode";
     };
 
-    # ── bili-danmaku-tui（B 站直播间弹幕 TUI，Go/bubbletea）──
-    # 自带 flake.nix（buildGoModule，vendorHash 已锁）；follows nixpkgs 复用本地镜像源
     bili-danmaku-tui = {
       url = "git+https://github.com/Youthdreamer/bili-danmaku-tui.git";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # ── CachyOS 内核（xddxdd/nix-cachyos-kernel）──
-    # release 分支带二进制缓存（attic.xuyh0120.wan/lantian，国内快）；
-    # ⚠️ 官方明确不要 follows nixpkgs（补丁与内核版本需匹配其 pin 的 nixpkgs）
+    # ⚠️ CachyOS 内核：不要 follows nixpkgs（补丁需匹配其 pin 的 nixpkgs 才能命中缓存）
     nix-cachyos-kernel = {
       url = "git+https://github.com/xddxdd/nix-cachyos-kernel?ref=release";
     };
 
-    # ── Noctalia V5（原生 C++ Wayland 桌面 shell，替代 v4 noctalia-shell）──
-    # 用 cachix 分支：始终指向官方 Cachix 已缓存的最新 commit，避免本地编译。
-    # ⚠️ 不要 follows nixpkgs：改了输入 hash 会失去二进制缓存命中。
+    # ⚠️ Noctalia：cachix 分支（命中官方缓存）；不要 follows nixpkgs
     noctalia = {
       url = "git+https://github.com/noctalia-dev/noctalia.git?ref=cachix";
     };
 
-    # ── rust-overlay（Axolotl 源码构建的 Rust 1.95 工具链）──
-    # 仓库 rust-toolchain.toml 要求 channel 1.95.0，NixOS 26.05 nixpkgs 的
-    # 默认 rustc 较旧 → 用 rust-overlay 提供（fromRustupToolchainFile）。
-    # 仅用于 selfPackages 的 pkgs 实例（下方 import nixpkgs overlays），
-    # 不影响系统级 nixpkgs。
+    # rust-overlay：Axolotl 需 Rust 1.95（仅作用于 selfPackages 实例）
     rust-overlay = {
       url = "git+https://github.com/oxalica/rust-overlay";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # ── Noctalia Greeter（greetd 登录界面，与 Noctalia V5 视觉一致）──
-    # follows nixpkgs 复用本机 nixpkgs（greeter 无二进制缓存，避免双份 nixpkgs）。
-    # 用 git+https 直连 github（绕开 GitHub REST API 限流 403，与 home-manager 同理）。
     noctalia-greeter = {
       url = "git+https://github.com/noctalia-dev/noctalia-greeter?ref=main";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # ── Astral 组网客户端（Flutter GUI + Rust/EasyTier 核心）──
-    # 上游构建需联网（dart pub get + cargokit 编译 Rust），Nix 沙箱内无法完成，
-    # 因此用 build.sh（pkgs/astral/）手动联网构建产物，以本地 path 输入引用。
-    # ⚠️ path 输入不入 git；换机器需先跑 build.sh 再 nixos-rebuild。
+    # ⚠️ Astral 构建需联网（沙箱内无法完成），走 build.sh 产物；path 输入不入 git，换机需先跑 build.sh
     astral-bundle = {
       url = "path:/home/cookie/.cache/astral/bundle";
       flake = false;
@@ -97,40 +68,29 @@
   outputs = { self, nixpkgs, home-manager, cooknixvim, opencode, bili-danmaku-tui, nix-cachyos-kernel, noctalia, noctalia-greeter, rust-overlay, astral-bundle, ... }:
     let
       system = "x86_64-linux";
-      # ── 改这里 ──────────────────────────────────────────────
-      username = "cookie";   # 你的用户名（也用于 home 目录 / autoLogin）
+      username = "cookie";   # 你的用户名（用于 home 目录 / autoLogin）
       hostname = "ATRI";
-      desktop  = "niri";       # 当前仅 "niri"（niri + Noctalia）
-      # ───────────────────────────────────────────────────────
+      desktop  = "niri";
 
-      # 自构建程序（AUR `-git` / 私有仓库）的派生，见 ./pkgs
-      # ⚠️ 不能用 legacyPackages（裸实例不带 nixpkgs.config）：unfree 包
-      #    （bedrockboot/axolotl 等标 unfreeRedistributable）评估会被拒。
-      #    用 import nixpkgs 显式带 config.allowUnfree（仅作用于 selfPackages，
-      #    不覆盖系统级配置——系统级仍由 configuration.nix 的 nixpkgs.config 管）。
+      # 自构建程序派生（见 ./pkgs）。显式 import nixpkgs 带 allowUnfree（unfree 包评估
+      # 需要 nixpkgs.config，legacyPackages 裸实例会拒）；仅作用于 selfPackages。
       pkgs = import nixpkgs {
         inherit system;
         config.allowUnfree = true;
-        # rust-overlay 仅作用于 selfPackages 实例（Axolotl 源码构建需要 Rust 1.95）
-        overlays = [ rust-overlay.overlays.default ];
+        overlays = [ rust-overlay.overlays.default ];   # Axolotl 需 Rust 1.95
       };
-      # Axolotl 构建工具链（仓库 rust-toolchain.toml：channel 1.95.0）
       rustToolchain = pkgs.rust-bin.fromRustupToolchainFile ./pkgs/axolotl/rust-toolchain.toml;
 
       selfPackages = import ./pkgs { inherit pkgs rustToolchain astral-bundle; };
 
-      # 公共 Home Manager 集成模块（nixos 实体机配置用）
       hmModule = {
-        # 必须先 import home-manager 的 NixOS 模块，home-manager.* 选项才有定义
         imports = [ home-manager.nixosModules.home-manager ];
 
         _module.args = { inherit desktop username selfPackages; };
 
-        # Home Manager 集成
         home-manager.useGlobalPkgs = true;
         home-manager.useUserPackages = true;
         home-manager.users.${username} = import ./home.nix;
-        # 把 cooknixvim / opencode / bili-danmaku-tui 三个 flake 输入，以及自构建包传给 home 配置
         home-manager.extraSpecialArgs = { inherit desktop username cooknixvim opencode bili-danmaku-tui selfPackages noctalia; };
       };
     in {
@@ -138,9 +98,7 @@
       packages.${system} = selfPackages;
 
       nixosConfigurations = {
-        # ── 实体机（btrfs + GRUB + snapper + 休眠）──
-        # hardware-configuration.nix 由 `nixos-generate-config --root /mnt` 在目标机生成，
-        # 需 `git add hardware-configuration.nix` 后才会被 flake 包含。
+        # 实体机；hardware-configuration.nix 需 git add 后才会被 flake 包含
         ${hostname} = nixpkgs.lib.nixosSystem {
           inherit system;
           specialArgs = { inherit noctalia-greeter; };
@@ -148,10 +106,8 @@
             ./hardware-configuration.nix
             ./configuration.nix
             hmModule
-            # CachyOS 内核 overlay（pinned：固定其 nixpkgs rev 以命中二进制缓存）
-            # + 修 neovim 包自带的 nvim.desktop（Name=Neovim wrapper）：
-            #   原版 Terminal=true + Exec=nvim，图形启动器拉起时缺终端处理器打不开
-            #   → 覆盖为 Terminal=false + Exec=kitty -e nvim %F（直接调 kitty 打开）
+            # CachyOS 内核 overlay（pinned 命中缓存）+ 修 nvim.desktop：
+            # 原版 Terminal=true 图形启动器打不开 → 覆盖为 kitty 打开
             {
               nixpkgs.overlays = [
                 nix-cachyos-kernel.overlays.pinned

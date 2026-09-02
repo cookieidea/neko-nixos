@@ -1,13 +1,4 @@
-# Shorin Arch Setup → Home Manager user config
-# 包来源：
-#   common-applist.txt          (GNOME 基线)
-#   kde-applist.txt             (shell/终端 + KDE 应用)
-#   kde-common-applist.txt      (KDE 系统工具/磁盘/媒体)
-# 桌面：niri (Wayland 滚动平铺 compositor) + Noctalia (桌面 shell)
-# 编辑器：CookNixvim（Youthdreamer/CookNixvim，模块化 Neovim 配置框架产物，
-#        基于 nix-community/nixvim；用其 flake 构建的 nvim 替代裸 nixvim 配置）
-# AUR-only 与 nixpkgs 差异见底部注释。
-
+# Home Manager 用户配置（桌面 niri + Noctalia；编辑器 CookNixvim）
 { config, pkgs, lib, desktop, username, cooknixvim, opencode, bili-danmaku-tui, selfPackages, noctalia, ... }:
 
 let
@@ -41,95 +32,69 @@ in
   home.homeDirectory = "/home/${username}";
   home.stateVersion = "26.05";
 
-  # kitty 终端 terminfo：kitty 设 TERM=xterm-kitty，NixOS 上 ncurses 找不到该
-  # terminfo 文件 → nvim 等 ncurses 应用吐转义码乱码（^[[?69…）。指向 kitty 包自带的
-  # share/terminfo 即可（xterm 等其余条目用 ncurses 内建 fallback）。
-  # ~/.local/bin 进 PATH：quicksave / quickload 等
-  # 私有脚本部署在这里（binds.kdl 裸命令调用靠 PATH 查找）。
+  # kitty terminfo（TERM=xterm-kitty 需指向 kitty 自带 share/terminfo 防乱码）
+  # ~/.local/bin 进 PATH（quicksave/quickload 等私有脚本，binds.kdl 裸命令调用）
   home.sessionPath = [ "$HOME/.local/bin" "$HOME/.cargo/bin" ];
   home.sessionVariables = {
     TERMINFO_DIRS = "${pkgs.kitty}/share/terminfo";
-    # gvfs 的 GIO 模块：缺了它 GIO 认不出 trash:/// 等 gvfs URI，
-    # 文件管理器（Thunar/Nautilus）回收站不可用。保留 dconf 模块。
-    GIO_EXTRA_MODULES = "${pkgs.gvfs}/lib/gio/modules:${pkgs.dconf}/lib/gio/modules";
-    # nautilus-open-any-terminal：Nautilus 内置 Python 宿主需要 gi/pygobject
-    PYTHONPATH = "${pkgs.python3Packages.pygobject3}/lib/python3.13/site-packages";
-    # ABDM 托盘兜底：ABDM 应用会把自己的 autostart 重写为 bin/ABDownloadManager.bin
-    # （/proc/self/exe 检测实际二进制）→ 绕过 makeWrapper → 无 systemdLibs →
-    # ComposeNativeTray 的 libLinuxTray.so 解析不到 libsystemd.so.0 → 托盘消失。
-    # 会话级 LD_LIBRARY_PATH 让任何入口（autostart/菜单/浏览器）都带该路径。
-    # 注意：sessionVariables 是覆盖语义，须保留用户会话原有的
-    # pipewire-jack 路径（JACK 音频应用依赖）。
+    GIO_EXTRA_MODULES = "${pkgs.gvfs}/lib/gio/modules:${pkgs.dconf}/lib/gio/modules";   # gvfs URI（trash:// 等）
+    PYTHONPATH = "${pkgs.python3Packages.pygobject3}/lib/python3.13/site-packages";   # nautilus 扩展宿主
+    # 覆盖语义，须保留原 pipewire-jack 路径；ABDM 托盘需 systemdLibs
     LD_LIBRARY_PATH = "${pkgs.systemdLibs}/lib:/nix/store/zcqp398mxlw62jl02sx0rsc7gvcl1qhc-pipewire-1.6.6-jack/lib";
-    # ── 开发工具链环境 ──
-    JAVA_HOME = "${pkgs.jdk21}";              # JDK 21 (LTS) 的 home（含 bin/java、lib）
-    # GSettings schema 修复：本系统 gtk3 用 Flatpak 式 gsettings-schemas 路径，
-    # 会话默认不扫描 → GTK 文件选择器读 org.gtk.Settings.FileChooser 失败
-    # （kdenlive 启动即 abort：g_settings_set_property→_g_log_abort）。
-    # 显式指到 gtk3 编译好的 schema 目录（GSETTINGS_SCHEMA_DIR 为追加语义，不覆盖默认）。
+    JAVA_HOME = "${pkgs.jdk21}";
+    # gtk3 schema 路径（否则 kdenlive 等 GTK 选择器 abort）
     GSETTINGS_SCHEMA_DIR = "${pkgs.gtk3}/share/gsettings-schemas/${pkgs.gtk3.name}/glib-2.0/schemas";
-    CARGO_HOME = "$HOME/.cargo";              # cargo 全局目录（registry / 已安装二进制）
+    CARGO_HOME = "$HOME/.cargo";
   };
-  # ============================================================
-  #  软件包（home.packages）
-  #  左 = Nixpkgs 属性名，括号内 = 原 Arch 包名
-  # ============================================================
   home.packages = with pkgs; [
-    # --- Standard (common-applist.txt) ---
-    gdu                                       # gdu
-    baobab                                    # baobab
+    # --- Standard ---
+    gdu
+    baobab
     file                                      # file 命令（random-anime-wallpaper-noctalia 壁纸脚本依赖）
     mission-center                            # mission-center
     gnome-font-viewer                         # gnome-font-viewer
     google-chrome                             # google-chrome (替代 firefox; unfree 已开启)
     transmission_4-gtk                        # transmission_4-gtk（26.05 移除 transmission_3-gtk / transmission-gtk）
-    localsend                                 # localsend
+    localsend
     gnome-clocks                              # gnome-clocks
-    lutris                                    # lutris
-    # steam —— 已从 home.packages 移除：home-manager 装的 pkgs.steam 不带
-    # fontPackages（FHS 环境缺 CJK 字体），且会遮蔽 programs.steam 的正确包。
-    mangohud                                  # mangohud
+    lutris
+    mangohud
     (mpv.override {
-      # thumbfast.lua 需要 LuaJIT 的 ffi 模块，默认 mpv 用 lua 5.2 没有 → 换 luajit 构建
-      mpv-unwrapped = mpv-unwrapped.override { lua = luajit; };
-    })                                    # mpv（luajit 构建，支持 thumbfast 缩略图）
-    opencc                                    # opencc（mpv opencc.lua 字幕繁简转换）
-    p7zip                                     # 7z（mpv auto_sub_fonts_dir 解压字幕字体包）
-    ffmpeg                                    # ffmpeg（mpv opencc.lua 提取字幕轨道）
-    yt-dlp                                    # yt-dlp（mpv 在线视频下载/播放）
-    vapoursynth                                # vapoursynth（mpv vapoursynth.lua 的 vspipe，Linux 版 VSPipe）
+      mpv-unwrapped = mpv-unwrapped.override { lua = luajit; };   # thumbfast 需 LuaJIT ffi
+    })
+    opencc                                    # mpv 字幕繁简转换
+    p7zip                                     # mpv 解压字幕字体包
+    ffmpeg                                    # mpv 提取字幕轨道
+    yt-dlp                                    # mpv 在线视频
+    vapoursynth                                # mpv VapourSynth（vspipe）
     obs-studio                                # obs-studio
     kdePackages.kdenlive                         # kdenlive（KDE 视频剪辑；26.05 属 kdePackages 不在顶层）
     kdePackages.kcalc                            # kcalc（KDE 计算器；26.05 属 kdePackages，gear 区）
-    upscaler                                  # upscaler
+    upscaler
     gimp                                      # gimp（图像编辑；3.x GTK3）
-    yazi                                      # yazi
-    # flatseal 已在 nixpkgs 26.05 移除 → 需要时用 flatpak 装：
-    #   flatpak install flathub com.github.tchx84.Flatseal
-    pavucontrol                               # pavucontrol
-    easyeffects                               # easyeffects
-    libreoffice                               # libreoffice（办公套件；默认 27 种语言含 zh-CN。⚠️ 不要对它 .override { langs=... }——pkgs.libreoffice 是带 unwrapped 的 wrapper，直接 override 会返回函数导致 home.packages 类型错误；真要减语言包需 override unwrapped）
-    # 日文输入法 fcitx5-mozc 已移除；输入法本体由 i18n.inputMethod 系统级配置
-    # rime-wubi 已在 26.05 移除 → 中文输入走 rime + rime-ice（雾凇，见 configuration.nix）
+    yazi
+    pavucontrol
+    easyeffects
+    libreoffice                               # ⚠️ 勿 .override langs（wrapper 直接 override 返回函数报错）
 
-    # --- Shell & Terminal (kde-applist.txt) ---
-    fish                                      # fish
-    starship                                  # starship
-    eza                                       # eza
-    zoxide                                    # zoxide
-    fastfetch                                 # fastfetch
-    imagemagick                               # imagemagick
-    jq                                        # jq
-    timg                                      # timg
-    bat                                       # bat
+    # --- Shell & Terminal ---
+    fish
+    starship
+    eza
+    zoxide
+    fastfetch
+    imagemagick
+    jq
+    timg
+    bat
     btop                                      # btop（DE 无关，常驻）
     ripgrep                                   # ripgrep（原 LazyVim/neovim 生态搜索工具）
     fd                                        # fd（find 替代，neovim/telescope 生态常用）
 
-    # --- 编辑器（替代 visual-studio-code-bin，AUR）---
-    vscodium                                  # visual-studio-code-bin → 用 vscodium 去遥测
+    # --- 编辑器 ---
+    vscodium
 
-    # --- 开发工具链（Java / Python / Rust）---
+    # --- 开发工具链 ---
     jdk21                                     # JDK 21 (LTS)；JAVA_HOME 见上方 sessionVariables
     (python3.withPackages (ps: [ ps.pip ]))   # python3 + pip
     uv                                        # uv（现代 Python 包/虚拟环境管理器）
@@ -138,31 +103,26 @@ in
     nodejs_22                                 # Node.js 22 LTS（含 npm）
     docker-compose                            # docker compose（配合 virtualisation.docker）
 
-    # --- 已确认在 nixpkgs 26.05 存在的原 AUR 包 ---
-    flclash                                   # flclash（代理 GUI）
-    # discord —— 改走 Flatpak（nixpkgs 构建需从 stable.dl.discordapp.net 下载，国内不可达）
-    ayugram-desktop                           # ayugram-desktop（Telegram 第三方客户端，unfree）
-    # wechat / qq —— nixpkgs 26.05 的 src 分别走 web.archive.org（429 限流）与腾讯 CDN
-    # 旧版本链接（404），且 wechat 的 src 深埋在 appimageTools.extract 内部无法 override，
-    # 故改走 Flatpak（flathub 官方维护），由 configuration.nix 的 flatpak-repo 服务启动时自动安装。
+    # --- 原 AUR 包 ---
+    flclash                                   # 代理 GUI
+    # discord/wechat/qq 改走 Flatpak（nixpkgs 源国内不可达）
+    ayugram-desktop                           # Telegram 第三方客户端
     distrobox                                 # distrobox（容器化发行版环境，需 docker/podman 后端）
     protonplus                                # protonplus（Proton 管理）
     mangojuice                                # mangojuice（GTK 文件管理器）
 
-    # --- 游戏 / 影音客户端（用户新增，已在 nixpkgs 26.05 核实存在）---
-    # prismlauncher 已替换为 Axolotl（selfPackages，上游 PR #298 nix 源码构建；见 pkgs/axolotl）
-    lunar-client                               # lunar-client（Minecraft 客户端，unfree；26.05 由 lunarclient 改名）
-    taterclient-ddnet                         # taterclient-ddnet（DDNet Teeworlds 修改版客户端，Apache-2.0）
+    # --- 游戏 / 影音客户端 ---
+    # prismlauncher → Axolotl（selfPackages，见 pkgs/axolotl）
+    lunar-client
+    taterclient-ddnet                         # DDNet Teeworlds 客户端
 
-    # --- 原清单里有、之前漏加的 ---
-    virt-manager                              # virt-manager（KVM 虚拟机 GUI，libvirtd 已在 configuration.nix 开）
-    virt-viewer                               # virt-viewer（QEMU/SPICE 客户端，virt-manager 配套）
-    gnome-disk-utility                        # gnome-disk-utility（磁盘管理 GUI，mainProgram=gnome-disks；原 kde-common-applist）
-    # ksystemlog —— nixpkgs 26.05 已移除（KDE 上游停止维护，KDE Gear 不再打包）；
-    # 系统日志用 journalctl / journalctl -f，或 GNOME 系可用 flatpak 的 org.gnome.Logs
-    video-downloader                          # video-downloader（yt-dlp 图形前端）
+    # --- 补漏 ---
+    virt-manager virt-viewer                  # KVM 虚拟机 GUI
+    gnome-disk-utility                        # 磁盘管理 GUI
+    # ksystemlog 已移除 → journalctl
+    video-downloader                          # yt-dlp 图形前端
 
-    # --- niri 桌面生态依赖（config.kdl / binds.kdl 里用到的程序）---
+    # --- niri 桌面生态 ---
     niri                                       # niri 合成器本体（greetd/Noctalia Greeter 会话拉起，也放这里保持 PATH 一致）
     kitty                                      # 终端（binds: Mod+Return / Mod+T / Mod+Slash / opencode）
     fuzzel                                     # 启动器兜底（binds: Mod+Z 失败回退 fuzzel）
@@ -173,7 +133,7 @@ in
     thunar                                     # 文件管理器（binds: Mod+E 优先）
     nautilus                                    # nautilus（GNOME Files，binds: Mod+Alt+E / Mod+E 兜底）
     zenity                                      # zenity（mpv input_plus 打开文件对话框，Linux 替代 openfile.exe）
-    # ── 原 04k 脚本的文件管理器生态（全量迁移）──
+    # 文件管理器生态
     gnome-keyring                             # 密钥环（登录钥匙串，nautilus/远程/应用依赖）
     gvfs                                      # 虚拟文件系统（smb/mtp/gphoto2 挂载）
     ffmpegthumbnailer                         # 视频缩略图（thunar/nautilus）
@@ -185,8 +145,8 @@ in
     gst_all_1.gst-plugins-base                # GStreamer 基础插件
     gst_all_1.gst-plugins-good                # GStreamer 常规插件
     gst_all_1.gst-libav                       # GStreamer libav（解码）
-    usbutils                                  # lsusb
-    pciutils                                  # lspci
+    usbutils
+    pciutils
     font-awesome                              # Font Awesome 图标字体（原 otf-font-awesome）
     satty                                      # 截图标注（binds: Mod+Shift+S）
     cliphist                                   # 剪贴板历史（noctalia config.toml 的 clipboard watch 命令）
@@ -195,16 +155,16 @@ in
     xsettingsd                                 # GTK 主题/字体经 XSETTINGS 注入应用（niri 无 DE 时需要）
     xprop                                       # xprop（26.05 起 xorg 属性集弃用，xorg.xprop 改为顶层 xprop；niri-force-kill-window 依赖）
     btrfs-assistant                            # btrfs 快照管理 CLI（quickload Mod+F8 的回滚后端）
-    # ── 原 02b/99-apps 补充 ──
+    # 02b/99-apps 补充
     power-profiles-daemon                      # 电源模式（平衡/省电/性能）
     cmatrix lolcat sl                          # 彩蛋趣味命令（原 02b 安装）
     wineWow64Packages.stable                   # wine（原 99-apps 的 wine 全家；26.05 弃用 wineWowPackages）
     # bottles 改走 Flatpak（nixpkgs FHS 版连接检测端点失效无法下载 runner）
 
-    # ── 全量脚本审查补漏（04j-minimal-niri / 04k-noctalia 核对结果）──
+    # 脚本审查补漏
     matugen                                    # 主题生成器（random-anime-wallpaper-noctalia 与 noctalia-shell 模板直接调用）
     mpvpaper                                   # 视频壁纸（mpv 渲染 wlr-layer-shell，niri 启动项播放 hatsune-miku.mp4）
-    # ── NyxNiri 迁移新增依赖 ──
+    # NyxNiri 新增
     tmux                                       # tmux（scratchpad 终端，Super+~）
     wlsunset                                   # wlsunset（护眼模式色温 Super+N）
     inotify-tools                              # inotifywait（noctalia mpvpaper-sync 监听 assignments）
@@ -235,8 +195,7 @@ in
   ++ [
     selfPackages.niri-sidebar     # niri-sidebar-git
     selfPackages.nyxniri-scratch-menu  # NyxNiri 星环菜单（GTK3+LayerShell，Super+A）
-    selfPackages.pins             # pins-git
-    selfPackages.pywalfox         # python-pywalfox
+    selfPackages.pins
     selfPackages.shorin-contrib   # shorin-contrib-git
     selfPackages.splayer-next     # SPlayer-Dev/SPlayer-Next（非 nixpkgs 的 splayer）
     selfPackages.ab-download-manager  # AB Download Manager（多线程下载器，Compose Desktop；自构建）
@@ -292,23 +251,16 @@ in
   # ============================================================
   #  systemd user 服务（登录图形会话后自启）
   # ============================================================
-  # ⚠️ ABDM 不自启在此定义（原 systemd.user.services.abdm 已移除）：
-  # ABDM 应用自身有开机自启机制（设置 autoStartOnBoot=true 默认），启动时会
-  # 自动写 ~/.config/autostart/com.abdownloadmanager.desktop（Exec 指向
-  # bin/ABDownloadManager.bin --background）。若再配 systemd 服务会双重启动，
-  # 第二次实例经单实例转发唤醒聚焦第一个实例的窗口 → 开机弹窗。
-  # 托盘环境问题由下方 xdg.configFile 的 systemd drop-in 兜底。
+  # ABDM 不自启（其自身有 autostart 机制，双启会弹窗）；托盘由下方 drop-in 兜底
 
-  # nautilus-open-any-terminal：nautilus 由 niri（systemd 服务）spawn，
-  # 只继承 systemd 用户环境（home.sessionVariables 只进 login shell 的
-  # hm-session-vars.sh，进不了图形会话）→ 把 pygobject（gi）和 nautilus
-  # typelib 注入 systemd 用户环境，右键"打开终端"才不消失。
+  # nautilus-open-any-terminal：nautilus 由 niri（systemd 服务）spawn，只继承
+  # systemd 用户环境 → 注入 gi/typelib，"打开终端"才不消失
   systemd.user.sessionVariables = {
     PYTHONPATH = "${pkgs.python3Packages.pygobject3}/lib/python3.13/site-packages";
     GI_TYPELIB_PATH = "${pkgs.nautilus}/lib/girepository-1.0";
   };
 
-  # 开机随机壁纸（noctalia IPC）：等 noctalia-shell 就绪后跑一次下载脚本
+  # 开机随机壁纸（noctalia IPC）
   systemd.user.services.noctalia-wallpaper = {
     Unit = {
       Description = "Set random anime wallpaper via noctalia";
@@ -324,26 +276,10 @@ in
     Install.WantedBy = [ "graphical-session.target" ];
   };
 
-  #  运行方式：nixpkgs 自带的 `noctalia-shell`（quickshell 配置 + qs 封装），
-  #  由 config.kdl 的 `spawn-sh-at-startup "noctalia-shell"` 拉起。
-  #  IPC 绑定见 binds.kdl：统一用 `noctalia-shell ipc call ...`（见文末说明）。
-  # ============================================================
-
-  # ============================================================
-  #  dotfiles（对应原仓库 noctalia-dotfiles 的 rice 配置）
-  #  通过 xdg.configFile 部署到 ~/.config/
-  # ============================================================
-
+  # dotfiles 部署到 ~/.config/（原 noctalia-dotfiles rice 配置）
   xdg.configFile = {
-    # ABDM 托盘兜底（systemd user unit drop-in）：ABDM 应用会把自己的
-    # autostart 重写为 bin/ABDownloadManager.bin（/proc/self/exe）→ 绕过
-    # makeWrapper → 无 systemdLibs → ComposeNativeTray 的 libLinuxTray.so
-    # 解析不到 libsystemd.so.0 → 开机自启的 ABDM 无托盘。
-    # systemd user 服务不经过 login shell（hm-session-vars.sh 不生效），
-    # 且本机 environment.d generator 缺失 → 用 unit drop-in 最可靠。
-    # ExecStartPre 补建 ~/.abdm/system/log/（ABDM 启动要写 crash.log，
-    # 目录缺失会 FileNotFoundException 崩溃退出，开机时序下不自动创建）。
-    # 注：LD_LIBRARY_PATH 为覆盖语义，保留 pipewire-jack 路径。
+    # ABDM 托盘：autostart 重写绕过 makeWrapper → 无 systemdLibs → 托盘消失；
+    # systemd user 服务不经过 login shell → 用 unit drop-in 注入 + 建 log 目录
     "systemd/user/app-com.abdownloadmanager@autostart.service.d/10-abdm-tray.conf".text = ''
       [Service]
       Environment=LD_LIBRARY_PATH=${pkgs.systemdLibs}/lib:/nix/store/zcqp398mxlw62jl02sx0rsc7gvcl1qhc-pipewire-1.6.6-jack/lib
@@ -359,30 +295,21 @@ in
     "fcitx5/conf/punctuation.conf".source = ./dotfiles/config/fcitx5/conf/punctuation.conf;
     "fcitx5/config".source = ./dotfiles/config/fcitx5/config;
     "fcitx5/profile".source = ./dotfiles/config/fcitx5/profile;
-    # fish 的 conf.d/config.fish/completions 由下方 NyxNiri 块部署，这里只保留函数与生成说明
-    # ⚠️ fish/fish_variables 不能部署成 store 只读符号链接——fish 运行时写通用变量会
-    #   报 "无法创建临时文件 /nix/store/... (os error 30 EROFS)"。让 fish 自己生成
-    #   （原文件只是默认空壳，无重要变量）。
+    # ⚠️ fish/fish_variables 不部署（store 只读链接，fish 运行时写会 EROFS），让 fish 自己生成
     "fish/functions/apt.fish".source = ./dotfiles/config/fish/functions/apt.fish;
     "fish/functions/f.fish".source = ./dotfiles/config/fish/functions/f.fish;
     "fish/functions/fwatch.fish".source = ./dotfiles/config/fish/functions/fwatch.fish;
     "fontconfig/fonts.conf".source = ./dotfiles/config/fontconfig/fonts.conf;
     "fuzzel/fuzzel.ini".source = ./dotfiles/config/fuzzel/fuzzel.ini;
-    # fuzzel/themes/noctalia 由 noctalia-shell 模板系统生成（matugen 写色），不可 home-manager 只读部署
+    # fuzzel/themes/noctalia 由模板生成，不部署
     "gtk-3.0/bookmarks".source = ./dotfiles/config/gtk-3.0/bookmarks;
     "gtk-3.0/gtk.css".source = ./dotfiles/config/gtk-3.0/gtk.css;
-    # ⚠️ gtk-3.0/noctalia.css 不部署：由 Noctalia 配色模板生成（template-processor
-    # 写色）。若部署成只读 symlink → 模板写入 PermissionError → "配色方案模板
-    # 处理失败"（toast.theming-processor-failed）。生成失败时才临时部署静态快照。
-    # gtk-3.0/settings.ini 不部署：由下方 gtk 模块（home-manager）全权写入，避免只读 symlink 冲突
+    # gtk-3.0/noctalia.css 与 settings.ini 不部署（Noctalia 模板生成 / gtk 模块写入）
     "gtk-4.0/gtk.css".source = ./dotfiles/config/gtk-4.0/gtk.css;
-    # gtk-4.0/noctalia.css 同上：由 Noctalia 模板生成，不部署只读版本。
-    # gtk-4.0/settings.ini 同上，由 gtk 模块写入
+    # gtk-4.0/noctalia.css、settings.ini 同上不部署
     "mimeapps.list".source = ./dotfiles/config/mimeapps.list;
-    # ── mpv（从 Windows mpv.lite portable_config 迁移；Linux 适配：去 nvidia、
-    #    opencc 路径改 ~/.config/mpv、TMPDIR、mkdir -p；并入原 hwdec=auto-safe）──
-    # 目录级（scripts/uosc 等只读内容）用目录 symlink；文件级 mpv 只读文件逐条链接，
-    # ~/.config/mpv 本体是真实目录（mpv 写 watch_later 需要）。
+    # mpv（自 Windows mpv.lite 迁移并 Linux 适配）；目录级只读内容用 symlink，
+    # ~/.config/mpv 本体是真实目录（watch_later 需写入）
     "mpv/mpv.conf".source = ./dotfiles/mpv/mpv.conf;
     "mpv/input.conf".source = ./dotfiles/mpv/input.conf;
     "mpv/contextmenu.conf".source = ./dotfiles/mpv/contextmenu.conf;
@@ -410,16 +337,12 @@ in
     "mpv/shaders".source = ./dotfiles/mpv/shaders;
     "mpv/vs".source = ./dotfiles/mpv/vs;
     "mpv/fonts".source = ./dotfiles/mpv/fonts;
-    # ── Niri 配置（迁移自 NyxNiri v2/niri；快捷键 binds.kdl 保留本机键位）──
-    # effects.kdl 是软链接（正常/护眼模式切换），由 toggle-eyecare.sh 维护，
-    # 由下方 home.activation 首次创建种子，不直接部署只读文件。
+    # niri 配置（迁移自 NyxNiri）；effects.kdl 为软链由 toggle-eyecare.sh 维护
     "niri/animations.kdl".source = ./dotfiles/config/niri/animations.kdl;
-    # binds.kdl 实体机上存在非 HM 管理的旧文件 → force = true 强制接管为 HM 链接。
     "niri/binds.kdl" = {
       source = ./dotfiles/config/niri/binds.kdl;
       force = true;
     };
-    # config.kdl 实体机上存在非 HM 管理的旧文件 → force = true 强制接管为 HM 链接。
     "niri/config.kdl" = {
       source = ./dotfiles/config/niri/config.kdl;
       force = true;
@@ -433,24 +356,17 @@ in
     "niri/__custom__.kdl".source = ./dotfiles/config/niri/__custom__.kdl;
     "niri/input__custom__.kdl".source = ./dotfiles/config/niri/input__custom__.kdl;
     "niri/scratchpad-items__custom__.toml".source = ./dotfiles/config/niri/scratchpad-items__custom__.toml;
-    # ── Noctalia V5 配置脚本（hook 脚本只读即可，由 noctalia 执行）──
-    # noctalia-config.toml 由 programs.noctalia.settings 部署，
-    # 再经下方 home.activation 复制为可写真实文件（V5 设置面板会写）。
-    # mpv-hook.lua 必须部署：noctalia/mpvpaper 插件的 mpv_options 引用它，
-    # 缺失会导致视频壁纸 mpvpaper 启动失败。
+    # noctalia hook 脚本；mpv-hook.lua 缺失会致 mpvpaper 视频壁纸失败
     "noctalia/theme-sync.sh".source = ./dotfiles/config/noctalia/theme-sync.sh;
     "noctalia/wallpaper-hook.sh".source = ./dotfiles/config/noctalia/wallpaper-hook.sh;
     "noctalia/mpv-hook.lua".source = ./dotfiles/config/noctalia/mpv-hook.lua;
-    # ── kitty（迁移自 NyxNiri；current-theme.conf 由 Noctalia kitty 模板生成，
-    #    不部署只读版，首次由 activation 种子写入）──
+    # kitty（current-theme.conf 由 Noctalia 模板生成，首次 activation 种子写入）
     "kitty/kitty.conf".source = ./dotfiles/config/kitty/kitty.conf;
     "kitty/__custom__.conf".source = ./dotfiles/config/kitty/__custom__.conf;
     "kitty/themes/noctalia.conf" = {
       source = ./dotfiles/config/kitty/themes/noctalia.conf;
       force = true;
     };
-    # ── fish（NyxNiri conf 文件 + 保留原 shorin 私有配置；config.fish 由
-    #    programs.fish 模块生成，NyxNiri 的函数以 conf.d/nyxniri.fish 形式注入）──
     "fish/conf.d/nyxniri-path.fish".source = ./dotfiles/config/fish/conf.d/nyxniri-path.fish;
     "fish/conf.d/nyxniri.fish".source = ./dotfiles/config/fish/conf.d/nyxniri.fish;
     "fish/conf.d/__custom__.fish".source = ./dotfiles/config/fish/conf.d/__custom__.fish;
@@ -775,9 +691,7 @@ in
     '';
   };
 
-  # polkit 认证代理：NixOS 上没有 Arch 的 /usr/lib/polkit-gnome，
-  # 改用 Home Manager 的 polkit-gnome 用户服务拉起。
-  services.polkit-gnome.enable = true;
+  services.polkit-gnome.enable = true;   # polkit 认证代理
 
   # ── gvfs 守护（Thunar/Nautilus 的回收站/挂载/远程文件支持）──
   # 本版 home-manager 无 services.gvfs 模块，改用 systemd.user 显式启用 gvfs 单元。
@@ -848,34 +762,6 @@ in
     };
   };
 
-  # ============================================================
-  #  不在 nixpkgs 的包 → 走 flake / 自行打包
-  #  （原脚本靠 shorin-arch 自建仓库与 AUR 提供，NixOS 无等价）
-  # ============================================================
-  # Flatpak 服务已在 configuration.nix 开启，flatpak-repo 服务启动时自动安装：
-  #   com.tencent.WeChat（微信）/ com.qq.QQ（QQ）/ com.github.tchx84.Flatseal（Flatpak 管理）
-  # 其他缺失的闭源 App 同样可走 Flatpak（flathub 已配 USTC 镜像），手动：
-  #   flatpak install flathub <应用ID>
-  # 已针对 NixOS 适配：桌面 shell 用 nixpkgs 自带的 noctalia-shell（quickshell 配置封装），
-  # 由 config.kdl 的 `spawn-sh-at-startup "noctalia-shell"` 拉起，还原了 SHORiN 原版
-  # `qs -c noctalia-shell` 的写法；注释掉了 Arch 专用的 /usr/lib/polkit-gnome、
-  # /usr/lib/xdg-desktop-portal-gnome，以及依赖私有脚本的 linuxqq-clipsync 等。
-  # polkit 代理改用 services.polkit-gnome.enable。
-  #
-  # ⚠️ 关于 SHORiN 原版交互的还原程度（配置迁移结果）：
-  #  • 私有 niri 脚本已迁移（见上面 home.file 的 ~/.config/niri/scripts/*）：
-  #    niri-binds / niri-pick / niri-force-kill-window / screenshot-sound.sh
-  #    —— 对应 binds.kdl 的快捷键菜单(Mod+Shift+Slash)、取窗口信息(Mod+P)、
-  #       强杀窗口(Alt+F4)、截图音效等绑定现已可用；截图音效需 config.kdl 里
-  #       的 `spawn-at-startup "~/.config/niri/scripts/screenshot-sound.sh"` 已启用。
-  #    random-anime-wallpaper-noctalia 已在 .local/bin 部署；niri-sidebar 走 selfPackages。
-  #  • 启动器/设置/壁纸/电源菜单/锁屏/音量/亮度等绑定现在走
-  #    `noctalia-shell ipc call ...`（binds.kdl 已全部改用 nixpkgs 的
-  #    noctalia-shell 封装，不再写 `qs -c noctalia-shell`）。桌面 shell 由
-  #    config.kdl 的 `spawn-sh-at-startup "noctalia-shell"` 拉起，这些 IPC 绑定现已生效。
-  #
-  # 不在 nixpkgs 的包，已用 ./pkgs 自构建派生解决（见 README「自构建程序」一节）：
-  #   niri-sidebar-git / pins-git / python-pywalfox / shorin-contrib-git /
-  #   splayer-next
-  # （miyu 已按需求移除。）flake 安装：opencode；桌面 shell 改为 nixpkgs 的 noctalia-shell（替代独立 noctalia v4.7.7 应用）。
+  # 不在 nixpkgs 的包走 flake / ./pkgs 自构建（见 README 自构建一节）
+  # 闭源 App（微信/QQ/Discord）走 Flatpak（configuration.nix 的 flatpak-repo 自动装）
 }

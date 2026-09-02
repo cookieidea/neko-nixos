@@ -1,7 +1,4 @@
-# PureVox —— 实时 AI 音频降噪工具（降噪 / TSE 目标说话人提取 / AEC 回声消除 / EQ）
-#
-# a2heng/PureVox（GPL-3.0，AI 模型除外见 MODEL-LICENSE.md）
-# 技术栈：Python + PySide6 + C 扩展 + ONNX Runtime；Linux 音频走原生 PipeWire。
+# PureVox（实时 AI 音频降噪，Python + PySide6 + ONNX，Linux 走 PipeWire）
 #
 # ⚠️ 打包方式（2026-08 重写）：
 # 之前用 appimageTools.wrapType2，但它的 init 脚本硬编码 extracted 路径，

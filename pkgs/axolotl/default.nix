@@ -1,8 +1,6 @@
-# Axolotl —— Minecraft Java 版启动器（替代 Prism Launcher / HMCL）
-#
-# 2026-08 起改为官方源码构建（vendored 自上游 PR #298 bfmhno3 的 nix 方案，
-# 构建细节见同目录 src.nix）：Rust/Tauri + pnpm 前端 + Java 引擎全部从
-# 官方仓库源码编译，外层 symlinkJoin + wrapGAppsHook 已带 flite/udev/alsa/jack/
+# Axolotl（MC Java 版启动器，替代 Prism/HMCL）
+# 官方源码构建（vendored 自上游 PR #298 的 nix 方案，细节见 src.nix）：
+# Rust/Tauri + pnpm 前端 + Java 引擎源码编译，外层 symlinkJoin + wrapGAppsHook
 # pulse/pipewire/jdk8/17/21/25 全套运行时（runtimeDependencies + PATH 注入）
 # 以及启动器/游戏所需环境变量（SDL Wayland / WebKit 降级 / JNA flite 路径，
 # 见 src.nix postBuild），桌面项与命令行均生效。

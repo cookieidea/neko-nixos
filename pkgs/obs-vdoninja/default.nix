@@ -1,8 +1,6 @@
-# VDO.Ninja OBS 插件（steveseguin/ninja-obs-plugin）
-# OBS 直推/收流 VDO.Ninja（低延迟 WebRTC），替代浏览器源。
-#
-# nixpkgs 无此包。官方 release 提供 Linux 预编译 .so（为 libobs.so.30 编译，
-# 与 OBS 32 兼容）。⚠️ 不能裸拷（home.file 部署）——预编译 .so 的 RPATH 指向
+# VDO.Ninja OBS 插件（OBS 直推/收流低延迟 WebRTC）
+# nixpkgs 无此包；官方预编译 .so 为 libobs.so.30（与 OBS 32 兼容）。
+# ⚠️ 不能裸拷（home.file）——预编译 .so 的 RPATH 指向
 # 构建机路径，NixOS 上依赖全找不到（实测 ldd 全 not found）。
 # 正确姿势：autoPatchelfHook 把依赖修到 nix store 路径。
 #

@@ -1,8 +1,4 @@
-# Self-built packages for the Shorin Arch → NixOS conversion.
-#
-# Each entry is a Nix derivation wired into the flake's `packages.<system>`
-# output (so `nix build .#<name>` works) and into home.nix `home.packages`
-# (so they get installed with `nixos-rebuild switch`).
+# 自构建包（flake 的 packages.<system> + home.nix 安装，`nix build .#<name>` 可单独构建）
 #
 # Source repos were taken from the original Arch setup
 # (SHORiN-KiWATA/shorin-arch-setup, scripts/04k-shorin-noctalia-quickshell.sh
@@ -17,7 +13,6 @@
 {
   niri-sidebar   = import ./niri-sidebar   { inherit pkgs; };
   pins           = import ./pins           { inherit pkgs; };
-  pywalfox       = import ./pywalfox       { inherit pkgs; };
   shorin-contrib = import ./shorin-contrib { inherit pkgs; };
   splayer-next   = import ./splayer-next   { inherit pkgs; };
   ab-download-manager = import ./ab-download-manager { inherit pkgs; };
