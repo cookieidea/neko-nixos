@@ -15,10 +15,10 @@
 # to iterate (electron version pin, ffmpeg patch, native module compile).
 (pkgs.appimageTools.wrapType2 {
   pname = "splayer-next";
-  version = "1.0.0";
+  version = "1.1.0";
   src = pkgs.fetchurl {
-    url = "https://github.com/SPlayer-Dev/SPlayer-Next/releases/download/v1.0.0/splayer-next-1.0.0-x86_64.AppImage";
-    sha256 = "sha256-11aQDxg76QtHG8cuRFGZRb5is1Ne5YercPXaI8la9Ug=";
+    url = "https://github.com/SPlayer-Dev/SPlayer-Next/releases/download/v1.1.0/splayer-next-1.1.0-x86_64.AppImage";
+    sha256 = "sha256-ycwZdd5LPM16y9bPuFfSfYlxWun19bmbO1EerDBcURY=";
   };
   extraPkgs = pkgs: with pkgs; [ ffmpeg ];
 }).overrideAttrs (old: {
