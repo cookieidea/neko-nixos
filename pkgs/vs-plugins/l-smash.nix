@@ -8,7 +8,7 @@ stdenv.mkDerivation rec {
     owner = "l-smash";
     repo = "l-smash";
     rev = "18a9ed25c7ff79a7f4f4bf850c345c72179b8998";
-    hash = "";
+    hash = "sha256-Su1zNlFGZG6FV2jIfxkRQAAFSXEkqNxKk8VTmqjXUTI=";
   };
 
   nativeBuildInputs = [ nasm ];
