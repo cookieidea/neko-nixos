@@ -60,7 +60,10 @@ in
     lutris
     mangohud
     (mpv.override {
-      mpv-unwrapped = mpv-unwrapped.override { lua = luajit; };   # thumbfast 需 LuaJIT ffi
+      mpv-unwrapped = mpv-unwrapped.override {
+        lua = luajit;                  # thumbfast 需 LuaJIT ffi
+        vapoursynthSupport = true;     # 实时补帧（vf vapoursynth，RIFE/SVP/UAI）
+      };
     })
     opencc                                    # mpv 字幕繁简转换
     p7zip                                     # mpv 解压字幕字体包
