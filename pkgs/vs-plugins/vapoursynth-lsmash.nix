@@ -14,12 +14,18 @@ stdenv.mkDerivation rec {
   nativeBuildInputs = [ pkg-config which ];
   buildInputs = [ vapoursynth ffmpeg_4 l-smash ];
 
-  sourceRoot = "source/VapourSynth";
   hardeningDisable = [ "all" ];
 
-  preConfigure = ''
-    patchShebangs configure
+  postPatch = ''
+    patchShebangs VapourSynth/configure
     export NIX_CFLAGS_COMPILE="$NIX_CFLAGS_COMPILE -Wno-error=implicit-function-declaration"
+  '';
+
+  configurePhase = ''
+    runHook preConfigure
+    cd VapourSynth
+    ./configure --prefix=$out
+    runHook postConfigure
   '';
 
   meta = with lib; {
