@@ -1,4 +1,4 @@
-{ lib, stdenv, fetchFromGitHub, meson, ninja, pkg-config, vapoursynth, llvmPackages_13 }:
+{ lib, stdenv, fetchFromGitHub, meson, ninja, pkg-config, vapoursynth }:
 
 stdenv.mkDerivation rec {
   pname = "vapoursynth-akarin";
@@ -11,9 +11,14 @@ stdenv.mkDerivation rec {
     hash = "sha256-azo5iD1gvGaMkIdRV7ZX2KQxEJ61B1j7mrhVdtrfarE=";
   };
 
-  nativeBuildInputs = [ meson ninja pkg-config llvmPackages_13.llvm.dev ];
+  nativeBuildInputs = [ meson ninja pkg-config ];
   buildInputs = [ vapoursynth ];
-  # llvm config-tool 需在 PATH（meson dependency('llvm', method='config-tool')）
+
+
+  postPatch = ''
+    # 用内置 asmjit 后端（此版本硬编码 false；llvm>=10,<16 的依赖在 nixpkgs 已不可用）
+    substituteInPlace meson.build --replace-fail "use_asmjit = false" "use_asmjit = true"
+  '';
 
   meta = with lib; {
     description = "AkarinVS VapourSynth plugin (Expr / akarin namespace)";
