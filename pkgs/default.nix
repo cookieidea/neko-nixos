@@ -16,7 +16,7 @@ rec {
   vapoursynth-lsmash    = pkgs.callPackage ./vs-plugins/vapoursynth-lsmash.nix { inherit l-smash; };
   vapoursynth-akarin    = pkgs.callPackage ./vs-plugins/vapoursynth-akarin.nix {};
   vapoursynth-rife-ncnn = pkgs.callPackage ./vs-plugins/vapoursynth-rife-ncnn.nix {};
-  k7sfunc               = pkgs.callPackage ./vs-plugins/k7sfunc.nix {};
+  k7sfunc               = pkgs.python3Packages.callPackage ./vs-plugins/k7sfunc.nix {};
   vapoursynth-with-plugins = pkgs.callPackage ./vs-plugins/vapoursynth-with-plugins.nix {
     inherit vapoursynth-lsmash vapoursynth-akarin vapoursynth-rife-ncnn k7sfunc;
   };
