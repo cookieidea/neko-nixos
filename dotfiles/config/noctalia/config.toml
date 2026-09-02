@@ -30,6 +30,7 @@ margin_edge = 10
 scale = 1.1
 shadow = false
 end = [
+    "mini-docker",
     "media",
     "tray",
     "wallpaper",
@@ -228,7 +229,7 @@ fill_mode = "crop"
 
 
 [plugins]
-enabled = ["noctalia/mpvpaper"]
+enabled = ["noctalia/kaomoji", "noctalia/mpvpaper", "noctalia/translator", "8bury/mini-docker"]
 
 [widget.active_window]
 min_length = 0
@@ -239,12 +240,19 @@ format = "{:%a, %d %b %H:%M}"
 [widget.tray]
 detached_panel = true
 drawer = true
+pinned = ["Fcitx"]
+
+[widget.mini-docker]
+type = "8bury/mini-docker:mini-docker"
 
 [widget."ray/echolyrics:echolyrics"]
 capsule = false
 
 [widget.mpvpaper]
 type = "noctalia/mpvpaper:mpvpaper"
+
+[plugin_settings."noctalia/translator"]
+target_lang = "zh"
 
 [plugin_settings."noctalia/mpvpaper"]
 mpv_options = "--script=~/.config/noctalia/mpv-hook.lua no-audio loop-file=inf hwdec=auto osc=no osd-level=0 load-scripts=no"

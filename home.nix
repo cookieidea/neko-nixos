@@ -357,6 +357,9 @@ in
     "niri/input__custom__.kdl".source = ./dotfiles/config/niri/input__custom__.kdl;
     "niri/scratchpad-items__custom__.toml".source = ./dotfiles/config/niri/scratchpad-items__custom__.toml;
     # noctalia hook 脚本；mpv-hook.lua 缺失会致 mpvpaper 视频壁纸失败
+    # config.toml 由 programs.noctalia.settings 部署为 symlink，activation 会复制为
+    # 可写真实文件（V5 面板回写）→ 配置变更时 force 覆盖避免 clobber
+    "noctalia/config.toml".force = true;
     "noctalia/theme-sync.sh".source = ./dotfiles/config/noctalia/theme-sync.sh;
     "noctalia/wallpaper-hook.sh".source = ./dotfiles/config/noctalia/wallpaper-hook.sh;
     "noctalia/mpv-hook.lua".source = ./dotfiles/config/noctalia/mpv-hook.lua;
@@ -456,6 +459,13 @@ in
   '';
 
   home.file = {
+    # 翻译插件修复：Google .com.hk + tk token（国内可直连）。部署到
+    # ~/.local/state/noctalia/plugins/materialized/official/translator/
+    # （noctalia 实际加载路径；源更新会覆盖 materialized，需重新部署）
+    ".local/state/noctalia/plugins/materialized/official/translator/translator.luau" = {
+      source = ./dotfiles/config/noctalia/plugins/translator/translator.luau;
+      force = true;
+    };
     # ── 用户头像（freedesktop 标准 ~/.face，Noctalia Greeter 登录界面 + Noctalia 控制中心读取）──
     ".face".source = ./dotfiles/avatar.png;
     # ── fastfetch logo 图片（kitty 图像协议；配置引用 ~/.local/share/fastfetch/NixOS.png）──

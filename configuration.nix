@@ -256,6 +256,12 @@ EOF
     "https://docker.xuanyuan.me"
     "https://docker.m.daocloud.io"
   ];
+  # distrobox：容器内挂载 /nix/store 与 per-user profiles（shell 初始化引用
+  # hm-session-vars.sh 等路径，默认只挂 $HOME 会报 no such file）
+  environment.etc."distrobox/distrobox.conf".text = ''
+    container_additional_volumes="/nix/store:/nix/store:ro /etc/profiles/per-user:/etc/profiles/per-user:ro /etc/static/profiles/per-user:/etc/static/profiles/per-user:ro"
+  '';
+
   services.udisks2.enable = true;   # USB 自动挂载
 
   # btrfs + snapper 快照（@snapshots 独立子卷，回滚根时不带快照）
