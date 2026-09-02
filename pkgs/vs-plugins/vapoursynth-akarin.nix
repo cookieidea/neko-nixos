@@ -8,7 +8,7 @@ stdenv.mkDerivation rec {
     owner = "AkarinVS";
     repo = "vapoursynth-plugin";
     rev = "8b7ff6dcc85bc9935789c799e63f1388dfbd1bd4";
-    hash = "sha256-L+DJ+XLU9AQ2NuhDUb+Lcvkcx3Z7NVZF00AIAGo0tT8=";
+    hash = "sha256-azo5iD1gvGaMkIdRV7ZX2KQxEJ61B1j7mrhVdtrfarE=";
   };
 
   nativeBuildInputs = [ meson ninja pkg-config ];
