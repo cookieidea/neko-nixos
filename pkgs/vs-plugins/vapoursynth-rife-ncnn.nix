@@ -2,7 +2,7 @@
 
 stdenv.mkDerivation rec {
   pname = "vapoursynth-rife-ncnn";
-  version = "r9-mod-v33";
+  version = "r9_mod_v33";
 
   # 预编译插件（ncnn+Vulkan 静态链接，仅依赖 libgomp/libstdc++，运行期 dlopen libvulkan）
   plugin = fetchurl {
