@@ -1,4 +1,4 @@
-{ lib, stdenv, fetchFromGitHub, nasm }:
+{ lib, stdenv, fetchFromGitHub, nasm, which }:
 
 stdenv.mkDerivation rec {
   pname = "l-smash";
@@ -11,7 +11,7 @@ stdenv.mkDerivation rec {
     hash = "sha256-Su1zNlFGZG6FV2jIfxkRQAAFSXEkqNxKk8VTmqjXUTI=";
   };
 
-  nativeBuildInputs = [ nasm ];
+  nativeBuildInputs = [ nasm which ];
 
   meta = with lib; {
     description = "L-SMASH MP4 library (core)";
