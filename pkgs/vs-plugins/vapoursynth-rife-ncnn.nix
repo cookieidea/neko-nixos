@@ -11,7 +11,7 @@ stdenv.mkDerivation rec {
   };
 
   models = fetchurl {
-    url = "https://github.com/cookieidea/vs-models/releases/download/rife-std-v1/vs-k7sfunc.0_6_3.rife_std-core_models.7z";
+    url = "https://github.com/cookieidea/vs-models/releases/download/rife-std-v1/rife-models.7z";
     hash = "sha256-Vdb6aZMI253BtAP/TH5NPvB05Weg/rP2FEl9IHjvWb8=";
   };
 
