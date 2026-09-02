@@ -1,4 +1,4 @@
-{ lib, stdenv, autoPatchelfHook, fetchurl, p7zip, libgcc, libgomp, vulkan-loader, vapoursynth }:
+{ lib, stdenv, autoPatchelfHook, fetchurl, p7zip, libgcc, gcc-unwrapped, vulkan-loader, vapoursynth }:
 
 stdenv.mkDerivation rec {
   pname = "vapoursynth-rife-ncnn";
@@ -16,7 +16,7 @@ stdenv.mkDerivation rec {
   };
 
   nativeBuildInputs = [ autoPatchelfHook p7zip ];
-  buildInputs = [ stdenv.cc.cc.lib libgomp vulkan-loader ];
+  buildInputs = [ stdenv.cc.cc.lib gcc-unwrapped.lib vulkan-loader ];
   sourceRoot = ".";
 
   dontUnpack = true;
