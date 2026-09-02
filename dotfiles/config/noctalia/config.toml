@@ -229,7 +229,13 @@ fill_mode = "crop"
 
 
 [plugins]
-enabled = ["noctalia/kaomoji", "noctalia/mpvpaper", "noctalia/translator", "8bury/mini-docker"]
+enabled = ["noctalia/kaomoji", "noctalia/mpvpaper", "8bury/mini-docker", "cookie/translator"]
+
+# 自定义翻译插件源（cookie/translator，MyMemory 后端国内直连）
+[[plugins.source]]
+kind = "git"
+location = "https://github.com/cookieidea/noctalia-plugins"
+name = "custom"
 
 [widget.active_window]
 min_length = 0

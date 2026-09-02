@@ -459,13 +459,6 @@ in
   '';
 
   home.file = {
-    # 翻译插件修复：Google .com.hk + tk token（国内可直连）。部署到
-    # ~/.local/state/noctalia/plugins/materialized/official/translator/
-    # （noctalia 实际加载路径；源更新会覆盖 materialized，需重新部署）
-    ".local/state/noctalia/plugins/materialized/official/translator/translator.luau" = {
-      source = ./dotfiles/config/noctalia/plugins/translator/translator.luau;
-      force = true;
-    };
     # ── 用户头像（freedesktop 标准 ~/.face，Noctalia Greeter 登录界面 + Noctalia 控制中心读取）──
     ".face".source = ./dotfiles/avatar.png;
     # ── fastfetch logo 图片（kitty 图像协议；配置引用 ~/.local/share/fastfetch/NixOS.png）──
