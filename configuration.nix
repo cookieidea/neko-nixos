@@ -134,6 +134,7 @@
 
   # GPU：AMD 6750 GRE（amdgpu + mesa RADV + VA-API 硬解）
   hardware.graphics.enable = true;
+  hardware.graphics.enable32Bit = true;   # Steam/Proton 32 位游戏必需
   hardware.graphics.extraPackages = with pkgs; [
     vulkan-loader
     libva
@@ -239,9 +240,14 @@ EOF
 
   # 应用级服务
   services.lact.enable = true;
+  services.smartd.enable = true;   # 磁盘健康监控（SMART）
+  programs.gamemode.enable = true; # gamemoderun 系统服务（游戏性能优化）
+  programs.nix-ld.enable = true;   # 跑预编译二进制（游戏/工具的 patchelf 兜底）
   programs.steam.enable = true;
   # Steam 中文字体：FHS fontconfig 渲染不了 VF（noto-cjk）→ 用静态 sarasa
   programs.steam.fontPackages = with pkgs; [ sarasa-gothic ];
+  # GE-Proton（声明式；Steam 里直接选 compattool）
+  programs.steam.extraCompatPackages = with pkgs; [ proton-ge-bin ];
   virtualisation.libvirtd.enable = true;
   # Waydroid（Android 容器；CachyOS 内核已移除 iptables → 用 nftables 版）
   virtualisation.waydroid.enable = true;
@@ -294,6 +300,6 @@ EOF
   users.users.${username} = {
     isNormalUser = true;
     description = username;
-    extraGroups = [ "networkmanager" "wheel" "libvirtd" "video" "audio" "docker" "uinput" ];
+    extraGroups = [ "networkmanager" "wheel" "libvirtd" "video" "audio" "docker" "uinput" "adbusers" "gamemode" ];
   };
 }
