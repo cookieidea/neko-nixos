@@ -8,7 +8,7 @@ stdenv.mkDerivation rec {
     owner = "VFR-maniac";
     repo = "L-SMASH-Works";
     rev = "198cc7814c93209e23f1c6a20daffd651945ba2b";
-    hash = "sha256-LaQz1R4zPSzi37PcGAPXgQ/0ck3kHkMJkYPpR8NEq2o=";
+    hash = "sha256-eQ2FnUceFPk84QewkNhGfoEoQK3WcapY8f0SFGDOaN0=";
   };
 
   nativeBuildInputs = [ autoreconfHook pkg-config which ];
