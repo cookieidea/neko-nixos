@@ -90,9 +90,9 @@ local LANG_MAP = {
   tr = "tr", uk = "uk", vi = "vi",
 }
 
--- MyMemory 无自动检测 → 启发式判断源语言（含 CJK 视为中文，否则英文）
+-- MyMemory 无自动检测 → 启发式判断源语言（含 CJK 字符视为中文，否则英文）
 local function guessSource(text)
-  if text:match("[\\xE4-\\xE9][\\x80-\\xBF][\\x80-\\xBF]") then
+  if text:match("[\xE4-\xE9][\x80-\xBF][\x80-\xBF]") then
     return "zh-CN"
   end
   return "en"
@@ -110,23 +110,6 @@ local function fetchGoogle(text, target, onDone)
     local ok, decoded = pcall(noctalia.json.decode, res.body)
     if ok and decoded and decoded.responseData and decoded.responseData.translatedText then
       onDone(decoded.responseData.translatedText, nil)
-    else
-      onDone(nil, "Translation error")
-    end
-  end)
-end
-
-local function fetchGoogle(text, target, onDone)
-  local tk = tkCalc(text)
-  local url = `https://translate.google.com.hk/translate_a/single?client=webapp&sl=auto&tl={noctalia.string.urlEncode(target)}&hl=zh-CN&dt=t&otf=2&ssel=0&tsel=0&kc=1&tk={tk}&q={noctalia.string.urlEncode(text)}`
-  noctalia.http({ url = url }, function(res)
-    if not res.ok then
-      onDone(nil, "Connection error - is the network up?")
-      return
-    end
-    local translated = parseGoogle(res.body)
-    if translated then
-      onDone(translated, nil)
     else
       onDone(nil, "Translation error")
     end
