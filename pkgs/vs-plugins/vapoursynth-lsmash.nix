@@ -1,4 +1,4 @@
-{ lib, stdenv, fetchFromGitHub, pkg-config, which, ffmpeg_6, vapoursynth, l-smash }:
+{ lib, stdenv, fetchFromGitHub, pkg-config, which, ffmpeg_4, vapoursynth, l-smash }:
 
 stdenv.mkDerivation rec {
   pname = "vapoursynth-lsmash";
@@ -12,7 +12,7 @@ stdenv.mkDerivation rec {
   };
 
   nativeBuildInputs = [ pkg-config which ];
-  buildInputs = [ vapoursynth ffmpeg_6 l-smash ];
+  buildInputs = [ vapoursynth ffmpeg_4 l-smash ];
 
   sourceRoot = "source/VapourSynth";
   hardeningDisable = [ "all" ];
