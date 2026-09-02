@@ -1,4 +1,4 @@
-{ lib, stdenv, fetchFromGitHub, pkg-config, which, ffmpeg_6, vapoursynth }:
+{ lib, stdenv, fetchFromGitHub, pkg-config, which, ffmpeg_6, vapoursynth, l-smash }:
 
 stdenv.mkDerivation rec {
   pname = "vapoursynth-lsmash";
@@ -12,7 +12,7 @@ stdenv.mkDerivation rec {
   };
 
   nativeBuildInputs = [ pkg-config which ];
-  buildInputs = [ vapoursynth ffmpeg_6 ];
+  buildInputs = [ vapoursynth ffmpeg_6 l-smash ];
 
   sourceRoot = "source/VapourSynth";
   hardeningDisable = [ "all" ];
@@ -22,7 +22,7 @@ stdenv.mkDerivation rec {
   '';
 
   meta = with lib; {
-    description = "L-SMASH Works VapourSynth plugin (lsmas, libav backend)";
+    description = "L-SMASH Works VapourSynth plugin (lsmas)";
     homepage = "https://github.com/VFR-maniac/L-SMASH-Works";
     license = licenses.isc;
     platforms = platforms.linux;
