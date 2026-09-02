@@ -1,4 +1,4 @@
-{ lib, stdenv, fetchFromGitHub, autoreconfHook, pkg-config, which, ffmpeg_6, vapoursynth }:
+{ lib, stdenv, fetchFromGitHub, pkg-config, which, ffmpeg_6, vapoursynth }:
 
 stdenv.mkDerivation rec {
   pname = "vapoursynth-lsmash";
@@ -11,7 +11,7 @@ stdenv.mkDerivation rec {
     hash = "sha256-eQ2FnUceFPk84QewkNhGfoEoQK3WcapY8f0SFGDOaN0=";
   };
 
-  nativeBuildInputs = [ autoreconfHook pkg-config which ];
+  nativeBuildInputs = [ pkg-config which ];
   buildInputs = [ vapoursynth ffmpeg_6 ];
 
   preConfigure = ''
