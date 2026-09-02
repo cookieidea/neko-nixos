@@ -39,3 +39,4 @@ stdenv.mkDerivation rec {
     platforms = platforms.linux;
   };
 }
+# vs plugins for RIFE interpolation
