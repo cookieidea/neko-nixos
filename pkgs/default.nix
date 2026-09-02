@@ -13,9 +13,13 @@
 rec {
   # VapourSynth 插件（RIFE 补帧链路）
   l-smash               = pkgs.callPackage ./vs-plugins/l-smash.nix {};
-  vapoursynth-lsmash    = pkgs.callPackage ./vs-plugins/vapoursynth-lsmash.nix  { l-smash = l-smash; };
+  vapoursynth-lsmash    = pkgs.callPackage ./vs-plugins/vapoursynth-lsmash.nix { inherit l-smash; };
   vapoursynth-akarin    = pkgs.callPackage ./vs-plugins/vapoursynth-akarin.nix {};
   vapoursynth-rife-ncnn = pkgs.callPackage ./vs-plugins/vapoursynth-rife-ncnn.nix {};
+  k7sfunc               = pkgs.callPackage ./vs-plugins/k7sfunc.nix {};
+  vapoursynth-with-plugins = pkgs.callPackage ./vs-plugins/vapoursynth-with-plugins.nix {
+    inherit vapoursynth-lsmash vapoursynth-akarin vapoursynth-rife-ncnn k7sfunc;
+  };
 
   niri-sidebar   = import ./niri-sidebar   { inherit pkgs; };
   pins           = import ./pins           { inherit pkgs; };
