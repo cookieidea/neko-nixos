@@ -18,8 +18,8 @@ stdenv.mkDerivation {
       ln -s "$p/lib/vapoursynth"/* "$out/lib/vapoursynth/" 2>/dev/null || true
     done
     makeWrapper ${vapoursynth}/bin/vspipe "$out/bin/vspipe" \
-      --set-default VAPOURSYNTH_EXTRA_PLUGIN_PATH "$out/lib/vapoursynth" \
-      --set-default PYTHONPATH "${k7sfunc}/${python3.sitePackages}:${python3Packages.vapoursynth}/${python3.sitePackages}"
+      --prefix VAPOURSYNTH_EXTRA_PLUGIN_PATH : "$out/lib/vapoursynth" \
+      --prefix PYTHONPATH : "${k7sfunc}/${python3.sitePackages}:${python3Packages.vapoursynth}/${python3.sitePackages}"
     runHook postInstall
   '';
 

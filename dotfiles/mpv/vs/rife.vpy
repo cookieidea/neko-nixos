@@ -1,37 +1,22 @@
+import os
+import vapoursynth as vs
 import k7sfunc
 
-## 整数，预降低处理源分辨率
-wpre = 1920
-hpre = 1080
+# Nix 的 VapourSynth 包不扫描额外插件目录；显式加载 RIFE 依赖。
+plugin_dir = os.environ["VAPOURSYNTH_EXTRA_PLUGIN_PATH"].split(":")[0]
+for name in ("libvslsmashsource.so", "libakarin.so", "librife.so", "libmvtools.so"):
+    vs.core.std.LoadPlugin(path=os.path.join(plugin_dir, name))
 
-## <ort_dml|trt|trt_rtx> 使用的后端
-be = "ort_dml"
-
-## <46|4251|426|4262> 使用的模型
-model = 46
-
-## 整数，Fnum/Fden 的值即输出
+# AMD 路径：RIFE-ncnn-Vulkan，直接使用 RADV；不依赖 Windows DirectML/ONNX。
+# 模型：23(v4.6) / 70(v4.25 lite) / 72(v4.26) / 73(v4.26 heavy)。
+model = 23
+turbo = 1
 fnum = 2
 fden = 1
-
-## <True|False> 输出帧率(True)还是倍率(False)
-abs = False
-
-## 限制最高输入帧率
-fmax = 30
-
-## <True|False> 场景切换检测
-sc = True
-
-## 使用的显卡序号，0为排序一号
+sc_mode = 1
 gpu = 0
+gpu_t = 1
 
-## <True|False> 锁定像素格式为yuv420p8
-lkfmt = False
-
-clip = video_in
-fin = container_fps
-clip = k7sfunc.FPS_LIMIT(clip, fin, fmax)
-clip = k7sfunc.FMT_DSCALE(clip, wpre, hpre, lkfmt)
-clip = k7sfunc.RIFE(clip, fin, be, model, abs, fnum, fden, sc, gpu)
+# mpv 的 vapoursynth vf 会预置 clip。
+clip = k7sfunc.RIFE_STD(clip, model, turbo, fnum, fden, sc_mode, 60.0, gpu, gpu_t)
 clip.set_output()

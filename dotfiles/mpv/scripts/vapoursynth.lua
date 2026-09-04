@@ -20,19 +20,16 @@ local vs = {
             }
         },
         rife = {
-            label = 'RIFE',
+            label = 'RIFE (AMD Vulkan)',
             path = '~~/vs/rife.vpy',
             settings = {
-                wpre = '1920',
-                hpre = '1080',
-                be = '"ort_dml"',
-                model = '46',
+                model = '23',
+                turbo = '1',
                 fnum = '2',
                 fden = '1',
-                abs = 'False',
-                fmax = '30',
-                sc = 'True',
-                gpu = '0'
+                sc_mode = '1',
+                gpu = '0',
+                gpu_t = '1'
             }
         },
         drba = {
@@ -156,62 +153,50 @@ local settings_menu = {
             title = 'RIFE 配置',
             items = {
                 {
-                    title = '预降低分辨率',
-                    items = {
-                        { title = '720p',  value = 'set rife wpre 1280; set rife hpre 720' },
-                        { title = '1080p', value = 'set rife wpre 1920; set rife hpre 1080' },
-                        { title = '1440p', value = 'set rife wpre 2560; set rife hpre 1440' },
-                        { title = '2160p', value = 'set rife wpre 3840; set rife hpre 2160' }
-                    }
-                },
-                {
                     title = '后端',
                     items = {
-                        { title = 'DML',     value = 'set rife be "ort_dml"' },
-                        { title = 'TRT',     value = 'set rife be "trt"' },
-                        { title = 'TRT_RTX', value = 'set rife be "trt_rtx"' }
+                        { title = 'AMD Vulkan（固定）', selectable = false, bold = true }
                     }
                 },
                 {
                     title = '模型',
                     items = {
-                        { title = 'v4.6',        value = 'set rife model 46' },
-                        { title = 'v4.25 lite',  value = 'set rife model 4251' },
-                        { title = 'v4.26',       value = 'set rife model 426' },
-                        { title = 'v4.26 heavy', value = 'set rife model 4262' }
+                        { title = 'v4.6',        value = 'set rife model 23' },
+                        { title = 'v4.25 lite',  value = 'set rife model 70' },
+                        { title = 'v4.26',       value = 'set rife model 72' },
+                        { title = 'v4.26 heavy', value = 'set rife model 73' }
+                    }
+                },
+                {
+                    title = '提速模式',
+                    items = {
+                        { title = '标准', value = 'set rife turbo 0' },
+                        { title = '平衡', value = 'set rife turbo 1' },
+                        { title = '快速', value = 'set rife turbo 2' }
                     }
                 },
                 {
                     title = '输出',
                     items = {
-                        { title = '2x',     value = 'set rife fnum 2; set rife fden 1; set rife abs False' },
-                        { title = '3x',     value = 'set rife fnum 3; set rife fden 1; set rife abs False' },
-                        { title = '4x',     value = 'set rife fnum 4; set rife fden 1; set rife abs False' },
-                        { title = '60fps',  value = 'set rife fnum 60000; set rife fden 1001; set rife abs True' },
-                        { title = '90fps',  value = 'set rife fnum 90000; set rife fden 1001; set rife abs True' },
-                        { title = '120fps', value = 'set rife fnum 120000; set rife fden 1001; set rife abs True' }
-                    }
-                },
-                {
-                    title = '限制输入',
-                    items = {
-                        { title = '30fps', value = 'set rife fmax 30' },
-                        { title = '60fps', value = 'set rife fmax 60' },
-                        { title = '90fps', value = 'set rife fmax 90' }
+                        { title = '2x',     value = 'set rife fnum 2; set rife fden 1' },
+                        { title = '3x',     value = 'set rife fnum 3; set rife fden 1' },
+                        { title = '4x',     value = 'set rife fnum 4; set rife fden 1' },
+                        { title = '60fps',  value = 'set rife fnum 60; set rife fden 1' },
+                        { title = '90fps',  value = 'set rife fnum 90; set rife fden 1' },
+                        { title = '120fps', value = 'set rife fnum 120; set rife fden 1' }
                     }
                 },
                 {
                     title = '场景切换检测',
                     items = {
-                        { title = '关', value = 'set rife sc False' },
-                        { title = '开', value = 'set rife sc True' }
+                        { title = '关', value = 'set rife sc_mode 0' },
+                        { title = '开', value = 'set rife sc_mode 1' }
                     }
                 },
                 {
                     title = '使用的 GPU',
                     items = {
-                        { title = 'GPU0', value = 'set rife gpu 0' },
-                        { title = 'GPU1', value = 'set rife gpu 1' }
+                        { title = 'GPU0（AMD）', value = 'set rife gpu 0' }
                     }
                 }
             }
@@ -530,8 +515,12 @@ local function create_vpy(video_path)
     local targets = {}
     for _, mode in ipairs(vs.state) do table.insert(targets, vs.modes[mode].path) end
     local script_parts = {
+        "import os",
         "import k7sfunc",
         "import vapoursynth",
+        "_vs_plugin_dir = os.environ.get('VAPOURSYNTH_EXTRA_PLUGIN_PATH', '').split(':')[0]",
+        "for _vs_plugin in ('libvslsmashsource.so', 'libakarin.so', 'librife.so', 'libmvtools.so'):",
+        "    vapoursynth.core.std.LoadPlugin(path=os.path.join(_vs_plugin_dir, _vs_plugin))",
         string.format("clip = vapoursynth.core.lsmas.LWLibavSource(source=%q)", video_path),
     }
     for _, path in ipairs(targets) do table.insert(script_parts, convert_vpy(path)) end
