@@ -25,10 +25,12 @@ stdenv.mkDerivation rec {
 
   installPhase = ''
     runHook preInstall
-    mkdir -p $out/lib/vapoursynth $out/models
+    tmpdir=$(mktemp -d)
+    mkdir -p $out/lib/vapoursynth
     cp ${plugin} $out/lib/vapoursynth/librife.so
     chmod +w $out/lib/vapoursynth/librife.so
-    7z x -y ${models} -o$out/models >/dev/null
+    7z x -y ${models} -o$tmpdir >/dev/null
+    mv $tmpdir/models $out/lib/vapoursynth/models
     runHook postInstall
   '';
 
