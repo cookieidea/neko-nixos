@@ -1,10 +1,7 @@
-{ lib, stdenv, makeWrapper, symlinkJoin, vapoursynth, python3
+{ lib, stdenv, makeWrapper, vapoursynth, python3, python3Packages
 , vapoursynth-lsmash, vapoursynth-akarin, vapoursynth-rife-ncnn, vapoursynth-mvtools
 , k7sfunc }:
 
-let
-  pyEnv = python3.withPackages (ps: [ ps.vapoursynth k7sfunc ]);
-in
 stdenv.mkDerivation {
   pname = "vapoursynth-with-plugins";
   version = vapoursynth.version;
@@ -16,13 +13,13 @@ stdenv.mkDerivation {
 
   installPhase = ''
     runHook preInstall
-    mkdir -p $out/lib/vapoursynth
+    mkdir -p "$out/lib/vapoursynth"
     for p in ${vapoursynth-lsmash} ${vapoursynth-akarin} ${vapoursynth-rife-ncnn} ${vapoursynth-mvtools}; do
-      ln -s $p/lib/vapoursynth/* $out/lib/vapoursynth/ 2>/dev/null || true
+      ln -s "$p/lib/vapoursynth"/* "$out/lib/vapoursynth/" 2>/dev/null || true
     done
-    makeWrapper ${vapoursynth}/bin/vspipe $out/bin/vspipe \
-      --set-default VAPOURSYNTH_PLUGIN_PATH $out/lib/vapoursynth \
-      --set-default PYTHONPATH ${pyEnv}/${python3.sitePackages}
+    makeWrapper ${vapoursynth}/bin/vspipe "$out/bin/vspipe" \
+      --set-default VAPOURSYNTH_EXTRA_PLUGIN_PATH "$out/lib/vapoursynth" \
+      --set-default PYTHONPATH "${k7sfunc}/${python3.sitePackages}:${python3Packages.vapoursynth}/${python3.sitePackages}"
     runHook postInstall
   '';
 
