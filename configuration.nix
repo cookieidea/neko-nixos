@@ -47,7 +47,7 @@
       ExecStart = "${pkgs.writeShellScript "nix-generation-cleanup" ''
         set -euo pipefail
         ${pkgs.nix}/bin/nix-env --delete-generations +5 -p /nix/var/nix/profiles/system
-        ${pkgs.nix}/bin/nix-env --delete-generations +5 -p /nix/var/nix/profiles/per-user/cookie/home-manager 2>/dev/null || true
+        ${pkgs.nix}/bin/nix-env --delete-generations +5 -p /nix/var/nix/profiles/per-user/${username}/home-manager 2>/dev/null || true
         ${pkgs.nix}/bin/nix-store --gc
       ''}";
     };
@@ -156,10 +156,10 @@
       flatpak remote-modify flathub --url=https://mirrors.ustc.edu.cn/flathub
       flatpak install --noninteractive --or-update flathub com.tencent.WeChat com.qq.QQ com.github.tchx84.Flatseal io.github.kolunmi.Bazaar io.github.yucling.open-orpheus com.discordapp.Discord io.github.Predidit.Kazumi
       # QQ/微信：禁 fallback-x11 并给真 x11 socket（否则 Xvfb 起不来打不开）
-      runuser -u cookie -- flatpak --user override --nosocket=fallback-x11 --socket=x11 com.qq.QQ
-      runuser -u cookie -- flatpak --user override --nosocket=fallback-x11 --socket=x11 com.tencent.WeChat
+      runuser -u ${username} -- flatpak --user override --nosocket=fallback-x11 --socket=x11 com.qq.QQ
+      runuser -u ${username} -- flatpak --user override --nosocket=fallback-x11 --socket=x11 com.tencent.WeChat
       # Open Orpheus 托盘：放开 session-bus（SNI 总线名注册需要）
-      runuser -u cookie -- flatpak --user override --socket=session-bus io.github.yucling.open-orpheus
+      runuser -u ${username} -- flatpak --user override --socket=session-bus io.github.yucling.open-orpheus
     '';
     serviceConfig = {
       Type = "oneshot";
@@ -198,13 +198,13 @@
   # 登录界面头像（AccountsService，greeter 读取）
   system.activationScripts.noctaliaGreeterAvatar = lib.stringAfter [ "users" ] ''
     mkdir -p /var/lib/AccountsService/icons
-    cp -f ${builtins.toString ./dotfiles/avatar.png} /var/lib/AccountsService/icons/cookie
-    chmod 0644 /var/lib/AccountsService/icons/cookie
-    chown ${username}:${username} /var/lib/AccountsService/icons/cookie 2>/dev/null || true
-    cat > /var/lib/AccountsService/users/cookie <<'EOF'
+    cp -f ${builtins.toString ./dotfiles/avatar.png} /var/lib/AccountsService/icons/${username}
+    chmod 0644 /var/lib/AccountsService/icons/${username}
+    chown ${username}:${username} /var/lib/AccountsService/icons/${username} 2>/dev/null || true
+    cat > /var/lib/AccountsService/users/${username} <<'EOF'
 [User]
 SystemAccount=false
-Icon=/var/lib/AccountsService/icons/cookie
+Icon=/var/lib/AccountsService/icons/${username}
 EOF
   '';
 

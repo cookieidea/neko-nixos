@@ -2,6 +2,23 @@
 { config, pkgs, lib, desktop, username, cooknixvim, opencode, bili-danmaku-tui, selfPackages, noctalia, ... }:
 
 let
+  mpvRife = pkgs.mpv.override {
+    mpv-unwrapped = pkgs.mpv-unwrapped.override {
+      lua = pkgs.luajit;
+      vapoursynthSupport = true;
+    };
+  };
+  mpvRifeWrapped = pkgs.symlinkJoin {
+    name = "mpv-rife";
+    paths = [ mpvRife ];
+    nativeBuildInputs = [ pkgs.makeWrapper ];
+    postBuild = ''
+      rm -f "$out/bin/mpv"
+      makeWrapper "${mpvRife}/bin/mpv" "$out/bin/mpv" \
+        --prefix PYTHONPATH : "${selfPackages.k7sfunc}/lib/python3.13/site-packages:${pkgs.python3Packages.vapoursynth}/lib/python3.13/site-packages" \
+        --set VAPOURSYNTH_EXTRA_PLUGIN_PATH "${selfPackages.vapoursynth-with-plugins}/lib/vapoursynth"
+    '';
+  };
   # 可写种子源（store 路径，供 activation 脚本复制出可写真实文件）
   seedKittyTheme    = builtins.toString ./dotfiles/config/kitty/themes/noctalia.conf;
   seedNoctaliaConfig = builtins.toString ./dotfiles/config/noctalia/config.toml;
@@ -62,12 +79,7 @@ in
     gnome-clocks                              # gnome-clocks
     lutris
     mangohud
-    (mpv.override {
-      mpv-unwrapped = mpv-unwrapped.override {
-        lua = luajit;                  # thumbfast 需 LuaJIT ffi
-        vapoursynthSupport = true;     # 实时补帧（vf vapoursynth，RIFE/SVP/UAI）
-      };
-    })
+    mpvRifeWrapped
     opencc                                    # mpv 字幕繁简转换
     p7zip                                     # mpv 解压字幕字体包
     ffmpeg                                    # mpv 提取字幕轨道
@@ -156,13 +168,11 @@ in
     font-awesome                              # Font Awesome 图标字体（原 otf-font-awesome）
     satty                                      # 截图标注（binds: Mod+Shift+S）
     cliphist                                   # 剪贴板历史（noctalia config.toml 的 clipboard watch 命令）
-    wl-clipboard                               # wl-paste / wl-copy（剪贴板 + 截图管道）
     libnotify                                 # notify-send（niri-pick / niri-force-kill-window / screenshot-sound.sh 的通知依赖）
     xsettingsd                                 # GTK 主题/字体经 XSETTINGS 注入应用（niri 无 DE 时需要）
     xprop                                       # xprop（26.05 起 xorg 属性集弃用，xorg.xprop 改为顶层 xprop；niri-force-kill-window 依赖）
     btrfs-assistant                            # btrfs 快照管理 CLI（quickload Mod+F8 的回滚后端）
     # 02b/99-apps 补充
-    power-profiles-daemon                      # 电源模式（平衡/省电/性能）
     cmatrix lolcat sl                          # 彩蛋趣味命令（原 02b 安装）
     wineWow64Packages.stable                   # wine（原 99-apps 的 wine 全家；26.05 弃用 wineWowPackages）
     # bottles 改走 Flatpak（nixpkgs FHS 版连接检测端点失效无法下载 runner）
@@ -171,10 +181,6 @@ in
     matugen                                    # 主题生成器（random-anime-wallpaper-noctalia 与 noctalia-shell 模板直接调用）
     mpvpaper                                   # 视频壁纸（mpv 渲染 wlr-layer-shell，niri 启动项播放 hatsune-miku.mp4）
     # NyxNiri 新增
-    tmux                                       # tmux（scratchpad 终端，Super+~）
-    wlsunset                                   # wlsunset（护眼模式色温 Super+N）
-    inotify-tools                              # inotifywait（noctalia mpvpaper-sync 监听 assignments）
-    ddcutil                                    # ddcutil（外接显示器亮度，XF86 亮度键）
     imv                                        # 图片查看器（mimeapps.list 的 image/* 默认打开器）
     kdePackages.breeze                           # 光标主题 Breeze_Cursors（cursor.kdl 指定；breeze 包含光标，非独立 breeze-cursors 属性）
     xhost                                      # XWayland 授权（config.kdl spawn-at-startup "xhost"；26.05 xorg 包集移到顶层）
@@ -317,7 +323,10 @@ in
     "mimeapps.list".source = ./dotfiles/config/mimeapps.list;
     # mpv（自 Windows mpv.lite 迁移并 Linux 适配）；目录级只读内容用 symlink，
     # ~/.config/mpv 本体是真实目录（watch_later 需写入）
-    "mpv/mpv.conf".source = ./dotfiles/mpv/mpv.conf;
+    "mpv/mpv.conf" = {
+      source = ./dotfiles/mpv/mpv.conf;
+      force = true;
+    };
     "mpv/input.conf".source = ./dotfiles/mpv/input.conf;
     "mpv/contextmenu.conf".source = ./dotfiles/mpv/contextmenu.conf;
     "mpv/t2s.json".source = ./dotfiles/mpv/t2s.json;
