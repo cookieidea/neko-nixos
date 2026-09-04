@@ -10,16 +10,17 @@
 # home.nix directly, replacing the standalone `noctalia` v4 app flake input.
 { pkgs, rustToolchain, astral-bundle }:
 
+let
+  vsPlugins = import ./vs-plugins { inherit pkgs; };
+in
 rec {
-  # VapourSynth 插件（RIFE 补帧链路）
-  l-smash               = pkgs.callPackage ./vs-plugins/l-smash.nix {};
-  vapoursynth-lsmash    = pkgs.callPackage ./vs-plugins/vapoursynth-lsmash.nix { inherit l-smash; };
-  vapoursynth-akarin    = pkgs.callPackage ./vs-plugins/vapoursynth-akarin.nix {};
-  vapoursynth-rife-ncnn = pkgs.callPackage ./vs-plugins/vapoursynth-rife-ncnn.nix {};
-  k7sfunc               = pkgs.python3Packages.callPackage ./vs-plugins/k7sfunc.nix {};
-  vapoursynth-with-plugins = pkgs.callPackage ./vs-plugins/vapoursynth-with-plugins.nix {
-    inherit vapoursynth-lsmash vapoursynth-akarin vapoursynth-rife-ncnn k7sfunc;
-  };
+  inherit (vsPlugins)
+    l-smash
+    vapoursynth-lsmash
+    vapoursynth-akarin
+    vapoursynth-rife-ncnn
+    k7sfunc
+    vapoursynth-with-plugins;
 
   niri-sidebar   = import ./niri-sidebar   { inherit pkgs; };
   pins           = import ./pins           { inherit pkgs; };
