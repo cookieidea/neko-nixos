@@ -392,6 +392,7 @@ local findef = false
 
 local function parse_command(str)
     local args = {}
+    if type(str) ~= "string" then return args end
     for command in str:gmatch("([^;]+)%s*") do
         local arg = {}
         for part in command:gmatch("%S+") do
@@ -625,6 +626,12 @@ local function init(_, loaded)
     end
     local saved = mp.get_property_native("user-data/vs")
     if saved then vs = saved end
+    -- 旧 Windows 配置持久化了 DirectML RIFE 参数，AMD 版强制迁移为 ncnn+Vulkan。
+    vs.modes.rife.label = 'RIFE (AMD Vulkan)'
+    vs.modes.rife.settings = {
+        model = '23', turbo = '1', fnum = '2', fden = '1',
+        sc_mode = '1', gpu = '0', gpu_t = '1'
+    }
     update("container_fps", true)
     mp.register_event("file-loaded", function()
         for _, item in ipairs(finset_menu.items) do
