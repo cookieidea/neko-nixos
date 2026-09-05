@@ -17,8 +17,11 @@
   };
 
   inputs = {
-    nixpkgs.url = "https://mirrors.ustc.edu.cn/nix-channels/nixos-26.05/nixexprs.tar.xz";
-    # 更新：`nix flake update nixpkgs`
+    # 走 github 分支输入（锁 rev），不用 USTC 的通道 tarball：
+    # 通道是滚动的，tarball 内容一变，锁定的 narHash 就对不上
+    # （换机器 / 重装会直接 mismatch，本机只是因为 store 有缓存才没事）。
+    # 更新：nix flake update nixpkgs
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
     home-manager = {
       url = "git+https://github.com/rycee/home-manager.git?ref=release-26.05";
       inputs.nixpkgs.follows = "nixpkgs";
