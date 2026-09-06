@@ -22,8 +22,10 @@
     # 下载源在国内，不依赖 GitHub 可达性。更新：nix flake update nixpkgs
     nixpkgs.url = "git+https://mirrors.nju.edu.cn/git/nixpkgs.git?ref=nixos-26.05&shallow=1";
     # 备选：nixpkgs.url = "git+https://mirrors.tuna.tsinghua.edu.cn/git/nixpkgs.git?ref=nixos-26.05&shallow=1";
+    # home-manager：GitCode 镜像（国内，分支与 GitHub 同步，rev 不变则 narHash 沿用）；
+    # 注意上游官方地址已从 rycee/ 迁到 nix-community/，此处一并校正。
     home-manager = {
-      url = "git+https://github.com/rycee/home-manager.git?ref=release-26.05";
+      url = "git+https://gitcode.com/nix-community/home-manager.git?ref=release-26.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -50,9 +52,9 @@
       url = "git+https://github.com/noctalia-dev/noctalia.git?ref=cachix";
     };
 
-    # rust-overlay：Axolotl 需 Rust 1.95（仅作用于 selfPackages 实例）
+    # rust-overlay：GitCode 镜像（国内；Axolotl 需 Rust 1.95，仅作用于 selfPackages 实例）
     rust-overlay = {
-      url = "git+https://github.com/oxalica/rust-overlay";
+      url = "git+https://gitcode.com/oxalica/rust-overlay.git?ref=master";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 

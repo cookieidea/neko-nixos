@@ -140,12 +140,12 @@
         "rev": "65258d5c65a250189fde2e35f490d15e064c4c62",
         "revCount": 6829,
         "type": "git",
-        "url": "https://github.com/rycee/home-manager.git"
+        "url": "https://gitcode.com/nix-community/home-manager.git"
       },
       "original": {
         "ref": "release-26.05",
         "type": "git",
-        "url": "https://github.com/rycee/home-manager.git"
+        "url": "https://gitcode.com/nix-community/home-manager.git"
       }
     },
     "nix-cachyos-kernel": {
@@ -392,15 +392,16 @@
       "locked": {
         "lastModified": 1788165049,
         "narHash": "sha256-en4IoUeCqvq9F66YhwOrUFw1nc70OBhrJwrzfalezvY=",
-        "ref": "refs/heads/master",
+        "ref": "master",
         "rev": "d03cd474bd97389dcc2e8cd3b3bb6b8c6e346b1a",
         "revCount": 2289,
         "type": "git",
-        "url": "https://github.com/oxalica/rust-overlay"
+        "url": "https://gitcode.com/oxalica/rust-overlay.git"
       },
       "original": {
         "type": "git",
-        "url": "https://github.com/oxalica/rust-overlay"
+        "url": "https://gitcode.com/oxalica/rust-overlay.git",
+        "ref": "master"
       }
     },
     "systems": {
