@@ -1,5 +1,5 @@
 # NixOS 系统配置
-{ config, pkgs, lib, username, noctalia-greeter, ... }:
+{ config, pkgs, lib, username, noctalia-greeter, selfPackages, ... }:
 
 {
   # 内核：CachyOS RT-BORE（实时调度 + BORE，直播/推流低延迟）
@@ -251,7 +251,19 @@ EOF
     sarasa-gothic
     jetbrains-mono
     nerd-fonts.jetbrains-mono
-  ];
+  ] ++ [ selfPackages.harmonyos-sans-sc ];
+
+  fonts.fontconfig = {
+    defaultFonts = {
+      sansSerif = [ "HarmonyOS Sans SC" ];
+      serif = [ "HarmonyOS Sans SC" ];
+    };
+    localConf = ''
+      <match target="pattern">
+        <edit name="weight" mode="append"><const>medium</const></edit>
+      </match>
+    '';
+  };
 
   # 应用级服务
   services.lact.enable = true;

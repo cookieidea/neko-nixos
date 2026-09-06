@@ -36,4 +36,5 @@ rec {
   # Astral 组网客户端（Flutter+Rust；bundle 由 pkgs/astral/build.sh 联网构建，
   # flake 输入 astral-bundle 以 path 引用，升级跑 build.sh 即可）
   astral          = import ./astral { inherit pkgs; lib = pkgs.lib; src = astral-bundle; };
+  harmonyos-sans-sc = import ./harmonyos-sans-sc { inherit pkgs; };
 }
