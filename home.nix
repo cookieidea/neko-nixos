@@ -534,6 +534,14 @@ in
       source = ./dotfiles/icons/hicolor/scalable/apps/application-exit.svg;
       force = true;
     };
+    # ── KCalc 图标 hicolor 兜底 ──
+    # kcalc.desktop 引用 Icon=accessories-calculator，该名仅 breeze/apps/48 有
+    # （Papirus/hicolor 均无）；Noctalia V5 自研解析器走该链找不到 → 启动器无图标。
+    # 放一份到 hicolor/scalable（全尺寸通配的最终兜底），与其他 symbolic 兜底同组。
+    ".local/share/icons/hicolor/scalable/apps/accessories-calculator.svg" = {
+      source = ./dotfiles/icons/hicolor/scalable/apps/accessories-calculator.svg;
+      force = true;
+    };
     # ── 应用图标 hicolor 兜底（256x256）──
     # tabby/splayer-next（AppImage wrap 包自带 desktop 但图标不在标准路径）、
     # lunarclient（nixpkgs 包 desktop Icon=lunarclient 但无对应图标文件）。
