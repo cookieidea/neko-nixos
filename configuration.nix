@@ -6,13 +6,23 @@
   boot.kernelPackages = pkgs.cachyosKernels.linuxPackages-cachyos-rt-bore;
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
-  # 国内二进制缓存：USTC + TUNA 兜底 + attic（CachyOS 内核，国内快）
-  nix.settings.extra-substituters = [
+  # 二进制缓存：国内优先（USTC + TUNA），attic 供 CachyOS 内核，
+  # noctalia.cachix.org 供 Noctalia 系包，cache.nixos.org 最后兜底。
+  # 用 substituters（显式覆盖）而不是 extra-：extra- 会追加到默认的
+  # cache.nixos.org 之后，等于官方源永远先命中（而它国内最慢），
+  # 国内镜像只沦为兜底。
+  nix.settings.substituters = [
     "https://mirrors.ustc.edu.cn/nix-channels/store"
     "https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store"
     "https://attic.xuyh0120.win/lantian"
+    "https://noctalia.cachix.org"
+    "https://cache.nixos.org"
   ];
-  nix.settings.extra-trusted-public-keys = [ "lantian:EeAUQ+W+6r7EtwnmYjeVwx5kOGEBpjlBfPlzGlTNvHc=" ];
+  nix.settings.trusted-public-keys = [
+    "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
+    "lantian:EeAUQ+W+6r7EtwnmYjeVwx5kOGEBpjlBfPlzGlTNvHc="
+    "noctalia.cachix.org-1:pCOR47nnMEo5thcxNDtzWpOxNFQsBRglJzxWPp3dkU4="
+  ];
   nixpkgs.config = {
     allowUnfree = true;   # steam / wechat-uos / 部分驱动需要
   };
