@@ -824,7 +824,7 @@ _mc_flatdata() {
                 if _mc_confirm "Clean user flatpaks"; then
                     local _tmp _pid
                     _tmp=$(mktemp) || return 1
-                    { flatpak uninstall --unused --user ; flatpak repair --user ; } >"$_tmp" 2>&1 & _pid="$!"
+                    { flatpak uninstall -y --unused --user ; flatpak repair --user ; } >"$_tmp" 2>&1 & _pid="$!"
                     _mc_loading "Working.." "$_pid" || return 1
                     cat "$_tmp" ; rm -f "$_tmp"
                 else
@@ -835,7 +835,7 @@ _mc_flatdata() {
                 if _mc_confirm "Clean system flatpaks"; then
                     local _tmp _pid
                     _tmp=$(mktemp) || return 1
-                    { flatpak uninstall --unused ; _mc_sudo_wrap flatpak repair ; } >"$_tmp" 2>&1 & _pid="$!"
+                    { flatpak uninstall -y --unused ; _mc_sudo_wrap flatpak repair ; } >"$_tmp" 2>&1 & _pid="$!"
                     _mc_loading "Working.." "$_pid" || return 1
                     cat "$_tmp" ; rm -f "$_tmp"
                 else
@@ -846,7 +846,7 @@ _mc_flatdata() {
                 if _mc_confirm "Clear flatpak application data"; then
                     local _tmp _pid
                     _tmp=$(mktemp) || return 1
-                    flatpak uninstall --delete-data >"$_tmp" 2>&1 & _pid="$!"
+                    flatpak uninstall -y --delete-data >"$_tmp" 2>&1 & _pid="$!"
                     _mc_loading "Working.." "$_pid" || return 1
                     cat "$_tmp" ; rm -f "$_tmp"
                 else
