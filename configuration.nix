@@ -33,7 +33,7 @@
   # Noctalia greeter 外观同步（pkexec）免密放行 wheel
   security.polkit.extraConfig = ''
     polkit.addRule(function(action, subject) {
-        if (action.id == "org.noctalia.greeter.apply-appearance" &&
+        if (action.id == "org.noctalia.greeter.sync-appearance" &&
             subject.isInGroup("wheel")) {
             return polkit.Result.YES;
         }
