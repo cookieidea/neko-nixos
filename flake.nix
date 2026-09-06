@@ -8,11 +8,13 @@
       "https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store"
       "https://attic.xuyh0120.win/lantian"
       "https://noctalia.cachix.org"
+      "https://nekobox.cachix.org"
     ];
     extra-trusted-public-keys = [
       "lantian:EeAUQ+W+6r7EtwnmYjeVwx5kOGEBpjlBfPlzGlTNvHc="
       "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
       "noctalia.cachix.org-1:pCOR47nnMEo5thcxNDtzWpOxNFQsBRglJzxWPp3dkU4="
+      "nekobox.cachix.org-1:bRpp0vZK2Uq/vnydXC+uuOmFJW3W6fN4PI5PDy4iD+s="
     ];
   };
 
