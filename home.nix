@@ -273,12 +273,13 @@ in
     VAPOURSYNTH_EXTRA_PLUGIN_PATH = "${selfPackages.vapoursynth-with-plugins}/lib/vapoursynth";
   };
 
-  # 关机时 astral handshake 超时导致 user@1000 等待90s，drop-in 缩短停止超时
+  # 关机时 astral handshake 超时导致 user@1000 等待90s；不等待优雅退出，
+  # SIGTERM 后 100ms 未退出即 SIGKILL（注意 TimeoutStopSec=0 表示禁用超时）
   xdg.configFile."systemd/user/astral-core.service.d/10-timeout.conf" = {
     force = true;
     text = ''
       [Service]
-      TimeoutStopSec=5s
+      TimeoutStopSec=100ms
     '';
   };
 
