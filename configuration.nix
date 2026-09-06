@@ -29,6 +29,7 @@
     allowUnfree = true;   # steam / wechat-uos / 部分驱动需要
   };
   security.polkit.enable = true;
+  security.sudo.extraConfig = "Defaults timestamp_timeout=30";
   # Noctalia greeter 外观同步（pkexec）免密放行 wheel
   security.polkit.extraConfig = ''
     polkit.addRule(function(action, subject) {
