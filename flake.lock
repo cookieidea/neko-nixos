@@ -257,7 +257,7 @@
       },
       "original": {
         "ref": "nixos-26.05",
-        "shallow": 1,
+        "shallow": true,
         "type": "git",
         "url": "https://mirrors.nju.edu.cn/git/nixpkgs.git"
       }
