@@ -1,3 +1,4 @@
+mp.msg.info("MARKER_NEW_VAPOURSYNTH_20250906")
 local mp = require 'mp'
 local utils = require 'mp.utils'
 
@@ -89,9 +90,6 @@ local main_menu = {
         { title = '清空', value = 'clear' },
         { title = '添加 SVP', value = 'add svp' },
         { title = '添加 RIFE', value = 'add rife' },
-        { title = '添加 DRBA', value = 'add drba' },
-        { title = '添加 RealESRGAN', value = 'add realesrgan' },
-        { title = '添加 UAI', value = 'add uai' },
         { title = '非实时处理当前视频', value = 'process_video' },
         { title = '输入帧率修正', value = 'show finset' },
         { title = '配置菜单', value = 'show settings', actions = { { name = 'toggle_preset', icon = 'lock_open', label = '禁用' } } }
@@ -632,6 +630,27 @@ local function init(_, loaded)
         model = '23', turbo = '1', fnum = '2', fden = '1',
         sc_mode = '1', gpu = '0', gpu_t = '1'
     }
+    -- 隐藏暂不支持的 ONNX 模式（DRBA/UAI/RealESRGAN 需额外 vs-mlrt/onnx 链路）
+    vs.modes.drba = nil
+    vs.modes.realesrgan = nil
+    vs.modes.uai = nil
+    if vs.state then
+        local filtered = {}
+        for _, m in ipairs(vs.state) do
+            if m == "rife" or m == "svp" then table.insert(filtered, m) end
+        end
+        vs.state = filtered
+    end
+    -- 同步隐藏设置菜单中的对应配置项
+    do
+        local keep = {}
+        for _, item in ipairs(settings_menu.items) do
+            if item.title ~= "DRBA 配置" and item.title ~= "RealESRGAN 配置" and item.title ~= "UAI 配置" then
+                table.insert(keep, item)
+            end
+        end
+        settings_menu.items = keep
+    end
     update("container_fps", true)
     mp.register_event("file-loaded", function()
         for _, item in ipairs(finset_menu.items) do
