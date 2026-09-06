@@ -260,7 +260,7 @@ _mc_check_sudopath() {
     fi
 
     case "$_mc_canpath" in
-        /usr/bin/sudo|/bin/sudo|/usr/local/bin/sudo) ;;
+        /usr/bin/sudo|/bin/sudo|/usr/local/bin/sudo|/run/wrappers/*/sudo) ;;
         *) printf 'Warning: sudo path not in allowlist: %s\n' "$_mc_canpath" >&2; return 1 ;;
     esac
 
@@ -315,6 +315,8 @@ _mc_sudo_wrap() {
     esac
     if [[ -n "${_mc_sudo_path:-}" && -x "$_mc_sudo_path" ]]; then
         "$_mc_sudo_path" "$@"
+    elif [[ $# -eq 1 && ("$1" == "-v" || "$1" == "-k") ]]; then
+        return 0
     else
         "$@"
     fi
