@@ -767,8 +767,8 @@ in
       package = pkgs.adwaita-icon-theme;
     };
     font = {
-      name = "Adwaita Sans";
-      size = 11;
+      name = "HarmonyOS Sans SC";
+      size = 10;
     };
     # 原 dotfiles/home/.gtkrc-2.0 的 fcitx 输入法配置合并进模块（避免 .gtkrc-2.0 管理冲突）
     gtk2.extraConfig = ''

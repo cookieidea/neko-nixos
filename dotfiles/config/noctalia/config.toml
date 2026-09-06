@@ -134,7 +134,7 @@ media = false
 nightlight = false
 
 [shell]
-font_family = "Noto Sans CJK SC"
+font_family = "HarmonyOS Sans SC"
 polkit_agent = true
 settings_show_advanced = true
 avatar_path = "~/.face"
