@@ -273,6 +273,15 @@ in
     VAPOURSYNTH_EXTRA_PLUGIN_PATH = "${selfPackages.vapoursynth-with-plugins}/lib/vapoursynth";
   };
 
+  # 关机时 astral handshake 超时导致 user@1000 等待90s，drop-in 缩短停止超时
+  xdg.configFile."systemd/user/astral-core.service.d/10-timeout.conf" = {
+    force = true;
+    text = ''
+      [Service]
+      TimeoutStopSec=5s
+    '';
+  };
+
   # 开机随机壁纸（noctalia IPC）
   systemd.user.services.noctalia-wallpaper = {
     Unit = {
