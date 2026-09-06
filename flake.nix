@@ -36,7 +36,7 @@
     };
 
     opencode = {
-      url = "git+https://github.com/sst/opencode";
+      url = "git+https://github.com/sst/opencode?rev=04284921ac8f657555b5a182f5ff055f471543e4";
     };
 
     bili-danmaku-tui = {
