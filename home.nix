@@ -113,11 +113,12 @@ in
     vscodium
 
     # --- 开发工具链 ---
-    # Zulu JDK：25 默认（JAVA_HOME，26.x MC 需 25）；17/8 供 HMCL 按需选择。
-    # 多个 JDK 同装会因 Welcome.html 等顶层文件 buildEnv 冲突 → HiPrio 压制
-    (pkgs.lib.hiPrio pkgs.zulu25)
-    pkgs.zulu17
-    pkgs.zulu8
+    # Zulu JDK：25 默认（JAVA_HOME，26.x MC 需 25）；21/17/8 供 HMCL 按需选择。
+    # 多个 JDK 顶层同名文件（Welcome.html/conf/...）buildEnv 冲突 → 逐级 HiPrio
+    (pkgs.lib.setPrio (-20) pkgs.zulu25)
+    (pkgs.lib.setPrio (-15) pkgs.zulu21)
+    (pkgs.lib.setPrio (-10) pkgs.zulu17)
+    (pkgs.lib.setPrio (-5) pkgs.zulu8)
     (python3.withPackages (ps: [ ps.pip ]))   # python3 + pip
     uv                                        # uv（现代 Python 包/虚拟环境管理器）
     rustc                                     # rust 编译器
@@ -494,6 +495,11 @@ in
   '';
 
   home.file = {
+    # ── HMCL Java 列表：HMCL 扫 ~/.jdks（IntelliJ 风格目录），链入各 zulu ──
+    ".jdks/zulu25".source = "${pkgs.zulu25}";
+    ".jdks/zulu21".source = "${pkgs.zulu21}";
+    ".jdks/zulu17".source = "${pkgs.zulu17}";
+    ".jdks/zulu8".source = "${pkgs.zulu8}";
     # ── 用户头像（freedesktop 标准 ~/.face，Noctalia Greeter 登录界面 + Noctalia 控制中心读取）──
     ".face".source = ./dotfiles/avatar.png;
     # ── fastfetch logo 图片（kitty 图像协议；配置引用 ~/.local/share/fastfetch/NixOS.png）──
