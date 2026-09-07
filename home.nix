@@ -283,12 +283,6 @@ in
     '';
   };
 
-  # astral-core 不随开机自启（由 astral GUI wrapper 按需拉起/停止）；
-  # GUI 重装服务时会重新 enable，每次激活时强制 disable
-  home.activation.astralCoreNoAutostart = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-    $DRY_RUN_CMD systemctl --user disable astral-core.service 2>/dev/null || true
-  '';
-
   # 开机随机壁纸（noctalia IPC）
   systemd.user.services.noctalia-wallpaper = {
     Unit = {
