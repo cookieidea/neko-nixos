@@ -16,7 +16,8 @@ CORE_WORK=/tmp/astral-core-build-work
 BUNDLE_DEST=/home/cookie/.cache/astral/bundle
 REPO_URL=https://github.com/AstralNext/Astral.git
 CORE_REPO_URL=https://github.com/AstralNext/astral-core.git
-REF=main
+REF=v1.0.12
+CORE_REF=v0.1.3
 
 cd "$(dirname "$0")"
 
@@ -44,7 +45,7 @@ rm -rf "$WORK"
 
 echo "==> 构建 astral-core（GUI 依赖的本机内核服务）"
 rm -rf "$CORE_WORK"
-git clone --depth 1 --branch "$REF" "$CORE_REPO_URL" "$CORE_WORK"
+git clone --depth 1 --branch "$CORE_REF" "$CORE_REPO_URL" "$CORE_WORK"
 nix develop ./dev-shell -c bash -c '
   set -euo pipefail
   cd "$1"

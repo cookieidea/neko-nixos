@@ -1,7 +1,7 @@
 {
   description = "Astral build dev shell (used by build.sh)";
 
-  inputs.nixpkgs.url = "path:/nix/store/bkr47zlf2aia9vwm3hr1x78ysy2350xi-source";
+  inputs.nixpkgs.url = "git+https://mirrors.nju.edu.cn/git/nixpkgs.git?ref=nixos-26.05&shallow=1";
 
   outputs = { self, nixpkgs }:
     let
