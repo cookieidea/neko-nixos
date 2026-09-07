@@ -130,7 +130,7 @@ in
     mangojuice                                # mangojuice（GTK 文件管理器）
 
     # --- 游戏 / 影音客户端 ---
-    # prismlauncher → Axolotl（selfPackages，见 pkgs/axolotl）
+    # prismlauncher → hmcl（nixpkgs）
     lunar-client
     taterclient-ddnet                         # DDNet Teeworlds 客户端
 
@@ -214,7 +214,7 @@ in
     selfPackages.tabby-terminal       # Tabby 终端（eugeny/tabby，Electron；自构建，nixpkgs 的 tabby 是 TabbyML AI 助手）
     selfPackages.purevox              # PureVox（实时 AI 音频降噪，AppImage 捆绑内嵌 Python，PipeWire 直用）
     selfPackages.bedrockboot          # BedrockBoot（MC 基岩版启动器，Avalonia；AppImage+FHS）
-    selfPackages.axolotl              # Axolotl（MC Java 版启动器，替代 Prism/HMCL；nix 源码构建）
+    hmcl                                    # HMCL（MC Java 版启动器，nixpkgs）
     selfPackages.astral               # Astral 组网客户端（Flutter+Rust；bundle 由 pkgs/astral/build.sh 联网构建）
     # 走 flake 输入的包（不在 nixpkgs 核心，直接引用其 flake 构建产物）
     bili-danmaku-tui.packages.${pkgs.stdenv.hostPlatform.system}.default  # B 站直播间弹幕 TUI
@@ -282,6 +282,12 @@ in
       TimeoutStopSec=100ms
     '';
   };
+
+  # astral-core 不随开机自启（由 astral GUI wrapper 按需拉起/停止）；
+  # GUI 重装服务时会重新 enable，每次激活时强制 disable
+  home.activation.astralCoreNoAutostart = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    $DRY_RUN_CMD systemctl --user disable astral-core.service 2>/dev/null || true
+  '';
 
   # 开机随机壁纸（noctalia IPC）
   systemd.user.services.noctalia-wallpaper = {

@@ -54,12 +54,6 @@
       url = "git+https://github.com/noctalia-dev/noctalia.git?ref=cachix";
     };
 
-    # rust-overlay：GitCode 镜像（国内；Axolotl 需 Rust 1.95，仅作用于 selfPackages 实例）
-    rust-overlay = {
-      url = "git+https://gitcode.com/oxalica/rust-overlay.git?ref=master";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     noctalia-greeter = {
       url = "git+https://github.com/noctalia-dev/noctalia-greeter?ref=main";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -72,7 +66,7 @@
     };
   };
 
-  outputs = { self, nixpkgs, home-manager, cooknixvim, opencode, bili-danmaku-tui, nix-cachyos-kernel, noctalia, noctalia-greeter, rust-overlay, astral-bundle, ... }:
+  outputs = { self, nixpkgs, home-manager, cooknixvim, opencode, bili-danmaku-tui, nix-cachyos-kernel, noctalia, noctalia-greeter, astral-bundle, ... }:
     let
       system = "x86_64-linux";
       username = "cookie";   # 你的用户名（用于 home 目录 / autoLogin）
@@ -84,11 +78,9 @@
       pkgs = import nixpkgs {
         inherit system;
         config.allowUnfree = true;
-        overlays = [ rust-overlay.overlays.default ];   # Axolotl 需 Rust 1.95
       };
-      rustToolchain = pkgs.rust-bin.fromRustupToolchainFile ./pkgs/axolotl/rust-toolchain.toml;
 
-      selfPackages = import ./pkgs { inherit pkgs rustToolchain astral-bundle; };
+      selfPackages = import ./pkgs { inherit pkgs astral-bundle; };
 
       hmModule = {
         imports = [ home-manager.nixosModules.home-manager ];

@@ -1,8 +1,7 @@
 # 自构建包（flake packages + home.nix 安装，`nix build .#<name>` 单独构建）
 # rev 固定已知 commit 保可复现，升级改 rev + sha256
 # noctalia-shell 来自 nixpkgs（home.nix 直接装），不在这里
-{ pkgs, rustToolchain, astral-bundle }:
-
+{ pkgs, astral-bundle }:
 let
   vsPlugins = import ./vs-plugins { inherit pkgs; };
 in
@@ -24,7 +23,6 @@ rec {
   obs-vdoninja    = import ./obs-vdoninja { inherit pkgs; };
   purevox         = import ./purevox { inherit pkgs; };
   bedrockboot     = import ./bedrockboot { inherit pkgs; };
-  axolotl         = import ./axolotl { inherit pkgs rustToolchain; };
   nyxniri-scratch-menu = import ./nyxniri-scratch-menu.nix { inherit pkgs; };
   # astral 的 bundle 由 pkgs/astral/build.sh 联网构建（flake 输入 astral-bundle）
   astral          = import ./astral { inherit pkgs; lib = pkgs.lib; src = astral-bundle; };

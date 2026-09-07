@@ -92,7 +92,7 @@ EOF
     # TUN 需 cap_net_admin，沙箱内无法 setcap；GUI 会复制 core 到
     # ~/.local/share/astral-core/app/ 再运行 → 升级后需重跑：
     #   sudo setcap cap_net_admin=ep ~/.local/share/astral-core/app/astral-core
-    makeWrapper $out/app/astral $out/bin/astral \
+    makeWrapper $out/app/astral $out/bin/.astral-gui \
       --prefix LD_LIBRARY_PATH : "$out/app/lib:${
         lib.makeLibraryPath (with pkgs; [
           gtk3 glib gdk-pixbuf pango cairo at-spi2-core
@@ -103,5 +103,16 @@ EOF
         ])
       }" \
       ''${gappsWrapperArgs[@]}
+
+    # 生命周期：GUI 启动前拉起 astral-core 用户服务，GUI 退出后停掉
+    cat > $out/bin/astral <<EOF
+    #!/bin/sh
+    systemctl --user start astral-core.service
+    $out/bin/.astral-gui "\$@"
+    status=\$?
+    systemctl --user stop astral-core.service
+    exit \$status
+    EOF
+    chmod +x $out/bin/astral
   '';
 }

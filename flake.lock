@@ -382,29 +382,7 @@
         "nixpkgs": "nixpkgs_4",
         "noctalia": "noctalia",
         "noctalia-greeter": "noctalia-greeter",
-        "opencode": "opencode",
-        "rust-overlay": "rust-overlay"
-      }
-    },
-    "rust-overlay": {
-      "inputs": {
-        "nixpkgs": [
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1788165049,
-        "narHash": "sha256-en4IoUeCqvq9F66YhwOrUFw1nc70OBhrJwrzfalezvY=",
-        "ref": "master",
-        "rev": "d03cd474bd97389dcc2e8cd3b3bb6b8c6e346b1a",
-        "revCount": 2289,
-        "type": "git",
-        "url": "https://gitcode.com/oxalica/rust-overlay.git"
-      },
-      "original": {
-        "ref": "master",
-        "type": "git",
-        "url": "https://gitcode.com/oxalica/rust-overlay.git"
+        "opencode": "opencode"
       }
     },
     "systems": {
