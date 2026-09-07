@@ -61,7 +61,7 @@ in
     VAPOURSYNTH_EXTRA_PLUGIN_PATH = "${selfPackages.vapoursynth-with-plugins}/lib/vapoursynth";
     # 覆盖语义，须保留原 pipewire-jack 路径；ABDM 托盘需 systemdLibs
     LD_LIBRARY_PATH = "${pkgs.systemdLibs}/lib:/nix/store/zcqp398mxlw62jl02sx0rsc7gvcl1qhc-pipewire-1.6.6-jack/lib";
-    JAVA_HOME = "${pkgs.jdk21}";
+    JAVA_HOME = "${pkgs.zulu25}";
     # gtk3 schema 路径（否则 kdenlive 等 GTK 选择器 abort）
     GSETTINGS_SCHEMA_DIR = "${pkgs.gtk3}/share/gsettings-schemas/${pkgs.gtk3.name}/glib-2.0/schemas";
     CARGO_HOME = "$HOME/.cargo";
@@ -113,7 +113,11 @@ in
     vscodium
 
     # --- 开发工具链 ---
-    jdk21                                     # JDK 21 (LTS)；JAVA_HOME 见上方 sessionVariables
+    # Zulu JDK：25 默认（JAVA_HOME，26.x MC 需 25）；17/8 供 HMCL 按需选择。
+    # 多个 JDK 同装会因 Welcome.html 等顶层文件 buildEnv 冲突 → HiPrio 压制
+    (pkgs.lib.hiPrio pkgs.zulu25)
+    pkgs.zulu17
+    pkgs.zulu8
     (python3.withPackages (ps: [ ps.pip ]))   # python3 + pip
     uv                                        # uv（现代 Python 包/虚拟环境管理器）
     rustc                                     # rust 编译器
