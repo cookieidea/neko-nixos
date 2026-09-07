@@ -69,10 +69,22 @@ else
 fi
 
 # ---------- 预构建自构建程序（flake 包）----------
+# ---------- Astral bundle（联网构建，flake path 输入所必需）----------
+# astral 的 bundle（约 75MB）不入 git；若本地没有，后面所有 nix 求值直接失败。
+# 检测到缺失就在此构建（约 20～30 分钟，无需值守）；build.sh 收尾会自动重锁 flake。
+BUNDLE_DIR="/home/$TARGET_USER/.cache/astral/bundle"
+if [[ ! -x "$BUNDLE_DIR/astral" || ! -x "$BUNDLE_DIR/astral-core" ]]; then
+  echo "==> Astral bundle 缺失，联网构建（约 20～30 分钟）..."
+  bash "$SRC/pkgs/astral/build.sh"
+  chown -R "$TARGET_USER" "$BUNDLE_DIR"
+else
+  echo "==> Astral bundle 已存在，跳过构建。"
+fi
+
 # 这些程序不在 nixpkgs 核心，由 ./pkgs 里的派生从源码 / 发布构建
 # 这些程序不在 nixpkgs 核心，由 ./pkgs 里的派生构建。这里先单独构建，便于提前暴露
 # 错误；后续 nixos-install / nixos-rebuild 会复用已构建的结果。
-SELF_PKGS=(niri-sidebar nyxniri-scratch-menu pins shorin-contrib splayer-next ab-download-manager tabby-terminal obs-vdoninja purevox bedrockboot axolotl)
+SELF_PKGS=(niri-sidebar nyxniri-scratch-menu pins shorin-contrib splayer-next ab-download-manager tabby-terminal obs-vdoninja purevox bedrockboot axolotl astral)
 echo "==> 预构建自构建程序（flake 包）..."
 for p in "${SELF_PKGS[@]}"; do
   echo "    • 构建 $p ..."
@@ -113,6 +125,7 @@ if [[ -n "$MNT" ]]; then
   nixos-install --flake "$DEST/#$FLAKE_HOST"
   echo ""
   echo "==> 安装完成！重启即可进入 ly → niri + Noctalia。"
+  echo "    Astral 首次使用前：进 GUI 连一次自动部署 core，之后跑：sudo setcap cap_net_admin=ep ~/.local/share/astral-core/app/astral-core（否则 TUN 起不来；每次更新 core 都要重跑一次）。"
   echo "    若首次登录密码留空，重启后在 TTY 用 root（或 live 环境）执行：passwd $TARGET_USER"
 else
   # ================= 已装系统：rebuild =================
@@ -130,5 +143,6 @@ else
   nixos-rebuild switch --flake "$DEST/#$FLAKE_HOST"
   echo ""
   echo "==> 完成！重启或重新登录以进入 niri + Noctalia 桌面。"
+  echo "    Astral core 若更新：GUI 里同步后跑 sudo setcap cap_net_admin=ep ~/.local/share/astral-core/app/astral-core，否则 TUN 起不来。"
   echo "    若 Home Manager 部分未生效，可再以该用户运行：home-manager switch --flake $DEST/#$FLAKE_HOST"
 fi

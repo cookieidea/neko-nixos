@@ -54,6 +54,6 @@ nix develop ./dev-shell -c bash -c '
 cp "$CORE_WORK/target/release/astral-core" "$BUNDLE_DEST/astral-core"
 rm -rf "$CORE_WORK"
 
-(cd /etc/nixos && nix flake lock --update-input astral-bundle)
+(cd "$(dirname "$0")/../.." && nix flake lock --update-input astral-bundle)
 
 echo "==> 完成。执行 sudo nixos-rebuild switch 重新打包。"
