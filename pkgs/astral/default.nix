@@ -1,11 +1,7 @@
 # Astral 组网客户端（Flutter GUI + Rust/EasyTier 核心）
-# 上游在 Nix 沙箱内无法联网构建（cargokit + dart pub get
-# 都需网络），且上游无 release 产物，因此采用「手动联网构建一次 + 本地 bundle 打包」：
-#   - bundle 由 scripts/build-astral.sh 生成到 /home/cookie/.cache/astral/bundle
-#   - 这里用 builtins.path 把 bundle 拷进 store（内容哈希，改动即失效重建）
-#   - 产物不入 git（bundle 75MB），换机器需重新手动构建
-#
-# 升级：重新跑 scripts/build-astral.sh，nixos-rebuild 会因内容哈希变化自动重建。
+# 沙箱内无法联网构建（cargokit/dart pub 均需网络）→ bundle 由 build.sh 联网
+# 构建到 ~/.cache/astral/bundle，经 flake 输入 astral-bundle（path 引用）打包；
+# 产物不入 git。升级：跑 build.sh，内容哈希变化自动重建。
 { pkgs, lib, src }:
 
 pkgs.stdenv.mkDerivation {
@@ -20,7 +16,6 @@ pkgs.stdenv.mkDerivation {
     pkgs.wrapGAppsHook3
   ];
 
-  # 运行时库：ldd 分析所得（gtk3 + 输入法/托盘 + EasyTier 所需 + X/Wayland）
   buildInputs = with pkgs; [
     gtk3
     glib
@@ -94,11 +89,9 @@ EOF
   '';
 
   postFixup = ''
-    # ⚠️ TUN 虚拟网卡需要 CAP_NET_ADMIN：Nix 沙箱内无法 setcap（缺 CAP_SETFCAP），
-    # 且 GUI 会复制 astral-core 到 ~/.local/share/astral-core/app/ 再运行。
-    # 已在安装副本上执行过：
-    #   sudo setcap cap_net_admin=ep ~/.local/share/astral-core/app/*/astral-core
-    # 升级内核版本后需重跑该命令。
+    # TUN 需 cap_net_admin，沙箱内无法 setcap；GUI 会复制 core 到
+    # ~/.local/share/astral-core/app/ 再运行 → 升级后需重跑：
+    #   sudo setcap cap_net_admin=ep ~/.local/share/astral-core/app/astral-core
     makeWrapper $out/app/astral $out/bin/astral \
       --prefix LD_LIBRARY_PATH : "$out/app/lib:${
         lib.makeLibraryPath (with pkgs; [

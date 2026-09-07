@@ -1,13 +1,6 @@
-# 自构建包（flake 的 packages.<system> + home.nix 安装，`nix build .#<name>` 可单独构建）
-#
-# Source repos were taken from the original Arch setup
-# (SHORiN-KiWATA/shorin-arch-setup, scripts/04k-shorin-noctalia-quickshell.sh
-# and the AUR `-git` package list). Revisions are pinned to a known commit so
-# builds are reproducible; bump `rev` + `sha256` when you want newer code.
-#
-# NOTE: noctalia-shell is intentionally NOT here — it now comes from nixpkgs
-# (pkgs.noctalia-shell, a quickshell config + qs wrapper) and is added in
-# home.nix directly, replacing the standalone `noctalia` v4 app flake input.
+# 自构建包（flake packages + home.nix 安装，`nix build .#<name>` 单独构建）
+# rev 固定已知 commit 保可复现，升级改 rev + sha256
+# noctalia-shell 来自 nixpkgs（home.nix 直接装），不在这里
 { pkgs, rustToolchain, astral-bundle }:
 
 let
@@ -33,8 +26,7 @@ rec {
   bedrockboot     = import ./bedrockboot { inherit pkgs; };
   axolotl         = import ./axolotl { inherit pkgs rustToolchain; };
   nyxniri-scratch-menu = import ./nyxniri-scratch-menu.nix { inherit pkgs; };
-  # Astral 组网客户端（Flutter+Rust；bundle 由 pkgs/astral/build.sh 联网构建，
-  # flake 输入 astral-bundle 以 path 引用，升级跑 build.sh 即可）
+  # astral 的 bundle 由 pkgs/astral/build.sh 联网构建（flake 输入 astral-bundle）
   astral          = import ./astral { inherit pkgs; lib = pkgs.lib; src = astral-bundle; };
   harmonyos-sans-sc = import ./harmonyos-sans-sc { inherit pkgs; };
 }

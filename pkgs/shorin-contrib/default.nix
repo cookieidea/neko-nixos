@@ -1,14 +1,8 @@
 { pkgs }:
 
-# shorin-contrib — helper shell scripts（筛选安装通用部分）
-# Upstream: https://github.com/SHORiN-KiWATA/shorin-contrib
-#
-# 只安装 NixOS 上可用的通用脚本：
-#   - others/*（battery-care / compressvideos / video2gif / media-info /
-#     getown / searchmodels / vir）+ terminal/lsi + system/procusage + timer
-# 排除 Arch 专用（pacman/paru/yay 系：pac pacd pacr pacrrr checkallupdates
-#   mirror-update sysup clean）与 snapshot/quicksave、quickload
-#   （已在 dotfiles/local/bin 有独立副本，Mod+F5/F8 走它们）。
+# shorin-contrib 通用脚本子集（https://github.com/SHORiN-KiWATA/shorin-contrib）
+# 装 others/* + terminal/lsi + system/procusage + timer；排除 Arch 专用
+# （pacman/paru 系）与 snapshot/quicksave/quickload（dotfiles 有独立副本）
 pkgs.stdenv.mkDerivation {
   pname = "shorin-contrib";
   version = "unstable-2026-08-24";

@@ -1,8 +1,6 @@
-# NyxNiri 星环菜单（GTK3 + GtkLayerShell + pygobject）NixOS 包装
-# 运行已部署到 ~/.config/niri/scripts/niri-scratch-menu.py 的脚本。
-# 用 wrapGAppsHook + gobject-introspection 自动收集 gtk3 依赖闭包的
-# GI_TYPELIB_PATH（gtk3/pango/harfbuzz/gdk-pixbuf 等）；gtk-layer-shell
-# 非 gtk3 依赖，手动 prepend 其 typelib 目录。
+# NyxNiri 星环菜单（GTK3 + GtkLayerShell + pygobject）
+# 跑 ~/.config/niri/scripts/niri-scratch-menu.py；wrapGAppsHook 收集 GI typelib，
+# gtk-layer-shell 需手动 prepend
 { pkgs }:
 let
   pythonEnv = pkgs.python3.withPackages (ps: [ ps.pygobject3 ps.pycairo ]);

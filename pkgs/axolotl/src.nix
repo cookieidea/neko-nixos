@@ -20,9 +20,8 @@ let
 
   frontendPackage = builtins.fromJSON (builtins.readFile "${src}/apps/app-frontend/package.json");
 
-  # 上游 frontend package.json 版本号滞后于 tag（v1.8.9 仍是 1.8.1），
-  # 这里统一以实际 tag 版本为准：包名 / tauri.conf.json（About 页）都显示 1.8.9
-  launcherVersion = "1.9.4";
+  # 以实际 tag 版本为准（部分 tag 的 frontend package.json 版本滞后）
+  launcherVersion = "1.9.6-beta.2";
 
   # Mojang 自带 JRE 的 java.awt（ModernUI 初始化字体时触发）找不到
   # fontconfig.properties → "Fontconfig head is null" 崩溃。
@@ -66,12 +65,12 @@ let
     };
   });
 
-  # 官方仓库 v1.8.9（tag SHA，`git ls-remote --tags` 查询）
+  # 官方仓库（tag SHA，`git ls-remote --tags` 查询）
   src = pkgs.fetchFromGitHub {
     owner = "Mystic-Stars";
     repo = "Axolotl";
-    rev = "d9ce23bcc7b292901440f64a035fde81f51763c6";
-    sha256 = "sha256-OGoZsz4Ba1QtBCXW4RdPbeXr2/nD8KJnM85K1+iKmnY=";
+    rev = "4e7cd9160e09812a978c0309f0dbe1e535784f45";
+    sha256 = "sha256-ff+0e6ASvOls1aNeJYnTFE/6R2mWNuXM7FXJUtrwyGs=";
     fetchSubmodules = true;
   };
 
@@ -105,11 +104,13 @@ let
       substituteInPlace apps/app-frontend/package.json \
         --replace-fail '"version": "${frontendPackage.version}"' '"version": "${launcherVersion}"'
       # Blockbench 依赖离线预装（npm ci --offline，沙箱无网络）
+      # ⚠️ v1.9.5 根目录新增 monorepo package.json（无 lock）→ npm ci --prefix
+      #    会撞上它报 EUSAGE；必须 cd 进子模块目录执行
       export npm_config_cache=${finalAttrs.blockbenchNpmDeps}
-      npm ci --offline --ignore-scripts --no-audit --no-fund --prefix third-party/blockbench
+      (cd third-party/blockbench && npm ci --offline --ignore-scripts --no-audit --no-fund)
     '';
 
-    cargoHash = "sha256-jsdywJl4EhhrI+37TfX8TeVuNolTNZGk51d2WtMXmxk=";
+    cargoHash = "sha256-5fKI9m24Q8I0MnWhqEdNknwwgnym3Pj0oPc362QGAwk=";
 
     # 跳过 cargo test（checkPhase 约 3.5 分钟），加速每次源码升级的增量构建
     doCheck = false;
@@ -271,6 +272,19 @@ pkgs.dejavu_fonts
         # 启动器/游戏所需环境（niri 下）：
         #   SDL 强制原生 Wayland（niri 缺 fifo-v1，SDL 默认回退 XWayland）
         --set SDL_VIDEO_DRIVER wayland
+        #   MC 26.3 GLFW→SDL3，运行时 dlopen wayland/xkbcommon/libdecor/glvnd/
+        #   驱动；Theseus 重置游戏 LD_LIBRARY_PATH → 经 nix-ld 的
+        #   NIX_LD_LIBRARY_PATH 注入（store 里 32 位副本会被 glibc 静默跳过，
+        #   makeLibraryPath 取 64 位）
+        --prefix NIX_LD_LIBRARY_PATH : ${
+          lib.makeLibraryPath [
+            pkgs.wayland
+            pkgs.libxkbcommon
+            pkgs.libdecor
+            pkgs.libglvnd
+            pkgs.addDriverRunpath.driverLink
+          ]
+        }
         #   radeonsi 下 WebKit DMABUF/合成路径崩 → 强制软件合成（仅 WebKit）
         --set WEBKIT_DISABLE_COMPOSITING_MODE 1
         --set WEBKIT_DISABLE_DMABUF_RENDERER 1

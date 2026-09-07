@@ -1,8 +1,6 @@
 { pkgs }:
 
-# Pins — create and edit application shortcuts (.desktop files).
-# Upstream: https://github.com/fabrialberio/Pins  (GTK4 / libadwaita, meson)
-# Arch AUR: pins-git
+# Pins — 创建/编辑 .desktop 快捷方式（GTK4/libadwaita）
 pkgs.stdenv.mkDerivation {
   pname = "pins";
   version = "2.4.5-unstable-2026-08-12";
