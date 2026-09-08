@@ -12,8 +12,7 @@ binds {
     // 显示快捷键教程
     Mod+Shift+Slash hotkey-overlay-title="快捷键教程 Keybind tutorial" { spawn "~/.config/niri/scripts/niri-binds"; }
 
-    // alt+tab切换窗口
-    Alt+Tab hotkey-overlay-title="跳转窗口 swich windows" {spawn "noctalia" "msg" "panel-toggle" "launcher";}
+    // Alt+Tab 窗口切换在 recent-windows.kdl（面板带缩略图）；此处不重复绑定
     // 特殊功能
     Mod+F1 hotkey-overlay-title="开关输入法 Toggle fcitx" {spawn-sh "pkill fcitx5 || fcitx5 ";}
     Mod+F2 hotkey-overlay-title="设置 Settings" { spawn-sh "noctalia msg settings-toggle";}
