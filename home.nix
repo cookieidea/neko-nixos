@@ -59,8 +59,9 @@ in
     PYTHONPATH = "${pkgs.python3Packages.pygobject3}/lib/python3.13/site-packages:${selfPackages.k7sfunc}/lib/python3.13/site-packages:${pkgs.python3Packages.vapoursynth}/lib/python3.13/site-packages";
     # VapourSynth R73 插件：lsmas / akarin / RIFE-ncnn / mvtools
     VAPOURSYNTH_EXTRA_PLUGIN_PATH = "${selfPackages.vapoursynth-with-plugins}/lib/vapoursynth";
-    # 覆盖语义，须保留原 pipewire-jack 路径；ABDM 托盘需 systemdLibs
-    LD_LIBRARY_PATH = "${pkgs.systemdLibs}/lib:/nix/store/zcqp398mxlw62jl02sx0rsc7gvcl1qhc-pipewire-1.6.6-jack/lib";
+    # 覆盖语义，须拼接：ABDM 托盘需 systemdLibs/pipewire-jack；MC natives（shaderc/
+    # SDL3 等 dlopen）需 libstdc++（gcc.lib）——见 hmcl wrapper 注释
+    LD_LIBRARY_PATH = "${pkgs.systemdLibs}/lib:/nix/store/zcqp398mxlw62jl02sx0rsc7gvcl1qhc-pipewire-1.6.6-jack/lib:${pkgs.stdenv.cc.cc.lib}/lib";
     JAVA_HOME = "${pkgs.zulu25}";
     # gtk3 schema 路径（否则 kdenlive 等 GTK 选择器 abort）
     GSETTINGS_SCHEMA_DIR = "${pkgs.gtk3}/share/gsettings-schemas/${pkgs.gtk3.name}/glib-2.0/schemas";
@@ -219,7 +220,20 @@ in
     selfPackages.tabby-terminal       # Tabby 终端（eugeny/tabby，Electron；自构建，nixpkgs 的 tabby 是 TabbyML AI 助手）
     selfPackages.purevox              # PureVox（实时 AI 音频降噪，AppImage 捆绑内嵌 Python，PipeWire 直用）
     selfPackages.bedrockboot          # BedrockBoot（MC 基岩版启动器，Avalonia；AppImage+FHS）
-    hmcl                                    # HMCL（MC Java 版启动器，nixpkgs）
+    # HMCL wrapper：SDL 强制原生 Wayland——niri 缺 fifo-v1 时 SDL3 回退 XWayland
+    # 锁帧 60fps；游戏继承此环境解锁帧率。natives 的 shaderc/spirv-cross 等 dlopen
+    # 依赖 libstdc++——HMCL 会重置游戏 LD_LIBRARY_PATH（自己的 NixOS 适配清单，
+    # 不含 gcc lib）→ 注入不进去，改用 LD_PRELOAD 强制全局可见
+    (pkgs.writeShellScriptBin "hmcl" ''
+      export SDL_VIDEO_DRIVER=wayland
+      export LD_PRELOAD="${pkgs.stdenv.cc.cc.lib}/lib/libstdc++.so.6''${LD_PRELOAD:+:$LD_PRELOAD}"
+      exec ${pkgs.hmcl}/bin/hmcl "$@"
+    '')
+    (pkgs.runCommand "hmcl-assets" { } ''
+      mkdir -p $out/share
+      cp -r ${pkgs.hmcl}/share/applications $out/share/
+      cp -r ${pkgs.hmcl}/share/icons $out/share/
+    '')
     selfPackages.astral               # Astral 组网客户端（Flutter+Rust；bundle 由 pkgs/astral/build.sh 联网构建）
     # 走 flake 输入的包（不在 nixpkgs 核心，直接引用其 flake 构建产物）
     bili-danmaku-tui.packages.${pkgs.stdenv.hostPlatform.system}.default  # B 站直播间弹幕 TUI
