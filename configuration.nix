@@ -101,7 +101,6 @@
   # DNS：腾讯 DNSPod；dns="none" 让 nameservers 静态写入（不被 DHCP 覆盖）
   networking.networkmanager.dns = "none";
   networking.nameservers = [ "119.29.29.29" "2402:4e00::" ];
-  systemd.services.NetworkManager-wait-online.enable = false; # 去掉 4.9s 阻塞（flatpak-repo 等待 network-online）
   # 组播回环：IPv4 组播经 lo 投递（MC 局域网联机扫描依赖；cachyos 内核需显式加路由）
   systemd.services.multicast-loopback = {
     description = "Add IPv4 multicast route via lo for local loopback delivery";
