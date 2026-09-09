@@ -51,7 +51,7 @@ in
 
   # kitty terminfo（TERM=xterm-kitty 需指向 kitty 自带 share/terminfo 防乱码）
   # ~/.local/bin 进 PATH（quicksave/quickload 等私有脚本，binds.kdl 裸命令调用）
-  home.sessionPath = [ "${selfPackages.vapoursynth-with-plugins}/bin" "$HOME/.local/bin" "$HOME/.cargo/bin" ];
+  home.sessionPath = [ "${selfPackages.vapoursynth-with-plugins}/bin" "$HOME/.local/bin" "$HOME/.cargo/bin" "$HOME/.npm-global/bin" ];
   home.sessionVariables = {
     TERMINFO_DIRS = "${pkgs.kitty}/share/terminfo";
     GIO_EXTRA_MODULES = "${pkgs.gvfs}/lib/gio/modules:${pkgs.dconf}/lib/gio/modules";   # gvfs URI（trash:// 等）
@@ -730,9 +730,11 @@ in
     };
 
     # ── 开发工具链国内镜像源 ──
-    # npm → npmmirror（淘宝镜像）
+    # npm → npmmirror（淘宝镜像）；prefix 指向用户目录——NixOS 的 nodejs 在只读
+    # store，npm -g 默认装 store 失败（ENOENT），用户前缀 + PATH 才可用
     ".npmrc".text = ''
       registry=https://registry.npmmirror.com
+      prefix=/home/cookie/.npm-global
     '';
     # cargo → 中科大 crates.io 稀疏索引
     ".cargo/config.toml".text = ''
