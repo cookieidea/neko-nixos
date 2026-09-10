@@ -222,11 +222,11 @@
         "nixpkgs": "nixpkgs_3"
       },
       "locked": {
-        "lastModified": 1788722952,
-        "narHash": "sha256-3oLga8IyFIGcmdrU08wd323Fy/nopOSEP2FmnmCXrs0=",
+        "lastModified": 1788984074,
+        "narHash": "sha256-3U+q8DCRoMtBS5Bq+8eXzaRraHl/WlGFi3p4TPJId2o=",
         "ref": "release",
-        "rev": "5dad735622e26198eaf193d6a523616a6cb715dd",
-        "revCount": 382,
+        "rev": "590f8bf4db1391dc75dbd5f95721cabf7ac9f02a",
+        "revCount": 385,
         "type": "git",
         "url": "https://github.com/xddxdd/nix-cachyos-kernel"
       },
@@ -300,11 +300,11 @@
     },
     "nixpkgs_3": {
       "locked": {
-        "lastModified": 1788659161,
-        "narHash": "sha256-rIzUUvgwhfJeWwm7y1ZF+xRo2Gep+QYkxpj9mJbG6cM=",
+        "lastModified": 1788967131,
+        "narHash": "sha256-JNrdXEtevKJgYc2SYffeT9wRoaGbkOrA7bvoSyVsZv8=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "de0ba0a81b0f6eed798a97fdec6f03a754b9d966",
+        "rev": "0c2af9d27e67eef9db365d86ed0fecf7ce3558ca",
         "type": "github"
       },
       "original": {
@@ -316,10 +316,10 @@
     },
     "nixpkgs_4": {
       "locked": {
-        "lastModified": 1788584326,
-        "narHash": "sha256-Fd3OB8J9JhgliQwOKcqx4M672CInxi1I5VnwsaXeSQo=",
+        "lastModified": 1788921488,
+        "narHash": "sha256-8+xWRxEkD6l217cIUdRxfeUGS9lQX0hVtUuNVsBaDzk=",
         "ref": "nixos-26.05",
-        "rev": "6713828a351efa628b025a1adf7f43cbf8597513",
+        "rev": "6aefcda9401be8acc2b74244fb3b37520ea1f0a8",
         "shallow": true,
         "type": "git",
         "url": "https://mirrors.nju.edu.cn/git/nixpkgs.git"
@@ -385,11 +385,11 @@
         "nixpkgs": "nixpkgs_5"
       },
       "locked": {
-        "lastModified": 1788725519,
-        "narHash": "sha256-8nn83EJksFOpzLFm+vNOcyFFnY9NROALY363cE7lzBY=",
+        "lastModified": 1789043117,
+        "narHash": "sha256-rW8ecnR54O8GDJzS2A1g571FZfVtPVcNPfTFrvh9ofQ=",
         "ref": "cachix",
-        "rev": "aed5f5d4eed2b21161e06adce96a6a40a3a276ab",
-        "revCount": 5478,
+        "rev": "60a239a799004ad904786ee15841858021ca5827",
+        "revCount": 5495,
         "type": "git",
         "url": "https://github.com/noctalia-dev/noctalia.git"
       },

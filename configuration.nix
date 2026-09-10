@@ -78,10 +78,6 @@
   # 加密文件在 secrets/，收件人公钥清单见 secrets.nix。
   # 用法：age -r <公钥> -o secrets/foo.age <明文>，然后此处声明
   age.identityPaths = [ "/etc/age/key" ];
-  age.secrets.test-secret = {
-    file = ./secrets/test-secret.age;
-    # 示例：部署后出现在 /run/agenix/test-secret（root 600，内存盘）
-  };
   boot.loader.timeout = 10; # GRUB 选择系统等待 10s
 
   # 引导：GRUB(UEFI) + os-prober（双系统检测 Windows）；efiInstallAsRemovable 兜底
