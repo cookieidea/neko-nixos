@@ -10,3 +10,6 @@ AI agent skills（opencode / Claude Code 通用格式）。安装：`cp -r skill
 ## 第三方
 
 - **actionbook/rust-skills**（38 个）— Rust 开发辅助：meta-cognition 三层认知框架（语言机制 m01-m07 / 设计选择 m09-m15 / 领域约束 domain-*）、rust-router 总路由、工具类分析器。skills-only 模式（无 hook 自动触发），来源 https://github.com/actionbook/rust-skills
+
+- **hamen/material-3-skill**（1 个）— Material 3 UI 设计规范辅助。来源 https://github.com/hamen/material-3-skill
+- **anthropics/skills**（19 个）— Anthropic 官方：文档处理套件（docx/pptx/xlsx/pdf）、claude-api、mcp-builder、skill-creator、frontend-design、canvas-design、theme-factory、webapp-testing 等。来源 https://github.com/anthropics/skills

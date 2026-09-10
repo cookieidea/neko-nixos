@@ -4,4 +4,5 @@ let
 in
 {
   "secrets/test-secret.age".publicKeys = [ atri ];
+  "secrets/bilibili-cookies.age".publicKeys = [ atri ];
 }
