@@ -64,9 +64,15 @@
       url = "path:/home/cookie/.cache/astral/bundle";
       flake = false;
     };
+
+    # agenix：age 加密的声明式 secrets（GitCode 镜像）
+    agenix = {
+      url = "git+https://gitcode.com/ryantm/agenix.git?ref=main";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, nixpkgs, home-manager, cooknixvim, opencode, bili-danmaku-tui, nix-cachyos-kernel, noctalia, noctalia-greeter, astral-bundle, ... }:
+  outputs = { self, nixpkgs, home-manager, cooknixvim, opencode, bili-danmaku-tui, nix-cachyos-kernel, noctalia, noctalia-greeter, agenix, astral-bundle, ... }:
     let
       system = "x86_64-linux";
       username = "cookie";   # 你的用户名（用于 home 目录 / autoLogin）
@@ -105,6 +111,7 @@
             ./hardware-configuration.nix
             ./configuration.nix
             hmModule
+            agenix.nixosModules.default
             # CachyOS 内核 overlay（pinned 命中缓存）+ 修 nvim.desktop：
             # 原版 Terminal=true 图形启动器打不开 → 覆盖为 kitty 打开
             {
