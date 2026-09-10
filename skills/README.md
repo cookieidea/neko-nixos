@@ -1,15 +1,18 @@
 # skills
 
-AI agent skills（opencode / Claude Code 通用格式）。安装：`cp -r skills/* ~/.claude/skills/`（opencode 自动扫描该外部目录）。
+AI agent skills 库（opencode / Claude Code 通用格式）。
+
+**本地启用**：`cp -r skills/<name> ~/.claude/skills/`（opencode 自动扫描该外部目录）。
+当前本机只启用了 NixOS 相关（nixos-managing / neko-nixos-recipes / cookie-profile），其余为库存。
 
 ## 自建
 
 - **neko-nixos-recipes** — 本机（ATRI / NixOS 26.05）实战经验：构建流水线、镜像/缓存、打包模式、运行时库疑难、系统维护、agenix
 - **cookie-profile** — 用户偏好与协作方式画像
 
-## 第三方
+## 第三方（库存，未启用）
 
-- **actionbook/rust-skills**（38 个）— Rust 开发辅助：meta-cognition 三层认知框架（语言机制 m01-m07 / 设计选择 m09-m15 / 领域约束 domain-*）、rust-router 总路由、工具类分析器。skills-only 模式（无 hook 自动触发），来源 https://github.com/actionbook/rust-skills
-
-- **hamen/material-3-skill**（1 个）— Material 3 UI 设计规范辅助。来源 https://github.com/hamen/material-3-skill
-- **anthropics/skills**（19 个）— Anthropic 官方：文档处理套件（docx/pptx/xlsx/pdf）、claude-api、mcp-builder、skill-creator、frontend-design、canvas-design、theme-factory、webapp-testing 等。来源 https://github.com/anthropics/skills
+- **nixos-managing** — NixOS 管理通用参考。https://github.com/michalzubkowicz/nixos-management-skill
+- **actionbook/rust-skills**（38 个）— Rust meta-cognition 三层认知框架（m01-m07 / m09-m15 / domain-*）+ 工具类分析器。https://github.com/actionbook/rust-skills
+- **anthropics/skills 官方**（19 个）— docx/pptx/xlsx/pdf 文档处理、claude-api、mcp-builder、skill-creator、frontend-design、canvas-design、theme-factory、webapp-testing 等。https://github.com/anthropics/skills
+- **material-3** — Material 3 设计规范。https://github.com/hamen/material-3-skill
