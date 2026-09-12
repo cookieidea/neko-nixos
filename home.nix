@@ -138,7 +138,6 @@ in
     # --- 游戏 / 影音客户端 ---
     # prismlauncher → hmcl（nixpkgs）
     lunar-client
-    taterclient-ddnet                         # DDNet Teeworlds 客户端
     # BestClient（DDNet fork，官方 flake 预编译包；nixpkgs 的 ddnet/无此包）
     bestclient.packages.${pkgs.stdenv.hostPlatform.system}.default
 
