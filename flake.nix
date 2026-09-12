@@ -70,9 +70,15 @@
       url = "git+https://gitcode.com/ryantm/agenix.git?ref=main";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    # BestClient（DDNet fork）：官方 flake 打包预编译版
+    bestclient = {
+      url = "git+https://github.com/BestProjectTeam/BestClient";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, nixpkgs, home-manager, cooknixvim, opencode, bili-danmaku-tui, nix-cachyos-kernel, noctalia, noctalia-greeter, agenix, astral-bundle, ... }:
+  outputs = { self, nixpkgs, home-manager, cooknixvim, opencode, bili-danmaku-tui, nix-cachyos-kernel, noctalia, noctalia-greeter, agenix, bestclient, astral-bundle, ... }:
     let
       system = "x86_64-linux";
       username = "cookie";   # 你的用户名（用于 home 目录 / autoLogin）
@@ -91,12 +97,12 @@
       hmModule = {
         imports = [ home-manager.nixosModules.home-manager ];
 
-        _module.args = { inherit desktop username selfPackages; };
+        _module.args = { inherit desktop username selfPackages bestclient; };
 
         home-manager.useGlobalPkgs = true;
         home-manager.useUserPackages = true;
         home-manager.users.${username} = import ./home.nix;
-        home-manager.extraSpecialArgs = { inherit desktop username cooknixvim opencode bili-danmaku-tui selfPackages noctalia; };
+        home-manager.extraSpecialArgs = { inherit desktop username cooknixvim opencode bili-danmaku-tui selfPackages noctalia bestclient; };
       };
     in {
       # 暴露自构建派生为 flake 包：可单独 `nix build .#<name>`

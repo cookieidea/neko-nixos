@@ -1,5 +1,5 @@
 # Home Manager 用户配置（桌面 niri + Noctalia；编辑器 CookNixvim）
-{ config, pkgs, lib, desktop, username, cooknixvim, opencode, bili-danmaku-tui, selfPackages, noctalia, ... }:
+{ config, pkgs, lib, desktop, username, cooknixvim, opencode, bili-danmaku-tui, selfPackages, noctalia, bestclient, ... }:
 
 let
   mpvRife = pkgs.mpv.override {
@@ -139,6 +139,8 @@ in
     # prismlauncher → hmcl（nixpkgs）
     lunar-client
     taterclient-ddnet                         # DDNet Teeworlds 客户端
+    # BestClient（DDNet fork，官方 flake 预编译包；nixpkgs 的 ddnet/无此包）
+    bestclient.packages.${pkgs.stdenv.hostPlatform.system}.default
 
     # --- 补漏 ---
     virt-manager virt-viewer                  # KVM 虚拟机 GUI

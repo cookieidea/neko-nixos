@@ -37,6 +37,26 @@
         "type": "path"
       }
     },
+    "bestclient": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1789050177,
+        "narHash": "sha256-eY+dqvuLWDoQnNj3nwSHIYJf7wHE1fp4O5qKSfZM/Rk=",
+        "ref": "refs/heads/main",
+        "rev": "e76ed48dfde6302a3160f7a57cef5ee3d7bfd8c9",
+        "revCount": 26545,
+        "type": "git",
+        "url": "https://github.com/BestProjectTeam/BestClient"
+      },
+      "original": {
+        "type": "git",
+        "url": "https://github.com/BestProjectTeam/BestClient"
+      }
+    },
     "bili-danmaku-tui": {
       "inputs": {
         "nixpkgs": [
@@ -443,6 +463,7 @@
       "inputs": {
         "agenix": "agenix",
         "astral-bundle": "astral-bundle",
+        "bestclient": "bestclient",
         "bili-danmaku-tui": "bili-danmaku-tui",
         "cooknixvim": "cooknixvim",
         "home-manager": "home-manager_2",
