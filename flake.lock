@@ -44,17 +44,17 @@
         ]
       },
       "locked": {
-        "lastModified": 1789050177,
-        "narHash": "sha256-eY+dqvuLWDoQnNj3nwSHIYJf7wHE1fp4O5qKSfZM/Rk=",
+        "lastModified": 1789261087,
+        "narHash": "sha256-7puWovWseqIGCA0btP/xWmdBzmayfr8ZW3QswIMWii4=",
         "ref": "refs/heads/main",
-        "rev": "e76ed48dfde6302a3160f7a57cef5ee3d7bfd8c9",
-        "revCount": 26545,
+        "rev": "363e576b73cbe5a81d5a2b987bcc46ebe70cf353",
+        "revCount": 26546,
         "type": "git",
-        "url": "https://github.com/BestProjectTeam/BestClient"
+        "url": "https://github.com/cookieidea/BestClient"
       },
       "original": {
         "type": "git",
-        "url": "https://github.com/BestProjectTeam/BestClient"
+        "url": "https://github.com/cookieidea/BestClient"
       }
     },
     "bili-danmaku-tui": {

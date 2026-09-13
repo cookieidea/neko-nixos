@@ -73,7 +73,9 @@
 
     # BestClient（DDNet fork）：官方 flake 打包预编译版
     bestclient = {
-      url = "git+https://github.com/BestProjectTeam/BestClient";
+      # fork：上游 flake 还锁 v1.5 且 bestdownload 仓库 v2.2+ 未传包 →
+      # fork 改指主仓库 release v2.3（上游修复后可切回）
+      url = "git+https://github.com/cookieidea/BestClient";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
