@@ -575,9 +575,11 @@ import zxingcpp, sys, json, numpy as np
 from PIL import Image
 img = Image.open(sys.argv[1]).convert('RGB')
 arr = np.array(img)[:, :, ::-1]
-result = zxingcpp.read_barcode(arr)
-if result:
-    print(json.dumps({'text': result.text, 'format': str(result.format)}))
+results = zxingcpp.read_barcodes(arr)
+output = {'backend': 'zxing', 'results': [], 'errors': []}
+for r in results:
+    output['results'].append({'text': r.text, 'format': str(r.format)})
+print(json.dumps(output))
 " "$1"
 SCANSCRIPT
     $DRY_RUN_CMD sed -i "s|LIBPATH_PLACEHOLDER|$LD_PATH|" "$MARK/code-scan-helper.sh"
