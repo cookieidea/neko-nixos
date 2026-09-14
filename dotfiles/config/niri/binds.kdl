@@ -52,24 +52,11 @@ binds {
     Alt+F4  hotkey-overlay-title="强制杀死窗口 Force kill -9 window" repeat=false { spawn "~/.config/niri/scripts/niri-force-kill-window"; }
     Alt+Shift+F4  hotkey-overlay-title="强制杀死窗口以及关联进程 Force kill -9 a window tree" repeat=false { spawn "~/.config/niri/scripts/niri-force-kill-window" "-f"; }
 
-    // niri-sidebar扩展相关
-    // 警告：这是实验性功能
-    // 切换 移动聚焦窗口至侧边栏 （建议配合切换浮动聚焦的快捷键使用，我设置的是super+n）
-    Mod+Alt+S hotkey-overlay-title="收起窗口 Move to Sidebar" { spawn "niri-sidebar" "toggle-window"; }
-    Mod+M hotkey-overlay-title="收起窗口 Move to Sidebar" { spawn "niri-sidebar" "toggle-window"; }
-    // 切换 收起/展开侧边栏
-    Mod+Alt+Z hotkey-overlay-title="展开/收起侧边栏 Toggle Sidebar" { spawn "niri-sidebar" "toggle-visibility";}
-    // 反向排序侧边栏
-    Mod+Alt+X hotkey-overlay-title=null { spawn "niri-sidebar" "flip";}
-    // 重新排列侧边栏中的窗口（侧边栏中的窗口本质是一个浮动窗口，你有时候可能会把它移动到别的地方
-    // 例如 ctrl+c居中。此时按下此键可以重新排列）
-    Mod+Alt+R hotkey-overlay-title="重置侧边栏 Reorder Sidebar"  { spawn "niri-sidebar" "reorder"; }
-
-    // niri-sidebar 四键配置（Mod+X / Mod+Shift+X / Mod+Ctrl+X / Mod+Alt+X）
+    // niri-sidebar 官方键位（S→X 避冲突）
     Mod+X hotkey-overlay-title="收起窗口 Move to Sidebar" { spawn "niri-sidebar" "toggle-window"; }
     Mod+Shift+X hotkey-overlay-title="展开/收起侧边栏 Toggle Sidebar" { spawn "niri-sidebar" "toggle-visibility"; }
-    Mod+Ctrl+X hotkey-overlay-title="重排侧边栏 Reorder Sidebar" { spawn "niri-sidebar" "reorder"; }
-    // Mod+Alt+X = flip 已在上面定义
+    Mod+Ctrl+X hotkey-overlay-title="翻转侧边栏 Flip Sidebar" { spawn "niri-sidebar" "flip"; }
+    Mod+Alt+R hotkey-overlay-title="重排侧边栏 Reorder Sidebar" { spawn "niri-sidebar" "reorder"; }
 
     
     // mod+鼠标中键 关闭窗口
