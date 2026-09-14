@@ -193,6 +193,24 @@
         "type": "github"
       }
     },
+    "flake-utils": {
+      "inputs": {
+        "systems": "systems_3"
+      },
+      "locked": {
+        "lastModified": 1731533236,
+        "narHash": "sha256-l0KFg5HjrsfsO/JpG+r7fRrqm12kzFHyUHqHCVpMMbI=",
+        "owner": "numtide",
+        "repo": "flake-utils",
+        "rev": "11707dc2f618dd54ca8739b309ec4fc024de578b",
+        "type": "github"
+      },
+      "original": {
+        "owner": "numtide",
+        "repo": "flake-utils",
+        "type": "github"
+      }
+    },
     "home-manager": {
       "inputs": {
         "nixpkgs": [
@@ -233,6 +251,27 @@
         "ref": "release-26.05",
         "type": "git",
         "url": "https://gitcode.com/nix-community/home-manager.git"
+      }
+    },
+    "mark-shot": {
+      "inputs": {
+        "flake-utils": "flake-utils",
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1789262143,
+        "narHash": "sha256-vV8J3Ej3DbuIUJMtsGS6g19R/1J4nZFooX+SwqwktRs=",
+        "ref": "refs/heads/main",
+        "rev": "08f8272accf2d511eaf5f1aafa8fd1766b04ef42",
+        "revCount": 455,
+        "type": "git",
+        "url": "https://github.com/jswysnemc/mark-shot"
+      },
+      "original": {
+        "type": "git",
+        "url": "https://github.com/jswysnemc/mark-shot"
       }
     },
     "nix-cachyos-kernel": {
@@ -467,6 +506,7 @@
         "bili-danmaku-tui": "bili-danmaku-tui",
         "cooknixvim": "cooknixvim",
         "home-manager": "home-manager_2",
+        "mark-shot": "mark-shot",
         "nix-cachyos-kernel": "nix-cachyos-kernel",
         "nixpkgs": "nixpkgs_4",
         "noctalia": "noctalia",
@@ -502,6 +542,21 @@
       "original": {
         "owner": "nix-systems",
         "ref": "future-26.11",
+        "repo": "default",
+        "type": "github"
+      }
+    },
+    "systems_3": {
+      "locked": {
+        "lastModified": 1681028828,
+        "narHash": "sha256-Vy1rq5AaRuLzOxct8nz4T6wlgyUR7zLU309k9mBC768=",
+        "owner": "nix-systems",
+        "repo": "default",
+        "rev": "da67096a3b9bf56a91d16901293e51ba5b49a27e",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-systems",
         "repo": "default",
         "type": "github"
       }

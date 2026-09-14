@@ -1,5 +1,5 @@
 # Home Manager 用户配置（桌面 niri + Noctalia；编辑器 CookNixvim）
-{ config, pkgs, lib, desktop, username, cooknixvim, opencode, bili-danmaku-tui, selfPackages, noctalia, bestclient, ... }:
+{ config, pkgs, lib, desktop, username, cooknixvim, opencode, bili-danmaku-tui, selfPackages, noctalia, bestclient, mark-shot, ... }:
 
 let
   mpvRife = pkgs.mpv.override {
@@ -140,6 +140,9 @@ in
     lunar-client
     # BestClient（DDNet fork，官方 flake 预编译包；nixpkgs 的 ddnet/无此包）
     bestclient.packages.${pkgs.stdenv.hostPlatform.system}.default
+
+    # mark-shot 截图+标注（替代 satty，Wayland 原生，支持 OCR/贴纸/录屏）
+    mark-shot.packages.${pkgs.stdenv.hostPlatform.system}.default
 
     # --- 补漏 ---
     virt-manager virt-viewer                  # KVM 虚拟机 GUI
