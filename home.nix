@@ -177,7 +177,7 @@ in
     pciutils
     font-awesome                              # Font Awesome 图标字体（原 otf-font-awesome）
     cliphist                                   # 剪贴板历史（noctalia config.toml 的 clipboard watch 命令）
-    libnotify                                 # notify-send（niri-pick / niri-force-kill-window / screenshot-sound.sh 的通知依赖）
+    libnotify                                 # notify-send（niri-pick / niri-force-kill-window 依赖）
     xsettingsd                                 # GTK 主题/字体经 XSETTINGS 注入应用（niri 无 DE 时需要）
     xprop                                       # xprop（26.05 起 xorg 属性集弃用，xorg.xprop 改为顶层 xprop；niri-force-kill-window 依赖）
     btrfs-assistant                            # btrfs 快照管理 CLI（quickload Mod+F8 的回滚后端）
@@ -433,8 +433,39 @@ in
     "starship.toml".source = ./dotfiles/config/starship.toml;
     # v4 版 noctalia 配置已全部移除（V5 用 config.toml，见 programs.noctalia 与上方 noctalia 部署）
     "xdg-desktop-portal/niri-portals.conf".source = ./dotfiles/config/xdg-desktop-portal/niri-portals.conf;
-    "mark-shot/mark-shot-edit.desktop".source = ./dotfiles/config/mark-shot/mark-shot-edit.desktop;
-    "applications/qq.desktop".source = ./dotfiles/config/qq-desktop.desktop;
+    ".local/share/applications/mark-shot-edit.desktop" = {
+      text = ''
+[Desktop Entry]
+Type=Application
+Name=Mark Shot Image Editor
+Name[zh_CN]=Mark Shot 图片编辑器
+Comment=Annotate and edit image files with Mark Shot (clipboard fallback)
+Comment[zh_CN]=使用 Mark Shot 标注和编辑图片文件（支持剪贴板）
+Exec=sh -c 'if [ $# -gt 0 ]; then mark-shot "$@"; else wl-paste > /tmp/clipboard-shot.png && mark-shot /tmp/clipboard-shot.png; fi' mark-shot %F
+Icon=mark-shot-edit
+Terminal=false
+Categories=Graphics;2DGraphics;RasterGraphics;
+Keywords=image;photo;picture;annotation;markup;screenshot;clipboard;
+Keywords[zh_CN]=图片;照片;图像;标注;编辑;截图;剪贴板;
+MimeType=image/png;image/jpeg;image/webp;image/gif;image/bmp;image/tiff;image/svg+xml;
+StartupNotify=false
+X-KDE-DBUS-Restricted-Interfaces=org.kde.KWin.ScreenShot2
+      '';
+    };
+    ".local/share/applications/qq.desktop" = {
+      force = true;
+      text = ''
+[Desktop Entry]
+Type=Application
+Name=QQ
+Exec=env PULSE_LATENCY_MSEC=30 PIPEWIRE_LATENCY=512/48000 flatpak run --branch=stable --arch=x86_64 --command=qq --file-forwarding com.qq.QQ --enable-features=UseOzonePlatform --ozone-platform=wayland @@u %U
+Icon=com.qq.QQ
+Terminal=false
+Categories=Network;InstantMessaging;
+MimeType=x-scheme-handler/tencent;
+X-Flatpak=com.qq.QQ
+      '';
+    };
     "xdg-terminals.list".source = ./dotfiles/config/xdg-terminals.list;
     "xfce4/helpers.rc".source = ./dotfiles/config/xfce4/helpers.rc;
     "xfce4/xfconf/xfce-perchannel-xml/thunar-volman.xml".source = ./dotfiles/config/xfce4/xfconf/xfce-perchannel-xml/thunar-volman.xml;
@@ -684,7 +715,7 @@ in
     # ── SHORiN 私有 niri 脚本（配置迁移：从上游 noctalia-dotfiles 引入）──
     # 对应 binds.kdl 里直接调用 ~/.config/niri/scripts/* 的绑定：
     #   niri-binds（Mod+Shift+Slash 快捷键菜单）、niri-pick（Mod+P 取窗口/颜色信息）、
-    #   niri-force-kill-window（Alt+F4 强杀窗口）、screenshot-sound.sh（截图音效守护，见 config.kdl）。
+    #   niri-force-kill-window（Alt+F4 强杀窗口）。
     # random-anime-wallpaper-noctalia 已在上面 .local/bin 部署；niri-sidebar 走 selfPackages。
     ".config/niri/scripts/niri-binds" = {
       source = ./dotfiles/config/niri/scripts/niri-binds;
@@ -696,10 +727,6 @@ in
     };
     ".config/niri/scripts/niri-force-kill-window" = {
       source = ./dotfiles/config/niri/scripts/niri-force-kill-window;
-      executable = true;
-    };
-    ".config/niri/scripts/screenshot-sound.sh" = {
-      source = ./dotfiles/config/niri/scripts/screenshot-sound.sh;
       executable = true;
     };
     # ── NyxNiri 新增 niri 脚本（护眼模式 / Scratchpad 终端 / 星环菜单）──
