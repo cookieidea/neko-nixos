@@ -170,6 +170,22 @@
   services.xserver.videoDrivers = [ "amdgpu" ];
   # 12400F 无核显 → 不需要 intel 驱动；非笔记本双显卡 → 不需要 NVIDIA Prime/offload。
 
+
+  # HIP 运行时（PyTorch/llama.cpp/ollama 找 /opt/rocm）
+  systemd.tmpfiles.rules = let
+    rocmEnv = pkgs.symlinkJoin {
+      name = "rocm-combined";
+      paths = with pkgs.rocmPackages; [ rocblas hipblas clr ];
+    };
+  in [ "L+ /opt/rocm - - - - ${rocmEnv}" ];
+
+  # Ollama（AMD ROCm）
+  services.ollama = {
+    enable = true;
+    package = pkgs.ollama-rocm;
+    rocmOverrideGfx = "10.3.0";  # RX 6600 = gfx1032
+  };
+
   services.openssh.enable = true;
 
   # Flatpak：26.05 移除声明式 remotes → 启动时 one-shot 添加 + 自动装应用（幂等）
