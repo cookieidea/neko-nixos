@@ -537,12 +537,6 @@ X-Flatpak=com.qq.QQ
       $DRY_RUN_CMD rm -rf "$OCR_VENV"
       $DRY_RUN_CMD $PYTHON -m venv "$OCR_VENV"
       $DRY_RUN_CMD env LD_LIBRARY_PATH="$LD_PATH" "$OCR_VENV/bin/pip" install rapidocr onnxruntime
-      $DRY_RUN_CMD cat > "$OCR_VENV/bin/ocr-wrapper" << WRAPPER
-#!/usr/bin/env bash
-export LD_LIBRARY_PATH="$LD_PATH"
-exec "$OCR_VENV/bin/python" "\$@"
-WRAPPER
-      $DRY_RUN_CMD chmod +x "$OCR_VENV/bin/ocr-wrapper"
     fi
 
     # code-scan venv
@@ -552,20 +546,31 @@ WRAPPER
       $DRY_RUN_CMD env LD_LIBRARY_PATH="$LD_PATH" "$SCAN_VENV/bin/pip" install zxing-cpp pillow
     fi
 
-    # code-scan helper script
-    if [ ! -f "$MARK/code-scan.sh" ]; then
-      $DRY_RUN_CMD cat > "$MARK/code-scan.sh" << 'SCANSCRIPT'
+    # OCR helper script（mark-shot 调用入口）
+    $DRY_RUN_CMD cat > "$MARK/ocr-helper.sh" << WRAPPER
 #!/usr/bin/env bash
-"$HOME/.local/share/mark-shot/code-scan-venv/bin/python" -c "
+export LD_LIBRARY_PATH="$LD_PATH"
+exec "$OCR_VENV/bin/python" "\$@"
+WRAPPER
+    $DRY_RUN_CMD chmod +x "$MARK/ocr-helper.sh"
+
+    # code-scan helper script（mark-shot 调用入口）
+    $DRY_RUN_CMD cat > "$MARK/code-scan-helper.sh" << 'SCANSCRIPT'
+#!/usr/bin/env bash
+export LD_LIBRARY_PATH="LIBPATH_PLACEHOLDER"
+exec "$HOME/.local/share/mark-shot/code-scan-venv/bin/python" -c "
 import sys, zxingcpp
 data = sys.stdin.buffer.read()
-result = zxingcpp.decode_barcode(data)
+result = zxingcpp.read_barcode(data)
 if result:
     print(result.text)
 " < /dev/stdin
 SCANSCRIPT
-      $DRY_RUN_CMD chmod +x "$MARK/code-scan.sh"
-    fi
+    $DRY_RUN_CMD sed -i "s|LIBPATH_PLACEHOLDER|$LD_PATH|" "$MARK/code-scan-helper.sh"
+    $DRY_RUN_CMD chmod +x "$MARK/code-scan-helper.sh"
+
+    # 同步 code-scan.sh
+    $DRY_RUN_CMD cp "$MARK/code-scan-helper.sh" "$MARK/code-scan.sh"
   '';
 
   home.file = {
