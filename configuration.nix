@@ -84,6 +84,7 @@
     owner = "cookie";
     group = "users";
   };
+  boot.kernel.sysctl."vm.max_map_count" = 2147483642;
   boot.loader.timeout = 10; # GRUB 选择系统等待 10s
 
   # 引导：GRUB(UEFI) + os-prober（双系统检测 Windows）；efiInstallAsRemovable 兜底
@@ -104,7 +105,8 @@
   # 显式声明 resumeDevice 兜底（26.05 initrd 会自动检测，异常 EFI 主板也可靠）。
   boot.resumeDevice = "/dev/disk/by-label/SWAP";
   # LACT / AMD 超频解锁（ppfeaturemask 全开）
-  boot.kernelParams = [ "amdgpu.ppfeaturemask=0xffffffff" "clearcpuid=514" ];
+  boot.kernelParams = [
+    "split_lock_mitigate=0" "amdgpu.ppfeaturemask=0xffffffff" "clearcpuid=514" ];
 
   networking.hostName = "ATRI";
   networking.firewall.enable = false;
