@@ -188,8 +188,8 @@
   # XDG 桌面门户
   xdg.portal.enable = true;
   programs.dconf.enable = true;   # home-manager gtk 模块写主题设置需要
-  # hyprland portal 兜底：部分 Wayland App 屏幕共享只认它
-  xdg.portal.extraPortals = with pkgs; [ xdg-desktop-portal-gtk xdg-desktop-portal-gnome xdg-desktop-portal-hyprland ];
+  # hyprland portal 兜底：部分 Wayland App 屏幕共享只认它；wlr 给 niri 文件对话框
+  xdg.portal.extraPortals = with pkgs; [ xdg-desktop-portal-gtk xdg-desktop-portal-gnome xdg-desktop-portal-hyprland xdg-desktop-portal-wlr ];
   xdg.portal.config.common.default = "gtk";
 
   # 显示服务器 + 登录：niri（Wayland 平铺）+ Noctalia Greeter（greetd）
@@ -239,6 +239,9 @@ EOF
     xwayland-satellite   # X11 兼容（微信/QQ 等）
     gamescope        # 基岩版鼠标修复（--force-grab-cursor）
     wl-clipboard     # Waydroid 剪贴板共享
+    grim             # Wayland 截图（mark-shot/niri 依赖）
+    kdePackages.layer-shell-qt  # Qt6 Wayland layer-shell（mark-shot overlay）
+    gtk-layer-shell  # GTK Wayland layer-shell
     android-tools    # adb（Waydroid GPS 转发）
     waydroid-helper  # Waydroid 配置 GUI
     rclone bindfs    # waydroid-helper 依赖
