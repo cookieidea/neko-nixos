@@ -585,12 +585,13 @@ SCANSCRIPT
     $DRY_RUN_CMD sed -i "s|LIBPATH_PLACEHOLDER|$LD_PATH|" "$MARK/code-scan-helper.sh"
     $DRY_RUN_CMD chmod +x "$MARK/code-scan-helper.sh"
     # 注入 agenix 敏感配置（youdao/freeimage keys）
-    if [ -f "/run/agenix/mark-shot-sensitive" ] && [ -f "$HOME/.config/mark-shot/config.json" ]; then
-      $DRY_RUN_CMD ${pkgs.python3}/bin/python3 "$HOME/.config/mark-shot/inject-secrets.py"
+    if [ -f "/run/agenix/mark-shot-sensitive" ]; then
+      $DRY_RUN_CMD ${pkgs.python3}/bin/python3 ${./dotfiles/config/mark-shot/inject-secrets.py}
     fi
   '';
 
   home.file = {
+
     # ── HMCL Java 列表：HMCL 扫 ~/.jdks（IntelliJ 风格目录），链入各 zulu ──
     ".jdks/zulu25".source = "${pkgs.zulu25}";
     ".jdks/zulu21".source = "${pkgs.zulu21}";
@@ -600,8 +601,6 @@ SCANSCRIPT
     ".face".source = ./dotfiles/avatar.png;
     # ── fastfetch logo 图片（kitty 图像协议；配置引用 ~/.local/share/fastfetch/NixOS.png）──
     ".local/share/fastfetch/NixOS.png".source = ./dotfiles/config/fastfetch/NixOS.png;
-    # ── mark-shot 敏感配置注入脚本（agenix 解密后调用）──
-    ".config/mark-shot/inject-secrets.py".source = ./dotfiles/config/mark-shot/inject-secrets.py;
     # ── Neovim wrapper 菜单条目修复 ──
     # nixvim 构建的 neovim 自带 nvim.desktop（Terminal=true，图形启动器打不开）。
     # flake overlay 覆盖不到 nixvim（它用自己 pin 的 nixpkgs 构建）→ 用用户级
