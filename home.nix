@@ -584,6 +584,20 @@ print(json.dumps(output))
 SCANSCRIPT
     $DRY_RUN_CMD sed -i "s|LIBPATH_PLACEHOLDER|$LD_PATH|" "$MARK/code-scan-helper.sh"
     $DRY_RUN_CMD chmod +x "$MARK/code-scan-helper.sh"
+    # 注入 agenix 敏感配置（youdao API key、freeimage key）
+    SECRET_FILE="/run/secrets/mark-shot-sensitive"
+    CONFIG_FILE="$HOME/.config/mark-shot/config.json"
+    if [ -f "$SECRET_FILE" ] && [ -f "$CONFIG_FILE" ]; then
+      $DRY_RUN_CMD ${pkgs.python3}/bin/python3 -c "
+import json, sys
+secret = json.load(open(sys.argv[1]))
+config = json.load(open(sys.argv[2]))
+config.setdefault('translation', {}).setdefault('youdao', {})['appKey'] = secret.get('youdaoAppKey', '')
+config.setdefault('translation', {}).setdefault('youdao', {})['appSecret'] = secret.get('youdaoAppSecret', '')
+config.setdefault('upload', {}).setdefault('env', {})['MARK_SHOT_UPLOAD_FIELD_key'] = secret.get('freeimageKey', '')
+json.dump(config, open(sys.argv[2], 'w'), indent=4, ensure_ascii=False)
+" "$SECRET_FILE" "$CONFIG_FILE"
+    fi
   '';
 
   home.file = {
