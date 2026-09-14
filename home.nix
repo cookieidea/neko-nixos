@@ -524,6 +524,50 @@ X-Flatpak=com.qq.QQ
     done
   '';
 
+  # mark-shot OCR + 扫码 venv 自动初始化
+  home.activation.markShotSetup = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    MARK="$HOME/.local/share/mark-shot"
+    OCR_VENV="$MARK/ocr-venv"
+    SCAN_VENV="$MARK/code-scan-venv"
+    PYTHON="${pkgs.python3}/bin/python3"
+    LD_PATH="${pkgs.stdenv.cc.cc.lib}/lib:${pkgs.zlib}/lib:${pkgs.libgcc.lib}/lib:${pkgs.libxcb}/lib:${pkgs.libglvnd}/lib:${pkgs.glib}/lib"
+
+    # OCR venv
+    if [ ! -f "$OCR_VENV/bin/python" ] || ! env LD_LIBRARY_PATH="$LD_PATH" "$OCR_VENV/bin/python" -c "import rapidocr" 2>/dev/null; then
+      $DRY_RUN_CMD rm -rf "$OCR_VENV"
+      $DRY_RUN_CMD $PYTHON -m venv "$OCR_VENV"
+      $DRY_RUN_CMD env LD_LIBRARY_PATH="$LD_PATH" "$OCR_VENV/bin/pip" install rapidocr onnxruntime
+      $DRY_RUN_CMD cat > "$OCR_VENV/bin/ocr-wrapper" << WRAPPER
+#!/usr/bin/env bash
+export LD_LIBRARY_PATH="$LD_PATH"
+exec "$OCR_VENV/bin/python" "\$@"
+WRAPPER
+      $DRY_RUN_CMD chmod +x "$OCR_VENV/bin/ocr-wrapper"
+    fi
+
+    # code-scan venv
+    if [ ! -f "$SCAN_VENV/bin/python" ] || ! env LD_LIBRARY_PATH="$LD_PATH" "$SCAN_VENV/bin/python" -c "import zxingcpp" 2>/dev/null; then
+      $DRY_RUN_CMD rm -rf "$SCAN_VENV"
+      $DRY_RUN_CMD $PYTHON -m venv "$SCAN_VENV"
+      $DRY_RUN_CMD env LD_LIBRARY_PATH="$LD_PATH" "$SCAN_VENV/bin/pip" install zxing-cpp pillow
+    fi
+
+    # code-scan helper script
+    if [ ! -f "$MARK/code-scan.sh" ]; then
+      $DRY_RUN_CMD cat > "$MARK/code-scan.sh" << 'SCANSCRIPT'
+#!/usr/bin/env bash
+"$HOME/.local/share/mark-shot/code-scan-venv/bin/python" -c "
+import sys, zxingcpp
+data = sys.stdin.buffer.read()
+result = zxingcpp.decode_barcode(data)
+if result:
+    print(result.text)
+" < /dev/stdin
+SCANSCRIPT
+      $DRY_RUN_CMD chmod +x "$MARK/code-scan.sh"
+    fi
+  '';
+
   home.file = {
     # ── HMCL Java 列表：HMCL 扫 ~/.jdks（IntelliJ 风格目录），链入各 zulu ──
     ".jdks/zulu25".source = "${pkgs.zulu25}";

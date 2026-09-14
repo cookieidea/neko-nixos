@@ -277,6 +277,14 @@ EOF
   services.smartd.enable = true;   # 磁盘健康监控（SMART）
   programs.gamemode.enable = true; # gamemoderun 系统服务（游戏性能优化）
   programs.nix-ld.enable = true;   # 跑预编译二进制（游戏/工具的 patchelf 兜底）
+  programs.nix-ld.libraries = with pkgs; [
+    stdenv.cc.cc.lib     # libstdc++.so.6
+    zlib                  # libz.so.1
+    libgcc.lib           # libgcc_s.so.1
+    libxcb               # libxcb.so.1
+    libglvnd             # libGL.so.1
+    glib                 # libgthread-2.0.so.0
+  ];
   programs.steam.enable = true;
   # Steam 中文字体：FHS fontconfig 渲染不了 VF（noto-cjk）→ 用静态 sarasa
   programs.steam.fontPackages = with pkgs; [ sarasa-gothic ];
