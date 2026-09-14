@@ -221,7 +221,7 @@ binds {
     Print  hotkey-overlay-title=null { spawn "mark-shot"; }
     Ctrl+Print  hotkey-overlay-title=null { spawn "mark-shot" "--fullscreen"; }
     Shift+Print  hotkey-overlay-title=null { spawn "mark-shot" "--all-outputs"; }
-    Mod+Shift+S  hotkey-overlay-title="截图标注 Edit screenshot" { spawn-sh "wl-paste | satty -f -"; }
+    Mod+Shift+S  hotkey-overlay-title="截图标注 Edit screenshot" { spawn "mark-shot"; }
 
     Mod+Escape allow-inhibiting=false { toggle-keyboard-shortcuts-inhibit; }
     Mod+Shift+E hotkey-overlay-title="退出niri Quit niri" { quit; }

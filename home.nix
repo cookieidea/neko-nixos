@@ -141,7 +141,7 @@ in
     # BestClient（DDNet fork，官方 flake 预编译包；nixpkgs 的 ddnet/无此包）
     bestclient.packages.${pkgs.stdenv.hostPlatform.system}.default
 
-    # mark-shot 截图+标注（替代 satty，Wayland 原生，支持 OCR/贴纸/录屏）
+    # mark-shot 截图+标注（Wayland 原生，支持 OCR/贴纸/录屏）
     mark-shot.packages.${pkgs.stdenv.hostPlatform.system}.default
 
     # --- 补漏 ---
@@ -176,7 +176,6 @@ in
     usbutils
     pciutils
     font-awesome                              # Font Awesome 图标字体（原 otf-font-awesome）
-    satty                                      # 截图标注（binds: Mod+Shift+S）
     cliphist                                   # 剪贴板历史（noctalia config.toml 的 clipboard watch 命令）
     libnotify                                 # notify-send（niri-pick / niri-force-kill-window / screenshot-sound.sh 的通知依赖）
     xsettingsd                                 # GTK 主题/字体经 XSETTINGS 注入应用（niri 无 DE 时需要）
@@ -433,7 +432,6 @@ in
     "fastfetch/config.jsonc".source = ./dotfiles/config/fastfetch/config.jsonc;
     "starship.toml".source = ./dotfiles/config/starship.toml;
     # v4 版 noctalia 配置已全部移除（V5 用 config.toml，见 programs.noctalia 与上方 noctalia 部署）
-    "satty/config.toml".source = ./dotfiles/config/satty/config.toml;
     "xdg-desktop-portal/niri-portals.conf".source = ./dotfiles/config/xdg-desktop-portal/niri-portals.conf;
     "xdg-terminals.list".source = ./dotfiles/config/xdg-terminals.list;
     "xfce4/helpers.rc".source = ./dotfiles/config/xfce4/helpers.rc;
