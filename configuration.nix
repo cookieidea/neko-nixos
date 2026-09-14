@@ -162,6 +162,8 @@
     vulkan-loader
     libva
   ];
+  hardware.amdgpu.opencl.enable = true;
+  environment.variables.ROC_ENABLE_PRE_VEGA = "1";
   services.xserver.videoDrivers = [ "amdgpu" ];
   # 12400F 无核显 → 不需要 intel 驱动；非笔记本双显卡 → 不需要 NVIDIA Prime/offload。
 
