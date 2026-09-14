@@ -584,19 +584,9 @@ print(json.dumps(output))
 SCANSCRIPT
     $DRY_RUN_CMD sed -i "s|LIBPATH_PLACEHOLDER|$LD_PATH|" "$MARK/code-scan-helper.sh"
     $DRY_RUN_CMD chmod +x "$MARK/code-scan-helper.sh"
-    # 注入 agenix 敏感配置（youdao API key、freeimage key）
-    SECRET_FILE="/run/secrets/mark-shot-sensitive"
-    CONFIG_FILE="$HOME/.config/mark-shot/config.json"
-    if [ -f "$SECRET_FILE" ] && [ -f "$CONFIG_FILE" ]; then
-      $DRY_RUN_CMD ${pkgs.python3}/bin/python3 -c "
-import json, sys
-secret = json.load(open(sys.argv[1]))
-config = json.load(open(sys.argv[2]))
-config.setdefault('translation', {}).setdefault('youdao', {})['appKey'] = secret.get('youdaoAppKey', '')
-config.setdefault('translation', {}).setdefault('youdao', {})['appSecret'] = secret.get('youdaoAppSecret', '')
-config.setdefault('upload', {}).setdefault('env', {})['MARK_SHOT_UPLOAD_FIELD_key'] = secret.get('freeimageKey', '')
-json.dump(config, open(sys.argv[2], 'w'), indent=4, ensure_ascii=False)
-" "$SECRET_FILE" "$CONFIG_FILE"
+    # 注入 agenix 敏感配置（youdao/freeimage keys）
+    if [ -f "/run/agenix/mark-shot-sensitive" ] && [ -f "$HOME/.config/mark-shot/config.json" ]; then
+      $DRY_RUN_CMD ${pkgs.python3}/bin/python3 "$HOME/.config/mark-shot/inject-secrets.py"
     fi
   '';
 
@@ -610,6 +600,8 @@ json.dump(config, open(sys.argv[2], 'w'), indent=4, ensure_ascii=False)
     ".face".source = ./dotfiles/avatar.png;
     # ── fastfetch logo 图片（kitty 图像协议；配置引用 ~/.local/share/fastfetch/NixOS.png）──
     ".local/share/fastfetch/NixOS.png".source = ./dotfiles/config/fastfetch/NixOS.png;
+    # ── mark-shot 敏感配置注入脚本（agenix 解密后调用）──
+    ".config/mark-shot/inject-secrets.py".source = ./dotfiles/config/mark-shot/inject-secrets.py;
     # ── Neovim wrapper 菜单条目修复 ──
     # nixvim 构建的 neovim 自带 nvim.desktop（Terminal=true，图形启动器打不开）。
     # flake overlay 覆盖不到 nixvim（它用自己 pin 的 nixpkgs 构建）→ 用用户级
