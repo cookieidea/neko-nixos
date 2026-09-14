@@ -530,7 +530,7 @@ X-Flatpak=com.qq.QQ
     OCR_VENV="$MARK/ocr-venv"
     SCAN_VENV="$MARK/code-scan-venv"
     PYTHON="${pkgs.python3}/bin/python3"
-    LD_PATH="${pkgs.stdenv.cc.cc.lib}/lib:${pkgs.zlib}/lib:${pkgs.libgcc.lib}/lib:${pkgs.libxcb}/lib:${pkgs.libglvnd}/lib:${pkgs.glib}/lib"
+    LD_PATH="${pkgs.stdenv.cc.cc.lib}/lib:${pkgs.zlib.out}/lib:${pkgs.libgcc.lib}/lib:${pkgs.libxcb}/lib:${pkgs.libglvnd}/lib:${pkgs.glib.out}/lib"
 
     # OCR venv
     if [ ! -f "$OCR_VENV/bin/python" ] || ! env LD_LIBRARY_PATH="$LD_PATH" "$OCR_VENV/bin/python" -c "import rapidocr" 2>/dev/null; then
@@ -554,23 +554,22 @@ exec "$OCR_VENV/bin/python" "\$@"
 WRAPPER
     $DRY_RUN_CMD chmod +x "$MARK/ocr-helper.sh"
 
-    # code-scan helper script（mark-shot 调用入口）
+    # code-scan helper script（mark-shot 调用入口，用 {imagePath} 占位符）
     $DRY_RUN_CMD cat > "$MARK/code-scan-helper.sh" << 'SCANSCRIPT'
 #!/usr/bin/env bash
 export LD_LIBRARY_PATH="LIBPATH_PLACEHOLDER"
-exec "$HOME/.local/share/mark-shot/code-scan-venv/bin/python" -c "
-import sys, zxingcpp
-data = sys.stdin.buffer.read()
-result = zxingcpp.read_barcode(data)
+/home/cookie/.local/share/mark-shot/code-scan-venv/bin/python -c "
+import zxingcpp, sys, json, numpy as np
+from PIL import Image
+img = Image.open(sys.argv[1]).convert('RGB')
+arr = np.array(img)[:, :, ::-1]
+result = zxingcpp.read_barcode(arr)
 if result:
-    print(result.text)
-" < /dev/stdin
+    print(json.dumps({'text': result.text, 'format': str(result.format)}))
+" "$1"
 SCANSCRIPT
     $DRY_RUN_CMD sed -i "s|LIBPATH_PLACEHOLDER|$LD_PATH|" "$MARK/code-scan-helper.sh"
     $DRY_RUN_CMD chmod +x "$MARK/code-scan-helper.sh"
-
-    # 同步 code-scan.sh
-    $DRY_RUN_CMD cp "$MARK/code-scan-helper.sh" "$MARK/code-scan.sh"
   '';
 
   home.file = {
