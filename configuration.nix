@@ -27,6 +27,7 @@
   ];
   nixpkgs.config = {
     allowUnfree = true;   # steam / wechat-uos / 部分驱动需要
+    rocmSupport = true;   # AMD ROCm/HIP（Blender、PyTorch、llama.cpp 等 GPU 计算）
   };
   security.polkit.enable = true;
   # Noctalia greeter 外观同步（pkexec）免密放行 wheel
