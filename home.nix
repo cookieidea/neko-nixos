@@ -584,9 +584,11 @@ print(json.dumps(output))
 SCANSCRIPT
     $DRY_RUN_CMD sed -i "s|LIBPATH_PLACEHOLDER|$LD_PATH|" "$MARK/code-scan-helper.sh"
     $DRY_RUN_CMD chmod +x "$MARK/code-scan-helper.sh"
-    # 注入 agenix 敏感配置（youdao/freeimage keys）
-    if [ -f "/run/agenix/mark-shot-sensitive" ]; then
-      $DRY_RUN_CMD ${pkgs.python3}/bin/python3 ${./dotfiles/config/mark-shot/inject-secrets.py}
+    # xdg.configFile 创建的是 nix store symlink（只读），覆盖为真实文件再注入 agenix secrets
+    CFG="$HOME/.config/mark-shot/config.json"
+    if [ -L "$CFG" ] && [ -f "/run/agenix/mark-shot-sensitive" ]; then
+      LINK_TARGET=$(${pkgs.coreutils}/bin/readlink -f "$CFG")
+      $DRY_RUN_CMD ${pkgs.python3}/bin/python3 ${./dotfiles/config/mark-shot/inject-secrets.py} "$CFG" "$LINK_TARGET"
     fi
   '';
 
