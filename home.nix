@@ -434,6 +434,7 @@ in
     # v4 版 noctalia 配置已全部移除（V5 用 config.toml，见 programs.noctalia 与上方 noctalia 部署）
     "xdg-desktop-portal/niri-portals.conf".source = ./dotfiles/config/xdg-desktop-portal/niri-portals.conf;
     "mark-shot/mark-shot-edit.desktop".source = ./dotfiles/config/mark-shot/mark-shot-edit.desktop;
+    "applications/qq.desktop".source = ./dotfiles/config/qq-desktop.desktop;
     "xdg-terminals.list".source = ./dotfiles/config/xdg-terminals.list;
     "xfce4/helpers.rc".source = ./dotfiles/config/xfce4/helpers.rc;
     "xfce4/xfconf/xfce-perchannel-xml/thunar-volman.xml".source = ./dotfiles/config/xfce4/xfconf/xfce-perchannel-xml/thunar-volman.xml;

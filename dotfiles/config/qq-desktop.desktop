@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=QQ
+Exec=env PULSE_LATENCY_MSEC=30 PIPEWIRE_LATENCY=512/48000 flatpak run --branch=stable --arch=x86_64 --command=qq --file-forwarding com.qq.QQ --enable-features=UseOzonePlatform --ozone-platform=wayland @@u %U
+Icon=com.qq.QQ
+Terminal=false
+Categories=Network;InstantMessaging;
+MimeType=x-scheme-handler/tencent;
+X-Flatpak=com.qq.QQ
