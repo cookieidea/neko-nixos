@@ -543,7 +543,7 @@ X-Flatpak=com.qq.QQ
     if [ ! -f "$SCAN_VENV/bin/python" ] || ! env LD_LIBRARY_PATH="$LD_PATH" "$SCAN_VENV/bin/python" -c "import zxingcpp" 2>/dev/null; then
       $DRY_RUN_CMD rm -rf "$SCAN_VENV"
       $DRY_RUN_CMD $PYTHON -m venv "$SCAN_VENV"
-      $DRY_RUN_CMD env LD_LIBRARY_PATH="$LD_PATH" "$SCAN_VENV/bin/pip" install zxing-cpp pillow
+      $DRY_RUN_CMD env LD_LIBRARY_PATH="$LD_PATH" "$SCAN_VENV/bin/pip" install zxing-cpp pillow numpy
     fi
 
     # OCR helper script（mark-shot 调用入口）
