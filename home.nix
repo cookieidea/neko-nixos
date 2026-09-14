@@ -546,12 +546,24 @@ X-Flatpak=com.qq.QQ
       $DRY_RUN_CMD env LD_LIBRARY_PATH="$LD_PATH" "$SCAN_VENV/bin/pip" install zxing-cpp pillow numpy
     fi
 
-    # OCR helper script（mark-shot 调用入口）
-    $DRY_RUN_CMD cat > "$MARK/ocr-helper.sh" << WRAPPER
+    # OCR helper script（mark-shot 调用入口，读图片路径 → rapidocr）
+    $DRY_RUN_CMD cat > "$MARK/ocr-helper.sh" << 'OCRSCRIPT'
 #!/usr/bin/env bash
-export LD_LIBRARY_PATH="$LD_PATH"
-exec "$OCR_VENV/bin/python" "\$@"
-WRAPPER
+export LD_LIBRARY_PATH="LIBPATH_PLACEHOLDER"
+/home/cookie/.local/share/mark-shot/ocr-venv/bin/python -c "
+from rapidocr import RapidOCR
+import sys, json
+e = RapidOCR()
+result = e(sys.argv[1])
+tokens = []
+if result and result.txts:
+    for i, txt in enumerate(result.txts):
+        box = result.boxes[i].tolist() if result.boxes is not None else []
+        tokens.append({'text': txt, 'confidence': float(result.scores[i]), 'box': box})
+print(json.dumps({'backend': 'rapidocr', 'tokens': tokens}))
+" "$1"
+OCRSCRIPT
+    $DRY_RUN_CMD sed -i "s|LIBPATH_PLACEHOLDER|$LD_PATH|" "$MARK/ocr-helper.sh"
     $DRY_RUN_CMD chmod +x "$MARK/ocr-helper.sh"
 
     # code-scan helper script（mark-shot 调用入口，用 {imagePath} 占位符）
