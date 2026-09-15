@@ -242,6 +242,9 @@
     enable = true;
     terminal = "kitty";
   };
+  # 覆盖 nautilus-open-any-terminal 模块的默认值，指向包含所有 C 扩展的统一目录
+  environment.sessionVariables.NAUTILUS_4_EXTENSION_DIR = lib.mkForce
+    "${selfPackages.nautilus-extensions.nautilus-with-extensions}/lib/nautilus/extensions-4";
   # 登录界面头像（AccountsService，greeter 读取）
   system.activationScripts.noctaliaGreeterAvatar = lib.stringAfter [ "users" ] ''
     mkdir -p /var/lib/AccountsService/icons

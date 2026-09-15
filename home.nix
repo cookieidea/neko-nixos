@@ -158,7 +158,12 @@ in
     adwaita-icon-theme                          # Adwaita 基底图标（默认 freedesktop 标准）
     papirus-icon-theme                          # Papirus（丰富的应用图标，覆盖 Steam/Flatpak 等）
     hicolor-icon-theme                          # hicolor 兜底主题（Flatpak 应用图标/桌面文件图标扫描依赖）
-    nautilus                                    # nautilus（GNOME Files，binds: Mod+E）
+    # nautilus 包装器：强制注入 NAUTILUS_4_EXTENSION_DIR（systemd user session 有旧值缓存）
+    (pkgs.runCommand "nautilus-wrapper" { buildInputs = [ pkgs.makeWrapper ]; } ''
+      makeWrapper ${pkgs.nautilus}/bin/nautilus $out/bin/nautilus \
+        --set NAUTILUS_4_EXTENSION_DIR "${selfPackages.nautilus-extensions.nautilus-with-extensions}/lib/nautilus/extensions-4"
+    '')                                              # nautilus + image-converter + video-to-audio（binds: Mod+E）
+    nautilus-python                             # nautilus Python 扩展加载器
     zenity                                      # zenity（mpv input_plus 打开文件对话框，Linux 替代 openfile.exe）
     # 文件管理器生态
     gnome-keyring                             # 密钥环（登录钥匙串，nautilus/远程/应用依赖）
@@ -287,6 +292,7 @@ in
   systemd.user.sessionVariables = {
     PYTHONPATH = "${pkgs.python3Packages.pygobject3}/lib/python3.13/site-packages:${selfPackages.k7sfunc}/lib/python3.13/site-packages:${pkgs.python3Packages.vapoursynth}/lib/python3.13/site-packages";
     GI_TYPELIB_PATH = "${pkgs.nautilus}/lib/girepository-1.0";
+    NAUTILUS_4_EXTENSION_DIR = "${selfPackages.nautilus-extensions.nautilus-with-extensions}/lib/nautilus/extensions-4";
     VAPOURSYNTH_EXTRA_PLUGIN_PATH = "${selfPackages.vapoursynth-with-plugins}/lib/vapoursynth";
   };
 
@@ -317,6 +323,11 @@ in
   };
 
   # dotfiles 部署到 ~/.config/（原 noctalia-dotfiles rice 配置）
+  # ── nautilus Python 扩展部署（nautilus-python 扫描 ~/.local/share/nautilus-python/extensions）──
+  xdg.dataFile = {
+    "nautilus-python/extensions/video-to-audio.py".source = ./dotfiles/config/nautilus-python/video-to-audio.py;
+  };
+
   xdg.configFile = {
     # ABDM 托盘：autostart 重写绕过 makeWrapper → 无 systemdLibs → 托盘消失；
     # systemd user 服务不经过 login shell → 用 unit drop-in 注入 + 建 log 目录
@@ -325,8 +336,6 @@ in
       Environment=LD_LIBRARY_PATH=${pkgs.systemdLibs}/lib:/nix/store/zcqp398mxlw62jl02sx0rsc7gvcl1qhc-pipewire-1.6.6-jack/lib
       ExecStartPre=${pkgs.coreutils}/bin/mkdir -p %h/.abdm/system/log
     '';
-    "Thunar/accels.scm".source = ./dotfiles/config/Thunar/accels.scm;
-    "Thunar/uca.xml".source = ./dotfiles/config/Thunar/uca.xml;
     "fcitx5/conf/cached_layouts".source = ./dotfiles/config/fcitx5/conf/cached_layouts;
     "fcitx5/conf/chttrans.conf".source = ./dotfiles/config/fcitx5/conf/chttrans.conf;
     "fcitx5/conf/classicui.conf".source = ./dotfiles/config/fcitx5/conf/classicui.conf;

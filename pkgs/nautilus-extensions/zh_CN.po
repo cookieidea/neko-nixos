@@ -1,0 +1,177 @@
+# nautilus-image-converter zh_CN.po.
+# Copyright (C) 2005 THE nautilus-image-converter'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the nautilus-image-converter package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: nautilus-image-converter trunk\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2007-12-22 11:37+0900\n"
+"PO-Revision-Date: 2026-09-15 19:50+0800\n"
+"Last-Translator: cookie\n"
+"Language-Team: Chinese (Simplified) <cookie@cookieidea.dev>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: ../src/nautilus-image-converter.c:118
+msgid "_Resize Images..."
+msgstr "调整图片大小(_R)..."
+
+#: ../src/nautilus-image-converter.c:119
+msgid "Resize each selected image"
+msgstr "调整每张选中图片的大小"
+
+#: ../src/nautilus-image-converter.c:128
+msgid "Ro_tate Images..."
+msgstr "旋转图片(_T)..."
+
+#: ../src/nautilus-image-converter.c:129
+msgid "Rotate each selected image"
+msgstr "旋转每张选中的图片"
+
+#: ../src/nautilus-image-converter.c:137
+msgid "Convert _Format..."
+msgstr "转换格式(_F)..."
+
+#: ../src/nautilus-image-converter.c:138
+msgid "Convert format of each selected image"
+msgstr "转换每张选中图片的格式"
+
+#: ../src/nautilus-image-resizer.c:224 ../src/nautilus-image-rotator.c:221
+msgid "_Skip"
+msgstr "跳过(_S)"
+
+#: ../src/nautilus-image-resizer.c:226 ../src/nautilus-image-rotator.c:223
+msgid "_Retry"
+msgstr "重试(_R)"
+
+#: ../src/nautilus-image-resizer.c:343
+#, c-format
+msgid "Resizing image: %d of %d"
+msgstr "正在调整图片大小：%d / %d"
+
+#: ../src/nautilus-image-resizer.c:348
+#, c-format
+msgid "<i>Resizing \"%s\"</i>"
+msgstr "<i>正在调整 \"%s\" 的大小</i>"
+
+#: ../src/nautilus-image-resizer.c:366 ../src/nautilus-image-rotator.c:365
+msgid "Please enter a valid filename suffix!"
+msgstr "请输入有效的文件名后缀！"
+
+#: ../src/nautilus-image-resize.ui.h:1
+msgid ".resized"
+msgstr ".已调整大小"
+
+#: ../src/nautilus-image-resize.ui.h:2
+#: ../src/nautilus-image-rotate.ui.h:5
+msgid "<b>Filename</b>"
+msgstr "<b>文件名</b>"
+
+#: ../src/nautilus-image-resize.ui.h:3
+msgid "<b>Image Size</b>"
+msgstr "<b>图片大小</b>"
+
+#: ../src/nautilus-image-resize.ui.h:4
+#: ../src/nautilus-image-rotate.ui.h:7
+msgid "Append"
+msgstr "追加到文件名"
+
+#: ../src/nautilus-image-resize.ui.h:5
+msgid "Custom size:"
+msgstr "自定义大小："
+
+#: ../src/nautilus-image-resize.ui.h:6
+msgid "Height:"
+msgstr "高度："
+
+#: ../src/nautilus-image-resize.ui.h:7
+msgid "Resize Images"
+msgstr "调整图片大小"
+
+#: ../src/nautilus-image-resize.ui.h:8
+msgid "Resize in place"
+msgstr "原地调整（不改文件名）"
+
+#: ../src/nautilus-image-resize.ui.h:9
+msgid "Scale:"
+msgstr "缩放："
+
+#: ../src/nautilus-image-resize.ui.h:10
+msgid "Select a size:"
+msgstr "选择大小："
+
+#: ../src/nautilus-image-resize.ui.h:11
+msgid "Width:"
+msgstr "宽度："
+
+#: ../src/nautilus-image-resize.ui.h:12
+msgid "_Resize"
+msgstr "调整(_R)"
+
+#: ../src/nautilus-image-resize.ui.h:13
+msgid "percent"
+msgstr "百分比"
+
+#: ../src/nautilus-image-resize.ui.h:14
+msgid "pixels"
+msgstr "像素"
+
+#: ../src/nautilus-image-resize.ui.h:15
+#: ../src/nautilus-image-rotate.ui.h:14
+msgid "to file title"
+msgstr "追加到文件名"
+
+#: ../src/nautilus-image-rotator.c:342
+#, c-format
+msgid "Rotating image: %d of %d"
+msgstr "正在旋转图片：%d / %d"
+
+#: ../src/nautilus-image-rotator.c:347
+#, c-format
+msgid "<i>Rotating \"%s\"</i>"
+msgstr "<i>正在旋转 \"%s\"</i>"
+
+#: ../src/nautilus-image-rotate.ui.h:1
+msgid ".rotated"
+msgstr ".已旋转"
+
+#: ../src/nautilus-image-rotate.ui.h:2
+msgid ""
+"90° clockwise\n"
+"90° counter-clockwise\n"
+"180°"
+msgstr ""
+"顺时针 90°\n"
+"逆时针 90°\n"
+"180°"
+
+#: ../src/nautilus-image-rotate.ui.h:6
+msgid "<b>Image Rotation</b>"
+msgstr "<b>图片旋转</b>"
+
+#: ../src/nautilus-image-rotate.ui.h:8
+msgid "Custom angle:"
+msgstr "自定义角度："
+
+#: ../src/nautilus-image-rotate.ui.h:9
+msgid "Rotate Images"
+msgstr "旋转图片"
+
+#: ../src/nautilus-image-rotate.ui.h:10
+msgid "Rotate in place"
+msgstr "原地旋转（不改文件名）"
+
+#: ../src/nautilus-image-rotate.ui.h:11
+msgid "Select an angle:"
+msgstr "选择角度："
+
+#: ../src/nautilus-image-rotate.ui.h:12
+msgid "_Rotate"
+msgstr "旋转(_R)"
+
+#: ../src/nautilus-image-rotate.ui.h:13
+msgid "degrees clockwise"
+msgstr "度（顺时针）"

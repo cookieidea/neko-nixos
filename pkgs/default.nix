@@ -27,4 +27,6 @@ rec {
   # astral 的 bundle 由 pkgs/astral/build.sh 联网构建（flake 输入 astral-bundle）
   astral          = import ./astral { inherit pkgs; lib = pkgs.lib; src = astral-bundle; };
   harmonyos-sans-sc = import ./harmonyos-sans-sc { inherit pkgs; };
+  # Nautilus 右键扩展（image-converter C 扩展 + video-audio-streams Python 扩展）
+  nautilus-extensions = import ./nautilus-extensions { inherit pkgs; };
 }
