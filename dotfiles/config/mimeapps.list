@@ -24,7 +24,6 @@ audio/mp4=mpv.desktop
 audio/aac=mpv.desktop
 audio/x-ms-wma=mpv.desktop
 text/plain=vim.desktop
-x-scheme-handler/celemod=cele-mod-handler.desktop
 x-scheme-handler/lunarclient=lunarclient.desktop
 x-scheme-handler/discord-562286213059444737=lunarclient.desktop
 
