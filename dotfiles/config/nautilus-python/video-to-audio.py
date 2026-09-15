@@ -30,6 +30,17 @@ import subprocess
 import threading
 import locale
 import re
+import traceback
+
+_LOG = os.path.join(os.path.expanduser("~"), ".cache",
+                    "nautilus-video-to-audio.log")
+
+def _log(msg):
+    try:
+        with open(_LOG, "a", encoding="utf-8") as f:
+            f.write(msg + "\n")
+    except Exception:
+        pass
 
 import gi
 gi.require_version("Gtk",     "4.0")
@@ -437,11 +448,22 @@ class VideoToAudioWindow(Adw.Window):
         self._qual_drop.set_sensitive(False)
         self._progress.set_visible(True)
         self._status.set_text(T["processing"])
-        threading.Thread(target=self._run_conversions, daemon=True).start()
-
-    def _run_conversions(self):
-        fmt_idx  = self._fmt_drop.get_selected()
+        # GTK 控件只能在主线程读：先取值再起工作线程（跨线程读会导致崩溃）
+        fmt_idx = self._fmt_drop.get_selected()
         qual_idx = self._qual_drop.get_selected()
+        dest_folder = self._dest_folder
+        threading.Thread(target=self._run_conversions,
+                         args=(fmt_idx, qual_idx, dest_folder),
+                         daemon=True).start()
+
+    def _run_conversions(self, fmt_idx, qual_idx, dest_folder):
+        try:
+            self.__run_conversions(fmt_idx, qual_idx, dest_folder)
+        except Exception:
+            _log(traceback.format_exc())
+            GLib.idle_add(self._on_done, 0, len(self._videos))
+
+    def __run_conversions(self, fmt_idx, qual_idx, dest_folder):
         ext, codec = AUDIO_FORMATS[fmt_idx]
         quality    = QUALITIES[qual_idx]
 
@@ -454,7 +476,7 @@ class VideoToAudioWindow(Adw.Window):
                 break
 
             src_dir   = os.path.dirname(video)
-            dest_dir  = self._dest_folder if self._dest_folder else src_dir
+            dest_dir  = dest_folder if dest_folder else src_dir
             name      = os.path.splitext(os.path.basename(video))[0]
             output    = os.path.join(dest_dir, f"{name}.{ext}")
             duration  = _get_duration(video)
@@ -558,7 +580,11 @@ class VideoToAudioExtension(GObject.GObject, Nautilus.MenuProvider):
         self._windows = []
 
     def _open_window(self, videos):
-        win = VideoToAudioWindow(videos)
+        try:
+            win = VideoToAudioWindow(videos)
+        except Exception:
+            _log(traceback.format_exc())
+            return
         self._windows.append(win)
         win.connect("close-request", lambda w: self._windows.remove(w))
         win.present()
