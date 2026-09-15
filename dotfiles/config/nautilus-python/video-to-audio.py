@@ -87,6 +87,7 @@ if _lang.startswith("zh"):
         "dest_folder":  "目标文件夹",
         "choose":       "选择…",
         "same_as_src":  "与源文件相同目录",
+        "no_audio":     "无音频轨道，跳过",
     }
 elif _lang.startswith("fr"):
     T = {
@@ -110,6 +111,7 @@ elif _lang.startswith("fr"):
         "dest_folder":  "Destination",
         "choose":       "Choisir…",
         "same_as_src":  "Même dossier que la source",
+        "no_audio":     "Pas de piste audio, ignoré",
     }
 elif _lang.startswith("de"):
     T = {
@@ -133,6 +135,7 @@ elif _lang.startswith("de"):
         "dest_folder":  "Ziel",
         "choose":       "Wählen…",
         "same_as_src":  "Gleicher Ordner wie Quelle",
+        "no_audio":     "Keine Audiospur, übersprungen",
     }
 else:
     T = {
@@ -156,6 +159,7 @@ else:
         "dest_folder":  "Destination",
         "choose":       "Choose…",
         "same_as_src":  "Same folder as source",
+        "no_audio":     "No audio track, skipped",
     }
 
 # Extensions vidéo supportées
@@ -202,6 +206,19 @@ def _parse_time(time_str):
         return int(h) * 3600 + int(m) * 60 + float(s)
     except Exception:
         return 0.0
+
+
+def _has_audio(path):
+    """视频是否含音频流（无音轨则 ffmpeg 提取必失败，提前告知）。"""
+    try:
+        out = subprocess.check_output(
+            ["ffprobe", "-v", "error", "-select_streams", "a",
+             "-show_entries", "stream=index",
+             "-of", "csv=p=0", path],
+            stderr=subprocess.DEVNULL).decode().strip()
+        return bool(out)
+    except Exception:
+        return False
 
 
 # ---------------------------------------------------------------------------
@@ -479,6 +496,14 @@ class VideoToAudioWindow(Adw.Window):
             dest_dir  = dest_folder if dest_folder else src_dir
             name      = os.path.splitext(os.path.basename(video))[0]
             output    = os.path.join(dest_dir, f"{name}.{ext}")
+
+            if not _has_audio(video):
+                GLib.idle_add(self._update_file_status, i, False)
+                GLib.idle_add(self._set_status_text,
+                              T["no_audio"] + f" — {os.path.basename(video)}")
+                GLib.idle_add(self._update_progress, (i + 1) / total, 1.0)
+                continue
+
             duration  = _get_duration(video)
 
             cmd = ["ffmpeg", "-y", "-i", video, "-vn", "-progress", "pipe:1",
@@ -523,6 +548,10 @@ class VideoToAudioWindow(Adw.Window):
             GLib.idle_add(self._update_progress, (i + 1) / total, 1.0)
 
         GLib.idle_add(self._on_done, ok, total)
+
+    def _set_status_text(self, text):
+        self._status.set_text(text)
+        return False
 
     def _update_progress(self, overall, file_frac):
         self._progress.set_fraction(overall)
