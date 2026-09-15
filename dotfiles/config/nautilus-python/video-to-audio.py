@@ -88,6 +88,8 @@ if _lang.startswith("zh"):
         "choose":       "选择…",
         "same_as_src":  "与源文件相同目录",
         "no_audio":     "无音频轨道，跳过",
+        "no_audio_all": "所选视频都没有音频轨道，无法提取。",
+        "skipped_suffix": "（{n} 个无音频轨道已跳过）",
     }
 elif _lang.startswith("fr"):
     T = {
@@ -112,6 +114,8 @@ elif _lang.startswith("fr"):
         "choose":       "Choisir…",
         "same_as_src":  "Même dossier que la source",
         "no_audio":     "Pas de piste audio, ignoré",
+        "no_audio_all": "Aucune des vidéos sélectionnées ne contient de piste audio.",
+        "skipped_suffix": "({n} sans piste audio ignorée(s))",
     }
 elif _lang.startswith("de"):
     T = {
@@ -136,6 +140,8 @@ elif _lang.startswith("de"):
         "choose":       "Wählen…",
         "same_as_src":  "Gleicher Ordner wie Quelle",
         "no_audio":     "Keine Audiospur, übersprungen",
+        "no_audio_all": "Keines der ausgewählten Videos enthält eine Audiospur.",
+        "skipped_suffix": "({n} ohne Audiospur übersprungen)",
     }
 else:
     T = {
@@ -160,6 +166,8 @@ else:
         "choose":       "Choose…",
         "same_as_src":  "Same folder as source",
         "no_audio":     "No audio track, skipped",
+        "no_audio_all": "None of the selected videos have an audio track.",
+        "skipped_suffix": "({n} skipped, no audio track)",
     }
 
 # Extensions vidéo supportées
@@ -478,7 +486,7 @@ class VideoToAudioWindow(Adw.Window):
             self.__run_conversions(fmt_idx, qual_idx, dest_folder)
         except Exception:
             _log(traceback.format_exc())
-            GLib.idle_add(self._on_done, 0, len(self._videos))
+            GLib.idle_add(self._on_done, 0, len(self._videos), 0)
 
     def __run_conversions(self, fmt_idx, qual_idx, dest_folder):
         ext, codec = AUDIO_FORMATS[fmt_idx]
@@ -486,6 +494,7 @@ class VideoToAudioWindow(Adw.Window):
 
         total = len(self._videos)
         ok    = 0
+        skipped = 0
         time_re = re.compile(r"time=(\d+:\d+:\d+\.\d+)")
 
         for i, video in enumerate(self._videos):
@@ -498,9 +507,8 @@ class VideoToAudioWindow(Adw.Window):
             output    = os.path.join(dest_dir, f"{name}.{ext}")
 
             if not _has_audio(video):
-                GLib.idle_add(self._update_file_status, i, False)
-                GLib.idle_add(self._set_status_text,
-                              T["no_audio"] + f" — {os.path.basename(video)}")
+                skipped += 1
+                GLib.idle_add(self._mark_skipped, i)
                 GLib.idle_add(self._update_progress, (i + 1) / total, 1.0)
                 continue
 
@@ -547,7 +555,13 @@ class VideoToAudioWindow(Adw.Window):
                 ok += 1
             GLib.idle_add(self._update_progress, (i + 1) / total, 1.0)
 
-        GLib.idle_add(self._on_done, ok, total)
+        GLib.idle_add(self._on_done, ok, total, skipped)
+
+    def _mark_skipped(self, idx):
+        lbl = self._file_labels[idx]
+        lbl.set_text("–")
+        lbl.add_css_class("dim-label")
+        return False
 
     def _set_status_text(self, text):
         self._status.set_text(text)
@@ -569,7 +583,7 @@ class VideoToAudioWindow(Adw.Window):
             lbl.add_css_class("error")
         return False
 
-    def _on_done(self, ok, total):
+    def _on_done(self, ok, total, skipped=0):
         self._done = True
         self._progress.set_visible(False)
         self._btn_cancel.set_visible(False)
@@ -577,8 +591,13 @@ class VideoToAudioWindow(Adw.Window):
         self._btn_close.set_visible(True)
         if self._cancelled:
             self._status.set_text(T["cancelled"])
+        elif skipped >= total:
+            self._status.set_text(T["no_audio_all"])
         else:
-            self._status.set_text(T["all_done"].format(ok=ok, total=total))
+            msg = T["all_done"].format(ok=ok, total=total)
+            if skipped:
+                msg += T["skipped_suffix"].format(n=skipped)
+            self._status.set_text(msg)
         return False
 
     def _on_cancel(self, _):
