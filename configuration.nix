@@ -177,7 +177,10 @@
       name = "rocm-combined";
       paths = with pkgs.rocmPackages; [ rocblas hipblas clr ];
     };
-  in [ "L+ /opt/rocm - - - - ${rocmEnv}" ];
+  in [
+    "L+ /opt/rocm - - - - ${rocmEnv}"
+    "d /.Trash 1777 root root - -"   # 根分区回收站（Nautilus 删根分区文件用）
+  ];
 
   # Ollama（AMD ROCm）
   services.ollama = {
