@@ -103,6 +103,8 @@ in
     zoxide
     fastfetch
     imagemagick
+    jpegoptim                                   # nautilus-image-converter 按目标大小压缩 JPEG
+    pngquant                                    # nautilus-image-converter 按目标大小压缩 PNG
     jq
     timg
     bat
@@ -159,9 +161,12 @@ in
     papirus-icon-theme                          # Papirus（丰富的应用图标，覆盖 Steam/Flatpak 等）
     hicolor-icon-theme                          # hicolor 兜底主题（Flatpak 应用图标/桌面文件图标扫描依赖）
     # nautilus 包装器：强制注入 NAUTILUS_4_EXTENSION_DIR（systemd user session 有旧值缓存）
+    # + PATH 前缀保证 image-converter（jpegoptim/pngquant/cp）和 video-to-audio（ffmpeg/ffprobe）
+    # 调用的外部命令不依赖 ambient PATH
     (pkgs.runCommand "nautilus-wrapper" { buildInputs = [ pkgs.makeWrapper ]; } ''
       makeWrapper ${pkgs.nautilus}/bin/nautilus $out/bin/nautilus \
-        --set NAUTILUS_4_EXTENSION_DIR "${selfPackages.nautilus-extensions.nautilus-with-extensions}/lib/nautilus/extensions-4"
+        --set NAUTILUS_4_EXTENSION_DIR "${selfPackages.nautilus-extensions.nautilus-with-extensions}/lib/nautilus/extensions-4" \
+        --prefix PATH : "${pkgs.lib.makeBinPath [ pkgs.imagemagick pkgs.jpegoptim pkgs.pngquant pkgs.ffmpeg pkgs.coreutils ]}"
     '')                                              # nautilus + image-converter + video-to-audio（binds: Mod+E）
     nautilus-python                             # nautilus Python 扩展加载器
     zenity                                      # zenity（mpv input_plus 打开文件对话框，Linux 替代 openfile.exe）

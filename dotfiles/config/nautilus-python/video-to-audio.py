@@ -40,7 +40,19 @@ from gi.repository import GObject, Gtk, Adw, GLib, Pango, Gdk, Nautilus
 # ---------------------------------------------------------------------------
 # i18n
 # ---------------------------------------------------------------------------
-_lang = locale.getlocale()[0] or ""
+def _detect_lang():
+    """nautilus-python 内嵌解释器 locale 常未初始化（getlocale → None），
+    回退读 LANG/LANGUAGE/LC_ALL 环境变量。"""
+    try:
+        lang = locale.getlocale()[0] or ""
+    except Exception:
+        lang = ""
+    if not lang:
+        lang = (os.environ.get("LANG", "") or os.environ.get("LANGUAGE", "")
+                or os.environ.get("LC_ALL", ""))
+    return lang
+
+_lang = _detect_lang()
 
 if _lang.startswith("zh"):
     T = {
@@ -137,7 +149,9 @@ else:
 
 # Extensions vidéo supportées
 VIDEO_EXTS = {".mp4", ".mkv", ".avi", ".mov", ".webm", ".flv", ".wmv",
-              ".m4v", ".mpg", ".mpeg", ".3gp", ".ts", ".ogv", ".vob"}
+               ".m4v", ".mpg", ".mpeg", ".3gp", ".3g2", ".ts", ".m2ts",
+               ".mts", ".m2t", ".mxf", ".ogv", ".vob", ".rmvb", ".rm",
+               ".f4v", ".asf", ".dv", ".divx"}
 
 # Formats audio disponibles (extension, codec ffmpeg)
 AUDIO_FORMATS = [
@@ -317,8 +331,12 @@ class VideoToAudioWindow(Adw.Window):
 
         # ── Liste des fichiers ────────────────────────────────────────────────
         files_label = Gtk.Label()
-        files_label.set_markup(f"<b>{len(video_files)} fichier(s)</b>" if _lang.startswith("fr")
-                               else f"<b>{len(video_files)} file(s)</b>")
+        if _lang.startswith("zh"):
+            files_label.set_markup(f"<b>{len(video_files)} 个文件</b>")
+        elif _lang.startswith("fr"):
+            files_label.set_markup(f"<b>{len(video_files)} fichier(s)</b>")
+        else:
+            files_label.set_markup(f"<b>{len(video_files)} file(s)</b>")
         files_label.set_halign(Gtk.Align.START)
         files_label.set_margin_start(16); files_label.set_margin_end(16)
         files_label.set_margin_top(8)
@@ -534,6 +552,17 @@ class VideoToAudioWindow(Adw.Window):
 class VideoToAudioExtension(GObject.GObject, Nautilus.MenuProvider):
     __gtype_name__ = "VideoToAudioExtension"
 
+    def __init__(self):
+        super().__init__()
+        # 保持已打开窗口的引用，防止 Python GC 提前销毁窗口
+        self._windows = []
+
+    def _open_window(self, videos):
+        win = VideoToAudioWindow(videos)
+        self._windows.append(win)
+        win.connect("close-request", lambda w: self._windows.remove(w))
+        win.present()
+
     def get_file_items(self, files):
         if not files:
             return []
@@ -561,7 +590,7 @@ class VideoToAudioExtension(GObject.GObject, Nautilus.MenuProvider):
             tip   = "Extract audio track from video files",
             icon  = "audio-x-generic-symbolic",
         )
-        item.connect("activate", lambda *_: VideoToAudioWindow(videos).present())
+        item.connect("activate", lambda *_: self._open_window(videos))
         return [item]
 
     def get_background_items(self, folder):

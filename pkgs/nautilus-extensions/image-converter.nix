@@ -27,10 +27,16 @@ pkgs.stdenv.mkDerivation rec {
   ];
 
   # extensiondir 由 pkg-config 提供（指向 nautilus 包 store 路径），覆盖到 $out
+  # /usr/bin/convert 在 NixOS 不存在 → 替换为 nix store 绝对路径（resize/rotate/convert 共 5 处）
   postPatch = ''
     substituteInPlace meson.build --replace-fail \
       "nautilus_extension_dir = libnautilus_extension.get_pkgconfig_variable('extensiondir')" \
       "nautilus_extension_dir = join_paths(get_option('prefix'), 'lib', 'nautilus', 'extensions-4')"
+    substituteInPlace src/nautilus-image-resizer.c src/nautilus-image-rotator.c src/nautilus-image-format-changer.c \
+      --replace-fail '/usr/bin/convert' '${pkgs.imagemagick}/bin/convert'
+    # 上游 .ui 漏标 translatable → 对话框内 label 全部英文；补上（无 .mo 条目的保持原文）
+    sed -i -E 's|<property name="(label\|title)">|<property name="\1" translatable="yes">|g' \
+      data/nautilus-image-resize.ui data/nautilus-image-rotate.ui data/nautilus-image-format-change.ui
   '';
 
   # 安装中文翻译（.po → .mo 编译后注入）
