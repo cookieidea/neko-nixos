@@ -158,16 +158,13 @@ in
     adwaita-icon-theme                          # Adwaita 基底图标（默认 freedesktop 标准）
     papirus-icon-theme                          # Papirus（丰富的应用图标，覆盖 Steam/Flatpak 等）
     hicolor-icon-theme                          # hicolor 兜底主题（Flatpak 应用图标/桌面文件图标扫描依赖）
-    thunar                                     # 文件管理器（binds: Mod+E 优先）
-    nautilus                                    # nautilus（GNOME Files，binds: Mod+Alt+E / Mod+E 兜底）
+    nautilus                                    # nautilus（GNOME Files，binds: Mod+E）
     zenity                                      # zenity（mpv input_plus 打开文件对话框，Linux 替代 openfile.exe）
     # 文件管理器生态
     gnome-keyring                             # 密钥环（登录钥匙串，nautilus/远程/应用依赖）
     gvfs                                      # 虚拟文件系统（smb/mtp/gphoto2 挂载）
-    ffmpegthumbnailer                         # 视频缩略图（thunar/nautilus）
+    ffmpegthumbnailer                         # 视频缩略图（nautilus）
     file-roller                               # 归档 GUI（= ark 的 GNOME 版）
-    thunar-archive-plugin                     # thunar 归档插件
-    thunar-volman                             # thunar 卷管理
     webp-pixbuf-loader                        # webp 缩略图
     poppler                                   # PDF 缩略图（libpoppler-glib）
     gst_all_1.gst-plugins-base                # GStreamer 基础插件
@@ -195,12 +192,10 @@ in
     xhost                                      # XWayland 授权（config.kdl spawn-at-startup "xhost"；26.05 xorg 包集移到顶层）
     pipewire                                   # 提供 pw-play（截图/强杀音效脚本依赖；服务已在 configuration.nix 开启）
     qt6Packages.fcitx5-configtool              # fcitx5 配置 GUI（原 fcitx5-configtool；26.05 移到 qt6Packages）
-    tumbler                                    # thunar 缩略图后端（图片/文档缩略图，原 04j/04k 必装）
     xdg-terminal-exec                          # 终端选择器（xdg-open 按 xdg-terminals.list 选 kitty）
     xdgOpenWithGio                             # trash:// 等 gvfs URI 正确交给 gio
     adw-gtk3                                     # libadwaita 主题 adw-gtk3-dark（nixpkgs 属性名 adw-gtk3，非 adw-gtk-theme）
     nwg-look                                   # GTK 主题设置（原脚本 + dotfiles 已部署 nwg-look/gsettings）
-    libgsf                                     # ODF/Office 文档缩略图（thunar，原 FM_PKGS2）
     icoextract                                 # Windows exe/ico 图标缩略图（原 FM_PKGS1）
     cava                                       # 音频可视化（终端彩蛋，原 04k TERM_PKGS）
   ] ++ [
@@ -448,9 +443,6 @@ X-Flatpak=com.qq.QQ
       '';
     };
     "xdg-terminals.list".source = ./dotfiles/config/xdg-terminals.list;
-    "xfce4/helpers.rc".source = ./dotfiles/config/xfce4/helpers.rc;
-    "xfce4/xfconf/xfce-perchannel-xml/thunar-volman.xml".source = ./dotfiles/config/xfce4/xfconf/xfce-perchannel-xml/thunar-volman.xml;
-    "xfce4/xfconf/xfce-perchannel-xml/thunar.xml".source = ./dotfiles/config/xfce4/xfconf/xfce-perchannel-xml/thunar.xml;
     "xsettingsd/xsettingsd.conf".source = ./dotfiles/config/xsettingsd/xsettingsd.conf;
   };
 
