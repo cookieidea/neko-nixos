@@ -24,7 +24,6 @@ rec {
   purevox         = import ./purevox { inherit pkgs; };
   bedrockboot     = import ./bedrockboot { inherit pkgs; };
   nyxniri-scratch-menu = import ./nyxniri-scratch-menu.nix { inherit pkgs; };
-  mpv-handler = import ./mpv-handler.nix { inherit pkgs; };
   # astral 的 bundle 由 pkgs/astral/build.sh 联网构建（flake 输入 astral-bundle）
   astral          = import ./astral { inherit pkgs; lib = pkgs.lib; src = astral-bundle; };
   harmonyos-sans-sc = import ./harmonyos-sans-sc { inherit pkgs; };

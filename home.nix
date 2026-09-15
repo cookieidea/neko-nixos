@@ -331,17 +331,6 @@ in
   # ── nautilus Python 扩展部署（nautilus-python 扫描 ~/.local/share/nautilus-python/extensions）──
   xdg.dataFile = {
     "nautilus-python/extensions/video-to-audio.py".source = ./dotfiles/config/nautilus-python/video-to-audio.py;
-    # mpv:// 协议处理器（OpenList 网页“用mpv打开”）——注册 x-scheme-handler/mpv
-    "applications/mpv-handler.desktop".text = ''
-      [Desktop Entry]
-      Type=Application
-      Name=MPV Handler
-      Comment=Open mpv:// links from OpenList web with mpv
-      Exec=${selfPackages.mpv-handler}/bin/mpv-handler %u
-      Terminal=false
-      NoDisplay=true
-      MimeType=x-scheme-handler/mpv;
-    '';
     # lunarclient 覆盖：原包 Exec 无 %u（discord-RPC 邀请链接丢参数只开启动器不进服），
     # 且未声明 discord-562286213059444737 scheme；用户级覆盖优先级最高
     "applications/lunarclient.desktop".text = ''

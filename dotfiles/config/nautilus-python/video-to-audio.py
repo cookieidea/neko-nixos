@@ -532,11 +532,7 @@ class VideoToAudioWindow(Adw.Window):
                     start_new_session=True,
                 )
                 # Lire la sortie ligne par ligne pour parser la progression
-                tail_lines = []
                 for line in self._process.stdout:
-                    tail_lines.append(line.rstrip())
-                    if len(tail_lines) > 20:
-                        tail_lines.pop(0)
                     if self._cancelled:
                         break
                     # ffmpeg avec -progress : lignes "out_time=00:00:12.34"
@@ -551,15 +547,6 @@ class VideoToAudioWindow(Adw.Window):
                 self._process.wait()
                 rc = self._process.returncode
                 success = (rc == 0 and not self._cancelled)
-                if success:
-                    try:
-                        size = os.path.getsize(output)
-                    except OSError:
-                        size = -1
-                    _log(f"OK rc=0 out={output} size={size} ffmpeg={shutil.which('ffmpeg')}")
-                else:
-                    _log(f"FAIL video={video} rc={rc} cancelled={self._cancelled} "
-                         f"ffmpeg={shutil.which('ffmpeg')} cmd={cmd} tail={tail_lines}")
             except Exception:
                 _log(f"EXC video={video}\n{traceback.format_exc()}")
                 success = False
