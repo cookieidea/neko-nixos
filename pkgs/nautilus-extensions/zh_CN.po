@@ -155,6 +155,50 @@ msgstr "像素"
 msgid "to file title"
 msgstr "追加到文件名"
 
+# ── 尺寸下拉框数值（保持原样，仅占位）──
+msgid "96x96"
+msgstr "96x96"
+
+msgid "128x128"
+msgstr "128x128"
+
+msgid "640x480"
+msgstr "640x480"
+
+msgid "800x600"
+msgstr "800x600"
+
+msgid "1024x768"
+msgstr "1024x768"
+
+msgid "1280x960"
+msgstr "1280x960"
+
+msgid "Compress images to approximately hit a target file size in KB or MB."
+msgstr "压缩图片，使文件大小尽量接近指定的 KB / MB 目标值。"
+
+msgid "Append dummy zero-bytes if the compressed image is smaller than the target size (useful for strict portals that mandate a minimum file size)."
+msgstr "若压缩后小于目标大小，则追加空字节补足（用于强制最小文件大小的上传限制）。"
+
+msgid "(optional suffix, e.g. .converted)"
+msgstr "（可选后缀，例如 .converted）"
+
+# ── 目标大小单位（保持原样）──
+msgid "KB"
+msgstr "KB"
+
+msgid "MB"
+msgstr "MB"
+
+msgid "90° clockwise"
+msgstr "顺时针 90°"
+
+msgid "90° counter-clockwise"
+msgstr "逆时针 90°"
+
+msgid "180°"
+msgstr "180°"
+
 # ── rotate 对话框（.ui）──
 msgid ""
 "90° clockwise\n"

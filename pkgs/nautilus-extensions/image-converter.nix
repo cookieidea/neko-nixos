@@ -37,6 +37,11 @@ pkgs.stdenv.mkDerivation rec {
     # 上游 .ui 漏标 translatable → 对话框内 label 全部英文；补上（无 .mo 条目的保持原文）
     sed -i -E 's|<property name="(label\|title)">|<property name="\1" translatable="yes">|g' \
       data/nautilus-image-resize.ui data/nautilus-image-rotate.ui data/nautilus-image-format-change.ui
+    # 布局修正：上游每行用独立 GtkBox，左列标签宽度不一 → 控件起始位置参差、
+    # 缩放框被 hexpand 拉满。改用 GtkGrid + GtkSizeGroup 统一列宽（见 ui/*.ui）
+    cp ${./ui}/nautilus-image-resize.ui data/nautilus-image-resize.ui
+    cp ${./ui}/nautilus-image-rotate.ui data/nautilus-image-rotate.ui
+    cp ${./ui}/nautilus-image-format-change.ui data/nautilus-image-format-change.ui
   '';
 
   # 安装中文翻译（.po → .mo 编译后注入）
