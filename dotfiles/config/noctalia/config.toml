@@ -47,7 +47,9 @@ thickness = 36
 warning_threshold = 30
 
 [brightness]
-enable_ddcutil = false
+# 外接显示器无 sysfs backlight 设备，亮度走 DDC/CI
+# （需 hardware.i2c.enable + ddcutil 在 PATH）
+enable_ddcutil = true
 
 [desktop_widgets]
 schema_version = 2
