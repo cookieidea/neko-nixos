@@ -1,5 +1,5 @@
 # Home Manager 用户配置（桌面 niri + Noctalia；编辑器 CookNixvim）
-{ config, pkgs, lib, desktop, username, cooknixvim, opencode, bili-danmaku-tui, selfPackages, noctalia, bestclient, mark-shot, llm-agents-nix, ... }:
+{ config, pkgs, lib, desktop, username, cooknixvim, opencode, bilihud, selfPackages, noctalia, bestclient, mark-shot, llm-agents-nix, ... }:
 
 let
   mpvRife = pkgs.mpv.override {
@@ -259,7 +259,7 @@ in
     '')
     selfPackages.astral               # Astral 组网客户端（Flutter+Rust；bundle 由 pkgs/astral/build.sh 联网构建）
     # 走 flake 输入的包（不在 nixpkgs 核心，直接引用其 flake 构建产物）
-    bili-danmaku-tui.packages.${pkgs.stdenv.hostPlatform.system}.default  # B 站直播间弹幕 TUI
+    bilihud.packages.${pkgs.stdenv.hostPlatform.system}.default  # B 站直播弹幕阅读器（PyQt6 + layer-shell 全屏浮窗）
     # CookNixvim：模块化 Neovim 配置（基于 nix-community/nixvim 的完整配置），
     # 产物 packages.<sys>.default 提供 nvim 命令（替代原 programs.nixvim 简易配置）
     cooknixvim.packages.${pkgs.stdenv.hostPlatform.system}.default        # nvim（CookNixvim）

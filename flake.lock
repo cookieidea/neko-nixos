@@ -57,24 +57,41 @@
         "url": "https://github.com/BestProjectTeam/BestClient"
       }
     },
-    "bili-danmaku-tui": {
+    "bilihud": {
       "inputs": {
+        "blivedm": "blivedm",
         "nixpkgs": [
           "nixpkgs"
         ]
       },
       "locked": {
-        "lastModified": 1786529246,
-        "narHash": "sha256-CpF6maL2hIZpgBWLAqJGYqTkyRPk+3NdyS+Fz+Zz6nY=",
-        "ref": "refs/heads/main",
-        "rev": "1863555b9cf36d60d0151c3fc417d1f2ddbeabf6",
-        "revCount": 22,
-        "type": "git",
-        "url": "https://github.com/Youthdreamer/bili-danmaku-tui.git"
+        "lastModified": 1788342964,
+        "narHash": "sha256-FNMNQUvaDXa7keswTvSzvS69SQqIqw+UwTTINFMY/HU=",
+        "owner": "locez",
+        "repo": "bilihud",
+        "rev": "87e6440028733e052bc8ed99855b33929d5c1e38",
+        "type": "github"
       },
       "original": {
-        "type": "git",
-        "url": "https://github.com/Youthdreamer/bili-danmaku-tui.git"
+        "owner": "locez",
+        "repo": "bilihud",
+        "type": "github"
+      }
+    },
+    "blivedm": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1786465492,
+        "narHash": "sha256-um10IZQ4/1hCKRW7G3NXCxf1VQmWtM4vUadU8EHtjWo=",
+        "owner": "xfgryujk",
+        "repo": "blivedm",
+        "rev": "93530bcc20de8a67f8d0ee4788096da2480b8a10",
+        "type": "github"
+      },
+      "original": {
+        "owner": "xfgryujk",
+        "repo": "blivedm",
+        "type": "github"
       }
     },
     "bun2nix": {
@@ -582,7 +599,7 @@
         "agenix": "agenix",
         "astral-bundle": "astral-bundle",
         "bestclient": "bestclient",
-        "bili-danmaku-tui": "bili-danmaku-tui",
+        "bilihud": "bilihud",
         "cooknixvim": "cooknixvim",
         "home-manager": "home-manager_2",
         "llm-agents-nix": "llm-agents-nix",
