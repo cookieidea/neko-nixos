@@ -1,7 +1,7 @@
 [Default Applications]
 image/png=imv.desktop
 video/webm=mpv.desktop
-application/x-shellscript=vim.desktop
+application/x-shellscript=nvim.desktop
 inode/directory=org.gnome.Nautilus.desktop
 x-scheme-handler/trash=org.gnome.Nautilus.desktop
 image/jpeg=imv.desktop
@@ -23,16 +23,24 @@ audio/x-wav=mpv.desktop
 audio/mp4=mpv.desktop
 audio/aac=mpv.desktop
 audio/x-ms-wma=mpv.desktop
-text/plain=vim.desktop
+text/plain=nvim.desktop
+text/markdown=nvim.desktop
+application/json=nvim.desktop
+text/x-yaml=nvim.desktop
+application/yaml=nvim.desktop
 x-scheme-handler/lunarclient=lunarclient.desktop
 x-scheme-handler/discord-562286213059444737=lunarclient.desktop
 
 [Added Associations]
 image/png=imv.desktop;
 video/webm=mpv.desktop;
-application/x-shellscript=vim.desktop;
+application/x-shellscript=nvim.desktop;
 video/mp4=mpv.desktop;
-text/plain=vim.desktop;
+text/plain=nvim.desktop;
+text/markdown=nvim.desktop;
+application/json=nvim.desktop;
+text/x-yaml=nvim.desktop;
+application/yaml=nvim.desktop;
 audio/mpeg=mpv.desktop;
 audio/ogg=mpv.desktop;
 audio/opus=mpv.desktop;
