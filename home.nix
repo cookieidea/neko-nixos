@@ -171,6 +171,10 @@ in
         --prefix PATH : "${pkgs.lib.makeBinPath [ pkgs.imagemagick pkgs.jpegoptim pkgs.pngquant pkgs.ffmpeg pkgs.coreutils ]}"
     '')                                              # nautilus + image-converter + video-to-audio（binds: Mod+E）
     nautilus-python                             # nautilus Python 扩展加载器
+    localsearch                                 # nautilus 全文搜索后端（Tracker3/LocalSearch3）
+                                                # 只作为 nautilus 构建期依赖存在时，其 D-Bus service
+                                                # 文件与 systemd user unit 不在搜索路径上 → 点
+                                                # 「搜索所有位置」报 ServiceUnknown: not activatable
     zenity                                      # zenity（mpv input_plus 打开文件对话框，Linux 替代 openfile.exe）
     # 文件管理器生态
     gnome-keyring                             # 密钥环（登录钥匙串，nautilus/远程/应用依赖）
