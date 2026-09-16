@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- 布局修正版：原先每行独立 GtkBox，左侧标签宽度不一导致控件起始位置参差、
-     缩放框被 hexpand 拉满。改用 GtkGrid 三列 + GtkSizeGroup 统一列宽。 -->
+     缩放框被 hexpand 拉满。改用 GtkGrid 三列 + GtkSizeGroup 统一列宽。
+     文件名的「原地调整」放在第 0 列，与「追加」左边缘对齐。 -->
 <interface>
   <requires lib="gtk" version="4.0"/>
   <object class="GtkAdjustment" id="adjustment1">
@@ -40,6 +41,7 @@
       <widget name="target_size_spinbutton"/>
     </widgets>
   </object>
+  <!-- 宽/高标签等宽，使两个输入框左边缘对齐 -->
   <object class="GtkSizeGroup" id="sizegroup_wh_label">
     <property name="mode">horizontal</property>
     <widgets>
@@ -349,9 +351,9 @@
                     <property name="use_underline">1</property>
                     <property name="group">append_radiobutton</property>
                     <layout>
-                      <property name="column">1</property>
+                      <property name="column">0</property>
                       <property name="row">8</property>
-                      <property name="column-span">2</property>
+                      <property name="column-span">3</property>
                     </layout>
                   </object>
                 </child>

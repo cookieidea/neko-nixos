@@ -111,10 +111,10 @@ msgid "_Rotate"
 msgstr "旋转(_R)"
 
 msgid ".resized"
-msgstr ".已调整大小"
+msgstr ".resized"
 
 msgid ".rotated"
-msgstr ".已旋转"
+msgstr ".rotated"
 
 msgid "<b>Filename</b>"
 msgstr "<b>文件名</b>"
@@ -123,7 +123,7 @@ msgid "<b>Image Size</b>"
 msgstr "<b>图片大小</b>"
 
 msgid "Append"
-msgstr "追加到文件名"
+msgstr "追加"
 
 msgid "Custom size:"
 msgstr "自定义大小："
@@ -153,7 +153,7 @@ msgid "pixels"
 msgstr "像素"
 
 msgid "to file title"
-msgstr "追加到文件名"
+msgstr "到文件名末尾"
 
 # ── 尺寸下拉框数值（保持原样，仅占位）──
 msgid "96x96"

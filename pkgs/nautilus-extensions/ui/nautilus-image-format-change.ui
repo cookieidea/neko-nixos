@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- 布局修正版：GtkGrid + GtkSizeGroup 统一列宽，见 resize.ui 说明。 -->
 <interface>
   <requires lib="gtk" version="4.0"/>
   <object class="GtkDialog" id="format_dialog">
