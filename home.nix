@@ -625,6 +625,26 @@ SCANSCRIPT
     ".face".source = ./dotfiles/avatar.png;
     # ── fastfetch logo 图片（kitty 图像协议；配置引用 ~/.local/share/fastfetch/NixOS.png）──
     ".local/share/fastfetch/NixOS.png".source = ./dotfiles/config/fastfetch/NixOS.png;
+    # ── 用户目录映射（nautilus 侧栏/模板目录定位，XDG_TEMPLATES_DIR=~/Templates）──
+    ".config/user-dirs.dirs" = {
+      force = true;
+      text = ''
+        XDG_DESKTOP_DIR="$HOME/Desktop"
+        XDG_DOCUMENTS_DIR="$HOME/Documents"
+        XDG_DOWNLOAD_DIR="$HOME/Downloads"
+        XDG_MUSIC_DIR="$HOME/Music"
+        XDG_PICTURES_DIR="$HOME/Pictures"
+        XDG_PUBLICSHARE_DIR="$HOME/Public"
+        XDG_TEMPLATES_DIR="$HOME/Templates"
+        XDG_VIDEOS_DIR="$HOME/Videos"
+      '';
+    };
+    # ── 新建文档模板（XDG_TEMPLATES_DIR=~/Templates；nautilus 右键「新建文档」读取）──
+    "Templates/空白文本.txt" = { force = true; text = ""; };
+    "Templates/空白文档.md" = { force = true; text = ""; };
+    "Templates/空白文档.yaml" = { force = true; text = ""; };
+    "Templates/空白文档.json" = { force = true; text = ""; };
+    "Templates/空白文档.sh" = { force = true; text = "#!/usr/bin/env bash\n"; executable = true; };
     # ── Neovim wrapper 菜单条目修复 ──
     # nixvim 构建的 neovim 自带 nvim.desktop（Terminal=true，图形启动器打不开）。
     # flake overlay 覆盖不到 nixvim（它用自己 pin 的 nixpkgs 构建）→ 用用户级
