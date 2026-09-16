@@ -125,6 +125,14 @@ in
     uv                                        # uv（现代 Python 包/虚拟环境管理器）
     rustc                                     # rust 编译器
     cargo                                     # cargo 构建系统（CARGO_HOME=~/.cargo）
+    rustfmt                                   # rust 格式化（cargo fmt 调用）
+    go                                        # go 工具链（含 gofmt）
+    gcc                                       # gcc/g++/ld/as/ar/nm/objdump/strip 等
+    gnumake                                   # make
+    pkg-config                                # 编译时查找库的 Cflags/Libs
+    patchelf                                  # 改 ELF 的 interpreter/rpath（Nix 生态常用）
+    gh                                        # GitHub CLI（推送流程靠它取 token）
+    glib                                      # gio/gsettings/gdbus (CLI 工具)
     nodejs_22                                 # Node.js 22 LTS（含 npm）
     pnpm                                      # pnpm（dsh 插件管理）
     llm-agents-nix.packages.${system}.dsh      # DeepSeek Harness（AI agent 框架）
