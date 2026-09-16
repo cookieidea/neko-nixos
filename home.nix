@@ -662,7 +662,7 @@ SCANSCRIPT
       Type=Application
       Terminal=false
       Categories=Utility;TextEditor;Development;
-      MimeType=text/plain;text/x-makefile;application/x-shellscript;text/x-c;text/x-c++src;text/markdown;application/json;text/x-yaml;application/yaml;text/yaml;application/x-yaml;
+      MimeType=text/plain;text/x-makefile;application/x-shellscript;text/x-c;text/x-c++src;text/markdown;application/json;text/x-yaml;application/yaml;text/yaml;application/x-yaml;application/x-zerosize;
       StartupNotify=false
       '';
     };

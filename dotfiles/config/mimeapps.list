@@ -28,6 +28,7 @@ text/markdown=nvim.desktop
 application/json=nvim.desktop
 text/x-yaml=nvim.desktop
 application/yaml=nvim.desktop
+application/x-zerosize=nvim.desktop
 x-scheme-handler/lunarclient=lunarclient.desktop
 x-scheme-handler/discord-562286213059444737=lunarclient.desktop
 
@@ -41,6 +42,7 @@ text/markdown=nvim.desktop;
 application/json=nvim.desktop;
 text/x-yaml=nvim.desktop;
 application/yaml=nvim.desktop;
+application/x-zerosize=nvim.desktop;
 audio/mpeg=mpv.desktop;
 audio/ogg=mpv.desktop;
 audio/opus=mpv.desktop;
