@@ -63,8 +63,10 @@ in
     # SDL3 等 dlopen）需 libstdc++（gcc.lib）——见 hmcl wrapper 注释
     LD_LIBRARY_PATH = "${pkgs.systemdLibs}/lib:/nix/store/zcqp398mxlw62jl02sx0rsc7gvcl1qhc-pipewire-1.6.6-jack/lib:${pkgs.stdenv.cc.cc.lib}/lib";
     JAVA_HOME = "${pkgs.zulu25}";
-    # gtk3 schema 路径（否则 kdenlive 等 GTK 选择器 abort）
-    GSETTINGS_SCHEMA_DIR = "${pkgs.gtk3}/share/gsettings-schemas/${pkgs.gtk3.name}/glib-2.0/schemas";
+    # gsettings schema 路径（冒号分隔多目录）：
+    # - gtk3：否则 kdenlive 等 GTK 选择器 abort
+    # - gsettings-desktop-schemas：org.gnome.desktop.interface 等（gsettings CLI 查询需要）
+    GSETTINGS_SCHEMA_DIR = "${pkgs.gtk3}/share/gsettings-schemas/${pkgs.gtk3.name}/glib-2.0/schemas:${pkgs.gsettings-desktop-schemas}/share/gsettings-schemas/${pkgs.gsettings-desktop-schemas.name}/glib-2.0/schemas";
     CARGO_HOME = "$HOME/.cargo";
   };
   home.packages = with pkgs; [
