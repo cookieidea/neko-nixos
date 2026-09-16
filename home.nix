@@ -1,5 +1,5 @@
 # Home Manager 用户配置（桌面 niri + Noctalia；编辑器 CookNixvim）
-{ config, pkgs, lib, desktop, username, cooknixvim, opencode, bili-danmaku-tui, selfPackages, noctalia, bestclient, mark-shot, ... }:
+{ config, pkgs, lib, desktop, username, cooknixvim, opencode, bili-danmaku-tui, selfPackages, noctalia, bestclient, mark-shot, llm-agents-nix, ... }:
 
 let
   mpvRife = pkgs.mpv.override {
@@ -127,6 +127,7 @@ in
     rustc                                     # rust 编译器
     cargo                                     # cargo 构建系统（CARGO_HOME=~/.cargo）
     nodejs_22                                 # Node.js 22 LTS（含 npm）
+    llm-agents-nix.packages.${system}.dsh      # DeepSeek Harness（AI agent 框架）
     docker-compose                            # docker compose（配合 virtualisation.docker）
 
     # --- 原 AUR 包 ---
