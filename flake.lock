@@ -294,11 +294,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1787377438,
-        "narHash": "sha256-Sxu1NLTD/Ern6hFGLlZmtKCSct3YQXZI/lls8RE1XeM=",
+        "lastModified": 1789267039,
+        "narHash": "sha256-LWiBv9yAYFi2LPbUhDGHPGKYskJQjj2fw12OlyO1uQo=",
         "ref": "release-26.05",
-        "rev": "65258d5c65a250189fde2e35f490d15e064c4c62",
-        "revCount": 6829,
+        "rev": "ec172013fa62135f58fb58dd17ae9651e8f39727",
+        "revCount": 6835,
         "type": "git",
         "url": "https://gitcode.com/nix-community/home-manager.git"
       },
@@ -319,11 +319,11 @@
         "treefmt-nix": "treefmt-nix"
       },
       "locked": {
-        "lastModified": 1789516709,
-        "narHash": "sha256-MPybPPMSKAifdOZenHVet/DbPS90qEFjAnxbWbuWWaw=",
+        "lastModified": 1789535734,
+        "narHash": "sha256-56CO4AuizC/1s7w0U+FSAGo8rXBYs+8YXKEz9mcca/0=",
         "owner": "numtide",
         "repo": "llm-agents.nix",
-        "rev": "8e90867b4e619db0cf41d310d88ecb58470d7c1c",
+        "rev": "bf74a12e8ec079637913289e245d9055d5cfc95b",
         "type": "github"
       },
       "original": {
@@ -454,10 +454,10 @@
     },
     "nixpkgs_4": {
       "locked": {
-        "lastModified": 1789114715,
-        "narHash": "sha256-ugpsyk3NM2s87vXfUiIIiibbJ4Pp0JPS5p/3mfs+q+c=",
+        "lastModified": 1789344334,
+        "narHash": "sha256-vdhpDJ3Lr24lkZ+fDCjmBRRtw9/vcSzkqGJOJyF5h2U=",
         "ref": "nixos-26.05",
-        "rev": "21a67dc470149f337cecafbe965d8d252a390518",
+        "rev": "c3eea5b2156db11c7eeeada3dc737711255b253e",
         "shallow": true,
         "type": "git",
         "url": "https://mirrors.nju.edu.cn/git/nixpkgs.git"
@@ -523,11 +523,11 @@
         "nixpkgs": "nixpkgs_5"
       },
       "locked": {
-        "lastModified": 1789344529,
-        "narHash": "sha256-vZ0K+5Par33Omh1z1iRAXEvS4m0/jIb6S6aflJjyUVE=",
+        "lastModified": 1789436433,
+        "narHash": "sha256-/Dy5P/7nCIss+uAhdF+8I59ww5WQUF4EBs1QJCB1aec=",
         "ref": "cachix",
-        "rev": "5d66d118861fedcbe039d9d04d06904cced40613",
-        "revCount": 5538,
+        "rev": "e4eb0ff97743c1d07d0f5a0d5770b277b6485b03",
+        "revCount": 5545,
         "type": "git",
         "url": "https://github.com/noctalia-dev/noctalia.git"
       },
@@ -544,11 +544,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1789303379,
-        "narHash": "sha256-nhg21B4QdKaEA/dNExGPDiNfRYv8tQ7hHTGOajMNVH4=",
+        "lastModified": 1789367673,
+        "narHash": "sha256-EUAnyaH/qpAaNWrgtARuPK7Lnow2kwnZBwnQDmsIERU=",
         "ref": "main",
-        "rev": "abdbee2bd7dc6e5a9b68219d2336ef286354abfb",
-        "revCount": 241,
+        "rev": "d9fe1d7851464a923020d39efae8a6e3561f0d63",
+        "revCount": 243,
         "type": "git",
         "url": "https://github.com/noctalia-dev/noctalia-greeter"
       },
