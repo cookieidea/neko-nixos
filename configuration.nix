@@ -109,8 +109,14 @@
     "split_lock_mitigate=0" "amdgpu.ppfeaturemask=0xffffffff" "clearcpuid=514" ];
 
   networking.hostName = "ATRI";
-  # 防火墙：暂时关闭（用户要求）。曾开启时的放行清单见 git 历史 8283a79。
-  networking.firewall.enable = false;
+  # 防火墙：默认拒绝入站。Sunshine（openFirewall=true）等已声明端口的服务会自动放行。
+  # MC 联机：13960 TCP+UDP（用户指定）。SSH 由 NixOS 默认放行（22）。
+  # workbuddy2api(7863) / dsh(3080) 只监听回环，无需放行。
+  networking.firewall = {
+    enable = true;
+    allowedTCPPorts = [ 13960 ];
+    allowedUDPPorts = [ 13960 ];
+  };
   networking.networkmanager.enable = true;
   # DNS：腾讯 DNSPod；dns="none" 让 nameservers 静态写入（不被 DHCP 覆盖）
   networking.networkmanager.dns = "none";
