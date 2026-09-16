@@ -109,7 +109,6 @@ in
     timg
     bat
     btop                                      # btop（DE 无关，常驻）
-    ripgrep                                   # ripgrep（原 LazyVim/neovim 生态搜索工具）
     fd                                        # fd（find 替代，neovim/telescope 生态常用）
 
     # --- 编辑器 ---
