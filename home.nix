@@ -127,6 +127,7 @@ in
     rustc                                     # rust 编译器
     cargo                                     # cargo 构建系统（CARGO_HOME=~/.cargo）
     nodejs_22                                 # Node.js 22 LTS（含 npm）
+    pnpm                                      # pnpm（dsh 插件管理）
     llm-agents-nix.packages.${system}.dsh      # DeepSeek Harness（AI agent 框架）
     docker-compose                            # docker compose（配合 virtualisation.docker）
 
