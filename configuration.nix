@@ -110,11 +110,11 @@
 
   networking.hostName = "ATRI";
   # 防火墙：默认拒绝入站。Sunshine（openFirewall=true）等已声明端口的服务会自动放行。
-  # MC 联机：13960 TCP+UDP（用户指定）。SSH 由 NixOS 默认放行（22）。
+  # MC 联机：13960 TCP+UDP（用户指定）。3081 = dsh web 第二实例（用户指定放行）。
   # workbuddy2api(7863) / dsh(3080) 只监听回环，无需放行。
   networking.firewall = {
     enable = true;
-    allowedTCPPorts = [ 13960 ];
+    allowedTCPPorts = [ 13960 3081 ];
     allowedUDPPorts = [ 13960 ];
   };
   networking.networkmanager.enable = true;
