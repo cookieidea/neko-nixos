@@ -924,25 +924,11 @@ SCANSCRIPT
     indicator = true;
   };
 
-  # ── gvfs 守护（Thunar/Nautilus 的回收站/挂载/远程文件支持）──
-  # 本版 home-manager 无 services.gvfs 模块，改用 systemd.user 显式启用 gvfs 单元。
-  systemd.user.services = {
-    gvfs-daemon = {
-      Unit = { Description = "Virtual filesystem service"; PartOf = [ "graphical-session.target" ]; };
-      Service = { ExecStart = "${pkgs.gvfs}/libexec/gvfsd"; Type = "dbus"; BusName = "org.gtk.vfs.Daemon"; };
-      Install.WantedBy = [ "graphical-session.target" ];
-    };
-    gvfs-udisks2-volume-monitor = {
-      Unit = { Description = "Virtual filesystem service - disk device monitor"; PartOf = [ "graphical-session.target" ]; };
-      Service = { ExecStart = "${pkgs.gvfs}/libexec/gvfs-udisks2-volume-monitor"; };
-      Install.WantedBy = [ "graphical-session.target" ];
-    };
-    gvfs-metadata = {
-      Unit = { Description = "Virtual filesystem metadata service"; PartOf = [ "graphical-session.target" ]; };
-      Service = { ExecStart = "${pkgs.gvfs}/libexec/gvfsd-metadata"; };
-      Install.WantedBy = [ "graphical-session.target" ];
-    };
-  };
+  # ── gvfs 已移至系统层（configuration.nix `services.gvfs.enable`）──
+  # 原因：polkitd 只扫描系统路径，而 gvfs 的 polkit policy
+  # （org.gtk.vfs.file-operations）必须在那里注册，否则文件管理器进 /root 报
+  # "Action ... is not registered"。该模块同时提供 gvfsd/metadata/volume-monitor
+  # 等 systemd user 单元与 GIO_EXTRA_MODULES，此处不再重复声明。
 
   # ── GTK 主题/图标（noctalia launcher、GTK 应用图标解析依赖 freedesktop 主题）──
   # 由 home-manager gtk 模块全权写 settings.ini（不部署 dotfiles 的 settings.ini，
