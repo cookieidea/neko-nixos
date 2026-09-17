@@ -911,6 +911,16 @@ SCANSCRIPT
 
   services.polkit-gnome.enable = true;   # polkit 认证代理
 
+  # ── KDE Connect（手机 ↔ 电脑：文件互传/剪贴板同步/媒体控制/通知转发）──
+  # 走 HM 模块而非 NixOS programs.kdeconnect：niri 不是 Plasma，不读 XDG autostart，
+  # 需要 HM 生成的 systemd user 单元（kdeconnectd 挂 graphical-session.target）才能自启。
+  # indicator 依赖 tray.target → Noctalia 实现了 StatusNotifierWatcher，托盘图标可用。
+  # 防火墙端口范围在 configuration.nix（HM 管不到系统防火墙）。
+  services.kdeconnect = {
+    enable = true;
+    indicator = true;
+  };
+
   # ── gvfs 守护（Thunar/Nautilus 的回收站/挂载/远程文件支持）──
   # 本版 home-manager 无 services.gvfs 模块，改用 systemd.user 显式启用 gvfs 单元。
   systemd.user.services = {
