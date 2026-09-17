@@ -336,11 +336,11 @@
         "treefmt-nix": "treefmt-nix"
       },
       "locked": {
-        "lastModified": 1789535734,
-        "narHash": "sha256-56CO4AuizC/1s7w0U+FSAGo8rXBYs+8YXKEz9mcca/0=",
+        "lastModified": 1789617213,
+        "narHash": "sha256-bVHFzwXsGqbR6JUoiUtGE6SxN8z7yZgHE+1WBUpn3i8=",
         "owner": "numtide",
         "repo": "llm-agents.nix",
-        "rev": "bf74a12e8ec079637913289e245d9055d5cfc95b",
+        "rev": "8116299652f09749a0e1b8780cc4a6b4b5e85897",
         "type": "github"
       },
       "original": {
@@ -471,10 +471,10 @@
     },
     "nixpkgs_4": {
       "locked": {
-        "lastModified": 1789344334,
-        "narHash": "sha256-vdhpDJ3Lr24lkZ+fDCjmBRRtw9/vcSzkqGJOJyF5h2U=",
+        "lastModified": 1789459628,
+        "narHash": "sha256-JOaadoI/IC9qEvwlnjwAhwdcWkCDqEeOJ+cOtUH/8RQ=",
         "ref": "nixos-26.05",
-        "rev": "c3eea5b2156db11c7eeeada3dc737711255b253e",
+        "rev": "b67c7a60c3732edd4b947a7df8af06215851a614",
         "shallow": true,
         "type": "git",
         "url": "https://mirrors.nju.edu.cn/git/nixpkgs.git"
@@ -540,11 +540,11 @@
         "nixpkgs": "nixpkgs_5"
       },
       "locked": {
-        "lastModified": 1789436433,
-        "narHash": "sha256-/Dy5P/7nCIss+uAhdF+8I59ww5WQUF4EBs1QJCB1aec=",
+        "lastModified": 1789611680,
+        "narHash": "sha256-obiNV+juEjUYDDusgYQukjLyoVsJJPmYppmjvIEfkSg=",
         "ref": "cachix",
-        "rev": "e4eb0ff97743c1d07d0f5a0d5770b277b6485b03",
-        "revCount": 5545,
+        "rev": "8c52cb71b5bcafbf67bfb8e659f1fc45f882a008",
+        "revCount": 5554,
         "type": "git",
         "url": "https://github.com/noctalia-dev/noctalia.git"
       },
