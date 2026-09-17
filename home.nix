@@ -26,6 +26,20 @@ let
   seedMangoHud      = builtins.toString ./dotfiles/config/MangoHud/MangoHud.conf;
   seedWallpaperDir   = builtins.toString ./dotfiles/Pictures/Wallpapers;
   seedWallpaperVideo = builtins.toString ./dotfiles/Pictures/Wallpapers/video/hatsune-miku.mp4;
+  # Lunar Client 的 SDL 强制原生 Wayland。niri 26.04 没有实现 wp_fifo_manager_v1，
+  # SDL3 检出后为「GPU 性能」自动改走 XWayland，而 XWayland 下取不到 OpenGL 函数
+  # → 游戏启动即崩（BackendCreationException: Could not retrieve OpenGL functions）。
+  # 与上面 hmcl 同一个坑、同一个解法；包本体不改，只在外层包一层设环境变量。
+  lunarclientWayland = pkgs.symlinkJoin {
+    name = "lunar-client-wayland";
+    paths = [ pkgs.lunar-client ];
+    nativeBuildInputs = [ pkgs.makeWrapper ];
+    postBuild = ''
+      rm -f $out/bin/lunarclient
+      makeWrapper ${pkgs.lunar-client}/bin/lunarclient $out/bin/lunarclient \
+        --set SDL_VIDEO_DRIVER wayland
+    '';
+  };
   xdgOpenWithGio = pkgs.writeShellScriptBin "xdg-open" ''
     for arg in "$@"; do
       case "$arg" in
@@ -150,7 +164,7 @@ in
 
     # --- 游戏 / 影音客户端 ---
     # prismlauncher → hmcl（nixpkgs）
-    lunar-client
+    lunarclientWayland                       # lunar-client + SDL_VIDEO_DRIVER=wayland（见上方 let 块）
     # BestClient（DDNet fork，官方 flake 预编译包；nixpkgs 的 ddnet/无此包）
     bestclient.packages.${pkgs.stdenv.hostPlatform.system}.default
 
