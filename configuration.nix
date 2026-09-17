@@ -76,7 +76,7 @@
   system.stateVersion = "26.05";
 
   # agenix：age 加密 secrets。私钥 /etc/age/key（root only，不入 git）；
-  # 加密文件在 secrets/，收件人公钥清单见 secrets.nix。
+  # 加密文件在 secrets/，收件人公钥清单见 secrets/secrets.nix。
   # 用法：age -r <公钥> -o secrets/foo.age <明文>，然后此处声明
   age.identityPaths = [ "/etc/age/key" ];
   age.secrets."mark-shot-sensitive" = {
@@ -95,7 +95,7 @@
     device = "nodev";
     configurationLimit = 20;
     efiInstallAsRemovable = true;
-    # BlueArchive 主题：yuzu(柚子)/tao(桃)/nagisa(渚)/aris(爱丽丝)/midori(绿)
+    # BlueArchive 主题（aris/爱丽丝）；其余 4 套未用主题已移出仓库
     theme = ./grub-theme/aris/Alice;
   };
   boot.supportedFilesystems = [ "btrfs" ];

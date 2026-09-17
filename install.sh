@@ -124,7 +124,7 @@ if [[ -n "$MNT" ]]; then
   echo "==> 执行 nixos-install --flake $DEST/#$FLAKE_HOST ..."
   nixos-install --flake "$DEST/#$FLAKE_HOST"
   echo ""
-  echo "==> 安装完成！重启即可进入 ly → niri + Noctalia。"
+  echo "==> 安装完成！重启即可进入 greetd → niri + Noctalia。"
   echo "    Astral 首次使用前：进 GUI 连一次自动部署 core，之后跑：sudo setcap cap_net_admin=ep ~/.local/share/astral-core/app/astral-core（否则 TUN 起不来；每次更新 core 都要重跑一次）。"
   echo "    若首次登录密码留空，重启后在 TTY 用 root（或 live 环境）执行：passwd $TARGET_USER"
 else
