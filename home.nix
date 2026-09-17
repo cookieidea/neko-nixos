@@ -1,5 +1,5 @@
 # Home Manager 用户配置（桌面 niri + Noctalia；编辑器 CookNixvim）
-{ config, pkgs, lib, desktop, username, cooknixvim, opencode, bilihud, selfPackages, noctalia, bestclient, mark-shot, llm-agents-nix, ... }:
+{ config, pkgs, lib, desktop, username, cooknixvim, bilihud, selfPackages, noctalia, bestclient, mark-shot, llm-agents-nix, ... }:
 
 let
   mpvRife = pkgs.mpv.override {
@@ -239,11 +239,13 @@ in
     cava                                       # 音频可视化（终端彩蛋，原 04k TERM_PKGS）
   ] ++ [
 
-  # opencode（AI 编程 Agent）走 flake 装，拿最新版（不在 nixpkgs 核心）。
+  # opencode（AI 编程 Agent）：改用 llm-agents.nix 的包（跟 dsh 同源）。
+  # 不用 nixpkgs 的 1.15.10（比在用的 1.18.x 旧，会降级）；llm-agents.nix 跟得更紧。
+  # 用户配置/数据在 ~/.config/opencode 与 ~/.local/share/opencode，与包无关，换包不丢。
   # noctalia-shell（桌面 shell，quickshell 配置 + qs 封装）直接用 nixpkgs 自带的
   # `noctalia-shell` 包，不再用独立的 noctalia v4 应用（见文末注释）。
 
-    opencode.packages.${pkgs.stdenv.hostPlatform.system}.default
+    llm-agents-nix.packages.${system}.opencode
   ]
 
   # 自构建程序（flake 包，见 ./pkgs；对应原 Arch 的 AUR `-git` / 私有仓库）

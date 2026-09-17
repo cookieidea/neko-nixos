@@ -37,10 +37,6 @@
       url = "git+https://github.com/Youthdreamer/CookNixvim";
     };
 
-    opencode = {
-      url = "git+https://github.com/sst/opencode?rev=04284921ac8f657555b5a182f5ff055f471543e4";
-    };
-
     # B 站直播弹幕阅读器（PyQt6 + layer-shell，游戏全屏时浮窗显示）
     # 上游 flake 基于 nixos-unstable；follows 后其打包定义用我们的 nixpkgs 求值
     bilihud = {
@@ -92,7 +88,7 @@
     };
   };
 
-  outputs = { self, nixpkgs, home-manager, cooknixvim, opencode, bilihud, nix-cachyos-kernel, noctalia, noctalia-greeter, agenix, bestclient, astral-bundle, mark-shot, llm-agents-nix, ... }:
+  outputs = { self, nixpkgs, home-manager, cooknixvim, bilihud, nix-cachyos-kernel, noctalia, noctalia-greeter, agenix, bestclient, astral-bundle, mark-shot, llm-agents-nix, ... }:
     let
       system = "x86_64-linux";
       username = "cookie";   # 你的用户名（用于 home 目录 / autoLogin）
@@ -116,7 +112,7 @@
         home-manager.useGlobalPkgs = true;
         home-manager.useUserPackages = true;
         home-manager.users.${username} = import ./home.nix;
-        home-manager.extraSpecialArgs = { inherit desktop username cooknixvim opencode bilihud selfPackages noctalia bestclient mark-shot llm-agents-nix; };
+        home-manager.extraSpecialArgs = { inherit desktop username cooknixvim bilihud selfPackages noctalia bestclient mark-shot llm-agents-nix; };
       };
     in {
       # 暴露自构建派生为 flake 包：可单独 `nix build .#<name>`
