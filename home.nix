@@ -148,6 +148,7 @@ in
     pkg-config                                # 编译时查找库的 Cflags/Libs
     patchelf                                  # 改 ELF 的 interpreter/rpath（Nix 生态常用）
     gh                                        # GitHub CLI（推送流程靠它取 token）
+    lazygit                                   # Git 终端 UI（TUI）
     glib                                      # gio/gsettings/gdbus (CLI 工具)
     nodejs_22                                 # Node.js 22 LTS（含 npm）
     pnpm                                      # pnpm（dsh 插件管理）
