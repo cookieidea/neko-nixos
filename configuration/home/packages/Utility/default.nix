@@ -24,16 +24,6 @@
     selfPackages.splayer-next     # SPlayer-Next
     selfPackages.ab-download-manager  # AB Download Manager（多线程下载器）
     selfPackages.tabby-terminal       # Tabby 终端（Electron，自构建）
-    (pkgs.writeShellScriptBin "hmcl" ''
-      export SDL_VIDEO_DRIVER=wayland
-      export LD_PRELOAD="${pkgs.stdenv.cc.cc.lib}/lib/libstdc++.so.6''${LD_PRELOAD:+:$LD_PRELOAD}"
-      exec ${pkgs.hmcl}/bin/hmcl "$@"
-    '')
-    (pkgs.runCommand "hmcl-assets" { } ''
-      mkdir -p $out/share
-      cp -r ${pkgs.hmcl}/share/applications $out/share/
-      cp -r ${pkgs.hmcl}/share/icons $out/share/
-    '')
     selfPackages.astral               # Astral 组网客户端
     bilihud.packages.${pkgs.stdenv.hostPlatform.system}.default  # B 站直播弹幕阅读器
     cooknixvim.packages.${pkgs.stdenv.hostPlatform.system}.default        # nvim（CookNixvim）
