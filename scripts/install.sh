@@ -75,14 +75,14 @@ fi
 BUNDLE_DIR="/home/$TARGET_USER/.cache/astral/bundle"
 if [[ ! -x "$BUNDLE_DIR/astral" || ! -x "$BUNDLE_DIR/astral-core" ]]; then
   echo "==> Astral bundle 缺失，联网构建（约 20～30 分钟）..."
-  bash "$SRC/packages/astral/build.sh"
+  bash "$SRC/pkgs/astral/build.sh"
   chown -R "$TARGET_USER" "$BUNDLE_DIR"
 else
   echo "==> Astral bundle 已存在，跳过构建。"
 fi
 
-# 这些程序不在 nixpkgs 核心，由 ./packages 里的派生从源码 / 发布构建
-# 这些程序不在 nixpkgs 核心，由 ./packages 里的派生构建。这里先单独构建，便于提前暴露
+# 这些程序不在 nixpkgs 核心，由 ./pkgs 里的派生从源码 / 发布构建
+# 这些程序不在 nixpkgs 核心，由 ./pkgs 里的派生构建。这里先单独构建，便于提前暴露
 # 错误；后续 nixos-install / nixos-rebuild 会复用已构建的结果。
 SELF_PKGS=(niri-sidebar nyxniri-scratch-menu pins shorin-contrib splayer-next ab-download-manager tabby-terminal obs-vdoninja purevox bedrockboot astral)
 echo "==> 预构建自构建程序（flake 包）..."
