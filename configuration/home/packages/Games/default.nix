@@ -21,6 +21,7 @@
       cp -r ${pkgs.hmcl}/share/icons $out/share/
     '')
     selfPackages.bedrockboot          # BedrockBoot（MC 基岩版启动器）
+    prismlauncher                             # PrismLauncher（MC 启动器，多实例/整合包）
     selfPackages.purevox              # PureVox（实时 AI 音频降噪）
   ];
 }
