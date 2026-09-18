@@ -48,7 +48,7 @@ fi
 # ---------- 获取源码 ----------
 echo "==> 获取仓库代码 ..."
 SRC=""
-if [[ -f flake.nix && -d config ]]; then
+if [[ -f flake.nix && -d configuration ]]; then
   SRC="$PWD"                       # 已从仓库内运行，复用当前目录
 else
   SRC="$(mktemp -d)"
@@ -75,14 +75,14 @@ fi
 BUNDLE_DIR="/home/$TARGET_USER/.cache/astral/bundle"
 if [[ ! -x "$BUNDLE_DIR/astral" || ! -x "$BUNDLE_DIR/astral-core" ]]; then
   echo "==> Astral bundle 缺失，联网构建（约 20～30 分钟）..."
-  bash "$SRC/pkgs/astral/build.sh"
+  bash "$SRC/configuration/pkgs/tools/networking/astral/build.sh"
   chown -R "$TARGET_USER" "$BUNDLE_DIR"
 else
   echo "==> Astral bundle 已存在，跳过构建。"
 fi
 
-# 这些程序不在 nixpkgs 核心，由 ./pkgs 里的派生从源码 / 发布构建
-# 这些程序不在 nixpkgs 核心，由 ./pkgs 里的派生构建。这里先单独构建，便于提前暴露
+# 这些程序不在 nixpkgs 核心，由 ./configuration/pkgs 里的派生从源码 / 发布构建
+# 这些程序不在 nixpkgs 核心，由 ./configuration/pkgs 里的派生构建。这里先单独构建，便于提前暴露
 # 错误；后续 nixos-install / nixos-rebuild 会复用已构建的结果。
 SELF_PKGS=(niri-sidebar nyxniri-scratch-menu pins shorin-contrib splayer-next ab-download-manager tabby-terminal obs-vdoninja purevox bedrockboot astral)
 echo "==> 预构建自构建程序（flake 包）..."
@@ -101,12 +101,12 @@ if [[ -n "$MNT" ]]; then
   DEST="$MNT/etc/nixos"
   mkdir -p "$DEST"
   echo "==> 部署到 $DEST ..."
-  # 复制全部；本仓库不含 hardware-configuration.nix，不会覆盖你 generate 出来的那份
+  # 复制全部；本仓库不含 hardware-config，不会覆盖你 generate 出来的那份
   cp -r "$SRC/." "$DEST/"
   rm -rf "$DEST/.git"
 
-  if [[ ! -f "$DEST/hosts/ATRI/hardware-configuration.nix" ]]; then
-    echo "错误：$DEST/hosts/ATRI/hardware-configuration.nix 不存在。" >&2
+  if [[ ! -f "$DEST/configuration/device/hardware/hardware-config.nix" ]]; then
+    echo "错误：$DEST/configuration/device/hardware/hardware-config.nix 不存在。" >&2
     echo "请先在分区并挂载到 $MNT 后运行：  nixos-generate-config --root $MNT" >&2
     echo "（该命令会生成 hardware-configuration.nix，含根分区挂载 / EFI / swap 等）" >&2
     exit 1
@@ -118,7 +118,7 @@ if [[ -n "$MNT" ]]; then
   echo
   if [[ -n "$PW" ]]; then
     esc_pw="$(printf '%s' "$PW" | sed 's/[&/\]/\\&/g')"
-    sed -i "s|# initialPassword = \"changeme\";|initialPassword = \"$esc_pw\";|" "$DEST/hosts/ATRI/configuration.nix"
+    sed -i "s|# initialPassword = \"changeme\";|initialPassword = \"$esc_pw\";|" "$DEST/configuration/ATRI/system.nix"
   fi
 
   echo "==> 执行 nixos-install --flake $DEST/#$FLAKE_HOST ..."
@@ -135,8 +135,8 @@ else
   mkdir -p "$DEST"
   cp -r "$SRC/." "$DEST/"
   rm -rf "$DEST/.git"
-  if [[ ! -f "$DEST/hosts/ATRI/hardware-configuration.nix" ]]; then
-    echo "警告：未找到 $DEST/hosts/ATRI/hardware-configuration.nix。"
+  if [[ ! -f "$DEST/configuration/device/hardware/hardware-config.nix" ]]; then
+    echo "警告：未找到 $DEST/configuration/device/hardware/hardware-config.nix。"
     echo "      若这是全新安装（minimal ISO），请改用：bash install.sh <用户> <挂载点>"
   fi
   echo "==> 执行 nixos-rebuild switch --flake $DEST/#$FLAKE_HOST ..."

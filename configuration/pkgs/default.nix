@@ -1,4 +1,4 @@
-# 自构建包聚合（flake packages + hosts/ATRI/home.nix 安装，`nix build .#<name>` 单独构建）
+# 自构建包聚合（flake packages + configuration/ATRI/home.nix 安装，`nix build .#<name>` 单独构建）
 # rev 固定已知 commit 保可复现，升级改 rev + sha256
 #
 # 按用途分类（参照 yigexuanmu/my-nixos-config 的 pkgs 组织方式）：

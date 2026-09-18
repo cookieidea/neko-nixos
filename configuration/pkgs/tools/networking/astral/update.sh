@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 # Astral 一键更新：查 release → 改 REF → 构建 → 重锁 → rebuild → 换 core → 推缓存 → 提交。
-# 用法：sudo bash pkgs/tools/networking/astral/update.sh [GUI_TAG [CORE_TAG]]
+# 用法：sudo bash configuration/pkgs/tools/networking/astral/update.sh [GUI_TAG [CORE_TAG]]
 #   不给参数则自动取 Astral 最新稳定版，core 版本从 release 正文解析。
 set -euo pipefail
 
 SCRIPT_DIR="$(dirname "$0")"
-REPO_ROOT="$(cd "$SCRIPT_DIR/../../../.." && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/../../../../.." && pwd)"
 TARGET_USER="${SUDO_USER:-cookie}"
 TARGET_HOME="/home/$TARGET_USER"
 TARGET_UID="$(id -u "$TARGET_USER")"

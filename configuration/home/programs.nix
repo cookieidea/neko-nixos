@@ -31,7 +31,7 @@
     noctalia = {
       enable = true;
       systemd.enable = false;
-      settings = ../../config/config/noctalia/config.toml;
+      settings = ./dotfiles/config/noctalia/config.toml;
     };
 
     # ── niri：Wayland 滚动平铺 compositor ────────────────

@@ -95,17 +95,17 @@
       hostname = "ATRI";
       desktop  = "niri";
 
-      # 自构建程序派生（见 ./pkgs）。显式 import nixpkgs 带 allowUnfree（unfree 包评估
+      # 自构建程序派生（见 ./configuration/pkgs）。显式 import nixpkgs 带 allowUnfree（unfree 包评估
       # 需要 nixpkgs.config，legacyPackages 裸实例会拒）；仅作用于 selfPackages。
       pkgs = import nixpkgs {
         inherit system;
         config.allowUnfree = true;
       };
 
-      selfPackages = import ./pkgs { inherit pkgs astral-bundle; };
+      selfPackages = import ./configuration/pkgs { inherit pkgs astral-bundle; };
 
       # home 模块共用绑定（原 home.nix 顶部 let 块）→ 注入为 hmLib
-      hmLib = import ./modules/home/lib.nix { inherit pkgs selfPackages; };
+      hmLib = import ./configuration/home/lib.nix { inherit pkgs selfPackages; };
 
       hmModule = {
         imports = [ home-manager.nixosModules.home-manager ];
@@ -114,7 +114,7 @@
 
         home-manager.useGlobalPkgs = true;
         home-manager.useUserPackages = true;
-        home-manager.users.${username} = import ./hosts/ATRI/home.nix;
+        home-manager.users.${username} = import ./configuration/ATRI/home.nix;
         home-manager.extraSpecialArgs = { inherit desktop username cooknixvim bilihud selfPackages noctalia bestclient mark-shot llm-agents-nix hmLib; };
       };
     in {
@@ -122,13 +122,12 @@
       packages.${system} = selfPackages;
 
       nixosConfigurations = {
-        # 实体机；hardware-configuration.nix 需 git add 后才会被 flake 包含
+        # 实体机；硬件配置见 configuration/device/hardware/hardware-config.nix（需 git add）
         ${hostname} = nixpkgs.lib.nixosSystem {
           inherit system;
           specialArgs = { inherit noctalia-greeter; };
           modules = [
-            ./hosts/ATRI/hardware-configuration.nix
-            ./hosts/ATRI/configuration.nix
+            ./configuration/ATRI/system.nix
             hmModule
             agenix.nixosModules.default
             # CachyOS 内核 overlay（pinned 命中缓存）+ 修 nvim.desktop：

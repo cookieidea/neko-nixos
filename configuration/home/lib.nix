@@ -25,12 +25,12 @@ rec {
   };
 
   # 可写种子源（store 路径，供 activation 脚本复制出可写真实文件）
-  seedKittyTheme     = builtins.toString ../../config/config/kitty/themes/noctalia.conf;
-  seedNoctaliaConfig = builtins.toString ../../config/config/noctalia/config.toml;
-  seedStarship       = builtins.toString ../../config/config/starship.toml;
-  seedMangoHud       = builtins.toString ../../config/config/MangoHud/MangoHud.conf;
-  seedWallpaperDir   = builtins.toString ../../config/Pictures/Wallpapers;
-  seedWallpaperVideo = builtins.toString ../../config/Pictures/Wallpapers/video/hatsune-miku.mp4;
+  seedKittyTheme     = builtins.toString ./dotfiles/config/kitty/themes/noctalia.conf;
+  seedNoctaliaConfig = builtins.toString ./dotfiles/config/noctalia/config.toml;
+  seedStarship       = builtins.toString ./dotfiles/config/starship.toml;
+  seedMangoHud       = builtins.toString ./dotfiles/config/MangoHud/MangoHud.conf;
+  seedWallpaperDir   = builtins.toString ./dotfiles/Pictures/Wallpapers;
+  seedWallpaperVideo = builtins.toString ./dotfiles/Pictures/Wallpapers/video/hatsune-miku.mp4;
 
   # Lunar Client 的 SDL 强制原生 Wayland。niri 26.04 没有实现 wp_fifo_manager_v1，
   # SDL3 检出后为「GPU 性能」自动改走 XWayland，而 XWayland 下取不到 OpenGL 函数

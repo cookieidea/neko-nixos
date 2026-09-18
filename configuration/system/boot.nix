@@ -18,7 +18,7 @@
     efiInstallAsRemovable = true;
     # BlueArchive 主题（aris/爱丽丝）；其余 4 套未用主题已移出仓库
     # 注意：本文件在 modules/system/ 下，相对路径需回退两级到仓库根
-    theme = ../../assets/grub-theme/aris/Alice;
+    theme = ../assets/grub-theme/aris/Alice;
   };
   boot.supportedFilesystems = [ "btrfs" ];
   boot.initrd.supportedFilesystems = [ "btrfs" ];
