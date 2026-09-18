@@ -2,6 +2,8 @@
 { hmLib, pkgs, username, selfPackages, ... }:
 
 {
+  imports = [ ./systemd.nix ];
+
   home.username = username;
   home.homeDirectory = "/home/${username}";
   home.stateVersion = "26.05";

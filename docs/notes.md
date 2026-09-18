@@ -27,6 +27,32 @@
   - `gtk-3.0/settings.ini`（HM `gtk` 模块负责写）
   - `gtk-*/noctalia.css`、`fuzzel/themes/noctalia`（Noctalia 模板生成）
 
+### `home.file` 与 `xdg.configFile` 的键不要混
+
+两个选项的键都是**相对家目录**的路径，规则不同：
+
+| 选项 | 键的相对基准 | 例 |
+| --- | --- | --- |
+| `home.file` | `$HOME` | `".local/share/applications/qq.desktop"` |
+| `xdg.configFile` | `$HOME/.config` | `"mpv/mpv.conf"` |
+
+把 `home.file` 风格的键（以 `.local/`、`.config/` 开头）误写进 `xdg.configFile`
+会落到 `~/.config/.local/...`、`~/.config/.config/...`（实测踩过两次），
+程序读不到、还留下垃圾目录。改完可用这条自查：
+
+```bash
+grep -nE '^\s+"\.' configuration/home/xdg/default.nix   # 应为空
+```
+
+### fish 插件
+
+用 `programs.fish.plugins` 声明式管理（原 `fish_plugins` 文件 + fisher 已移除）。
+注意选项类型是 `{ name, src }` 列表，**要取 `.src` 而不是直接给包**：
+
+```nix
+plugins = [ { name = "autopair"; src = pkgs.fishPlugins.autopair.src; } ];
+```
+
 ### activation 三兄弟
 
 | 脚本 | 作用 |

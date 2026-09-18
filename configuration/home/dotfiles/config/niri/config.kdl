@@ -80,8 +80,6 @@ xwayland-satellite {
 // 设置会话类环境变量（NixOS 上 systemctl 可用）
 spawn-sh-at-startup "systemctl --user set-environment XDG_SESSION_CLASS=user"
 
-// 截图音效守护进程（SHORiN 私有脚本）
-spawn-at-startup "~/.config/niri/scripts/screenshot-sound.sh"
 
 // 视频壁纸：由 Noctalia V5 的 noctalia/mpvpaper 插件管理（config.toml 里
 // video_directory 指向 ~/Pictures/Wallpapers/video），不再直接 spawn mpvpaper。
