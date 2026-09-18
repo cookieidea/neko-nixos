@@ -2,7 +2,6 @@
 { pkgs, ... }:
 
 {
-  # btrfs + snapper 快照（@snapshots 独立子卷）
   services.snapper = {
     # 每次开机产生一个 boot 快照
     snapshotRootOnBoot = true;

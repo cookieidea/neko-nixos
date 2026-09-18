@@ -2,7 +2,7 @@
 { pkgs, ... }:
 
 {
-  # 指定 package 与 home.nix 的 GIO_EXTRA_MODULES 同源
+  # 与 home.nix 的 GIO_EXTRA_MODULES 用同一个 gvfs
   services.gvfs = {
     enable = true;
     package = pkgs.gvfs;

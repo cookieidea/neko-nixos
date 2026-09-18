@@ -19,7 +19,7 @@
     "nekobox.cachix.org-1:bRpp0vZK2Uq/vnydXC+uuOmFJW3W6fN4PI5PDy4iD+s="
   ];
   nixpkgs.config = {
-    allowUnfree = true;   # steam / wechat-uos / 部分驱动需要
+    allowUnfree = true;   # 允许非自由软件（steam/wechat-uos 等）
     rocmSupport = true;   # ROCm/HIP GPU 计算
   };
 

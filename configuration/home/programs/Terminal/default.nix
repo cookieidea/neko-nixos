@@ -8,12 +8,12 @@
     eza
     zoxide
     bat
-    btop                                      # btop（DE 无关，常驻）
+    btop
     yazi
-    fd                                        # fd（find 替代，neovim/telescope 生态常用）
+    fd                                        # fd（find 替代）
     fastfetch
     timg
-    cava                                       # 音频可视化（终端彩蛋，原 04k TERM_PKGS）
-    cmatrix lolcat sl                          # 彩蛋趣味命令（原 02b 安装）
+    cava                                       # 音频可视化
+    cmatrix lolcat sl                          # 彩蛋趣味命令
   ];
 }

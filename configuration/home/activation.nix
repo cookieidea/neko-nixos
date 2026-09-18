@@ -2,17 +2,7 @@
 { hmLib, pkgs, config, lib, username, selfPackages, ... }:
 
 {
-  # ============================================================
-  #  Noctalia V5 迁移所需的可写 seed
-  # ============================================================
-  # 1) niri/effects.kdl 软链接：config.kdl `include "effects.kdl"`，由
-  #    toggle-eyecare.sh 在普通/护眼模式间切换。首次缺失时建为 Normal。
-  # 2) kitty/current-theme.conf：由 Noctalia kitty 模板生成（写色），只读
-  #    symlink 会挡住写入 → 首次缺失时种子写入一个可写真实文件。
-# 3) noctalia-config.toml（V5 读 ~/.config/noctalia/config.toml）：programs.noctalia.settings
-    #    部署的是只读 store symlink，而 V5 设置面板会回写该文件 → 复制为可写真实文件。
-  # 4) starship.toml：palette 段由 Noctalia starship 模板重写 → 复制为可写。
-  # 均仅在文件缺失/是 store 链接时执行，不覆盖用户运行期修改。
+  # Noctalia V5 可写 seed（文件缺失或是 store 链接时复制）
   home.activation.noctaliaV5Seed = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     NIRI_DIR="$HOME/.config/niri"
     KITTY_DIR="$HOME/.config/kitty"
@@ -52,7 +42,7 @@
     fi
   '';
 
-  # ── 壁纸真实文件（不用软链：GC 会删旧 store 路径导致断链）──
+  # 壁纸真实文件（不用软链）
   home.activation.wallpaperRealFiles = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     WP="$HOME/Pictures/Wallpapers"
     for f in wallhaven-d88d53.png wallhaven-yq8w67.jpg; do
@@ -72,7 +62,7 @@
     done
   '';
 
-  # mark-shot OCR + 扫码 venv 自动初始化
+  # mark-shot OCR + 扫码 venv
   home.activation.markShotSetup = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     MARK="$HOME/.local/share/mark-shot"
     OCR_VENV="$MARK/ocr-venv"

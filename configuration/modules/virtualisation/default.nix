@@ -2,8 +2,8 @@
 { pkgs, ... }:
 
 {
-  programs.gamemode.enable = true; # gamemoderun 系统服务（游戏性能优化）
-  programs.nix-ld.enable = true;   # 跑预编译二进制（游戏/工具的 patchelf 兜底）
+  programs.gamemode.enable = true; # 游戏性能优化服务
+  programs.nix-ld.enable = true;   # 跑预编译二进制
   programs.nix-ld.libraries = with pkgs; [
     stdenv.cc.cc.lib     # libstdc++.so.6
     zlib                  # libz.so.1
@@ -14,7 +14,7 @@
   ];
 
   programs.steam.enable = true;
-  # Steam 中文字体（用静态 sarasa）
+  # Steam 中文字体
   programs.steam.fontPackages = with pkgs; [ sarasa-gothic ];
   # GE-Proton
   programs.steam.extraCompatPackages = with pkgs; [ proton-ge-bin ];

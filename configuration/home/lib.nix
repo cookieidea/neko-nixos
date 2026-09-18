@@ -1,11 +1,8 @@
-# home.nix 拆分后各模块共用的 let 绑定（原 home.nix 顶部的 let 块）
-#
-# 通过 flake.nix 的 home-manager.extraSpecialArgs 注入为 `hmLib`，各 home 模块
-# 在参数里 `hmLib, ...` 取用。这样各段正文保持原样（只改 ./ → ../../ 路径）。
+# home 模块共用的 let 绑定（经 flake.nix extraSpecialArgs 注入为 hmLib）
 { pkgs, selfPackages }:
 
 rec {
-  # mpv + RIFE 补帧（VapourSynth；k7sfunc 需要 luajit + vapoursynth 支持）
+  # mpv + RIFE 补帧（VapourSynth）
   mpvRife = pkgs.mpv.override {
     mpv-unwrapped = pkgs.mpv-unwrapped.override {
       lua = pkgs.luajit;
@@ -24,7 +21,7 @@ rec {
     '';
   };
 
-  # 可写种子源（store 路径，供 activation 脚本复制出可写真实文件）
+  # 可写种子源（activation 复制用）
   seedKittyTheme     = builtins.toString ./dotfiles/config/kitty/themes/noctalia.conf;
   seedNoctaliaConfig = builtins.toString ./dotfiles/config/noctalia/config.toml;
   seedStarship       = builtins.toString ./dotfiles/config/starship.toml;
@@ -32,10 +29,7 @@ rec {
   seedWallpaperDir   = builtins.toString ./dotfiles/Pictures/Wallpapers;
   seedWallpaperVideo = builtins.toString ./dotfiles/Pictures/Wallpapers/video/hatsune-miku.mp4;
 
-  # Lunar Client 的 SDL 强制原生 Wayland。niri 26.04 没有实现 wp_fifo_manager_v1，
-  # SDL3 检出后为「GPU 性能」自动改走 XWayland，而 XWayland 下取不到 OpenGL 函数
-  # → 游戏启动即崩（BackendCreationException: Could not retrieve OpenGL functions）。
-  # 与 hmcl 同一个坑、同一个解法；包本体不改，只在外层包一层设环境变量。
+  # Lunar Client 强制 SDL 原生 Wayland（niri 下走 XWayland 会崩）
   lunarclientWayland = pkgs.symlinkJoin {
     name = "lunar-client-wayland";
     paths = [ pkgs.lunar-client ];
@@ -47,7 +41,7 @@ rec {
     '';
   };
 
-  # trash:// 等 gvfs URI 交给 gio（原 xdg-open 不认这些 scheme）
+  # trash:// 等 gvfs URI 交给 gio
   xdgOpenWithGio = pkgs.writeShellScriptBin "xdg-open" ''
     for arg in "$@"; do
       case "$arg" in

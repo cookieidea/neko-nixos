@@ -2,7 +2,7 @@
 { pkgs, ... }:
 
 {
-  # 内核：CachyOS RT-BORE（实时调度 + BORE，直播/推流低延迟）
+  # 内核：CachyOS RT-BORE（实时调度 + BORE）
   boot.kernelPackages = pkgs.cachyosKernels.linuxPackages-cachyos-rt-bore;
 
   boot.kernel.sysctl."vm.max_map_count" = 2147483642;
@@ -16,15 +16,13 @@
     device = "nodev";
     configurationLimit = 20;
     efiInstallAsRemovable = true;
-    # BlueArchive 主题（aris/爱丽丝）；其余 4 套未用主题已移出仓库
-    # 注意：本文件在 modules/system/ 下，相对路径需回退两级到仓库根
+    # BlueArchive 主题（aris/爱丽丝）
     theme = ../assets/grub-theme/aris/Alice;
   };
   boot.supportedFilesystems = [ "btrfs" ];
   boot.initrd.supportedFilesystems = [ "btrfs" ];
 
-  # 休眠：btrfs swapfile 官方不支持恢复 → 独立 SWAP 分区（docs/install-btrfs.md 创建）。
-  # 显式声明 resumeDevice 兜底（26.05 initrd 会自动检测，异常 EFI 主板也可靠）。
+  # 休眠：独立 SWAP 分区（docs/install-btrfs.md 创建）
   boot.resumeDevice = "/dev/disk/by-label/SWAP";
   # LACT / AMD 超频解锁（ppfeaturemask 全开）
   boot.kernelParams = [
