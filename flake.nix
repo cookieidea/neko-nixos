@@ -104,6 +104,9 @@
 
       selfPackages = import ./pkgs { inherit pkgs astral-bundle; };
 
+      # home 模块共用绑定（原 home.nix 顶部 let 块）→ 注入为 hmLib
+      hmLib = import ./modules/home/lib.nix { inherit pkgs selfPackages; };
+
       hmModule = {
         imports = [ home-manager.nixosModules.home-manager ];
 
@@ -112,7 +115,7 @@
         home-manager.useGlobalPkgs = true;
         home-manager.useUserPackages = true;
         home-manager.users.${username} = import ./home.nix;
-        home-manager.extraSpecialArgs = { inherit desktop username cooknixvim bilihud selfPackages noctalia bestclient mark-shot llm-agents-nix; };
+        home-manager.extraSpecialArgs = { inherit desktop username cooknixvim bilihud selfPackages noctalia bestclient mark-shot llm-agents-nix hmLib; };
       };
     in {
       # 暴露自构建派生为 flake 包：可单独 `nix build .#<name>`
