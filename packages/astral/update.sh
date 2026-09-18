@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Astral 一键更新：查 release → 改 REF → 构建 → 重锁 → rebuild → 换 core → 推缓存 → 提交。
-# 用法：sudo bash pkgs/astral/update.sh [GUI_TAG [CORE_TAG]]
+# 用法：sudo bash packages/astral/update.sh [GUI_TAG [CORE_TAG]]
 #   不给参数则自动取 Astral 最新稳定版，core 版本从 release 正文解析。
 set -euo pipefail
 
@@ -37,11 +37,11 @@ fi
 echo "==> Core 版本：$CORE_REF"
 
 GUI_VER="${GUI_REF#v}"
-sed -i "s/^REF=.*/REF=$GUI_REF/; s/^CORE_REF=.*/CORE_REF=$CORE_REF/" "$REPO_ROOT/pkgs/astral/build.sh"
-sed -i "s/^  version = \".*\";/  version = \"$GUI_VER\";/" "$REPO_ROOT/pkgs/astral/default.nix"
+sed -i "s/^REF=.*/REF=$GUI_REF/; s/^CORE_REF=.*/CORE_REF=$CORE_REF/" "$REPO_ROOT/packages/astral/build.sh"
+sed -i "s/^  version = \".*\";/  version = \"$GUI_VER\";/" "$REPO_ROOT/packages/astral/default.nix"
 
 echo "==> 联网构建（约 20 分钟）..."
-bash "$REPO_ROOT/pkgs/astral/build.sh"
+bash "$REPO_ROOT/packages/astral/build.sh"
 
 echo "==> rebuild ..."
 nixos-rebuild switch --flake "$REPO_ROOT"

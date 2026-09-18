@@ -10,13 +10,13 @@
     # （设置/壁纸/主题模板等），替代 v4 noctalia-shell。
     noctalia.homeModules.default
 
-    ./modules/home/session.nix
-    ./modules/home/packages.nix
-    ./modules/home/programs.nix
-    ./modules/home/systemd.nix
-    ./modules/home/xdg.nix
-    ./modules/home/activation.nix
-    ./modules/home/files.nix
-    ./modules/home/misc.nix
+    ../../modules/home/session.nix
+    ../../modules/home/packages.nix
+    ../../modules/home/programs.nix
+    ../../modules/home/systemd.nix
+    ../../modules/home/xdg.nix
+    ../../modules/home/activation.nix
+    ../../modules/home/files.nix
+    ../../modules/home/misc.nix
   ];
 }

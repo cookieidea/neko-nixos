@@ -136,7 +136,7 @@ SCANSCRIPT
     CFG="$HOME/.config/mark-shot/config.json"
     if [ -L "$CFG" ] && [ -f "/run/agenix/mark-shot-sensitive" ]; then
       LINK_TARGET=$(${pkgs.coreutils}/bin/readlink -f "$CFG")
-      $DRY_RUN_CMD ${pkgs.python3}/bin/python3 ${../../dotfiles/config/mark-shot/inject-secrets.py} "$CFG" "$LINK_TARGET"
+      $DRY_RUN_CMD ${pkgs.python3}/bin/python3 ${../../config/config/mark-shot/inject-secrets.py} "$CFG" "$LINK_TARGET"
     fi
   '';
 }

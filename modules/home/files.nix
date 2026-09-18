@@ -11,9 +11,9 @@
     ".jdks/zulu17".source = "${pkgs.zulu17}";
     ".jdks/zulu8".source = "${pkgs.zulu8}";
     # ── 用户头像（freedesktop 标准 ~/.face，Noctalia Greeter 登录界面 + Noctalia 控制中心读取）──
-    ".face".source = ../../dotfiles/avatar.png;
+    ".face".source = ../../config/avatar.png;
     # ── fastfetch logo 图片（kitty 图像协议；配置引用 ~/.local/share/fastfetch/NixOS.png）──
-    ".local/share/fastfetch/NixOS.png".source = ../../dotfiles/config/fastfetch/NixOS.png;
+    ".local/share/fastfetch/NixOS.png".source = ../../config/config/fastfetch/NixOS.png;
     # ── 用户目录映射（nautilus 侧栏/模板目录定位，XDG_TEMPLATES_DIR=~/Templates）──
     ".config/user-dirs.dirs" = {
       force = true;
@@ -63,15 +63,15 @@
     # 逐文件部署（目录级 source 在目标目录已存在时 ln 无法覆盖目录，即使 force=true）；
     # 文件级 force=true 覆盖手动复制过的同名文件。
     ".local/share/icons/hicolor/scalable/apps/input-keyboard-symbolic.svg" = {
-      source = ../../dotfiles/icons/hicolor/scalable/apps/input-keyboard-symbolic.svg;
+      source = ../../config/icons/hicolor/scalable/apps/input-keyboard-symbolic.svg;
       force = true;
     };
     ".local/share/icons/hicolor/scalable/apps/view-refresh.svg" = {
-      source = ../../dotfiles/icons/hicolor/scalable/apps/view-refresh.svg;
+      source = ../../config/icons/hicolor/scalable/apps/view-refresh.svg;
       force = true;
     };
     ".local/share/icons/hicolor/scalable/apps/application-exit.svg" = {
-      source = ../../dotfiles/icons/hicolor/scalable/apps/application-exit.svg;
+      source = ../../config/icons/hicolor/scalable/apps/application-exit.svg;
       force = true;
     };
     # ── KCalc 图标 hicolor 兜底 ──
@@ -79,7 +79,7 @@
     # （Papirus/hicolor 均无）；Noctalia V5 自研解析器走该链找不到 → 启动器无图标。
     # 放一份到 hicolor/scalable（全尺寸通配的最终兜底），与其他 symbolic 兜底同组。
     ".local/share/icons/hicolor/scalable/apps/accessories-calculator.svg" = {
-      source = ../../dotfiles/icons/hicolor/scalable/apps/accessories-calculator.svg;
+      source = ../../config/icons/hicolor/scalable/apps/accessories-calculator.svg;
       force = true;
     };
     # ── 应用图标 hicolor 兜底（256x256）──
@@ -87,15 +87,15 @@
     # lunarclient（nixpkgs 包 desktop Icon=lunarclient 但无对应图标文件）。
     # 之前 VM 手动复制未固化 → 实体机重装后图标消失，收进仓库声明式部署。
     ".local/share/icons/hicolor/256x256/apps/tabby.png" = {
-      source = ../../dotfiles/icons/hicolor/256x256/apps/tabby.png;
+      source = ../../config/icons/hicolor/256x256/apps/tabby.png;
       force = true;
     };
     ".local/share/icons/hicolor/256x256/apps/splayer-next.png" = {
-      source = ../../dotfiles/icons/hicolor/256x256/apps/splayer-next.png;
+      source = ../../config/icons/hicolor/256x256/apps/splayer-next.png;
       force = true;
     };
     ".local/share/icons/hicolor/256x256/apps/lunarclient.png" = {
-      source = ../../dotfiles/icons/hicolor/256x256/apps/lunarclient.png;
+      source = ../../config/icons/hicolor/256x256/apps/lunarclient.png;
       force = true;
     };
     # ── AppImage wrap 包（tabby/splayer-next）的 desktop 入口 ──
@@ -132,7 +132,7 @@
     # ⚠️ 不能裸拷 .so（RPATH 指向构建机，依赖全丢）；链接 Nix 包产物，
     #    autoPatchelf 后 .so 的 RPATH 指向 store 里的 libobs/libdatachannel/ffmpeg 等
     ".config/scripts/noctalia-wallpaper-autostart.sh" = {
-      source = ../../dotfiles/scripts/noctalia-wallpaper-autostart.sh;
+      source = ../../config/scripts/noctalia-wallpaper-autostart.sh;
       executable = true;
       force = true;
     };
@@ -144,51 +144,51 @@
     # 视频壁纸（mpvpaper 播放；noctalia 壁纸组件已禁用，背景层由 mpvpaper 接管）
     # 原 .gtkrc-2.0 内容已并入 gtk.gtk2.extraConfig（fcitx 输入法），不再手动部署避免模块冲突
     ".local/bin/random-anime-wallpaper-noctalia" = {
-      source = ../../dotfiles/local/bin/random-anime-wallpaper-noctalia;
+      source = ../../config/local/bin/random-anime-wallpaper-noctalia;
       executable = true;
     };
     # SHORiN 私有脚本迁移（对应 binds.kdl：Mod+F3 录屏菜单、Mod+F5 快存、Mod+F8 快读）
     ".local/bin/quicksave" = {
-      source = ../../dotfiles/local/bin/quicksave;
+      source = ../../config/local/bin/quicksave;
       executable = true;
     };
     ".local/bin/quickload" = {
-      source = ../../dotfiles/local/bin/quickload;
+      source = ../../config/local/bin/quickload;
       executable = true;
     };
-    ".local/share/fcitx5/rime/default.custom.yaml".source = ../../dotfiles/local/share/fcitx5/rime/default.custom.yaml;
-    ".local/share/fcitx5/rime/rime_ice.custom.yaml".source = ../../dotfiles/local/share/fcitx5/rime/rime_ice.custom.yaml;
-    ".local/share/fcitx5/themes/Matugen/theme.conf".source = ../../dotfiles/local/share/fcitx5/themes/Matugen/theme.conf;
-    ".local/share/fcitx5/themes/default/theme.conf".source = ../../dotfiles/local/share/fcitx5/themes/default/theme.conf;
-    ".local/share/icons/Adwaita-Matugen-B/index.theme".source = ../../dotfiles/local/share/icons/Adwaita-Matugen-B/index.theme;
-    ".local/share/icons/Adwaita-Matugen-B/scalable/mimetypes/application-x-addon.svg".source = ../../dotfiles/local/share/icons/Adwaita-Matugen-B/scalable/mimetypes/application-x-addon.svg;
-    ".local/share/icons/Adwaita-Matugen-B/scalable/mimetypes/application-x-executable.svg".source = ../../dotfiles/local/share/icons/Adwaita-Matugen-B/scalable/mimetypes/application-x-executable.svg;
-    ".local/share/icons/Adwaita-Matugen-B/scalable/mimetypes/audio-x-generic.svg".source = ../../dotfiles/local/share/icons/Adwaita-Matugen-B/scalable/mimetypes/audio-x-generic.svg;
-    ".local/share/icons/Adwaita-Matugen-B/scalable/mimetypes/font-x-generic.svg".source = ../../dotfiles/local/share/icons/Adwaita-Matugen-B/scalable/mimetypes/font-x-generic.svg;
-    ".local/share/icons/Adwaita-Matugen-B/scalable/mimetypes/inode-directory.svg".source = ../../dotfiles/local/share/icons/Adwaita-Matugen-B/scalable/mimetypes/inode-directory.svg;
-    ".local/share/icons/Adwaita-Matugen-B/scalable/mimetypes/text-html.svg".source = ../../dotfiles/local/share/icons/Adwaita-Matugen-B/scalable/mimetypes/text-html.svg;
-    ".local/share/icons/Adwaita-Matugen-B/scalable/mimetypes/text-x-script.svg".source = ../../dotfiles/local/share/icons/Adwaita-Matugen-B/scalable/mimetypes/text-x-script.svg;
-    ".local/share/icons/Adwaita-Matugen-B/scalable/mimetypes/x-office-document.svg".source = ../../dotfiles/local/share/icons/Adwaita-Matugen-B/scalable/mimetypes/x-office-document.svg;
-    ".local/share/icons/Adwaita-Matugen-B/scalable/mimetypes/x-office-presentation.svg".source = ../../dotfiles/local/share/icons/Adwaita-Matugen-B/scalable/mimetypes/x-office-presentation.svg;
-    ".local/share/icons/Adwaita-Matugen-B/scalable/places/folder-documents.svg".source = ../../dotfiles/local/share/icons/Adwaita-Matugen-B/scalable/places/folder-documents.svg;
-    ".local/share/icons/Adwaita-Matugen-B/scalable/places/folder-download.svg".source = ../../dotfiles/local/share/icons/Adwaita-Matugen-B/scalable/places/folder-download.svg;
-    ".local/share/icons/Adwaita-Matugen-B/scalable/places/folder-drag-accept.svg".source = ../../dotfiles/local/share/icons/Adwaita-Matugen-B/scalable/places/folder-drag-accept.svg;
-    ".local/share/icons/Adwaita-Matugen-B/scalable/places/folder-music.svg".source = ../../dotfiles/local/share/icons/Adwaita-Matugen-B/scalable/places/folder-music.svg;
-    ".local/share/icons/Adwaita-Matugen-B/scalable/places/folder-pictures.svg".source = ../../dotfiles/local/share/icons/Adwaita-Matugen-B/scalable/places/folder-pictures.svg;
-    ".local/share/icons/Adwaita-Matugen-B/scalable/places/folder-publicshare.svg".source = ../../dotfiles/local/share/icons/Adwaita-Matugen-B/scalable/places/folder-publicshare.svg;
-    ".local/share/icons/Adwaita-Matugen-B/scalable/places/folder-remote.svg".source = ../../dotfiles/local/share/icons/Adwaita-Matugen-B/scalable/places/folder-remote.svg;
-    ".local/share/icons/Adwaita-Matugen-B/scalable/places/folder-templates.svg".source = ../../dotfiles/local/share/icons/Adwaita-Matugen-B/scalable/places/folder-templates.svg;
-    ".local/share/icons/Adwaita-Matugen-B/scalable/places/folder-videos.svg".source = ../../dotfiles/local/share/icons/Adwaita-Matugen-B/scalable/places/folder-videos.svg;
-    ".local/share/icons/Adwaita-Matugen-B/scalable/places/folder.svg".source = ../../dotfiles/local/share/icons/Adwaita-Matugen-B/scalable/places/folder.svg;
-    ".local/share/icons/Adwaita-Matugen-B/scalable/places/network-server.svg".source = ../../dotfiles/local/share/icons/Adwaita-Matugen-B/scalable/places/network-server.svg;
-    ".local/share/icons/Adwaita-Matugen-B/scalable/places/network-workgroup.svg".source = ../../dotfiles/local/share/icons/Adwaita-Matugen-B/scalable/places/network-workgroup.svg;
-    ".local/share/icons/Adwaita-Matugen-B/scalable/places/user-bookmarks.svg".source = ../../dotfiles/local/share/icons/Adwaita-Matugen-B/scalable/places/user-bookmarks.svg;
-    ".local/share/icons/Adwaita-Matugen-B/scalable/places/user-desktop.svg".source = ../../dotfiles/local/share/icons/Adwaita-Matugen-B/scalable/places/user-desktop.svg;
-    ".local/share/icons/Adwaita-Matugen-B/scalable/places/user-home.svg".source = ../../dotfiles/local/share/icons/Adwaita-Matugen-B/scalable/places/user-home.svg;
-    ".local/share/icons/Adwaita-Matugen-B/scalable/places/user-trash.svg".source = ../../dotfiles/local/share/icons/Adwaita-Matugen-B/scalable/places/user-trash.svg;
-    ".local/share/icons/Adwaita-Matugen-B/scalable/status/folder-open.svg".source = ../../dotfiles/local/share/icons/Adwaita-Matugen-B/scalable/status/folder-open.svg;
-    ".local/share/icons/Adwaita-Matugen-B/scalable/status/user-trash-full.svg".source = ../../dotfiles/local/share/icons/Adwaita-Matugen-B/scalable/status/user-trash-full.svg;
-    ".local/share/nwg-look/gsettings".source = ../../dotfiles/local/share/nwg-look/gsettings;
+    ".local/share/fcitx5/rime/default.custom.yaml".source = ../../config/local/share/fcitx5/rime/default.custom.yaml;
+    ".local/share/fcitx5/rime/rime_ice.custom.yaml".source = ../../config/local/share/fcitx5/rime/rime_ice.custom.yaml;
+    ".local/share/fcitx5/themes/Matugen/theme.conf".source = ../../config/local/share/fcitx5/themes/Matugen/theme.conf;
+    ".local/share/fcitx5/themes/default/theme.conf".source = ../../config/local/share/fcitx5/themes/default/theme.conf;
+    ".local/share/icons/Adwaita-Matugen-B/index.theme".source = ../../config/local/share/icons/Adwaita-Matugen-B/index.theme;
+    ".local/share/icons/Adwaita-Matugen-B/scalable/mimetypes/application-x-addon.svg".source = ../../config/local/share/icons/Adwaita-Matugen-B/scalable/mimetypes/application-x-addon.svg;
+    ".local/share/icons/Adwaita-Matugen-B/scalable/mimetypes/application-x-executable.svg".source = ../../config/local/share/icons/Adwaita-Matugen-B/scalable/mimetypes/application-x-executable.svg;
+    ".local/share/icons/Adwaita-Matugen-B/scalable/mimetypes/audio-x-generic.svg".source = ../../config/local/share/icons/Adwaita-Matugen-B/scalable/mimetypes/audio-x-generic.svg;
+    ".local/share/icons/Adwaita-Matugen-B/scalable/mimetypes/font-x-generic.svg".source = ../../config/local/share/icons/Adwaita-Matugen-B/scalable/mimetypes/font-x-generic.svg;
+    ".local/share/icons/Adwaita-Matugen-B/scalable/mimetypes/inode-directory.svg".source = ../../config/local/share/icons/Adwaita-Matugen-B/scalable/mimetypes/inode-directory.svg;
+    ".local/share/icons/Adwaita-Matugen-B/scalable/mimetypes/text-html.svg".source = ../../config/local/share/icons/Adwaita-Matugen-B/scalable/mimetypes/text-html.svg;
+    ".local/share/icons/Adwaita-Matugen-B/scalable/mimetypes/text-x-script.svg".source = ../../config/local/share/icons/Adwaita-Matugen-B/scalable/mimetypes/text-x-script.svg;
+    ".local/share/icons/Adwaita-Matugen-B/scalable/mimetypes/x-office-document.svg".source = ../../config/local/share/icons/Adwaita-Matugen-B/scalable/mimetypes/x-office-document.svg;
+    ".local/share/icons/Adwaita-Matugen-B/scalable/mimetypes/x-office-presentation.svg".source = ../../config/local/share/icons/Adwaita-Matugen-B/scalable/mimetypes/x-office-presentation.svg;
+    ".local/share/icons/Adwaita-Matugen-B/scalable/places/folder-documents.svg".source = ../../config/local/share/icons/Adwaita-Matugen-B/scalable/places/folder-documents.svg;
+    ".local/share/icons/Adwaita-Matugen-B/scalable/places/folder-download.svg".source = ../../config/local/share/icons/Adwaita-Matugen-B/scalable/places/folder-download.svg;
+    ".local/share/icons/Adwaita-Matugen-B/scalable/places/folder-drag-accept.svg".source = ../../config/local/share/icons/Adwaita-Matugen-B/scalable/places/folder-drag-accept.svg;
+    ".local/share/icons/Adwaita-Matugen-B/scalable/places/folder-music.svg".source = ../../config/local/share/icons/Adwaita-Matugen-B/scalable/places/folder-music.svg;
+    ".local/share/icons/Adwaita-Matugen-B/scalable/places/folder-pictures.svg".source = ../../config/local/share/icons/Adwaita-Matugen-B/scalable/places/folder-pictures.svg;
+    ".local/share/icons/Adwaita-Matugen-B/scalable/places/folder-publicshare.svg".source = ../../config/local/share/icons/Adwaita-Matugen-B/scalable/places/folder-publicshare.svg;
+    ".local/share/icons/Adwaita-Matugen-B/scalable/places/folder-remote.svg".source = ../../config/local/share/icons/Adwaita-Matugen-B/scalable/places/folder-remote.svg;
+    ".local/share/icons/Adwaita-Matugen-B/scalable/places/folder-templates.svg".source = ../../config/local/share/icons/Adwaita-Matugen-B/scalable/places/folder-templates.svg;
+    ".local/share/icons/Adwaita-Matugen-B/scalable/places/folder-videos.svg".source = ../../config/local/share/icons/Adwaita-Matugen-B/scalable/places/folder-videos.svg;
+    ".local/share/icons/Adwaita-Matugen-B/scalable/places/folder.svg".source = ../../config/local/share/icons/Adwaita-Matugen-B/scalable/places/folder.svg;
+    ".local/share/icons/Adwaita-Matugen-B/scalable/places/network-server.svg".source = ../../config/local/share/icons/Adwaita-Matugen-B/scalable/places/network-server.svg;
+    ".local/share/icons/Adwaita-Matugen-B/scalable/places/network-workgroup.svg".source = ../../config/local/share/icons/Adwaita-Matugen-B/scalable/places/network-workgroup.svg;
+    ".local/share/icons/Adwaita-Matugen-B/scalable/places/user-bookmarks.svg".source = ../../config/local/share/icons/Adwaita-Matugen-B/scalable/places/user-bookmarks.svg;
+    ".local/share/icons/Adwaita-Matugen-B/scalable/places/user-desktop.svg".source = ../../config/local/share/icons/Adwaita-Matugen-B/scalable/places/user-desktop.svg;
+    ".local/share/icons/Adwaita-Matugen-B/scalable/places/user-home.svg".source = ../../config/local/share/icons/Adwaita-Matugen-B/scalable/places/user-home.svg;
+    ".local/share/icons/Adwaita-Matugen-B/scalable/places/user-trash.svg".source = ../../config/local/share/icons/Adwaita-Matugen-B/scalable/places/user-trash.svg;
+    ".local/share/icons/Adwaita-Matugen-B/scalable/status/folder-open.svg".source = ../../config/local/share/icons/Adwaita-Matugen-B/scalable/status/folder-open.svg;
+    ".local/share/icons/Adwaita-Matugen-B/scalable/status/user-trash-full.svg".source = ../../config/local/share/icons/Adwaita-Matugen-B/scalable/status/user-trash-full.svg;
+    ".local/share/nwg-look/gsettings".source = ../../config/local/share/nwg-look/gsettings;
     # （.vimrc 已删：vim 未安装，编辑器 nvim=CookNixvim 不读 .vimrc）
 
     # ── SHORiN 私有 niri 脚本（配置迁移：从上游 noctalia-dotfiles 引入）──
@@ -197,46 +197,46 @@
     #   niri-force-kill-window（Alt+F4 强杀窗口）。
     # random-anime-wallpaper-noctalia 已在上面 .local/bin 部署；niri-sidebar 走 selfPackages。
     ".config/niri/scripts/niri-binds" = {
-      source = ../../dotfiles/config/niri/scripts/niri-binds;
+      source = ../../config/config/niri/scripts/niri-binds;
       executable = true;
     };
     ".config/niri/scripts/niri-pick" = {
-      source = ../../dotfiles/config/niri/scripts/niri-pick;
+      source = ../../config/config/niri/scripts/niri-pick;
       executable = true;
     };
     ".config/niri/scripts/niri-force-kill-window" = {
-      source = ../../dotfiles/config/niri/scripts/niri-force-kill-window;
+      source = ../../config/config/niri/scripts/niri-force-kill-window;
       executable = true;
     };
     # ── NyxNiri 新增 niri 脚本（护眼模式 / Scratchpad 终端 / 星环菜单）──
     # 对应 NyxNiri 绑定：Mod+N（护眼）、Mod+Grave（scratch 终端）、Mod+A（星环菜单）。
     # 星环菜单本体由 selfPackages.nyxniri-scratch-menu 包装（提供 pygobject/GI 依赖）。
     ".config/niri/scripts/toggle-eyecare.sh" = {
-      source = ../../dotfiles/config/niri/scripts/toggle-eyecare.sh;
+      source = ../../config/config/niri/scripts/toggle-eyecare.sh;
       executable = true;
     };
     ".config/niri/scripts/niri-scratch-toggle.sh" = {
-      source = ../../dotfiles/config/niri/scripts/niri-scratch-toggle.sh;
+      source = ../../config/config/niri/scripts/niri-scratch-toggle.sh;
       executable = true;
     };
     ".config/niri/scripts/niri-scratch-menu.py" = {
-      source = ../../dotfiles/config/niri/scripts/niri-scratch-menu.py;
+      source = ../../config/config/niri/scripts/niri-scratch-menu.py;
       executable = true;
     };
     # NyxNiri fish 缓存清理脚本（星环菜单 clean-cache 入口）
     ".config/fish/clean-cache" = {
-      source = ../../dotfiles/config/fish/clean-cache;
+      source = ../../config/config/fish/clean-cache;
       executable = true;
     };
     # ── NyxMellow fcitx5 动态皮肤模板（Noctalia V5 模板输入，渲染到 themes/nyxmellow/）──
     ".local/share/fcitx5/themes/nyxmellow/templates/theme.conf" = {
-      source = ../../dotfiles/local/share/fcitx5/themes/nyxmellow/templates/theme.conf;
+      source = ../../config/local/share/fcitx5/themes/nyxmellow/templates/theme.conf;
     };
     ".local/share/fcitx5/themes/nyxmellow/templates/panel.svg" = {
-      source = ../../dotfiles/local/share/fcitx5/themes/nyxmellow/templates/panel.svg;
+      source = ../../config/local/share/fcitx5/themes/nyxmellow/templates/panel.svg;
     };
     ".local/share/fcitx5/themes/nyxmellow/templates/highlight.svg" = {
-      source = ../../dotfiles/local/share/fcitx5/themes/nyxmellow/templates/highlight.svg;
+      source = ../../config/local/share/fcitx5/themes/nyxmellow/templates/highlight.svg;
     };
 
     # ── 开发工具链国内镜像源 ──

@@ -79,6 +79,6 @@
     };
   };
 
-  # 不在 nixpkgs 的包走 flake / ./pkgs 自构建（见 README 自构建一节）
+  # 不在 nixpkgs 的包走 flake / ./packages 自构建（见 README 自构建一节）
   # 闭源 App（微信/QQ/Discord）走 Flatpak（configuration.nix 的 flatpak-repo 自动装）
 }

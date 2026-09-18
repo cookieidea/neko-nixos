@@ -102,7 +102,7 @@
         config.allowUnfree = true;
       };
 
-      selfPackages = import ./pkgs { inherit pkgs astral-bundle; };
+      selfPackages = import ./packages { inherit pkgs astral-bundle; };
 
       # home 模块共用绑定（原 home.nix 顶部 let 块）→ 注入为 hmLib
       hmLib = import ./modules/home/lib.nix { inherit pkgs selfPackages; };
@@ -114,7 +114,7 @@
 
         home-manager.useGlobalPkgs = true;
         home-manager.useUserPackages = true;
-        home-manager.users.${username} = import ./home.nix;
+        home-manager.users.${username} = import ./hosts/ATRI/home.nix;
         home-manager.extraSpecialArgs = { inherit desktop username cooknixvim bilihud selfPackages noctalia bestclient mark-shot llm-agents-nix hmLib; };
       };
     in {
@@ -127,8 +127,8 @@
           inherit system;
           specialArgs = { inherit noctalia-greeter; };
           modules = [
-            ./hardware-configuration.nix
-            ./configuration.nix
+            ./hosts/ATRI/hardware-configuration.nix
+            ./hosts/ATRI/configuration.nix
             hmModule
             agenix.nixosModules.default
             # CachyOS 内核 overlay（pinned 命中缓存）+ 修 nvim.desktop：
