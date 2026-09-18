@@ -13,6 +13,7 @@
 ├── flake.nix                    # 入口：inputs / hostname / username / nixosConfigurations
 ├── flake.lock                   # inputs 锁文件
 ├── install.sh                   # 安装与更新脚本
+├── LICENSE                      # GPL-3.0
 ├── README.md
 │
 ├── configuration/               # 所有声明式配置
@@ -135,3 +136,16 @@ sudo nix-collect-garbage -d
 # 回滚
 sudo nixos-rebuild switch --flake /etc/nixos --rollback
 ```
+
+## 致谢
+
+本仓库的桌面配置派生自以下项目，版权归各原作者所有：
+
+- **[ech678/NyxNiri](https://github.com/ech678/NyxNiri)** — GPL-3.0
+  星环菜单（`niri-scratch-menu.py`）及 niri / kitty / fish / Noctalia 的
+  部分配置改写自该项目，已针对 NixOS 适配。上游版权归原作者所有。
+- **[SHORiN-KiWATA/shorin-contrib](https://github.com/SHORiN-KiWATA/shorin-contrib)**
+  — 无明确许可证声明；`configuration/pkgs/desktop/shorin-contrib` 打包其通用脚本子集，
+  版权归原作者所有。
+
+完整许可证见 [LICENSE](LICENSE)。
