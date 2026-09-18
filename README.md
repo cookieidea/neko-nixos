@@ -5,7 +5,6 @@
 - 主机 `ATRI` / 用户 `cookie`
 - 桌面 **niri** + **Noctalia**，登录 **greetd**（Noctalia Greeter）
 - 内核 **CachyOS RT-BORE**
-- 硬件：AMD RX 6600（gfx1032）+ Intel i5-12400F
 
 ## 目录
 
