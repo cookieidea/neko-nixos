@@ -102,7 +102,7 @@ in
     ffmpeg                                    # mpv 提取字幕轨道
     yt-dlp                                    # mpv 在线视频
     vapoursynth                                # mpv VapourSynth（vspipe）
-    obs-studio                                # obs-studio
+    # obs-studio 改由 programs.obs-studio 模块提供（含 VDO.Ninja 插件，见下）
     kdePackages.kdenlive                         # kdenlive（KDE 视频剪辑；26.05 属 kdePackages 不在顶层）
     kdePackages.kcalc                            # kcalc（KDE 计算器；26.05 属 kdePackages，gear 区）
     upscaler
@@ -777,10 +777,8 @@ SCANSCRIPT
       executable = true;
       force = true;
     };
-    ".config/obs-studio/plugins/obs-vdoninja/bin/64bit".source =
-      selfPackages.obs-vdoninja + "/lib/obs-plugins";
-    ".config/obs-studio/plugins/obs-vdoninja/data".source =
-      selfPackages.obs-vdoninja + "/share/obs/obs-plugins/obs-vdoninja/locale";
+    # obs-vdoninja 的部署已交给 programs.obs-studio 模块（wrapOBS 设 OBS_PLUGINS_PATH），
+    # 原先往 ~/.config/obs-studio/plugins/ 塞的两个 symlink 已移除
     # ── 壁纸（原 resources/Wallpapers，noctalia 壁纸轮播/随机切换依赖 ~/Pictures/Wallpapers）──
     # ⚠️ 不用 home.file 软链（GC 后 store 路径失效会断链）→ 由下方
     #    home.activation.wallpaperRealFiles 复制为真实文件。
@@ -913,6 +911,16 @@ SCANSCRIPT
   };
 
   services.polkit-gnome.enable = true;   # polkit 认证代理
+
+  # ── OBS Studio（占用 HM 模块而非裸包，插件走 wrapOBS 统一注入）──
+  # VDO.Ninja 是自建包（pkgs/obs-vdoninja，预编译 .so + autoPatchelf）。
+  # 它的产物路径（lib/obs-plugins、share/obs/obs-plugins）正好是 wrapOBS 期望的
+  # 布局 → 直接作为 plugin 传入，由模块设 OBS_PLUGINS_PATH/OBS_PLUGINS_DATA_PATH，
+  # 不再需要手工往 ~/.config/obs-studio/plugins/ 里塞 symlink。
+  programs.obs-studio = {
+    enable = true;
+    plugins = [ selfPackages.obs-vdoninja ];
+  };
 
   # ── KDE Connect（手机 ↔ 电脑：文件互传/剪贴板同步/媒体控制/通知转发）──
   # 走 HM 模块而非 NixOS programs.kdeconnect：niri 不是 Plasma，不读 XDG autostart，

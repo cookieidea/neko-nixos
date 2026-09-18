@@ -342,6 +342,9 @@ EOF
   programs.steam.fontPackages = with pkgs; [ sarasa-gothic ];
   # GE-Proton（声明式；Steam 里直接选 compattool）
   programs.steam.extraCompatPackages = with pkgs; [ proton-ge-bin ];
+  # 远程游玩 / 专用服务器：自动放行所需端口（防火墙已启用，否则连不上）
+  programs.steam.remotePlay.openFirewall = true;
+  programs.steam.dedicatedServer.openFirewall = true;
   virtualisation.libvirtd.enable = true;
   # Waydroid（Android 容器；CachyOS 内核已移除 iptables → 用 nftables 版）
   virtualisation.waydroid.enable = true;
