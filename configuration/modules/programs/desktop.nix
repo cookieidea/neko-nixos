@@ -17,13 +17,13 @@
       keyboard.layout = "us";
     };
   };
-  # niri 系统模块（26.05 起用 programs.niri 注册会话，displayManager.session 已移除）
+  # niri 系统模块
   programs.niri.enable = true;
   programs.nautilus-open-any-terminal = {
     enable = true;
     terminal = "kitty";
   };
-  # 覆盖 nautilus-open-any-terminal 模块的默认值，指向包含所有 C 扩展的统一目录
+  # nautilus C 扩展统一目录
   environment.sessionVariables.NAUTILUS_4_EXTENSION_DIR = lib.mkForce
     "${selfPackages.nautilus-extensions.nautilus-with-extensions}/lib/nautilus/extensions-4";
   # 登录界面头像（AccountsService，greeter 读取）
@@ -41,12 +41,12 @@ EOF
 
   # XDG 桌面门户
   xdg.portal.enable = true;
-  programs.dconf.enable = true;   # home-manager gtk 模块写主题设置需要
-  # hyprland portal 兜底：部分 Wayland App 屏幕共享只认它；wlr 给 niri 文件对话框
+  programs.dconf.enable = true;   # home-manager gtk 模块依赖
+  # 屏幕共享 / 文件对话框 portal 兜底
   xdg.portal.extraPortals = with pkgs; [ xdg-desktop-portal-gtk xdg-desktop-portal-gnome xdg-desktop-portal-hyprland xdg-desktop-portal-wlr ];
   xdg.portal.config.common.default = "gtk";
 
-  # Flatpak：26.05 移除声明式 remotes → 启动时 one-shot 添加 + 自动装应用（幂等）
+  # Flatpak：启动时 one-shot 添加 remote + 自动装应用
   services.flatpak.enable = true;
   systemd.services.flatpak-repo = {
     wantedBy = [ "multi-user.target" ];
@@ -69,7 +69,7 @@ EOF
     };
   };
 
-  # 系统级包（其余在 home.nix）
+  # 系统级包
   environment.systemPackages = with pkgs; [
     git
     tmux             # scratchpad

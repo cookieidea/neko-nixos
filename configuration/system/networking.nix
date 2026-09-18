@@ -3,10 +3,7 @@
 
 {
   networking.hostName = "ATRI";
-  # 防火墙：默认拒绝入站。Sunshine/Steam 等（openFirewall=true）会自动放行。
-  # MC 联机：13960 TCP+UDP（用户指定）。3081 = dsh web 第二实例（用户指定放行）。
-  # KDE Connect：1714-1764 TCP+UDP（发现+传输，官方要求；HM 模块管不到系统防火墙）。
-  # workbuddy2api(7863) / dsh(3080) 只监听回环，无需放行。
+  # 防火墙：默认拒绝入站；13960=MC 联机，3081=dsh web，1714-1764=KDE Connect
   networking.firewall = {
     enable = true;
     allowedTCPPorts = [ 13960 3081 ];

@@ -5,7 +5,7 @@
   time.timeZone = "Asia/Shanghai";
   i18n.defaultLocale = "zh_CN.UTF-8";
 
-  # 输入法 fcitx5：rime + 雾凇拼音（rime-ice）。waylandFrontend（niri 走 text-input-v3）
+  # 输入法 fcitx5：rime + 雾凇拼音（rime-ice）
   i18n.inputMethod = {
     enable = true;
     type = "fcitx5";

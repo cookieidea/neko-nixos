@@ -8,7 +8,7 @@
   boot.kernel.sysctl."vm.max_map_count" = 2147483642;
   boot.loader.timeout = 10; # GRUB 选择系统等待 10s
 
-  # 引导：GRUB(UEFI) + os-prober（双系统检测 Windows）；efiInstallAsRemovable 兜底
+  # 引导：GRUB(UEFI) + os-prober（双系统检测 Windows）
   boot.loader.grub = {
     enable = true;
     useOSProber = true;

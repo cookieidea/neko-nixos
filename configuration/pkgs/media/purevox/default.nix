@@ -1,11 +1,8 @@
-# PureVox（实时 AI 音频降噪，Python + PySide6 + ONNX，Linux 走 PipeWire）
-# ⚠️ 不能用 wrapType2：其 init 硬编码 extracted 路径，extraInstallCommands
-# 改的 AppRun 不会被执行 → extract + mkDerivation 覆盖 AppRun + buildFHSEnv
+# PureVox（实时 AI 音频降噪，Python + PySide6 + ONNX）
 { pkgs }:
 
 let
   version = "2026.08.14.1643";
-  # 资产文件名用连字符日期（2026-08-14-1643），tag 用点格式——URL 两处不能混用
   assetDate = "2026-08-14-1643";
 
   src = pkgs.fetchurl {
@@ -13,7 +10,7 @@ let
     sha256 = "cbae6a1ec0e5d29db8bd2cf87b0f5ff4cba76c79f08843132ccde83ad96b8892";
   };
 
-  # 上游打包脚本漏了 dialog_virtual_mic_linux.py → 从源码补（codeload tarball）
+  # 补充上游缺失的模块源码
   srcGit = pkgs.fetchzip {
     url = "https://github.com/cookieidea/purevox/archive/d020117dbe6b1ccc83181df3260af7fcbc8745dd.tar.gz";
     sha256 = "sha256-rUXR7Rm5SQSHBeU9wSYnEbJ2PQhm4LV4l15gHbIwmk8=";
@@ -28,7 +25,6 @@ let
     pname = "purevox-app";
     inherit version;
     src = extracted;
-    # srcGit 经 `inherit` 进 derivation 输入（fetchzip 产物是已解包目录）
     inherit srcGit;
     installPhase = ''
       runHook preInstall
@@ -36,17 +32,16 @@ let
       cp -a . $out/
       chmod -R u+w $out
 
-      # 补上游打包脚本漏掉的虚拟声卡模块
+      # 补上游缺失的虚拟声卡模块
       cp "$srcGit/dialog_virtual_mic_linux.py" "$out/usr/lib/purevox/"
 
-      # ── 覆盖 AppRun ──
       cat > $out/AppRun <<'EOF'
       #!/bin/sh
       HERE="$(dirname "$(readlink -f "$0")")"
       export PYTHONHOME="$HERE/usr/python38"
       LIBS=$(find "$HERE" -type d \( -name lib -o -name lib64 \) 2>/dev/null | tr '\n' ':')
       export LD_LIBRARY_PATH="$LIBS''${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
-      # 内嵌 Qt 无 libQt6WaylandClient 且宿主 Qt 版本不匹配 → 用 xcb(XWayland)
+      # Qt 平台插件用 xcb
       export QT_QPA_PLATFORM=xcb
       export PATH="$HERE/usr/python38/bin:$PATH"
       cd "$HERE/usr/lib/purevox" || exit 1
@@ -60,7 +55,6 @@ in
 pkgs.buildFHSEnv {
   name = "purevox";
   targetPkgs = pkgs: [
-    # 基础
     pkgs.glibc
     pkgs.stdenv.cc.cc.lib              # libstdc++
     pkgs.zlib
@@ -73,7 +67,7 @@ pkgs.buildFHSEnv {
     pkgs.xz
     pkgs.gmp
     pkgs.krb5
-    # 图形 / 字体 / GTK 栈（PySide6 及其插件需要）
+    # 图形 / 字体 / GTK
     pkgs.fontconfig
     pkgs.cairo
     pkgs.pango
@@ -86,7 +80,7 @@ pkgs.buildFHSEnv {
     pkgs.freeglut
     pkgs.glew
     pkgs.gsettings-desktop-schemas
-    # X11 / xcb（Qt libqxcb 平台插件）
+    # X11 / xcb
     pkgs.libx11
     pkgs.libxext
     pkgs.libxfixes
@@ -104,14 +98,13 @@ pkgs.buildFHSEnv {
     pkgs.libxcb-keysyms
     pkgs.libxcb-render-util
     pkgs.libxcb-util
-    # Wayland / GL / 输入
     pkgs.wayland
     pkgs.libxkbcommon
     pkgs.libglvnd
     pkgs.pixman
     pkgs.libpciaccess
     pkgs.xkeyboard_config
-    # 音频（PipeWire 直用）
+    # 音频
     pkgs.alsa-lib
     pkgs.pipewire                     # pw-cli（创建虚拟麦克风 null-sink）
     pkgs.pulseaudio                   # pactl（虚拟麦克风 remap-source/set-default-sink）
@@ -123,7 +116,6 @@ pkgs.buildFHSEnv {
     pkgs.SDL2_ttf
     pkgs.vulkan-loader
     pkgs.systemdMinimal
-    # AppImage 未内嵌、NixOS 无全局库路径
     pkgs.libffi                        # python ctypes
     pkgs.libopus                       # opuslib
     pkgs.cups                          # Qt 打印

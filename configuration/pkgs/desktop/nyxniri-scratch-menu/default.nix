@@ -1,6 +1,4 @@
 # NyxNiri 星环菜单（GTK3 + GtkLayerShell + pygobject）
-# 跑 ~/.config/niri/scripts/niri-scratch-menu.py；wrapGAppsHook 收集 GI typelib，
-# gtk-layer-shell 需手动 prepend
 { pkgs }:
 let
   pythonEnv = pkgs.python3.withPackages (ps: [ ps.pygobject3 ps.pycairo ]);

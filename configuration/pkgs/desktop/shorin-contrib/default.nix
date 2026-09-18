@@ -1,8 +1,6 @@
 { pkgs }:
 
-# shorin-contrib 通用脚本子集（https://github.com/SHORiN-KiWATA/shorin-contrib）
-# 装 others/* + terminal/lsi + system/procusage + timer；排除 Arch 专用
-# （pacman/paru 系）与 snapshot/quicksave/quickload（dotfiles 有独立副本）
+# shorin-contrib 通用脚本子集
 pkgs.stdenv.mkDerivation {
   pname = "shorin-contrib";
   version = "unstable-2026-08-24";

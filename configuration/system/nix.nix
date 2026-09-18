@@ -3,11 +3,7 @@
 
 {
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
-  # 二进制缓存：国内优先（USTC + TUNA），attic 供 CachyOS 内核，
-  # noctalia.cachix.org 供 Noctalia 系包，cache.nixos.org 最后兜底。
-  # 用 substituters（显式覆盖）而不是 extra-：extra- 会追加到默认的
-  # cache.nixos.org 之后，等于官方源永远先命中（而它国内最慢），
-  # 国内镜像只沦为兜底。
+  # 二进制缓存：国内镜像优先，官方源兜底
   nix.settings.substituters = [
     "https://mirrors.ustc.edu.cn/nix-channels/store"
     "https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store"
@@ -24,7 +20,7 @@
   ];
   nixpkgs.config = {
     allowUnfree = true;   # steam / wechat-uos / 部分驱动需要
-    rocmSupport = true;   # AMD ROCm/HIP（Blender、PyTorch、llama.cpp 等 GPU 计算）
+    rocmSupport = true;   # ROCm/HIP GPU 计算
   };
 
   # 自动垃圾回收 + store 去重

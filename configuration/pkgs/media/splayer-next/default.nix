@@ -1,7 +1,6 @@
 { pkgs }:
 
-# SPlayer-Next（Electron 音乐播放器；⚠️ 非 nixpkgs 的 `splayer`）
-# wrap 官方 release AppImage（Electron 源码构建脆弱）
+# SPlayer-Next（Electron 音乐播放器；注意非 nixpkgs 的 `splayer`）
 (pkgs.appimageTools.wrapType2 {
   pname = "splayer-next";
   version = "1.1.0";
@@ -12,7 +11,7 @@
   extraPkgs = pkgs: with pkgs; [ ffmpeg ];
 }).overrideAttrs (old: {
   postInstall = (old.postInstall or "") + ''
-    # wrapType2 的 desktop 在 $out/usr/share/applications → 补标准路径 + 修 Exec
+    # 补标准路径 desktop
     binname=$(basename "$(find "$out/bin" -maxdepth 1 -type f -executable | head -1)")
     mkdir -p "$out/share/applications" "$out/share/pixmaps"
     icon=$(find "$out" -path "*icons*" -name "*.png" 2>/dev/null | head -1)

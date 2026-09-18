@@ -1,7 +1,4 @@
 # AB Download Manager（Kotlin/Compose，jpackage 打包）
-# 踩坑：1) "Fontconfig head is null" → runtime/lib 里放 libfontconfig 符号链接
-#       2) 托盘 libLinuxTray.so 需 libsystemd.so.0 → LD_LIBRARY_PATH 注入
-#       3) wrapper 须放原始路径 bin/ABDownloadManager，否则应用重写的 autostart 绕过 wrapper
 { pkgs }:
 
 let
@@ -32,18 +29,17 @@ pkgs.stdenv.mkDerivation {
   installPhase = ''
     runHook preInstall
     mkdir -p $out/lib/abdm $out/bin $out/share/applications $out/share/pixmaps
-    # stdenv 解压后 cwd 已在 ABDownloadManager/ 内（sourceRoot）
     cp -r . "$out/lib/abdm/"
     chmod -R u+w "$out/lib/abdm/"
     chmod +x "$out/lib/abdm/bin/ABDownloadManager"
 
-    # 字体修复（见文件头 1）
+    # 字体：libfontconfig 符号链接
     ln -s "${pkgs.fontconfig.lib}/lib/libfontconfig.so.1" \
       "$out/lib/abdm/lib/runtime/lib/libfontconfig.so.1"
 
-    # 托盘修复（见文件头 2/3）：真二进制移 .bin，wrapper 占原始路径覆盖所有入口
+    # 托盘：真二进制移 .bin，wrapper 占原始路径
     mv "$out/lib/abdm/bin/ABDownloadManager" "$out/lib/abdm/bin/ABDownloadManager.bin"
-    # jpackage 启动器按 <launcher 名>.cfg 找配置，改名后需配套 cfg
+    # jpackage 启动器配置
     cp "$out/lib/abdm/lib/app/ABDownloadManager.cfg" \
       "$out/lib/abdm/lib/app/ABDownloadManager.bin.cfg"
     makeWrapper "$out/lib/abdm/bin/ABDownloadManager.bin" "$out/lib/abdm/bin/ABDownloadManager" \

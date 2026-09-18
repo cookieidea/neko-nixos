@@ -1,5 +1,4 @@
-# BedrockBoot（MC 基岩版启动器，Avalonia/.NET，AppImage → FHS）
-# 更新：改 version + sha256
+# BedrockBoot（MC 基岩版启动器，Avalonia/.NET）
 { pkgs }:
 
 let
@@ -20,8 +19,7 @@ let
     exec ${extracted}/AppRun "$@"
   '';
 
-  # Xbox 登录需开系统浏览器；沙箱内 chrome/portal-gio 不可靠（可直连宿主
-  # session bus）→ 注入自定义 xdg-open 直调 org.freedesktop.portal.OpenURI
+  # 自定义 xdg-open（走 portal 开系统浏览器）
   xdgOpenSupport = pkgs.stdenv.mkDerivation {
     pname = "bedrockboot-xdg-support";
     version = "1";
@@ -54,7 +52,7 @@ let
     extraBuildCommands = ''
       mkdir -p $out/usr/bin
       cp -a ${xdgOpenSupport}/usr/bin/* $out/usr/bin/
-      # BedrockBoot 用 wineboot 初始化 prefix 启动基岩版：宿主 wine-wow64 + python3（GDK-Proton 脚本需要）
+      # wine 初始化 prefix
       for b in ${pkgs.wineWow64Packages.stable}/bin/*; do
         ln -sf "$b" $out/usr/bin/$(basename "$b")
       done
@@ -62,14 +60,12 @@ let
     '';
     runScript = pkgs.writeShellScript "bedrockboot-run" ''
       export GDK_BACKEND=x11
-      # 用 GDK-Proton 自带 wine 11.1（宿主 11.0 与 GDK 库不匹配 → 崩溃）；
-      # 其 wine 为 Wayland 后端，bin-wow64 缺 wineboot → 宿主 /usr/bin 兜底
+      # 用 GDK-Proton 自带 wine
       export GDK_PROTON_DIR="$HOME/.config/RoundStudio/BedrockBoot2/BedrockBoot.Linux/xuserProject/proton/GDK-Proton-xuser"
       export PATH="$GDK_PROTON_DIR/files/bin-wow64:$PATH"
       export WINEDLLPATH="$GDK_PROTON_DIR/files/lib/wine/x86_64-unix''${WINEDLLPATH:+:$WINEDLLPATH}"
       export LD_LIBRARY_PATH="$GDK_PROTON_DIR/files/lib/x86_64-linux-gnu:/usr/lib64:/usr/lib:/usr/lib/x86_64-linux-gnu''${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
-      # ⚠️ 不能强制 VK_DRIVER_FILES=lavapipe（游戏经 umu 在沙箱外跑 → 找不到 ICD 白屏），
-      #    走宿主 RADV；DXVK 与内置 vkd3d 混用白屏 → 强制 wine 内置 D3D 栈
+      # 走宿主 RADV + wine 内置 D3D 栈
       export WINEDLLOVERRIDES="d3d12=b;d3d12core=b;dxgi=b"
       exec ${appRun} "$@"
     '';
@@ -84,7 +80,7 @@ let
       pkgs.zlib
       pkgs.openssl
       pkgs.icu            # .NET ICU
-      # 图形 / 字体 / X11 / Wayland（Avalonia 渲染）
+      # 图形 / 字体 / X11 / Wayland
       pkgs.fontconfig
       pkgs.freetype
       pkgs.libx11
@@ -96,7 +92,7 @@ let
       pkgs.dbus
       pkgs.glib
       pkgs.gsettings-desktop-schemas
-      # Avalonia/X11 运行时库
+      # Avalonia / X11
       pkgs.libICE
       pkgs.libSM
       pkgs.libXt
@@ -110,7 +106,7 @@ let
       pkgs.libXcomposite
       pkgs.libxshmfence
       pkgs.libXpresent
-      # GDK wine ntdll.so 需 liblzma.so.5；音频 pulse/alsa
+      # 压缩库 + 音频
       pkgs.xz
       pkgs.libpulseaudio
       pkgs.alsa-lib
@@ -127,7 +123,7 @@ pkgs.stdenv.mkDerivation {
     mkdir -p $out/bin $out/share/applications $out/share/pixmaps
     ln -s ${fhsEnv}/bin/bedrockboot $out/bin/bedrockboot
 
-    # 图标：从解包产物找
+    # 图标
     icon=$(find . -path "*icons*" -name "*.png" 2>/dev/null | head -1)
     [ -n "$icon" ] && cp "$icon" "$out/share/pixmaps/bedrockboot.png" || true
 

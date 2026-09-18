@@ -1,7 +1,5 @@
 # Astral 组网客户端（Flutter GUI + Rust/EasyTier 核心）
-# 沙箱内无法联网构建（cargokit/dart pub 均需网络）→ bundle 由 build.sh 联网
-# 构建到 ~/.cache/astral/bundle，经 flake 输入 astral-bundle（path 引用）打包；
-# 产物不入 git。升级：跑 build.sh，内容哈希变化自动重建。
+# bundle 由 build.sh 联网构建到 ~/.cache/astral/bundle（flake 输入 astral-bundle）
 { pkgs, lib, src }:
 
 pkgs.stdenv.mkDerivation {
@@ -89,9 +87,7 @@ EOF
   '';
 
   postFixup = ''
-    # TUN 需 cap_net_admin，沙箱内无法 setcap；GUI 会复制 core 到
-    # ~/.local/share/astral-core/app/ 再运行 → 升级后需重跑：
-    #   sudo setcap cap_net_admin=ep ~/.local/share/astral-core/app/astral-core
+    # TUN 需 cap_net_admin，装后手动 setcap（见 README）
     makeWrapper $out/app/astral $out/bin/astral \
       --prefix LD_LIBRARY_PATH : "$out/app/lib:${
         lib.makeLibraryPath (with pkgs; [

@@ -1,4 +1,4 @@
-# 带扩展的 nautilus（symlinkJoin 把 C 扩展 .so 合进 nautilus 的 extensions-4 目录）
+# 带扩展的 nautilus（symlinkJoin 合入 extensions-4 目录）
 { pkgs }:
 let
   imgconv = import ./image-converter.nix { inherit pkgs; };

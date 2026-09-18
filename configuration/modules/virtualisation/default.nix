@@ -14,16 +14,16 @@
   ];
 
   programs.steam.enable = true;
-  # Steam 中文字体：FHS fontconfig 渲染不了 VF（noto-cjk）→ 用静态 sarasa
+  # Steam 中文字体（用静态 sarasa）
   programs.steam.fontPackages = with pkgs; [ sarasa-gothic ];
-  # GE-Proton（声明式；Steam 里直接选 compattool）
+  # GE-Proton
   programs.steam.extraCompatPackages = with pkgs; [ proton-ge-bin ];
-  # 远程游玩 / 专用服务器：自动放行所需端口（防火墙已启用，否则连不上）
+  # 远程游玩 / 专用服务器：自动放行所需端口
   programs.steam.remotePlay.openFirewall = true;
   programs.steam.dedicatedServer.openFirewall = true;
 
   virtualisation.libvirtd.enable = true;
-  # Waydroid（Android 容器；CachyOS 内核已移除 iptables → 用 nftables 版）
+  # Waydroid（Android 容器，nftables 版）
   virtualisation.waydroid.enable = true;
   virtualisation.waydroid.package = pkgs.waydroid-nftables;
   services.geoclue2.enable = true;   # Waydroid GPS 转发
@@ -37,8 +37,7 @@
     "https://docker.xuanyuan.me"
     "https://docker.m.daocloud.io"
   ];
-  # distrobox：容器内挂载 /nix/store 与 per-user profiles（shell 初始化引用
-  # hm-session-vars.sh 等路径，默认只挂 $HOME 会报 no such file）
+  # distrobox：挂载 /nix/store 与 per-user profiles
   environment.etc."distrobox/distrobox.conf".text = ''
     container_additional_volumes="/nix/store:/nix/store:ro /etc/profiles/per-user:/etc/profiles/per-user:ro /etc/static/profiles/per-user:/etc/static/profiles/per-user:ro"
   '';
