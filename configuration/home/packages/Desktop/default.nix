@@ -9,11 +9,16 @@
     adwaita-icon-theme                          # Adwaita 基底图标
     papirus-icon-theme                          # Papirus 图标主题
     hicolor-icon-theme                          # hicolor 兜底主题
-    (pkgs.runCommand "nautilus-wrapper" { buildInputs = [ pkgs.makeWrapper ]; } ''
-      makeWrapper ${pkgs.nautilus}/bin/nautilus $out/bin/nautilus \
-        --set NAUTILUS_4_EXTENSION_DIR "${selfPackages.nautilus-extensions.nautilus-with-extensions}/lib/nautilus/extensions-4" \
-        --prefix PATH : "${pkgs.lib.makeBinPath [ pkgs.imagemagick pkgs.jpegoptim pkgs.pngquant pkgs.ffmpeg pkgs.coreutils ]}"
-    '')                                              # nautilus + image-converter
+    (pkgs.symlinkJoin {
+      name = "nautilus-wrapper";
+      paths = [ pkgs.nautilus ];
+      nativeBuildInputs = [ pkgs.makeWrapper ];
+      postBuild = ''
+        wrapProgram $out/bin/nautilus \
+          --set NAUTILUS_4_EXTENSION_DIR "${selfPackages.nautilus-extensions.nautilus-with-extensions}/lib/nautilus/extensions-4" \
+          --prefix PATH : "${pkgs.lib.makeBinPath [ pkgs.imagemagick pkgs.jpegoptim pkgs.pngquant pkgs.ffmpeg pkgs.coreutils ]}"
+      '';
+    })                                              # nautilus + image-converter（symlinkJoin 保留 desktop 文件）
     nautilus-python                             # nautilus Python 扩展加载器
     localsearch                                 # nautilus 全文搜索后端
     zenity                                      # mpv 文件对话框
