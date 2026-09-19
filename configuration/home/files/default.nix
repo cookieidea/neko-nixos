@@ -121,12 +121,6 @@
       force = true;
     };
 
-    # QQ（Flatpak）desktop 入口
-    ".local/share/applications/qq.desktop" = {
-      source = ../dotfiles/config/qq-desktop.desktop;
-      force = true;
-    };
-
     # 随机壁纸脚本（noctalia IPC）
     ".config/scripts/noctalia-wallpaper-autostart.sh" = {
       source = ../dotfiles/scripts/noctalia-wallpaper-autostart.sh;
