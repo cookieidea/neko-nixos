@@ -16,7 +16,6 @@
       "noctalia.cachix.org-1:pCOR47nnMEo5thcxNDtzWpOxNFQsBRglJzxWPp3dkU4="
       "nekobox.cachix.org-1:bRpp0vZK2Uq/vnydXC+uuOmFJW3W6fN4PI5PDy4iD+s="
       "niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g="
-      "https://cache.numtide.com"
     ];
   };
 
@@ -34,28 +33,28 @@
     };
 
     cooknixvim = {
-      url = "git+https://github.com/Youthdreamer/CookNixvim";
+      url = "git+https://ghfast.top/https://github.com/Youthdreamer/CookNixvim";
     };
 
     # B 站直播弹幕阅读器（PyQt6 + layer-shell，游戏全屏时浮窗显示）
     # 上游 flake 基于 nixos-unstable；follows 后其打包定义用我们的 nixpkgs 求值
     bilihud = {
-      url = "github:locez/bilihud";
+      url = "git+https://ghfast.top/https://github.com/locez/bilihud";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
     # ⚠️ CachyOS 内核：不要 follows nixpkgs（补丁需匹配其 pin 的 nixpkgs 才能命中缓存）
     nix-cachyos-kernel = {
-      url = "git+https://github.com/xddxdd/nix-cachyos-kernel?ref=release";
+      url = "git+https://ghfast.top/https://github.com/xddxdd/nix-cachyos-kernel?ref=release";
     };
 
     # ⚠️ Noctalia：cachix 分支（命中官方缓存）；不要 follows nixpkgs
     noctalia = {
-      url = "git+https://github.com/noctalia-dev/noctalia.git?ref=cachix";
+      url = "git+https://ghfast.top/https://github.com/noctalia-dev/noctalia.git?ref=cachix";
     };
 
     noctalia-greeter = {
-      url = "git+https://github.com/noctalia-dev/noctalia-greeter?ref=main";
+      url = "git+https://ghfast.top/https://github.com/noctalia-dev/noctalia-greeter?ref=main";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -73,17 +72,17 @@
 
     # BestClient（DDNet fork）：官方 flake 打包预编译版
     bestclient = {
-      url = "git+https://github.com/BestProjectTeam/BestClient";
+      url = "git+https://ghfast.top/https://github.com/BestProjectTeam/BestClient";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
     mark-shot = {
-      url = "git+https://github.com/jswysnemc/mark-shot";
+      url = "git+https://ghfast.top/https://github.com/jswysnemc/mark-shot";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
     llm-agents-nix = {
-      url = "github:numtide/llm-agents.nix";
+      url = "git+https://ghfast.top/https://github.com/numtide/llm-agents.nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };

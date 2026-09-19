@@ -50,11 +50,11 @@
         "rev": "909b4aafe1b4a82e5e559e06ea419b9c9fa53479",
         "revCount": 26549,
         "type": "git",
-        "url": "https://github.com/BestProjectTeam/BestClient"
+        "url": "https://ghfast.top/https://github.com/BestProjectTeam/BestClient"
       },
       "original": {
         "type": "git",
-        "url": "https://github.com/BestProjectTeam/BestClient"
+        "url": "https://ghfast.top/https://github.com/BestProjectTeam/BestClient"
       }
     },
     "bilihud": {
@@ -67,15 +67,15 @@
       "locked": {
         "lastModified": 1788342964,
         "narHash": "sha256-FNMNQUvaDXa7keswTvSzvS69SQqIqw+UwTTINFMY/HU=",
-        "owner": "locez",
-        "repo": "bilihud",
+        "ref": "refs/heads/main",
         "rev": "87e6440028733e052bc8ed99855b33929d5c1e38",
-        "type": "github"
+        "revCount": 159,
+        "type": "git",
+        "url": "https://ghfast.top/https://github.com/locez/bilihud"
       },
       "original": {
-        "owner": "locez",
-        "repo": "bilihud",
-        "type": "github"
+        "type": "git",
+        "url": "https://ghfast.top/https://github.com/locez/bilihud"
       }
     },
     "blivedm": {
@@ -141,11 +141,11 @@
         "rev": "abf95546c1f2e17957ef88320f6d9b6df8f76965",
         "revCount": 67,
         "type": "git",
-        "url": "https://github.com/Youthdreamer/CookNixvim"
+        "url": "https://ghfast.top/https://github.com/Youthdreamer/CookNixvim"
       },
       "original": {
         "type": "git",
-        "url": "https://github.com/Youthdreamer/CookNixvim"
+        "url": "https://ghfast.top/https://github.com/Youthdreamer/CookNixvim"
       }
     },
     "darwin": {
@@ -338,15 +338,15 @@
       "locked": {
         "lastModified": 1789617213,
         "narHash": "sha256-bVHFzwXsGqbR6JUoiUtGE6SxN8z7yZgHE+1WBUpn3i8=",
-        "owner": "numtide",
-        "repo": "llm-agents.nix",
+        "ref": "refs/heads/main",
         "rev": "8116299652f09749a0e1b8780cc4a6b4b5e85897",
-        "type": "github"
+        "revCount": 18552,
+        "type": "git",
+        "url": "https://ghfast.top/https://github.com/numtide/llm-agents.nix"
       },
       "original": {
-        "owner": "numtide",
-        "repo": "llm-agents.nix",
-        "type": "github"
+        "type": "git",
+        "url": "https://ghfast.top/https://github.com/numtide/llm-agents.nix"
       }
     },
     "mark-shot": {
@@ -361,13 +361,13 @@
         "narHash": "sha256-vV8J3Ej3DbuIUJMtsGS6g19R/1J4nZFooX+SwqwktRs=",
         "ref": "refs/heads/main",
         "rev": "08f8272accf2d511eaf5f1aafa8fd1766b04ef42",
-        "revCount": 455,
+        "revCount": 465,
         "type": "git",
-        "url": "https://github.com/jswysnemc/mark-shot"
+        "url": "https://ghfast.top/https://github.com/jswysnemc/mark-shot"
       },
       "original": {
         "type": "git",
-        "url": "https://github.com/jswysnemc/mark-shot"
+        "url": "https://ghfast.top/https://github.com/jswysnemc/mark-shot"
       }
     },
     "nix-cachyos-kernel": {
@@ -383,12 +383,12 @@
         "rev": "444d135dde71c1de547cf7bfd73e67145e67aebb",
         "revCount": 390,
         "type": "git",
-        "url": "https://github.com/xddxdd/nix-cachyos-kernel"
+        "url": "https://ghfast.top/https://github.com/xddxdd/nix-cachyos-kernel"
       },
       "original": {
         "ref": "release",
         "type": "git",
-        "url": "https://github.com/xddxdd/nix-cachyos-kernel"
+        "url": "https://ghfast.top/https://github.com/xddxdd/nix-cachyos-kernel"
       }
     },
     "nixpkgs": {
@@ -528,14 +528,14 @@
         "narHash": "sha256-obiNV+juEjUYDDusgYQukjLyoVsJJPmYppmjvIEfkSg=",
         "ref": "cachix",
         "rev": "8c52cb71b5bcafbf67bfb8e659f1fc45f882a008",
-        "revCount": 5554,
+        "revCount": 5555,
         "type": "git",
-        "url": "https://github.com/noctalia-dev/noctalia.git"
+        "url": "https://ghfast.top/https://github.com/noctalia-dev/noctalia.git"
       },
       "original": {
         "ref": "cachix",
         "type": "git",
-        "url": "https://github.com/noctalia-dev/noctalia.git"
+        "url": "https://ghfast.top/https://github.com/noctalia-dev/noctalia.git"
       }
     },
     "noctalia-greeter": {
@@ -549,14 +549,14 @@
         "narHash": "sha256-EUAnyaH/qpAaNWrgtARuPK7Lnow2kwnZBwnQDmsIERU=",
         "ref": "main",
         "rev": "d9fe1d7851464a923020d39efae8a6e3561f0d63",
-        "revCount": 243,
+        "revCount": 261,
         "type": "git",
-        "url": "https://github.com/noctalia-dev/noctalia-greeter"
+        "url": "https://ghfast.top/https://github.com/noctalia-dev/noctalia-greeter"
       },
       "original": {
         "ref": "main",
         "type": "git",
-        "url": "https://github.com/noctalia-dev/noctalia-greeter"
+        "url": "https://ghfast.top/https://github.com/noctalia-dev/noctalia-greeter"
       }
     },
     "root": {
