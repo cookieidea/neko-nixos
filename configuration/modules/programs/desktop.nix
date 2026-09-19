@@ -6,7 +6,7 @@
   imports = [
     noctalia-greeter.nixosModules.default
   ];
-  programs.noctalia-greeter = {
+  services.displayManager.noctalia-greeter = {
     enable = true;
     greeter-args = "--session niri";
     settings = {
@@ -39,12 +39,9 @@ Icon=/var/lib/AccountsService/icons/${username}
 EOF
   '';
 
-  # XDG 桌面门户
+  # XDG 桌面门户（niri 模块已提供 gnome+gtk 与 gnome-keyring 配置，见 nixos/modules/programs/wayland/niri.nix）
   xdg.portal.enable = true;
   programs.dconf.enable = true;   # home-manager gtk 模块依赖
-  # 屏幕共享 / 文件对话框 portal 兜底
-  xdg.portal.extraPortals = with pkgs; [ xdg-desktop-portal-gtk xdg-desktop-portal-gnome xdg-desktop-portal-hyprland xdg-desktop-portal-wlr ];
-  xdg.portal.config.common.default = "gtk";
 
   # Flatpak：启动时 one-shot 添加 remote + 自动装应用
   services.flatpak.enable = true;

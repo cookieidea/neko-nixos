@@ -208,7 +208,7 @@ builtin_ids = ["kitty", "qt", "starship"]
 community_ids = []
 
 # NyxMellow 动态 fcitx5 皮肤（mellow 形状 + Material You 自动取色）
-# 路径中的 /home/cookie 为占位符，由 lib/deploy.sh 在部署时替换为实际 $HOME
+# 下段路径为硬编码 /home/cookie，仅在用户名为 cookie 时有效
 [theme.templates.user.nyxmellow_theme]
 index = 0
 input_path = "/home/cookie/.local/share/fcitx5/themes/nyxmellow/templates/theme.conf"

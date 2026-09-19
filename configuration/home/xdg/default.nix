@@ -24,7 +24,7 @@
     # ABDM 托盘（unit drop-in 注入 LD_LIBRARY_PATH 与 log 目录）
     "systemd/user/app-com.abdownloadmanager@autostart.service.d/10-abdm-tray.conf".text = ''
       [Service]
-      Environment=LD_LIBRARY_PATH=${pkgs.systemdLibs}/lib:/nix/store/zcqp398mxlw62jl02sx0rsc7gvcl1qhc-pipewire-1.6.6-jack/lib
+      Environment=LD_LIBRARY_PATH=${pkgs.systemdLibs}/lib:${pkgs.pipewire.jack}/lib
       ExecStartPre=${pkgs.coreutils}/bin/mkdir -p %h/.abdm/system/log
     '';
     "fcitx5/conf/cached_layouts".source = ../dotfiles/config/fcitx5/conf/cached_layouts;
