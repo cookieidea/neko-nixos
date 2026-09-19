@@ -15,14 +15,17 @@
     "https://cache.numtide.com"
     # CookNixvim 官方缓存（nvim 及其插件）
     "https://cook-nixvim.cachix.org"
+    # nix-community 通用缓存（unfree 可再分发包 + 社区包，官方源不构建这类）
+    "https://nix-community.cachix.org"
   ];
   # 同理，cache.nixos.org 的 key 由模块默认提供，此处只列额外缓存
   nix.settings.trusted-public-keys = [
     "lantian:EeAUQ+W+6r7EtwnmYjeVwx5kOGEBpjlBfPlzGlTNvHc="
-    "noctalia.cachix.org-1:pCOR47nnMEo5thcxNDtzWpOxNFQsBRglJzxWPp3dkU4="
+    "noctalia.cachix.org-1:pCOR47nnMeo5thcxNDtzWpOxNFQsBRglJzxWPp3dkU4="
     "nekobox.cachix.org-1:bRpp0vZK2Uq/vnydXC+uuOmFJW3W6fN4PI5PDy4iD+s="
     "niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g="
     "cook-nixvim.cachix.org-1:LjCZ3VSYrcwTQxHpd834EIswdkfHoSd/EsKUYLRruF4="
+    "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
   ];
   # 允许本用户使用 --substituters 等客户端缓存设置（否则被忽略：not a trusted user）
   # root 由 nixos/modules/config/nix.nix 默认提供，无需重复
