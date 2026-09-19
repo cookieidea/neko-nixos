@@ -3,21 +3,25 @@
 
 {
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
-  # 二进制缓存：国内镜像优先，官方源兜底
+  # 二进制缓存：国内镜像优先。cache.nixos.org 由 nixos/modules/config/nix.nix
+  # 用 mkAfter 自动追加到末尾兜底，无需手写（手写会重复）
   nix.settings.substituters = [
     "https://mirrors.ustc.edu.cn/nix-channels/store"
     "https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store"
     "https://attic.xuyh0120.win/lantian"
     "https://noctalia.cachix.org"
     "https://nekobox.cachix.org"
-    "https://cache.nixos.org"
   ];
+  # 同理，cache.nixos.org 的 key 由模块默认提供，此处只列额外缓存
   nix.settings.trusted-public-keys = [
-    "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
     "lantian:EeAUQ+W+6r7EtwnmYjeVwx5kOGEBpjlBfPlzGlTNvHc="
     "noctalia.cachix.org-1:pCOR47nnMEo5thcxNDtzWpOxNFQsBRglJzxWPp3dkU4="
     "nekobox.cachix.org-1:bRpp0vZK2Uq/vnydXC+uuOmFJW3W6fN4PI5PDy4iD+s="
   ];
+  # 允许本用户使用 --substituters 等客户端缓存设置（否则被忽略：not a trusted user）
+  # root 由 nixos/modules/config/nix.nix 默认提供，无需重复
+  nix.settings.trusted-users = [ username ];
+
   nixpkgs.config = {
     allowUnfree = true;   # 允许非自由软件（steam/wechat-uos 等）
     rocmSupport = true;   # ROCm/HIP GPU 计算
