@@ -42,16 +42,9 @@
     fi
   '';
 
-  # 壁纸真实文件（不用软链）
+  # 视频壁纸真实文件（不用软链）
   home.activation.wallpaperRealFiles = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     WP="$HOME/Pictures/Wallpapers"
-    for f in wallhaven-d88d53.png wallhaven-yq8w67.jpg; do
-      if [ -L "$WP/$f" ] || [ ! -e "$WP/$f" ]; then
-        $DRY_RUN_CMD mkdir -p "$WP"
-        $DRY_RUN_CMD rm -f "$WP/$f"
-        $DRY_RUN_CMD cp -f "${hmLib.seedWallpaperDir}/$f" "$WP/$f"
-      fi
-    done
     # 视频壁纸本体 + mpvpaper 插件赋值路径（assignments.json 指向 ~/Videos/wallpaper/）
     for dest in "$WP/video/hatsune-miku.mp4" "$HOME/Videos/wallpaper/hatsune-miku.mp4"; do
       if [ -L "$dest" ] || [ ! -e "$dest" ]; then

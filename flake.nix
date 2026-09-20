@@ -104,7 +104,7 @@
       selfPackages = import ./configuration/pkgs { inherit pkgs astral-bundle; };
 
       # home 模块共用绑定（原 home.nix 顶部 let 块）→ 注入为 hmLib
-      hmLib = import ./configuration/home/lib.nix { inherit pkgs selfPackages; };
+      hmLib = import ./configuration/home/lib.nix { inherit pkgs selfPackages username; };
 
       hmModule = {
         imports = [ home-manager.nixosModules.home-manager ];

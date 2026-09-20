@@ -220,28 +220,10 @@
       source = ../dotfiles/local/share/fcitx5/themes/nyxmellow/templates/highlight.svg;
     };
 
-    # 国内镜像源
-    ".npmrc".text = ''
-      registry=https://registry.npmmirror.com
-      prefix=/home/cookie/.npm-global
-    '';
-    ".cargo/config.toml".text = ''
-      [source.crates-io]
-      replace-with = 'ustc'
-      [source.ustc]
-      registry = "sparse+https://mirrors.ustc.edu.cn/crates.io-index/"
-      [net]
-      git-fetch-with-cli = true
-    '';
-    ".config/pip/pip.conf".text = ''
-      [global]
-      index-url = https://mirrors.ustc.edu.cn/pypi/simple
-      trusted-host = mirrors.ustc.edu.cn
-    '';
-    ".config/uv/uv.toml".text = ''
-      [[index]]
-      url = "https://mirrors.ustc.edu.cn/pypi/simple"
-      default = true
-    '';
+    # 国内镜像源（内容定义见 modules/home/lib.nix，单一数据源）
+    ".npmrc".text = hmLib.npmrc;
+    ".cargo/config.toml".text = hmLib.cargoConfig;
+    ".config/pip/pip.conf".text = hmLib.pipConf;
+    ".config/uv/uv.toml".text = hmLib.uvToml;
   };
 }

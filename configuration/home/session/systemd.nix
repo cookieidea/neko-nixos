@@ -5,11 +5,14 @@
   # systemd user 服务（登录图形会话后自启）
 
   # nautilus-open-any-terminal（niri 由 systemd 服务 spawn，需注入 gi/typelib）
-  systemd.user.sessionVariables = {
-    PYTHONPATH = "${pkgs.python3Packages.pygobject3}/lib/python3.13/site-packages:${selfPackages.k7sfunc}/lib/python3.13/site-packages:${pkgs.python3Packages.vapoursynth}/lib/python3.13/site-packages";
+  #
+  # 这些值必须与 home.sessionVariables 一致：niri/nautilus 等由 systemd 拉起，
+  # 不读 ~/.profile，只能靠 systemd.user.sessionVariables 注入。
+  # 故 PYTHONPATH / VAPOURSYNTH_EXTRA_PLUGIN_PATH / JAVA_HOME / CARGO_HOME
+  # 统一取自 lib.nix 的 devEnv（单一数据源，避免两处漂移）。
+  systemd.user.sessionVariables = hmLib.devEnv // {
     GI_TYPELIB_PATH = "${pkgs.nautilus}/lib/girepository-1.0";
-    NAUTILUS_4_EXTENSION_DIR = "${selfPackages.nautilus-extensions.nautilus-with-extensions}/lib/nautilus/extensions-4";
-    VAPOURSYNTH_EXTRA_PLUGIN_PATH = "${selfPackages.vapoursynth-with-plugins}/lib/vapoursynth";
+    NAUTILUS_4_EXTENSION_DIR = hmLib.nautilusExtensionDir;
   };
 
   # astral 关机超时（SIGTERM 后 100ms 未退出即 SIGKILL）
