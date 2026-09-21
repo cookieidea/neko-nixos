@@ -1,7 +1,7 @@
 {
   description = "Shorin Arch Setup (shorin-arch-setup) → NixOS + Home Manager conversion";
 
-  # 国内二进制缓存（USTC 优先 + TUNA 兜底）；nixpkgs 源码走 USTC tarball，其余输入走 github。
+  
   nixConfig = {
     extra-substituters = [
       "https://mirrors.ustc.edu.cn/nix-channels/store"
@@ -20,13 +20,9 @@
   };
 
   inputs = {
-    # nixpkgs 走国内镜像的 git 浅克隆（NJU 主选，TUNA 备选）：
-    # 仍是真正的 git 输入 → flake.lock 锁 rev + narHash，不漂移；
-    # 下载源在国内，不依赖 GitHub 可达性。更新：nix flake update nixpkgs
+    # nixpkgs 使用国内 Git 镜像，锁定的 rev 仍由 flake.lock 保证。
     nixpkgs.url = "git+https://mirrors.nju.edu.cn/git/nixpkgs.git?ref=nixos-26.05&shallow=1";
-    # 备选：nixpkgs.url = "git+https://mirrors.tuna.tsinghua.edu.cn/git/nixpkgs.git?ref=nixos-26.05&shallow=1";
-    # home-manager：GitCode 镜像（国内，分支与 GitHub 同步，rev 不变则 narHash 沿用）；
-    # 注意上游官方地址已从 rycee/ 迁到 nix-community/，此处一并校正。
+    # Home Manager 使用镜像地址；上游仓库已迁移到 nix-community。
     home-manager = {
       url = "git+https://gitcode.com/nix-community/home-manager.git?ref=release-26.05";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -36,19 +32,18 @@
       url = "git+https://github.com/Youthdreamer/CookNixvim";
     };
 
-    # B 站直播弹幕阅读器（PyQt6 + layer-shell，游戏全屏时浮窗显示）
-    # 上游 flake 基于 nixos-unstable；follows 后其打包定义用我们的 nixpkgs 求值
+    # bilihud：B 站直播弹幕浮窗。
     bilihud = {
       url = "github:locez/bilihud";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # ⚠️ CachyOS 内核：不要 follows nixpkgs（补丁需匹配其 pin 的 nixpkgs 才能命中缓存）
+    # CachyOS 内核使用项目自身固定的 nixpkgs。
     nix-cachyos-kernel = {
       url = "git+https://github.com/xddxdd/nix-cachyos-kernel?ref=release";
     };
 
-    # ⚠️ Noctalia：cachix 分支（命中官方缓存）；不要 follows nixpkgs
+    # Noctalia 使用官方 Cachix 分支。
     noctalia = {
       url = "git+https://github.com/noctalia-dev/noctalia.git?ref=cachix";
     };
@@ -58,13 +53,13 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # agenix：age 加密的声明式 secrets（GitCode 镜像）
+    # agenix：声明式 age secrets。
     agenix = {
       url = "git+https://gitcode.com/ryantm/agenix.git?ref=main";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # BestClient（DDNet fork）：官方 flake 打包预编译版
+    # BestClient：预编译 DDNet fork。
     bestclient = {
       url = "git+https://github.com/BestProjectTeam/BestClient";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -89,8 +84,7 @@
       hostname = "ATRI";
       desktop  = "niri";
 
-      # 自构建程序派生（见 ./configuration/pkgs）。显式 import nixpkgs 带 allowUnfree（unfree 包评估
-      # 需要 nixpkgs.config，legacyPackages 裸实例会拒）；仅作用于 selfPackages。
+      # 自构建包显式启用 allowUnfree，只影响 selfPackages。
       pkgs = import nixpkgs {
         inherit system;
         config.allowUnfree = true;
@@ -98,7 +92,7 @@
 
       selfPackages = import ./configuration/pkgs { inherit pkgs; };
 
-      # home 模块共用绑定（原 home.nix 顶部 let 块）→ 注入为 hmLib
+      # Home 模块共享库。
       hmLib = import ./configuration/home/lib.nix { inherit pkgs selfPackages username; };
 
       hmModule = {
@@ -112,11 +106,11 @@
         home-manager.extraSpecialArgs = { inherit desktop username cooknixvim bilihud selfPackages noctalia bestclient mark-shot llm-agents-nix hmLib; };
       };
     in {
-      # 暴露自构建派生为 flake 包：可单独 `nix build .#<name>`
+      # 导出自构建包，支持单独 nix build。
       packages.${system} = selfPackages;
 
       nixosConfigurations = {
-        # 实体机；硬件配置见 configuration/device/hardware-config.nix（需 git add）
+        # 实体机配置。硬件文件由安装目标机生成。
         ${hostname} = nixpkgs.lib.nixosSystem {
           inherit system;
           specialArgs = { inherit noctalia-greeter; };
@@ -124,29 +118,21 @@
             ./configuration/system.nix
             hmModule
             agenix.nixosModules.default
-            # overlays 见 configuration/overlays/default.nix
+            # 平台 overlays。
             (import ./configuration/overlays { inherit nix-cachyos-kernel; })
           ];
         };
       };
 
-      # nix fmt：格式化所有 .nix
-      # 注：nixfmt-rfc-style 已并入 pkgs.nixfmt（两者同版本），用后者避免废弃警告
+      # Nix 格式化器。
       formatter = forAllSystems (system: nixpkgs.legacyPackages.${system}.nixfmt);
 
-      # nix flake check —— 静态分析
-      #
-      # deadnix：未使用的 let 绑定与 lambda 参数（本仓库重构时曾漏过引用）。
-      #   排除 pkgs/ 下的第三方派生与 dev-shell（上游代码，不该由本仓库的风格约束）。
-      #
-      # statix：Nix 反模式。默认只当**警告**（不阻塞），因为其 W20 会把
-      #   `services.a = ...; services.b = ...;` 这种合法的点号语法误报为
-      #   「重复键」（已实测：a.b/a.c 会 desugar 成嵌套 attrset，完全合法）。
-      #   想看得更严可跑：nix run nixpkgs#statix -- check .
+      # 静态检查只覆盖仓库自维护的 Nix 配置。
+      # deadnix 检查未使用绑定；statix 保持非阻塞使用。
       checks = forAllSystems (system:
         let
           pkgs = nixpkgs.legacyPackages.${system};
-          # 只纳入本仓库自己维护的配置，排除第三方源码与 dotfiles
+          # 只检查本仓库维护的配置。
           targets = "configuration/system configuration/modules configuration/home configuration/overlays flake.nix";
         in {
           deadnix = pkgs.runCommand "deadnix-check"
