@@ -1,4 +1,4 @@
-# home.file 部署：JDK 链、图标、desktop 入口、脚本、镜像源
+# home.file：JDK、图标、desktop entry、脚本和镜像配置。
 { hmLib, pkgs, ... }:
 
 {
@@ -6,19 +6,19 @@
 
   home.file = {
 
-    # HMCL 的 JDK 列表（扫 ~/.jdks）
+    # HMCL JDK 列表。
     ".jdks/zulu25".source = "${pkgs.zulu25}";
     ".jdks/zulu21".source = "${pkgs.zulu21}";
     ".jdks/zulu17".source = "${pkgs.zulu17}";
     ".jdks/zulu8".source = "${pkgs.zulu8}";
 
-    # 用户头像（greeter / 控制中心读取）
+    # 用户头像。
     ".face".source = ../dotfiles/avatar.png;
 
-    # fastfetch logo
+    # Fastfetch logo。
     ".local/share/fastfetch/NixOS.png".source = ../dotfiles/config/fastfetch/NixOS.png;
 
-    # 用户目录映射
+    # 用户目录。
     ".config/user-dirs.dirs" = {
       force = true;
       text = ''
@@ -33,14 +33,14 @@
       '';
     };
 
-    # 新建文档模板
+    # 文档模板。
     "Templates/空白文本.txt" = { force = true; text = ""; };
     "Templates/空白文档.md" = { force = true; text = ""; };
     "Templates/空白文档.yaml" = { force = true; text = ""; };
     "Templates/空白文档.json" = { force = true; text = ""; };
     "Templates/空白文档.sh" = { force = true; text = "#!/usr/bin/env bash\n"; executable = true; };
 
-    # nvim.desktop 覆盖（上游 Terminal=true，图形启动器打不开）
+    # Neovim desktop entry 覆盖。
     ".local/share/applications/nvim.desktop" = {
       force = true;
       text = ''
@@ -59,7 +59,7 @@
       '';
     };
 
-    # fcitx5 托盘 / 菜单图标（hicolor 兜底）
+    # Fcitx5 托盘和菜单图标。
     ".local/share/icons/hicolor/scalable/apps/input-keyboard-symbolic.svg" = {
       source = ../dotfiles/icons/hicolor/scalable/apps/input-keyboard-symbolic.svg;
       force = true;
@@ -73,13 +73,13 @@
       force = true;
     };
 
-    # KCalc 图标（accessories-calculator 仅 breeze 有）
+    # KCalc 图标。
     ".local/share/icons/hicolor/scalable/apps/accessories-calculator.svg" = {
       source = ../dotfiles/icons/hicolor/scalable/apps/accessories-calculator.svg;
       force = true;
     };
 
-    # 应用图标（tabby / splayer-next / lunarclient）
+    # 应用图标。
     ".local/share/icons/hicolor/256x256/apps/tabby.png" = {
       source = ../dotfiles/icons/hicolor/256x256/apps/tabby.png;
       force = true;
@@ -93,7 +93,7 @@
       force = true;
     };
 
-    # AppImage 包的 desktop 入口（上游不带标准路径 desktop）
+    # AppImage desktop entry。
     ".local/share/applications/tabby.desktop" = {
       text = ''
         [Desktop Entry]
@@ -121,14 +121,14 @@
       force = true;
     };
 
-    # 随机壁纸脚本（noctalia IPC）
+    # 随机壁纸脚本。
     ".config/scripts/noctalia-wallpaper-autostart.sh" = {
       source = ../dotfiles/scripts/noctalia-wallpaper-autostart.sh;
       executable = true;
       force = true;
     };
 
-    # 壁纸 / 快照脚本
+    # 壁纸和快照脚本。
     ".local/bin/random-anime-wallpaper-noctalia" = {
       source = ../dotfiles/local/bin/random-anime-wallpaper-noctalia;
       executable = true;
@@ -142,13 +142,13 @@
       executable = true;
     };
 
-    # fcitx5 配置与主题
+    # Fcitx5 配置和主题。
     ".local/share/fcitx5/rime/default.custom.yaml".source = ../dotfiles/local/share/fcitx5/rime/default.custom.yaml;
     ".local/share/fcitx5/rime/rime_ice.custom.yaml".source = ../dotfiles/local/share/fcitx5/rime/rime_ice.custom.yaml;
     ".local/share/fcitx5/themes/Matugen/theme.conf".source = ../dotfiles/local/share/fcitx5/themes/Matugen/theme.conf;
     ".local/share/fcitx5/themes/default/theme.conf".source = ../dotfiles/local/share/fcitx5/themes/default/theme.conf;
 
-    # Adwaita-Matugen 图标主题
+    # Adwaita-Matugen 图标主题。
     ".local/share/icons/Adwaita-Matugen-B/index.theme".source = ../dotfiles/local/share/icons/Adwaita-Matugen-B/index.theme;
     ".local/share/icons/Adwaita-Matugen-B/scalable/mimetypes/application-x-addon.svg".source = ../dotfiles/local/share/icons/Adwaita-Matugen-B/scalable/mimetypes/application-x-addon.svg;
     ".local/share/icons/Adwaita-Matugen-B/scalable/mimetypes/application-x-executable.svg".source = ../dotfiles/local/share/icons/Adwaita-Matugen-B/scalable/mimetypes/application-x-executable.svg;
@@ -179,7 +179,7 @@
     ".local/share/icons/Adwaita-Matugen-B/scalable/status/user-trash-full.svg".source = ../dotfiles/local/share/icons/Adwaita-Matugen-B/scalable/status/user-trash-full.svg;
     ".local/share/nwg-look/gsettings".source = ../dotfiles/local/share/nwg-look/gsettings;
 
-    # niri 脚本（binds.kdl 直接调用）
+    # niri 脚本。
     ".config/niri/scripts/niri-binds" = {
       source = ../dotfiles/config/niri/scripts/niri-binds;
       executable = true;
@@ -209,7 +209,7 @@
       executable = true;
     };
 
-    # fcitx5 动态皮肤模板（Noctalia 渲染到 themes/nyxmellow/）
+    # Fcitx5 动态主题模板。
     ".local/share/fcitx5/themes/nyxmellow/templates/theme.conf" = {
       source = ../dotfiles/local/share/fcitx5/themes/nyxmellow/templates/theme.conf;
     };
@@ -220,7 +220,7 @@
       source = ../dotfiles/local/share/fcitx5/themes/nyxmellow/templates/highlight.svg;
     };
 
-    # 国内镜像源（内容定义见 modules/home/lib.nix，单一数据源）
+    # 国内镜像配置来自 home/lib.nix。
     ".npmrc".text = hmLib.npmrc;
     ".cargo/config.toml".text = hmLib.cargoConfig;
     ".config/pip/pip.conf".text = hmLib.pipConf;
