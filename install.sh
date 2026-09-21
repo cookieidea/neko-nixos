@@ -70,24 +70,51 @@ if [[ -z "${FLAKE_HOST:-}" ]]; then
 fi
 
 # 只修改 flake.nix 中的 username，不做全仓库文本替换。
-if [[ "$TARGET_USER" != "$OLD_USER" ]]; then
-  echo "==> 设置用户名为 $TARGET_USER（改 flake.nix 单一数据源）..."
-  if ! grep -qE '^ *username = "' "$SRC/flake.nix"; then
-    echo "错误：在 $SRC/flake.nix 中找不到 username 定义，无法设置用户名。" >&2
-    exit 1
-  fi
-  sed -i -E "s|^( *username = )\"$OLD_USER\";|\1\"$TARGET_USER\";|" "$SRC/flake.nix"
-  if ! grep -qE "^ *username = \"$TARGET_USER\";" "$SRC/flake.nix"; then
-    echo "错误：用户名替换失败，请手工检查 $SRC/flake.nix。" >&2
+# 从文件中读取当前值再比较 —— 不能假设它永远是 cookie，
+# 否则 cookie→alice→bob 这类二次迁移会匹配不上而报错。
+CURRENT_USER="$(sed -n 's/^ *username = "\([^"]*\)";.*/\1/p' "$SRC/flake.nix" | head -1)"
+if [[ -z "$CURRENT_USER" ]]; then
+  echo "错误：在 $SRC/flake.nix 中找不到 username 定义，无法设置用户名。" >&2
+  exit 1
+fi
+
+if [[ "$TARGET_USER" == "$CURRENT_USER" ]]; then
+  echo "==> 用户名已是 $TARGET_USER，跳过替换。"
+else
+  echo "==> 设置用户名：$CURRENT_USER → $TARGET_USER（改 flake.nix 单一数据源）..."
+  sed -i -E "s|^( *username = )\"$CURRENT_USER\";|\1\"$TARGET_USER\";|" "$SRC/flake.nix"
+  NEW_USER="$(sed -n 's/^ *username = "\([^"]*\)";.*/\1/p' "$SRC/flake.nix" | head -1)"
+  if [[ "$NEW_USER" != "$TARGET_USER" ]]; then
+    echo "错误：用户名替换失败（flake.nix 中仍为 $NEW_USER），请手工检查。" >&2
     exit 1
   fi
   echo "      ✓ username = \"$TARGET_USER\""
-else
-  echo "==> 目标用户名即 cookie，跳过替换。"
 fi
 
 # 先单独构建自定义包，便于定位失败；成功结果会被后续安装复用。
-SELF_PKGS=(niri-sidebar nyxniri-scratch-menu pins shorin-contrib splayer-next ab-download-manager tabby-terminal obs-vdoninja purevox bedrockboot astral)
+#
+# 包列表从 flake 的 packages.<system> 派生，不在此手写 —— 手写会与
+# configuration/pkgs 脱节（曾漏掉 vapoursynth-* / k7sfunc / mark-shot 环境等）。
+echo "==> 读取 flake 暴露的包列表 ..."
+# 先取本机 system，再列为该 system 下的全部 packages 属性名。
+# 用 --impure（flake 路径非锁定引用）+ jq 解析，避免 shell 侧手动拆 JSON。
+if ! SYSTEM="$(nix eval --raw --impure --expr \
+      "(builtins.getFlake \"$SRC\").nixosConfigurations.\"$FLAKE_HOST\".pkgs.stdenv.hostPlatform.system" \
+      2>"$SRC/.pkglist.log")" || [[ -z "$SYSTEM" ]]; then
+  echo "错误：无法确定 system（详见 $SRC/.pkglist.log）。" >&2
+  exit 1
+fi
+if ! mapfile -t SELF_PKGS < <(nix eval --json --impure --expr \
+      "builtins.attrNames (builtins.getFlake \"$SRC\").packages.\"$SYSTEM\"" \
+      2>>"$SRC/.pkglist.log" | jq -r '.[]'); then
+  echo "错误：无法读取 flake 包列表（详见 $SRC/.pkglist.log）。" >&2
+  exit 1
+fi
+if (( ${#SELF_PKGS[@]} == 0 )); then
+  echo "错误：flake 包列表为空。" >&2
+  exit 1
+fi
+echo "      system=$SYSTEM，共 ${#SELF_PKGS[@]} 个包"
 echo "==> 预构建自构建程序（flake 包）..."
 FAILED_PKGS=()
 for p in "${SELF_PKGS[@]}"; do
