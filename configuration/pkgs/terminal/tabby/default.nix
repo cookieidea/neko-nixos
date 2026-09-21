@@ -1,4 +1,4 @@
-# Tabby 终端（Electron；注意 nixpkgs 的 `tabby` 是 TabbyML，同名不同项目）
+# Tabby 终端（Electron；不同于 nixpkgs 的 TabbyML）。
 { pkgs }:
 
 (pkgs.appimageTools.wrapType2 {
@@ -11,7 +11,7 @@
   extraPkgs = pkgs: with pkgs; [ ];
 }).overrideAttrs (old: {
   postInstall = (old.postInstall or "") + ''
-    # 补标准路径 desktop
+    # 补充标准 desktop entry 路径。
     binname=$(basename "$(find "$out/bin" -maxdepth 1 -type f -executable | head -1)")
     mkdir -p "$out/share/applications" "$out/share/pixmaps"
     icon=$(find "$out" -path "*icons*" -name "*.png" 2>/dev/null | head -1)
