@@ -1,12 +1,6 @@
 #!/usr/bin/env bash
-# Astral 更新：查上游最新 Release → 改 version → 重算 hash → 验证构建 → 部署运行中的 core。
-#
+# Astral 更新脚本：更新 Release 版本、hash，并验证构建。
 # 用法：sudo bash configuration/pkgs/tools/networking/astral/update.sh [TAG]
-#   不给参数则自动取 Astral 最新稳定版。
-#
-# 架构说明：Astral 现由 fetchurl 直接取上游 GitHub Release 的
-#   astral-<ver>-linux-x64.tar.gz（含 GUI + 官方 astral-core），
-#   故本脚本只负责「改版本号 + 更新 hash」，不再本机编译 Flutter/Rust。
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -25,7 +19,7 @@ if [[ "$(id -u)" != "0" ]]; then
   exit 1
 fi
 
-# ---------- 1. 确定目标版本 ----------
+# 1. 确定目标版本。
 TAG="${1:-}"
 if [[ -z "$TAG" ]]; then
   echo "==> 查询 Astral 最新稳定版 ..."
@@ -41,21 +35,21 @@ TARBALL="astral-${VER}-linux-x64.tar.gz"
 URL="$REPO_URL/releases/download/${TAG}/${TARBALL}"
 echo "==> 目标版本：$TAG"
 
-# ---------- 2. 确认该 release 里确有 Linux 产物 ----------
+# 2. 确认 Linux 产物。
 if ! curl -fsSLI "$URL" >/dev/null 2>&1; then
   echo "错误：上游没有 $TARBALL" >&2
   echo "      该 release 可能未发布 Linux 产物，请核对：$REPO_URL/releases/tag/$TAG" >&2
   exit 1
 fi
 
-# ---------- 3. 预取并计算 hash（SRI） ----------
+# 3. 预取并计算 SRI hash。
 echo "==> 下载并计算 hash（约 47MB）..."
 PREFETCH_JSON="$(nix store prefetch-file --json --hash-type sha256 "$URL")"
 NEW_HASH="$(printf '%s' "$PREFETCH_JSON" | python3 -c 'import json,sys; print(json.load(sys.stdin)["hash"])')"
 [[ -n "$NEW_HASH" ]] || { echo "错误：无法计算 hash。" >&2; exit 1; }
 echo "      $NEW_HASH"
 
-# ---------- 4. 写入 default.nix ----------
+# 4. 更新 default.nix。
 OLD_VER="$(sed -n 's/^ *version = "\(.*\)";/\1/p' "$PKG_NIX" | head -1)"
 OLD_HASH="$(sed -n 's/^ *hash = "\(.*\)";/\1/p' "$PKG_NIX" | head -1)"
 
@@ -67,7 +61,7 @@ else
   sed -i "s|^\( *hash = \) \".*\";|\1\"$NEW_HASH\";|" "$PKG_NIX"
 fi
 
-# ---------- 5. 验证新版本能构建 ----------
+# 5. 验证构建。
 echo "==> 校验构建 ..."
 if ! nix build "$REPO_ROOT#astral" --no-link; then
   echo "错误：新版本构建失败，已回滚 default.nix。" >&2
@@ -78,15 +72,12 @@ fi
 NEW_OUT="$(nix path-info "$REPO_ROOT#packages.x86_64-linux.astral")"
 echo "      ✓ $NEW_OUT"
 
-# ---------- 6. 部署 ----------
+# 6. 部署。
 echo "==> rebuild ..."
 nixos-rebuild switch --flake "$REPO_ROOT"
 
-# core 的生命周期由 GUI 自行管理（启动 GUI 时由它拉起同级的 astral-core，
-# 退出即结束），本仓库不再安装 astral-core.service，也不设开机自启。
-#
-# 若 GUI 之前已把 core 部署到 ~/.local/share/astral-core（可写副本 + setcap），
-# 升级后该副本仍是旧版 —— 删掉它，GUI 下次启动会从新包重新部署并设权限。
+# core 由 GUI 生命周期管理，本仓库不创建 systemd 服务。
+# 升级后删除用户目录中的旧 core，让 GUI 重新部署新版。
 LOCAL_CORE_DIR="$TARGET_HOME/.local/share/astral-core"
 if [[ -d "$LOCAL_CORE_DIR" ]]; then
   echo "==> 清除 GUI 部署的旧 core 副本（将由 GUI 重新部署）..."
@@ -97,7 +88,7 @@ if [[ -d "$LOCAL_CORE_DIR" ]]; then
   echo "      ✓ 已删除 $LOCAL_CORE_DIR"
 fi
 
-# ---------- 7. 推缓存 + 提交 ----------
+# 7. 推缓存并提交。
 echo "==> 推缓存 ..."
 sudo -H -u "$TARGET_USER" cachix push nekobox "$NEW_OUT" \
   || echo "cachix 推送失败，稍后手动补推：cachix push nekobox $NEW_OUT" >&2
