@@ -1,4 +1,4 @@
-# 游戏与虚拟化：Steam、libvirtd、Waydroid、Docker、distrobox
+# 游戏与虚拟化：Steam、libvirtd、Waydroid、Docker、distrobox。
 { pkgs, username, ... }:
 
 {
@@ -14,16 +14,16 @@
   ];
 
   programs.steam.enable = true;
-  # Steam 中文字体
+  # Steam 中文字体。
   programs.steam.fontPackages = with pkgs; [ sarasa-gothic ];
-  # GE-Proton
+  # GE-Proton。
   programs.steam.extraCompatPackages = with pkgs; [ proton-ge-bin ];
-  # 远程游玩 / 专用服务器：自动放行所需端口
+  # Steam 远程游玩和专用服务器端口。
   programs.steam.remotePlay.openFirewall = true;
   programs.steam.dedicatedServer.openFirewall = true;
 
   virtualisation.libvirtd.enable = true;
-  # Waydroid（Android 容器，nftables 版）
+  # Waydroid Android 容器网络。
   virtualisation.waydroid.enable = true;
   virtualisation.waydroid.package = pkgs.waydroid-nftables;
   services.geoclue2.enable = true;   # Waydroid GPS 转发
@@ -31,18 +31,18 @@
   systemd.services.waydroid-mount.wantedBy = [ "multi-user.target" ];
 
   virtualisation.docker.enable = true;
-  # Docker Hub 国内镜像
+  # Docker Hub 镜像。
   virtualisation.docker.daemon.settings.registry-mirrors = [
     "https://docker.1ms.run"
     "https://docker.xuanyuan.me"
     "https://docker.m.daocloud.io"
   ];
-  # distrobox：挂载 /nix/store 与 per-user profiles
+  # distrobox：挂载 /nix/store 和用户 profile。
   environment.etc."distrobox/distrobox.conf".text = ''
     container_additional_volumes="/nix/store:/nix/store:ro /etc/profiles/per-user:/etc/profiles/per-user:ro /etc/static/profiles/per-user:/etc/static/profiles/per-user:ro"
   '';
 
-  # 本模块启用功能所需的用户组
+  # 本模块涉及的用户组。
   users.users.${username}.extraGroups = [
     "libvirtd"    # virt-manager 免 sudo
     "docker"      # docker 免 sudo
