@@ -5,7 +5,6 @@
     selfPackages.niri-sidebar
     selfPackages.nyxniri-scratch-menu
     selfPackages.pins
-    selfPackages.shorin-contrib
     selfPackages.splayer-next
     selfPackages.ab-download-manager
     selfPackages.tabby-terminal

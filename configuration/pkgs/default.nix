@@ -18,7 +18,6 @@ in
   # 桌面和窗口管理。
   niri-sidebar         = import ./desktop/niri-sidebar   { inherit pkgs; };
   pins                 = import ./desktop/pins           { inherit pkgs; };
-  shorin-contrib       = import ./desktop/shorin-contrib { inherit pkgs; };
   nyxniri-scratch-menu = import ./desktop/nyxniri-scratch-menu { inherit pkgs; };
 
   # 工具和网络。

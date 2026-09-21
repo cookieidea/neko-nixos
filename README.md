@@ -305,11 +305,9 @@ configuration/modules/flatpak.nix
 
 ## 致谢
 
-本仓库的部分桌面配置和脚本来自或参考以下项目：
+本仓库的部分桌面配置来自或参考以下项目：
 
 - **[ech678/NyxNiri](https://github.com/ech678/NyxNiri)** — GPL-3.0  
   星环菜单以及部分 niri / kitty / fish / Noctalia 配置基于该项目改写。
-- **[SHORiN-KiWATA/shorin-contrib](https://github.com/SHORiN-KiWATA/shorin-contrib)**  
-  `configuration/pkgs/desktop/shorin-contrib` 打包其中一部分通用脚本。
 
 具体第三方文件与许可证以各自上游仓库为准；本仓库整体许可证见 [LICENSE](LICENSE)。
