@@ -58,8 +58,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # ⚠️ Astral 构建需联网（沙箱内无法完成），走 build.sh 产物；path 输入不入 git，换机需先跑 build.sh
-
     # agenix：age 加密的声明式 secrets（GitCode 镜像）
     agenix = {
       url = "git+https://gitcode.com/ryantm/agenix.git?ref=main";

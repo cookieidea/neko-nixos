@@ -29,6 +29,14 @@ if [[ -z "$TARGET_USER" || "$TARGET_USER" == "root" ]]; then
   echo "错误：用户名不能为空或 root。" >&2
   exit 1
 fi
+# 合法 Linux 用户名：小写字母/下划线开头，后接小写字母/数字/下划线/连字符。
+# 必须校验：该值会写入 flake.nix 并用于路径拼接，含空格、斜杠或 shell 元字符
+# 会导致替换异常甚至命令注入。
+if [[ ! "$TARGET_USER" =~ ^[a-z_][a-z0-9_-]*$ ]]; then
+  echo "错误：非法 Linux 用户名 '$TARGET_USER'。" >&2
+  echo "      要求：小写字母或下划线开头，仅含小写字母、数字、下划线、连字符。" >&2
+  exit 1
+fi
 
 if [[ -n "$MNT" && ! -d "$MNT" ]]; then
   echo "错误：挂载点 $MNT 不存在。请先分区并挂载到该目录。" >&2
@@ -101,19 +109,35 @@ fi
 # 不再需要本机联网构建 bundle，故此处无 Astral 专属步骤。
 
 # 这些程序不在 nixpkgs 核心，由 ./configuration/pkgs 里的派生从源码 / 发布构建
-# 这些程序不在 nixpkgs 核心，由 ./configuration/pkgs 里的派生构建。这里先单独构建，便于提前暴露
-# 错误；后续 nixos-install / nixos-rebuild 会复用已构建的结果。
+# 这些程序不在 nixpkgs 核心，由 ./configuration/pkgs 里的派生构建。这里先单独构建，
+# 便于把失败定位到具体某个包（直接跑 nixos-rebuild 只会给出一整片闭包错误）。
+# 后续 nixos-install / nixos-rebuild 会复用已构建的结果。
+#
+# 失败即中止：这 11 个包全部在系统闭包内（home.packages / HM 程序选项），
+# 任一构建失败都必然导致后续 rebuild 失败。继续跑只会浪费时间，
+# 并把真正的错误埋在几十行闭包输出里。
 SELF_PKGS=(niri-sidebar nyxniri-scratch-menu pins shorin-contrib splayer-next ab-download-manager tabby-terminal obs-vdoninja purevox bedrockboot astral)
 echo "==> 预构建自构建程序（flake 包）..."
+FAILED_PKGS=()
 for p in "${SELF_PKGS[@]}"; do
   echo "    • 构建 $p ..."
   if nix build ".#$p" --no-link 2>"$SRC/.build-$p.log"; then
     echo "      ✓ $p 构建成功"
   else
-    # 不中断整体安装：后续 nixos-rebuild 会再次报错并给出完整信息
-    echo "      ✗ $p 构建失败（详见 $SRC/.build-$p.log）；继续。" >&2
+    echo "      ✗ $p 构建失败" >&2
+    FAILED_PKGS+=("$p")
   fi
 done
+if (( ${#FAILED_PKGS[@]} > 0 )); then
+  echo "" >&2
+  echo "错误：以下包构建失败，已中止安装：" >&2
+  for p in "${FAILED_PKGS[@]}"; do
+    echo "        · $p    （日志：$SRC/.build-$p.log）" >&2
+  done
+  echo "      这些包都在系统闭包内，继续只会让 rebuild 稍后以更难读的方式失败。" >&2
+  echo "      修复后可重跑本脚本（已成功构建的包会被缓存，不会重复构建）。" >&2
+  exit 1
+fi
 
 if [[ -n "$MNT" ]]; then
   # ================= 全新安装模式（minimal ISO） =================
