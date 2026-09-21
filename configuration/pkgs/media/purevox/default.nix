@@ -1,4 +1,4 @@
-# PureVox（实时 AI 音频降噪，Python + PySide6 + ONNX）
+# PureVox（Python + PySide6 + ONNX）。
 { pkgs }:
 
 let
@@ -10,7 +10,7 @@ let
     sha256 = "cbae6a1ec0e5d29db8bd2cf87b0f5ff4cba76c79f08843132ccde83ad96b8892";
   };
 
-  # 补充上游缺失的模块源码
+  # 补齐上游包遗漏的模块。
   srcGit = pkgs.fetchzip {
     url = "https://github.com/cookieidea/purevox/archive/d020117dbe6b1ccc83181df3260af7fcbc8745dd.tar.gz";
     sha256 = "sha256-rUXR7Rm5SQSHBeU9wSYnEbJ2PQhm4LV4l15gHbIwmk8=";
@@ -32,7 +32,7 @@ let
       cp -a . $out/
       chmod -R u+w $out
 
-      # 补上游缺失的虚拟声卡模块
+      # 补齐虚拟声卡模块。
       cp "$srcGit/dialog_virtual_mic_linux.py" "$out/usr/lib/purevox/"
 
       cat > $out/AppRun <<'EOF'
@@ -41,7 +41,7 @@ let
       export PYTHONHOME="$HERE/usr/python38"
       LIBS=$(find "$HERE" -type d \( -name lib -o -name lib64 \) 2>/dev/null | tr '\n' ':')
       export LD_LIBRARY_PATH="$LIBS''${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
-      # Qt 平台插件用 xcb
+      # Qt 使用 xcb 平台插件。
       export QT_QPA_PLATFORM=xcb
       export PATH="$HERE/usr/python38/bin:$PATH"
       cd "$HERE/usr/lib/purevox" || exit 1
@@ -67,7 +67,7 @@ pkgs.buildFHSEnv {
     pkgs.xz
     pkgs.gmp
     pkgs.krb5
-    # 图形 / 字体 / GTK
+    # 图形、字体和 GTK 依赖。
     pkgs.fontconfig
     pkgs.cairo
     pkgs.pango
@@ -80,7 +80,7 @@ pkgs.buildFHSEnv {
     pkgs.freeglut
     pkgs.glew
     pkgs.gsettings-desktop-schemas
-    # X11 / xcb
+    # X11 / xcb 依赖。
     pkgs.libx11
     pkgs.libxext
     pkgs.libxfixes
@@ -104,7 +104,7 @@ pkgs.buildFHSEnv {
     pkgs.pixman
     pkgs.libpciaccess
     pkgs.xkeyboard_config
-    # 音频
+    # 音频依赖。
     pkgs.alsa-lib
     pkgs.pipewire                     # pw-cli（创建虚拟麦克风 null-sink）
     pkgs.pulseaudio                   # pactl（虚拟麦克风 remap-source/set-default-sink）
