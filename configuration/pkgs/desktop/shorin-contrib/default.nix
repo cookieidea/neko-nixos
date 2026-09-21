@@ -1,6 +1,6 @@
 { pkgs }:
 
-# shorin-contrib 通用脚本子集
+# shorin-contrib 通用脚本。
 pkgs.stdenv.mkDerivation {
   pname = "shorin-contrib";
   version = "unstable-2026-08-24";
