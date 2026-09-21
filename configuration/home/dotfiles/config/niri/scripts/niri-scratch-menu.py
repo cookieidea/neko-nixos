@@ -62,7 +62,7 @@ except Exception:
 LOCK_FILE_PATH = os.path.join(RUNTIME_DIR, "nyxniri-scratch-menu.lock")
 PID_FILE_PATH = os.path.join(RUNTIME_DIR, "nyxniri-scratch-menu.pid")
 
-# ── Geometry & Physical Constants ─────────────────────────────────────────────
+# 布局和动画参数。
 BASE_ORBIT_RADIUS = 168.0   # Golden ratio orbital radius (+16% breathing space)
 DEADZONE_RADIUS = 48.0      # Calibrated deadzone radius (r < 48px: center hub focus)
 HYSTERESIS_DEG = 6.0        # Angular hysteresis margin (±6° entry threshold)
@@ -71,7 +71,7 @@ FLOAT_SPRING = 16.0         # Radial outward displacement on activation (+16px)
 CAPSULE_IDLE_H = 48.0       # Idle capsule height (px)
 CAPSULE_ACTIVE_H = 54.0     # Active capsule height (px)
 
-# ── Default Declarative Hierarchical Menu Tree ────────────────────────────────
+# 默认菜单树。
 DEFAULT_MENU_TREE = [
     {
         "id": "kitty",
@@ -212,7 +212,7 @@ DEFAULT_SEARCH_ENGINES = [
 ]
 
 
-# ── Material You Dynamic Palette Engine ───────────────────────────────────────
+# Material You 动态配色。
 def hex_to_rgb(hex_str, default=(0.5, 0.5, 0.5)):
     try:
         hex_str = hex_str.strip().lstrip("#")
@@ -273,16 +273,16 @@ def load_material_palette():
 
 def is_modifier_or_nav_key(keyval):
     """Check if keyval is a modifier or special navigation key that should never trigger search."""
-    # Modifiers: Shift, Control, Caps, ShiftLock, Meta, Alt, Super, Hyper
+    # 修饰键。
     if 0xffe1 <= keyval <= 0xffee:
         return True
-    # ISO shifts / AltGr / Level modifiers
+    # ISO / AltGr 修饰键。
     if 0xfe00 <= keyval <= 0xfeff:
         return True
-    # Function keys F1..F35
+    # F1-F35。
     if Gdk.KEY_F1 <= keyval <= Gdk.KEY_F35:
         return True
-    # System / Navigation keys: Insert, Delete, Home, End, Page_Up, Page_Down, Pause, Print, Menu, Locks
+    # 系统和导航键。
     if keyval in (
         Gdk.KEY_Insert, Gdk.KEY_Delete, Gdk.KEY_Home, Gdk.KEY_End,
         Gdk.KEY_Page_Up, Gdk.KEY_Page_Down, Gdk.KEY_Pause, Gdk.KEY_Print,
@@ -292,7 +292,7 @@ def is_modifier_or_nav_key(keyval):
     return False
 
 
-# ── Analytical Second-Order Spring Solver (x'' = -ω²(x - target) - 2ζωx') ────
+# 二阶弹簧动画模型。
 class Spring:
     def __init__(self, initial=0.0, omega=14.0, zeta=0.70):
         self.current = initial
@@ -313,7 +313,7 @@ class Spring:
         return False
 
 
-# ── Single-Instance & True Toggle Lock Engine ────────────────────────────────
+# 单实例与切换锁。
 def acquire_instance_lock():
     """Ensure single-instance execution. If already running, signal active instance to toggle-close."""
     try:
@@ -363,7 +363,7 @@ class ScratchpadRadialMenu(Gtk.Window):
         self.apps = self.root_items
         self.num_items = len(self.apps)
 
-        # Search Config & Engine Suite
+        # 搜索配置。
         self.search_engines, self.search_meta = self.load_search_config()
         self.default_engine_id = self.search_meta.get("default_engine", "bing")
         self.placeholder_text = self.search_meta.get("placeholder", "Search or ask...")
@@ -377,7 +377,7 @@ class ScratchpadRadialMenu(Gtk.Window):
         self.search_active = False
         self.cursor_time = 0.0
 
-        # Pre-cache Pango Back Icon
+        # 预缓存返回图标。
         self.layout_back = self.create_pango_layout("󰌍")
         self.layout_back.set_font_description(Pango.FontDescription("JetBrainsMono Nerd Font Bold 16"))
         self.back_ink_rect, _ = self.layout_back.get_pixel_extents()
@@ -390,7 +390,7 @@ class ScratchpadRadialMenu(Gtk.Window):
         self.is_dismissing = False
         self.last_mouse_pos = None
 
-        # Physics Springs Matrix
+        # 初始化动画状态。
         self.entry_spring = Spring(0.0, omega=14.0, zeta=0.70)
         self.trans_spring = Spring(1.0, omega=15.0, zeta=0.80)
         self.core_spring_x = Spring(0.0, omega=18.0, zeta=1.00)
@@ -399,7 +399,7 @@ class ScratchpadRadialMenu(Gtk.Window):
         self.engine_switch_spring = Spring(1.0, omega=22.0, zeta=0.78)
         self.node_springs = []
 
-        # Native Wayland CJK IME Context (Fcitx5 / IBus)
+        # 原生 Wayland 输入法上下文。
         self.im_context = Gtk.IMMulticontext()
         self.im_context.set_use_preedit(True)
         self.im_context.connect("commit", self.on_im_commit)
@@ -407,11 +407,11 @@ class ScratchpadRadialMenu(Gtk.Window):
 
         self.setup_current_tier()
 
-        # GdkFrameClock VBLANK synchronization callback
+        # GdkFrameClock 帧同步。
         self.tick_callback_id = None
         self.last_frame_time = 0
 
-        # Layer Shell Setup
+        # Layer Shell。
         GtkLayerShell.init_for_window(self)
         GtkLayerShell.set_layer(self, GtkLayerShell.Layer.OVERLAY)
         GtkLayerShell.set_keyboard_mode(self, GtkLayerShell.KeyboardMode.EXCLUSIVE)
@@ -587,7 +587,7 @@ class ScratchpadRadialMenu(Gtk.Window):
             app["idle_w"] = max(156.0, needed_w)
             app["active_w"] = app["idle_w"] + 24.0
 
-        # Pre-cache search engine layouts (Android Gemini Avatar Icon Style)
+        # 预缓存搜索引擎布局。
         font_engine_icon = Pango.FontDescription("JetBrainsMono Nerd Font Bold 16")
         font_placeholder = Pango.FontDescription("Noto Sans CJK SC, Inter Bold 13")
         for eng in self.search_engines:
@@ -692,12 +692,12 @@ class ScratchpadRadialMenu(Gtk.Window):
         self._request_frame()
 
     def trigger_app(self, item):
-        # 1. Folder drill-down
+        # 文件夹进入。
         if "children" in item and len(item["children"]) > 0:
             self.drill_down(item["children"])
             return
 
-        # 2. Web URL direct launching via xdg-open
+        # URL 通过 xdg-open 打开。
         url = item.get("url", "")
         cmd = item.get("cmd") or item.get("id") or item.get("name", "").lower()
         target_url = url if url else (cmd if cmd.startswith(("http://", "https://", "www.")) else "")
@@ -712,7 +712,7 @@ class ScratchpadRadialMenu(Gtk.Window):
             self.dismiss_menu()
             return
 
-        # 3. Local Scratchpad / App Command
+        # 本地命令或应用。
         script_path = os.path.expanduser("~/.config/niri/scripts/niri-scratch-toggle.sh")
         if not os.path.isfile(script_path):
             script_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "niri-scratch-toggle.sh")
@@ -773,7 +773,7 @@ class ScratchpadRadialMenu(Gtk.Window):
         if self.engine_switch_spring.update(dt):
             still_animating = True
 
-        # Keep smooth animation for breathing cursor while search is active
+        # 搜索状态保持光标动画。
         if self.search_spring.current > 0.01 and not self.is_dismissing and len(self.menu_stack) == 0:
             still_animating = True
 
@@ -859,10 +859,10 @@ class ScratchpadRadialMenu(Gtk.Window):
 
         is_search_mode = (self.search_spring.current > 0.05 or bool(self.search_query)) and len(self.menu_stack) == 0
 
-        # Right-click (button 3) or Middle-click (button 2)
+        # 右键或中键。
         if event.button in (2, 3):
             if is_search_mode:
-                # Smoothly collapse search back to star-ring (Forgiving undo)
+                # 收起搜索状态。
                 self.search_query = ""
                 self.search_active = False
                 self.search_spring.target = 0.0
@@ -875,21 +875,21 @@ class ScratchpadRadialMenu(Gtk.Window):
                     self.dismiss_menu()
                 return True
 
-        # Left-click (button 1)
+        # 左键。
         if event.button == 1:
             cx, cy = (self.center_x or 960.0), (self.center_y or 540.0)
             dx = event.x - cx
             dy = event.y - cy
             dist = math.hypot(dx, dy)
 
-            # Check search mode click handling
+            # 搜索模式点击处理。
             if len(self.menu_stack) == 0:
                 search_prog = max(0.0, min(1.0, self.search_spring.current))
                 if search_prog > 0.05:
                     sw = 36.0 + (390.0 - 36.0) * search_prog
                     sh = 36.0 + (64.0 - 36.0) * search_prog
                     if abs(dx) <= sw / 2.0 and abs(dy) <= sh / 2.0:
-                        # Clicked inside left circular engine avatar -> cycle engine
+                        # 点击左侧引擎图标切换引擎。
                         if dx < -sw / 4.0 and len(self.search_engines) > 0:
                             self.current_engine_idx = (self.current_engine_idx + 1) % len(self.search_engines)
                             self.engine_switch_spring.current = 0.85
@@ -900,14 +900,14 @@ class ScratchpadRadialMenu(Gtk.Window):
                         self._request_frame()
                         return True
                     else:
-                        # Clicked outside search pill -> collapse back to star-ring
+                        # 点击搜索框外部收起搜索。
                         self.search_query = ""
                         self.search_active = False
                         self.search_spring.target = 0.0
                         self._request_frame()
                         return True
                 elif dist <= DEADZONE_RADIUS:
-                    # Clicked idle center dot -> wake search
+                    # 点击中心点进入搜索。
                     self.search_active = True
                     self.search_spring.target = 1.0
                     self.keyboard_selected = None
@@ -968,20 +968,20 @@ class ScratchpadRadialMenu(Gtk.Window):
 
         is_search_mode = (self.search_spring.current > 0.05 or bool(self.search_query)) and len(self.menu_stack) == 0
 
-        # ── 1. IDLE MODE (Zero search active) ─────────────────────────────────
+        # 空闲模式。
         if not is_search_mode:
-            # (0) Ignore modifier keys (Super, Alt, Ctrl, Shift, F-keys, etc.)
+            # 忽略修饰键和功能键。
             if is_modifier_or_nav_key(keyval):
                 return False
 
-            # (A) Number keys 1..9 directly trigger apps (Bypassing IME filter completely)
+            # 数字键直接触发对应项目。
             if Gdk.KEY_1 <= keyval <= Gdk.KEY_9:
                 num = keyval - Gdk.KEY_1
                 if num < self.num_items:
                     self.trigger_app(self.apps[num])
                     return True
 
-            # (B) Escape / Backspace closes menu (or returns to parent)
+            # Escape / Backspace 返回或退出。
             if keyval in (Gdk.KEY_Escape, Gdk.KEY_BackSpace, Gdk.KEY_q, Gdk.KEY_Q):
                 if len(self.menu_stack) > 0:
                     self.return_to_parent()
@@ -989,7 +989,7 @@ class ScratchpadRadialMenu(Gtk.Window):
                     self.dismiss_menu()
                 return True
 
-            # (C) Tab / Shift+Tab -> Wake up search and cycle engine
+            # Tab / Shift+Tab 唤醒搜索并切换引擎。
             if keyval in (Gdk.KEY_Tab, Gdk.KEY_ISO_Left_Tab):
                 if len(self.menu_stack) == 0 and len(self.search_engines) > 0:
                     is_backward = bool(event.state & Gdk.ModifierType.SHIFT_MASK) or keyval == Gdk.KEY_ISO_Left_Tab
@@ -1010,7 +1010,7 @@ class ScratchpadRadialMenu(Gtk.Window):
                     self._request_frame()
                     return True
 
-            # (D) Return / Enter / Space triggers selected app
+            # Enter / Space 执行当前项目。
             if keyval in (Gdk.KEY_Return, Gdk.KEY_KP_Enter, Gdk.KEY_space):
                 active_idx = self.keyboard_selected if self.keyboard_selected is not None else self.hovered_index
                 if active_idx is not None and active_idx < self.num_items:
@@ -1022,7 +1022,7 @@ class ScratchpadRadialMenu(Gtk.Window):
                         self.dismiss_menu()
                 return True
 
-            # (E) Spatial direction navigation
+            # 方向键导航。
             dir_map = {
                 Gdk.KEY_h: 180.0, Gdk.KEY_Left: 180.0,
                 Gdk.KEY_l: 0.0,   Gdk.KEY_Right: 0.0,
@@ -1043,7 +1043,7 @@ class ScratchpadRadialMenu(Gtk.Window):
                     self._request_frame()
                     return True
 
-            # (F) Character typing or IME wakes up search
+            # 输入字符或使用 IME 唤醒搜索。
             if len(self.menu_stack) == 0:
                 if self.im_context.filter_keypress(event):
                     self.search_active = True
@@ -1061,12 +1061,12 @@ class ScratchpadRadialMenu(Gtk.Window):
 
             return False
 
-        # ── 2. SEARCH ACTIVE MODE ─────────────────────────────────────────────
-        # (A) Pass to Native Wayland IME Filter first
+        # 搜索模式。
+        # 优先交给原生 IME 处理。
         if self.im_context.filter_keypress(event):
             return True
 
-        # (B) Escape -> Clear search and collapse back to center dot
+        # Escape 清空搜索并收起。
         if keyval in (Gdk.KEY_Escape,):
             self.search_query = ""
             self.search_active = False
@@ -1074,7 +1074,7 @@ class ScratchpadRadialMenu(Gtk.Window):
             self._request_frame()
             return True
 
-        # (C) Backspace -> Delete last character; collapse when emptied
+        # Backspace 删除字符；清空后收起。
         if keyval in (Gdk.KEY_BackSpace,):
             if self.search_query:
                 self.search_query = self.search_query[:-1]
@@ -1084,7 +1084,7 @@ class ScratchpadRadialMenu(Gtk.Window):
             self._request_frame()
             return True
 
-        # (D) Tab / Shift+Tab -> Cycle Search Engine
+        # Tab / Shift+Tab 切换引擎。
         if keyval in (Gdk.KEY_Tab, Gdk.KEY_ISO_Left_Tab):
             if len(self.search_engines) > 0:
                 is_backward = bool(event.state & Gdk.ModifierType.SHIFT_MASK) or keyval == Gdk.KEY_ISO_Left_Tab
@@ -1096,13 +1096,13 @@ class ScratchpadRadialMenu(Gtk.Window):
                 self._request_frame()
                 return True
 
-        # (E) Return / Enter -> Execute Search
+        # Enter 执行搜索。
         if keyval in (Gdk.KEY_Return, Gdk.KEY_KP_Enter):
             if self.search_query.strip():
                 self.trigger_search()
                 return True
 
-        # (F) Character typing (including numbers 1..9 in search mode)
+        # 继续输入搜索内容。
         key_char = chr(keyval) if 32 <= keyval <= 126 else ""
         if key_char:
             self.search_query += key_char
@@ -1137,16 +1137,16 @@ class ScratchpadRadialMenu(Gtk.Window):
 
         is_submenu = len(self.menu_stack) > 0
 
-        # Outer component alpha: Fades completely to 0.0 during search (100% focused)
+        # 搜索时隐藏外围菜单。
         outer_alpha = max(0.0, 1.0 - search_prog * 1.05) * entry_val if not is_submenu else entry_val
 
-        # 1. Atmospheric Scrim
+        # 背景遮罩。
         cr.save()
         cr.set_source_rgba(dim_r, dim_g, dim_b, (0.42 if p["is_dark"] else 0.22) * entry_val)
         cr.paint()
         cr.restore()
 
-        # Scale & Alpha Transform
+        # 缩放和透明度。
         cr.save()
         scale = (0.76 + 0.24 * entry_val) * trans_val
         cr.translate(cx, cy)
@@ -1156,11 +1156,11 @@ class ScratchpadRadialMenu(Gtk.Window):
         core_x = cx + self.core_spring_x.current
         core_y = cy + self.core_spring_y.current
 
-        # Radial displacement for smooth outward breath on search (+20px)
+        # 搜索状态径向位移。
         search_disp = search_prog * 20.0 if not is_submenu else 0.0
         orbit_r = max(BASE_ORBIT_RADIUS, 120.0 + self.num_items * 12.0) + search_disp
 
-        # 2. Celestial Star-Ring (Only rendered when outer_alpha > 0.01)
+        # 星环。
         if outer_alpha > 0.01:
             cr.save()
             cr.new_path()
@@ -1227,7 +1227,7 @@ class ScratchpadRadialMenu(Gtk.Window):
                         cr.stroke()
                         cr.restore()
 
-        # 3. Dynamic Tethers (Lines from center core to hovered nodes in idle mode)
+        # 中心到节点的动态连线。
         if search_prog <= 0.01:
             cr.save()
             cr.new_path()
@@ -1258,9 +1258,9 @@ class ScratchpadRadialMenu(Gtk.Window):
                         cr.stroke()
                         cr.restore()
 
-        # 4. Center Core: Smooth Morphing (Idle Center Dot <-> Android Gemini Chubby Search Capsule)
+        # 中心控件形态过渡。
         if is_submenu:
-            # Submenu Return Node
+            # 子菜单返回节点。
             cr.save()
             core_radius = 18.0
             cr.new_path()
@@ -1282,9 +1282,9 @@ class ScratchpadRadialMenu(Gtk.Window):
             PangoCairo.show_layout(cr, self.layout_back)
             cr.restore()
         else:
-            # Root Tier: Smooth Morphing
+            # 根菜单中心控件。
             if search_prog <= 0.01:
-                # 100% Original Idle Center Dot
+                # 空闲中心点。
                 cr.save()
                 core_radius = 14.0
                 cr.new_path()
@@ -1316,14 +1316,14 @@ class ScratchpadRadialMenu(Gtk.Window):
                 cr.fill()
                 cr.restore()
             else:
-                # Android Gemini Chubby Search Capsule (390px × 64px, 32px Stadium Curve)
+                # 搜索胶囊。
                 sw = 36.0 + (390.0 - 36.0) * search_prog
                 sh = 36.0 + (64.0 - 36.0) * search_prog
                 sr = sh / 2.0
                 sx = cx - sw / 2.0
                 sy = cy - sh / 2.0
 
-                # (1) Expressive Ambient Aura Glow (底层漫反射柔和光晕)
+                # 环境光晕。
                 cr.save()
                 halo_radius = (sw / 2.0) + 48.0
                 pattern = cairo.RadialGradient(cx, cy, 10.0, cx, cy, halo_radius)
@@ -1335,14 +1335,14 @@ class ScratchpadRadialMenu(Gtk.Window):
                 cr.fill()
                 cr.restore()
 
-                # (2) Shadow
+                # 阴影。
                 cr.save()
                 self.draw_rounded_pill(cr, sx, sy + 4.0 * search_prog, sw, sh, sr)
                 cr.set_source_rgba(0.0, 0.0, 0.0, (0.32 * search_prog) * entry_val)
                 cr.fill()
                 cr.restore()
 
-                # (3) Translucent Frosted Glass Surface Pill
+                # 半透明磨砂表面。
                 cr.save()
                 self.draw_rounded_pill(cr, sx, sy, sw, sh, sr)
                 fill_alpha = (0.92 + 0.06 * search_prog) * entry_val
@@ -1355,7 +1355,7 @@ class ScratchpadRadialMenu(Gtk.Window):
                 cr.stroke()
                 cr.restore()
 
-                # (4) Left Circular Engine Avatar Island (Gemini Style 44px Circular Badge)
+                # 左侧搜索引擎图标。
                 if search_prog > 0.25 and self.search_engines:
                     tag_fade = min(1.0, (search_prog - 0.25) / 0.75) * entry_val
                     cur_eng = self.search_engines[self.current_engine_idx % len(self.search_engines)]
@@ -1373,7 +1373,7 @@ class ScratchpadRadialMenu(Gtk.Window):
                     cr.scale(switch_prog, switch_prog)
                     cr.translate(-avatar_cx, -avatar_cy)
 
-                    # Circular Avatar Background
+                    # 图标背景。
                     cr.new_path()
                     cr.arc(avatar_cx, avatar_cy, avatar_r, 0, 2 * math.pi)
                     cr.set_source_rgba(dim_r, dim_g, dim_b, (0.55 + 0.15 * search_prog) * tag_fade)
@@ -1382,7 +1382,7 @@ class ScratchpadRadialMenu(Gtk.Window):
                     cr.set_line_width(1.0)
                     cr.stroke()
 
-                    # Engine Icon Centered
+                    # 居中引擎图标。
                     if ink_rect:
                         draw_icon_x = avatar_cx - ink_rect.x - (ink_rect.width / 2.0)
                         draw_icon_y = avatar_cy - ink_rect.y - (ink_rect.height / 2.0)
@@ -1395,7 +1395,7 @@ class ScratchpadRadialMenu(Gtk.Window):
                     PangoCairo.show_layout(cr, eng_layout)
                     cr.restore()
 
-                    # Text / Placeholder & Neon Caret (Comfortable 14px negative space)
+                    # 搜索文本和光标。
                     text_start_x = avatar_cx + avatar_r + 14.0
                     avail_w = max(20.0, (sx + sw - 22.0) - text_start_x)
 
@@ -1414,7 +1414,7 @@ class ScratchpadRadialMenu(Gtk.Window):
                         PangoCairo.show_layout(cr, lt_query)
                         cr.restore()
 
-                        # Breathing Neon Caret
+                        # 光标呼吸动画。
                         cursor_x = min(draw_qx + qw + 2.0, sx + sw - 22.0)
                         sin_val = (math.sin(self.cursor_time * 5.5) + 1.0) / 2.0
                         cursor_alpha = (0.35 + 0.65 * sin_val) * tag_fade
@@ -1427,7 +1427,7 @@ class ScratchpadRadialMenu(Gtk.Window):
                         cr.stroke()
                         cr.restore()
 
-                        # Update Native IME Location to track cursor position
+                        # 更新 IME 光标位置。
                         self.update_im_cursor_location(cursor_x, cy + 16.0)
                     else:
                         cr.save()
@@ -1447,10 +1447,10 @@ class ScratchpadRadialMenu(Gtk.Window):
                         cr.stroke()
                         cr.restore()
 
-                        # Update Native IME Location for empty text
+                        # 更新空搜索状态的 IME 位置。
                         self.update_im_cursor_location(text_start_x, cy + 16.0)
 
-        # 5. M3E Content-Aware Adaptive Streamline Capsules (Only rendered when outer_alpha > 0.01)
+        # 自适应内容胶囊。
         if outer_alpha > 0.01:
             for i, app in enumerate(self.apps):
                 prog = max(0.0, min(1.0, self.node_springs[i].current)) if i < len(self.node_springs) else 0.0
@@ -1498,7 +1498,7 @@ class ScratchpadRadialMenu(Gtk.Window):
                 cr.set_line_width(b_width)
                 cr.stroke()
 
-                # (A) Left Icon Chip Pill
+                # 左侧图标。
                 chip_cx = cx_box + (ch / 2.0)
                 chip_cy = iy
                 chip_r = 15.0 + 1.5 * prog
@@ -1529,7 +1529,7 @@ class ScratchpadRadialMenu(Gtk.Window):
                 PangoCairo.show_layout(cr, app["layout_icon"])
                 cr.restore()
 
-                # (B) Middle Typography: Title & Subtitle
+                # 标题和副标题。
                 text_x = chip_cx + chip_r + 9.0
 
                 if prog < 0.18:
@@ -1554,7 +1554,7 @@ class ScratchpadRadialMenu(Gtk.Window):
                     PangoCairo.show_layout(cr, app["layout_desc"])
                     cr.restore()
 
-                # (C) Right Shortcut Badge Pill
+                # 快捷键标签。
                 right_pad = 13.0
                 key_x = cx_box + cw - right_pad - kw
                 key_y = iy - kh / 2.0
