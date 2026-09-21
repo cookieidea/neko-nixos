@@ -1,4 +1,4 @@
-# ATRI 系统配置入口：聚合 system/ + device/ + modules/{programs,services,virtualisation,pkgs}
+# 系统配置入口：聚合 system/ + device/ + modules/
 { ... }:
 
 {
