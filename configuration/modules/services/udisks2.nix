@@ -1,4 +1,4 @@
-# udisks2：USB 自动挂载
+# udisks2 USB 自动挂载。
 { ... }:
 
 {
