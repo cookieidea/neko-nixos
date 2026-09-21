@@ -108,7 +108,7 @@
 
         home-manager.useGlobalPkgs = true;
         home-manager.useUserPackages = true;
-        home-manager.users.${username} = import ./configuration/ATRI/home.nix;
+        home-manager.users.${username} = import ./configuration/home.nix;
         home-manager.extraSpecialArgs = { inherit desktop username cooknixvim bilihud selfPackages noctalia bestclient mark-shot llm-agents-nix hmLib; };
       };
     in {
@@ -116,12 +116,12 @@
       packages.${system} = selfPackages;
 
       nixosConfigurations = {
-        # 实体机；硬件配置见 configuration/device/hardware/hardware-config.nix（需 git add）
+        # 实体机；硬件配置见 configuration/device/hardware-config.nix（需 git add）
         ${hostname} = nixpkgs.lib.nixosSystem {
           inherit system;
           specialArgs = { inherit noctalia-greeter; };
           modules = [
-            ./configuration/ATRI/system.nix
+            ./configuration/system.nix
             hmModule
             agenix.nixosModules.default
             # overlays 见 configuration/overlays/default.nix
@@ -147,7 +147,7 @@
         let
           pkgs = nixpkgs.legacyPackages.${system};
           # 只纳入本仓库自己维护的配置，排除第三方源码与 dotfiles
-          targets = "configuration/ATRI configuration/system configuration/modules configuration/home configuration/overlays flake.nix";
+          targets = "configuration/system configuration/modules configuration/home configuration/overlays flake.nix";
         in {
           deadnix = pkgs.runCommand "deadnix-check"
             { nativeBuildInputs = [ pkgs.deadnix ]; } ''

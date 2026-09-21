@@ -1,4 +1,4 @@
-# 桌面会话：niri、Noctalia Greeter、XDG 门户、Flatpak、字体、系统包
+# 桌面会话：niri、Noctalia Greeter、XDG 门户、字体、系统包
 { pkgs, lib, username, noctalia-greeter, selfPackages, ... }:
 
 {
@@ -29,7 +29,7 @@
   # 登录界面头像（AccountsService，greeter 读取）
   system.activationScripts.noctaliaGreeterAvatar = lib.stringAfter [ "users" ] ''
     mkdir -p /var/lib/AccountsService/icons
-    cp -f ${builtins.toString ../../home/dotfiles/avatar.png} /var/lib/AccountsService/icons/${username}
+    cp -f ${builtins.toString ../home/dotfiles/avatar.png} /var/lib/AccountsService/icons/${username}
     chmod 0644 /var/lib/AccountsService/icons/${username}
     chown ${username}:${username} /var/lib/AccountsService/icons/${username} 2>/dev/null || true
     cat > /var/lib/AccountsService/users/${username} <<'EOF'
@@ -49,28 +49,6 @@ EOF
     binfmt = true;
   };
 
-  # Flatpak：启动时 one-shot 添加 remote + 自动装应用
-  services.flatpak.enable = true;
-  systemd.services.flatpak-repo = {
-    wantedBy = [ "multi-user.target" ];
-    after = [ "network-online.target" ];
-    wants = [ "network-online.target" ];
-    path = [ pkgs.flatpak pkgs.util-linux ];
-    script = ''
-      flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
-      flatpak remote-modify flathub --url=https://mirrors.ustc.edu.cn/flathub
-      flatpak install --noninteractive --or-update flathub com.tencent.WeChat com.qq.QQ com.github.tchx84.Flatseal io.github.kolunmi.Bazaar io.github.yucling.open-orpheus com.discordapp.Discord io.github.Predidit.Kazumi
-      # QQ/微信：禁 fallback-x11 并给真 x11 socket（否则 Xvfb 起不来打不开）
-      runuser -u ${username} -- flatpak --user override --nosocket=fallback-x11 --socket=x11 com.qq.QQ
-      runuser -u ${username} -- flatpak --user override --nosocket=fallback-x11 --socket=x11 com.tencent.WeChat
-      # Open Orpheus 托盘：放开 session-bus（SNI 总线名注册需要）
-      runuser -u ${username} -- flatpak --user override --socket=session-bus io.github.yucling.open-orpheus
-    '';
-    serviceConfig = {
-      Type = "oneshot";
-      RemainAfterExit = true;
-    };
-  };
 
   # 系统级包
   environment.systemPackages = with pkgs; [

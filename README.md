@@ -17,11 +17,10 @@
 ├── README.md
 │
 ├── configuration/               # 所有声明式配置
-│   ├── ATRI/                    # ── 主机入口（换主机复制此目录改引用即可）
-│   │   ├── system.nix           # 聚合：system/ + device/ + modules/
-│   │   ├── modules.nix          # 聚合：modules/{programs,services,virtualisation}
-│   │   ├── home.nix             # 聚合：home/ 下各 Home Manager 模块
-│   │   └── device.nix           # 导入硬件配置
+│   ├── system.nix               # 系统配置聚合入口
+│   ├── home.nix                  # Home Manager 聚合入口
+│   ├── modules.nix               # 系统功能模块聚合入口
+│   ├── device.nix                # 硬件配置聚合入口
 │   │
 │   ├── system/                  # ── 纯系统级配置
 │   │   ├── nix.nix              # Nix 守护进程、二进制缓存、垃圾回收、zram
@@ -32,13 +31,15 @@
 │   │   ├── security-users.nix   # polkit 与用户账户
 │   │   └── secrets.nix          # agenix 加密 secrets 声明
 │   │
-│   ├── device/hardware/         # ── 硬件特定
+│   ├── device/                 # ── 硬件特定
 │   │   ├── hardware-config.nix  # nixos-generate-config 产物（勿手改）
 │   │   └── gpu.nix              # AMD GPU / ROCm
 │   │
 │   ├── modules/                 # ── 可复用 NixOS 模块
-│   │   ├── programs/
-│   │   │   └── desktop.nix      # niri、Noctalia Greeter、XDG 门户、Flatpak、字体、系统包
+│   │   ├── desktop.nix           # niri、Noctalia Greeter、XDG 门户、字体、系统包
+│   │   ├── flatpak.nix           # Flatpak remote、应用与权限
+│   │   ├── minecraft.nix         # MC 联机端口 + 组播路由
+│   │   ├── dsh.nix               # dsh web 端口
 │   │   ├── services/
 │   │   │   ├── openssh.nix      # SSH
 │   │   │   ├── udisks2.nix      # USB 自动挂载
@@ -46,8 +47,7 @@
 │   │   │   ├── snapper.nix      # btrfs 快照
 │   │   │   ├── sunshine.nix     # Moonlight 串流
 │   │   │   └── lact-smartd.nix  # 显卡控制 + 磁盘健康
-│   │   └── virtualisation/
-│   │       └── default.nix      # Steam、libvirtd、Waydroid、Docker
+│   │   └── virtualisation.nix    # Steam、libvirtd、Waydroid、Docker
 │   │
 │   ├── home/                    # ── Home Manager 用户配置
 │   │   ├── lib.nix              # 共用 let 绑定（经 extraSpecialArgs 注入为 hmLib）
@@ -62,9 +62,9 @@
 │   │   │   ├── Entertain/       # 播放器、图像、办公、下载、浏览器
 │   │   │   ├── Desktop/         # niri、主题图标、文件管理器、剪贴板
 │   │   │   └── Utility/         # 系统信息、磁盘、代理、自建程序
-│   │   ├── programs/default.nix # HM 程序选项（git/starship/fish/noctalia…）
-│   │   ├── desktop/default.nix  # polkit、GTK 主题、KDE Connect、OBS
-│   │   ├── xdg/default.nix      # xdg.configFile / xdg.dataFile 部署
+│   │   ├── programs.nix          # HM 程序选项（git/starship/fish/noctalia…）
+│   │   ├── desktop.nix           # polkit、GTK 主题、KDE Connect、OBS
+│   │   ├── xdg.nix               # xdg.configFile / xdg.dataFile 部署
 │   │   ├── files/               # home.file 部署
 │   │   │   ├── default.nix      # JDK 链、图标、desktop 入口、镜像源
 │   │   │   └── activation.nix   # activation 脚本（Noctalia seed、壁纸、mark-shot helper）
@@ -107,11 +107,11 @@
 ```
 flake.nix
   └─ nixosConfigurations.ATRI
-       ├─ configuration/ATRI/system.nix   → system/ + device/ + modules/
-       └─ configuration/ATRI/home.nix     → home/（Home Manager）
+       ├─ configuration/system.nix   → system/ + device/ + modules/
+       └─ configuration/home.nix     → home/（Home Manager）
 ```
 
-`configuration/ATRI/*.nix` 只是聚合入口，实际内容都在同级各目录里；
+`configuration/*.nix` 中的入口文件负责聚合；实际内容都在对应目录里。
 新增模块时在对应聚合文件加一行 `imports` 即可。
 
 ## 常用命令

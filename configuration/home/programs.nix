@@ -38,7 +38,7 @@
       settings = builtins.replaceStrings
         [ "/home/cookie" ]
         [ "/home/${username}" ]
-        (builtins.readFile ../dotfiles/config/noctalia/config.toml);
+        (builtins.readFile ./dotfiles/config/noctalia/config.toml);
     };
 
     # niri：配置走 dotfiles 的 kdl 拆分文件（见 xdg.configFile）

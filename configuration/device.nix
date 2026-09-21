@@ -3,7 +3,7 @@
 
 {
   imports = [
-    ../device/hardware/hardware-config.nix
-    ../device/hardware/gpu.nix
+    ./device/hardware-config.nix
+    ./device/gpu.nix
   ];
 }

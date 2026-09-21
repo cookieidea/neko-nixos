@@ -148,7 +148,7 @@ if [[ -n "$MNT" ]]; then
   #
   # nixos-generate-config --root /mnt 写到 $MNT/etc/nixos/hardware-configuration.nix
   # （源文件名；见 nixpkgs 的 nixos-generate-config.pl），而本仓库的结构是
-  # configuration/device/hardware/hardware-config.nix —— 需转换路径。
+  # configuration/device/hardware-config.nix —— 需转换路径。
   #
   # 仓库里那份绑定 ATRI 的分区 UUID（/ 与 /boot 的 by-uuid），若不加处理
   # 会被全量复制覆盖，导致新机器按 ATRI 的分区表安装。
@@ -156,7 +156,7 @@ if [[ -n "$MNT" ]]; then
   # 检查必须在**任何写入 $DEST 之前**完成：否则用户漏跑
   # nixos-generate-config 时，$DEST 会先被写入一半再报错，留下半安装状态。
   GEN_HW="$MNT/etc/nixos/hardware-configuration.nix"
-  GEN_HW_ALT="$MNT/etc/nixos/configuration/device/hardware/hardware-config.nix"
+  GEN_HW_ALT="$MNT/etc/nixos/configuration/device/hardware-config.nix"
   KEEP_HW=""
   if [[ -f "$GEN_HW" ]]; then
     KEEP_HW="$(mktemp)"
@@ -184,7 +184,7 @@ if [[ -n "$MNT" ]]; then
   rm -rf "$DEST/.git"
 
   # 目标机自己生成的硬件配置优先于仓库里 ATRI 的那份
-  cp -a "$KEEP_HW" "$DEST/configuration/device/hardware/hardware-config.nix"
+  cp -a "$KEEP_HW" "$DEST/configuration/device/hardware-config.nix"
   rm -f "$KEEP_HW"
 
   # 密码不在安装时注入（配置里已无 initialPassword 占位，sed 注入属失效逻辑）。
@@ -215,17 +215,17 @@ else
 
   # 保留目标机现有的 hardware-config（含该机分区 UUID；仓库里那份属 ATRI，
   # 换机时不应被覆盖）
-  if [[ -f "$DEST/configuration/device/hardware/hardware-config.nix" ]]; then
-    cp -a "$DEST/configuration/device/hardware/hardware-config.nix" "$STAGE/hardware-config.keep"
+  if [[ -f "$DEST/configuration/device/hardware-config.nix" ]]; then
+    cp -a "$DEST/configuration/device/hardware-config.nix" "$STAGE/hardware-config.keep"
   fi
 
   cp -r "$SRC/." "$STAGE/"
   rm -rf "$STAGE/.git"
   [[ -f "$STAGE/hardware-config.keep" ]] && \
-    mv "$STAGE/hardware-config.keep" "$STAGE/configuration/device/hardware/hardware-config.nix"
+    mv "$STAGE/hardware-config.keep" "$STAGE/configuration/device/hardware-config.nix"
 
-  if [[ ! -f "$STAGE/configuration/device/hardware/hardware-config.nix" ]]; then
-    echo "警告：未找到 configuration/device/hardware/hardware-config.nix。"
+  if [[ ! -f "$STAGE/configuration/device/hardware-config.nix" ]]; then
+    echo "警告：未找到 configuration/device/hardware-config.nix。"
     echo "      若这是全新安装（minimal ISO），请改用：bash install.sh <用户> <挂载点>"
   fi
 
