@@ -1,34 +1,17 @@
 function f
-    # ==============================================================================
-    # 脚本功能说明
-    # 1. 结合 Fastfetch，在终端启动时展示随机二次元图片。
-    # 2. 具备静默后台异步下载机制，库存不足时自动补货，绝不阻塞前台终端的启动。
-    # 3. 具备智能缓存管理机制，自动控制待展示区与已使用区的图片数量上限。
-    # 4. 具备极致的网络环境容错处理，无网或弱网时自动降级，避免死等。
-    # 5. 具备自动清理 Fastfetch 内部生成的图片转换缓存功能，防止磁盘空间无感膨胀。
-    # ==============================================================================
+    # Fastfetch 随机壁纸：前台立即显示，后台异步补充缓存。
 
-    # ================= 配置区域 =================
-    
-    # 开关：阅后即焚模式，针对 Fastfetch 内部缓存
-    # true  = 运行后强力清空 ~/.cache/fastfetch/images/，防止转码缓存膨胀
-    # false = 保留缓存
+    # 配置。
+    # 是否清理 Fastfetch 生成的图片缓存。
     set -l CLEAN_CACHE_MODE true
     
-    # 每次补货下载多少张
     set -l DOWNLOAD_BATCH_SIZE 10
-    # 最大库存上限，即待展示区
     set -l MAX_CACHE_LIMIT 100
-    # 库存少于多少张时开始补货
     set -l MIN_TRIGGER_LIMIT 60
     
-    # used 目录最大存放数量
-    # 超过此数量将按照时间顺序删除最旧的文件
     set -l MAX_USED_LIMIT 50
     
-    # ===========================================
-
-    # --- 0. 语言与提示语配置 ---
+    # 提示语言。
     
     set -l IS_ZH true
     if not string match -q -r "^zh" "$LANG"
@@ -45,11 +28,11 @@ function f
         set MSG_FAIL "Failed to get image, falling back to default Logo QAQ"
     end
     
-    # --- 1. 参数解析与模式设置 ---
+    # 参数和 Fastfetch 选项。
     
     set -l ARGS_FOR_FASTFETCH
     for arg in $argv
-        # 拦截帮助指令
+        # 显示帮助。
         if test "$arg" = "-h"; or test "$arg" = "--help"
             if test "$IS_ZH" = true
                 echo "========================================================"
@@ -84,21 +67,17 @@ function f
         end
     end
     
-    # --- 2. 目录配置 ---
-    
-    # 根据模式区分缓存目录和锁文件
+    # 缓存目录和并发锁。
     set -l CACHE_DIR "$HOME/.cache/fastfetch_waifu"
     set -l LOCK_FILE "/tmp/fastfetch_waifu.lock"
     
-    # 定义已使用目录
     set -l USED_DIR "$CACHE_DIR/used"
     
     mkdir -p "$CACHE_DIR"
     mkdir -p "$USED_DIR"
     
-    # --- 3. 核心函数 ---
+    # 网络、下载和后台补货。
 
-    # 抛弃脆弱的 1.1.1.1，使用苹果的全球探针节点，并使用 -I 极限提速
     function check_network
         curl -sI --connect-timeout 2 "http://captive.apple.com/hotspot-detect.html" >/dev/null 2>&1
         return $status
@@ -108,7 +87,6 @@ function f
         set -l TIMEOUT --connect-timeout 5 --max-time 15
         set -l RAND (math (random) % 3 + 1)
         
-        # === SFW 正常 API ===
         switch $RAND
             case 1
                 curl -s $TIMEOUT "https://api.waifu.im/images?IncludedTags=waifu&IsNsfw=false" | jq -r '.images[0].url'
@@ -122,13 +100,11 @@ function f
     function download_one_image -V CACHE_DIR
         set -l URL (get_random_url)
         if string match -qr "^http" -- "$URL"
-            # 使用带时间戳的随机文件名
             set -l FILENAME "waifu_"(date +%s%N)"_"(random)".jpg"
             set -l TARGET_PATH "$CACHE_DIR/$FILENAME"
             
             curl -s -L --connect-timeout 5 --max-time 15 -o "$TARGET_PATH" "$URL"
             
-            # 简单校验
             if test -s "$TARGET_PATH"
                 if command -v file >/dev/null 2>&1
                     if not file --mime-type "$TARGET_PATH" | grep -q "image/"
@@ -142,32 +118,31 @@ function f
     end
     
     function background_job -V CACHE_DIR -V LOCK_FILE -V MIN_TRIGGER_LIMIT -V DOWNLOAD_BATCH_SIZE -V MAX_CACHE_LIMIT
-        # 导出函数定义以便在 fish -c 中使用
+        # 后台 shell 需要重新导入这些函数。
         set -l get_random_url_def (functions get_random_url | string collect)
         set -l download_one_image_def (functions download_one_image | string collect)
         set -l check_network_def (functions check_network | string collect)
         
         fish -c "
-            # 忽略终端关闭带来的 SIGHUP 信号
+            # 后台任务脱离终端。
             trap '' HUP
 
-            # 重新定义需要的函数
             $get_random_url_def
             $download_one_image_def
             $check_network_def
             
-            # 使用 flock 防止并发
+            # 防止并发补货。
             flock -n 200 || exit 1
 
-            # 网络检查，没网就悄悄退出，不占后台资源
+            # 无网络时直接结束后台任务。
             if not check_network
                 exit 0
             end
             
-            # 导入变量
+            # 传入缓存目录。
             set CACHE_DIR '$CACHE_DIR'
             
-            # 1. 补货检查
+            # 检查是否需要补货。
             set CURRENT_COUNT (find \$CACHE_DIR -maxdepth 1 -name '*.jpg' 2>/dev/null | wc -l)
             
             if test \$CURRENT_COUNT -lt $MIN_TRIGGER_LIMIT
@@ -177,7 +152,7 @@ function f
                 end
             end
             
-            # 2. 清理过多库存
+            # 删除超出上限的旧图片。
             set FINAL_COUNT (find \$CACHE_DIR -maxdepth 1 -name '*.jpg' 2>/dev/null | wc -l)
             if test \$FINAL_COUNT -gt $MAX_CACHE_LIMIT
                 set DELETE_START_LINE (math $MAX_CACHE_LIMIT + 1)
@@ -185,16 +160,16 @@ function f
             end
         " 200>"$LOCK_FILE" &
         
-        # 将刚才丢入后台的 fish 子进程剥离终端控制
+        # 让后台任务脱离当前终端。
         disown
     end
     
-    # --- 4. 主程序逻辑 ---
+    # 选择图片并运行 Fastfetch。
     
     set -l FILES $CACHE_DIR/*.jpg
     set -l NUM_FILES (count $FILES)
     
-    # fish 若无匹配文件，$FILES 可能为空或保留模式字符串，需额外判断
+    # Fish glob 无匹配时需要额外检查。
     if test "$NUM_FILES" -eq 1; and not test -f "$FILES[1]"
         set NUM_FILES 0
         set FILES
@@ -203,14 +178,14 @@ function f
     set -l SELECTED_IMG ""
     
     if test "$NUM_FILES" -gt 0
-        # 有库存，随机选一张
+        # 有缓存时随机选择。
         set -l RAND_INDEX (math (random) % $NUM_FILES + 1)
         set SELECTED_IMG "$FILES[$RAND_INDEX]"
         
-        # 后台补货
+        # 同时异步补货。
         background_job >/dev/null 2>&1
     else
-        # 没库存，输出多语言提示语并增加网络连通性容错
+        # 无缓存时先检查网络并同步下载一张。
         echo "$MSG_WAIT"
         
         if check_network
@@ -226,28 +201,27 @@ function f
         end
     end
     
-    # 运行 Fastfetch
+
     if test -n "$SELECTED_IMG"; and test -f "$SELECTED_IMG"
-        # 显示图片
+
         fastfetch --logo "$SELECTED_IMG" --logo-preserve-aspect-ratio true $ARGS_FOR_FASTFETCH
         
-        # === 逻辑: 移动到 used 目录 ===
+        # 消费后移动到 used。
         mv "$SELECTED_IMG" "$USED_DIR/"
         
-        # === 逻辑: 检查 used 目录并清理旧图 ===
+        # 清理超量的历史图片。
         set -l used_files $USED_DIR/*.jpg
         set -l used_count (count $used_files)
         
-        # 再次确认 count
         if test "$used_count" -gt 0; and not test -f "$used_files[1]"
              set used_count 0
         end
 
         if test "$used_count" -gt "$MAX_USED_LIMIT"
-            # 计算需要跳过的行数
+            # 保留最新的图片。
             set -l skip_lines (math "$MAX_USED_LIMIT" + 1)
             
-            # 列出所有文件按时间倒序，取尾部，删除
+            # 删除最旧的文件。
             set -l files_to_delete (ls -tp "$USED_DIR"/*.jpg 2>/dev/null | tail -n +$skip_lines)
             
             if test -n "$files_to_delete"
@@ -255,13 +229,13 @@ function f
             end
         end
 
-        # 检查是否开启清理 Fastfetch 内部缓存
+        # 按配置清理 Fastfetch 缓存。
         if test "$CLEAN_CACHE_MODE" = true
-            # 仅删除缩略图缓存，保留原图
+            # 只清理转换缓存。
             rm -rf "$HOME/.cache/fastfetch/images"
         end
     else
-        # 失败提示语
+        # 无可用图片时使用 Fastfetch 默认 logo。
         echo "$MSG_FAIL"
         fastfetch $ARGS_FOR_FASTFETCH
     end
