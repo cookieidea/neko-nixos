@@ -1,5 +1,5 @@
 # 聚合 programs / services / virtualisation 模块
-{ unusedVar, ... }:
+{ ... }:
 
 {
   imports = [
