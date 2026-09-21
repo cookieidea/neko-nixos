@@ -39,7 +39,7 @@
 │   │   ├── desktop.nix           # niri、Noctalia Greeter、XDG 门户、字体、系统包
 │   │   ├── flatpak.nix           # Flatpak remote、应用与权限
 │   │   ├── minecraft.nix         # MC 联机端口 + 组播路由
-│   │   └── dsh.nix               # dsh web 端口
+│   │   ├── dsh.nix               # dsh web 端口
 │   │   ├── services/
 │   │   │   ├── openssh.nix      # SSH
 │   │   │   ├── udisks2.nix      # USB 自动挂载
