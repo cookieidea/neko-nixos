@@ -97,7 +97,8 @@ print(json.dumps(output))
 SCANSCRIPT
     $DRY_RUN_CMD chmod +x "$MARK/code-scan-helper.sh"
 
-    # 删除旧的 pip venv。
+    # 清理遗留的 pip venv：早期版本在此创建 venv 装 OCR/扫码依赖，
+    # 现改由 Nix 环境提供（见 pkgs/tools/mark-shot-python），此处只负责收尾。
     $DRY_RUN_CMD rm -rf "$MARK/ocr-venv" "$MARK/code-scan-venv"
 
     # 将 HM 的只读 config symlink 转为真实文件后再注入 secret。

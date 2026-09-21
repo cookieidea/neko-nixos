@@ -17,7 +17,7 @@
     # GSettings schema 路径。
     GSETTINGS_SCHEMA_DIR = "${pkgs.gtk3}/share/gsettings-schemas/${pkgs.gtk3.name}/glib-2.0/schemas:${pkgs.gsettings-desktop-schemas}/share/gsettings-schemas/${pkgs.gsettings-desktop-schemas.name}/glib-2.0/schemas";
   }
-  # 开发环境变量来自 home/lib.nix 的 devEnv。
+  # 开发环境变量来自 home/lib/dev-env.nix 的 devEnv。
   // hmLib.devEnv;
   # 按需注入运行库，避免全局 LD_LIBRARY_PATH 污染。
 }
