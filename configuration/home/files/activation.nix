@@ -7,11 +7,15 @@
     copy_seed() {
       seed_source="$1"
       seed_target="$2"
+      seed_mode="${3:-}"
 
       if [ -L "$seed_target" ] || [ ! -e "$seed_target" ]; then
         $DRY_RUN_CMD mkdir -p "$(dirname "$seed_target")"
         $DRY_RUN_CMD rm -f "$seed_target"
         $DRY_RUN_CMD cp -f "$seed_source" "$seed_target"
+        if [ -n "$seed_mode" ]; then
+          $DRY_RUN_CMD chmod "$seed_mode" "$seed_target"
+        fi
       fi
     }
 
@@ -32,8 +36,7 @@
     fi
 
     copy_seed "${hmLib.seedStarship}" "$HOME/.config/starship.toml"
-    copy_seed "${hmLib.seedMangoHud}" "$HOME/.config/MangoHud/MangoHud.conf"
-    $DRY_RUN_CMD chmod 644 "$HOME/.config/MangoHud/MangoHud.conf"
+    copy_seed "${hmLib.seedMangoHud}" "$HOME/.config/MangoHud/MangoHud.conf" 644
   '';
 
   home.activation.wallpaperRealFiles = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
