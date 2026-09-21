@@ -17,6 +17,8 @@
     "https://cook-nixvim.cachix.org"
     # nix-community 通用缓存（unfree 可再分发包 + 社区包，官方源不构建这类）
     "https://nix-community.cachix.org"
+    # Denial 官方缓存（命中即免编译 Flutter 引擎）
+    "https://denial.cachix.org"
   ];
   # 同理，cache.nixos.org 的 key 由模块默认提供，此处只列额外缓存
   nix.settings.trusted-public-keys = [
@@ -26,6 +28,7 @@
     "niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g="
     "cook-nixvim.cachix.org-1:LjCZ3VSYrcwTQxHpd834EIswdkfHoSd/EsKUYLRruF4="
     "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+    "denial.cachix.org-1:wd8YTnvPmugFrtdMJWtR1XdVknR3/g2nmBJkT+vAruo="
   ];
   # 允许本用户使用 --substituters 等客户端缓存设置（否则被忽略：not a trusted user）
   # root 由 nixos/modules/config/nix.nix 默认提供，无需重复

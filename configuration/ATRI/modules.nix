@@ -5,6 +5,7 @@
   imports = [
     # --- 系统级程序 ---
     ../modules/programs/desktop.nix
+    ../modules/programs/denial.nix
 
     # --- 系统服务 ---
     ../modules/services/openssh.nix
