@@ -1,11 +1,11 @@
-# XDG 数据/配置部署（nautilus 扩展、niri、fish、kitty、mpv…）
+# XDG 数据与配置文件部署。
 { pkgs, username, ... }:
 
 {
-  # nautilus Python 扩展部署（nautilus-python 扫描 ~/.local/share/nautilus-python/extensions）
+  # Nautilus Python 扩展。
   xdg.dataFile = {
     "nautilus-python/extensions/video-to-audio.py".source = ./dotfiles/config/nautilus-python/video-to-audio.py;
-    # lunarclient 覆盖（Exec 加 %u、补 discord scheme）
+    # Lunar Client desktop entry 覆盖。
     "applications/lunarclient.desktop".text = ''
       [Desktop Entry]
       Name=Lunar Client
@@ -21,7 +21,7 @@
   };
 
   xdg.configFile = {
-    # ABDM 托盘（unit drop-in 注入 LD_LIBRARY_PATH 与 log 目录）
+    # AB Download Manager 托盘 service drop-in。
     "systemd/user/app-com.abdownloadmanager@autostart.service.d/10-abdm-tray.conf".text = ''
       [Service]
       Environment=LD_LIBRARY_PATH=${pkgs.systemdLibs}/lib:${pkgs.pipewire.jack}/lib
@@ -40,7 +40,7 @@
     "fish/functions/fwatch.fish".source = ./dotfiles/config/fish/functions/fwatch.fish;
     "fontconfig/fonts.conf".source = ./dotfiles/config/fontconfig/fonts.conf;
     "fuzzel/fuzzel.ini".source = ./dotfiles/config/fuzzel/fuzzel.ini;
-    # 书签栏路径随用户名变化 → 由 Nix 生成而非静态文件
+    # 书签路径随用户名生成。
     "gtk-3.0/bookmarks".text = ''
       file:///home/${username}/Documents Documents
       file:///home/${username}/Pictures Pictures
@@ -53,9 +53,7 @@
     "gtk-3.0/gtk.css".source = ./dotfiles/config/gtk-3.0/gtk.css;
     "gtk-4.0/gtk.css".source = ./dotfiles/config/gtk-4.0/gtk.css;
     "mimeapps.list".source = ./dotfiles/config/mimeapps.list;
-    # mpv（配置本体是真实目录，watch_later 需写入）
-    # mpv.conf 含 bilibili cookies 路径（原为 /home/cookie/...），
-    # 用 readFile + 替换使路径随 username 变化
+    # mpv.conf 需要按 username 替换路径；运行时数据目录保持可写。
     "mpv/mpv.conf" = {
       text = builtins.replaceStrings
         [ "/home/cookie" ]
@@ -89,7 +87,7 @@
     "mpv/shaders".source = ./dotfiles/mpv/shaders;
     "mpv/vs".source = ./dotfiles/mpv/vs;
     "mpv/fonts".source = ./dotfiles/mpv/fonts;
-    # niri 配置（effects.kdl 为软链由 toggle-eyecare.sh 维护）
+    # niri 配置；effects.kdl 由护眼脚本维护。
     "niri/animations.kdl".source = ./dotfiles/config/niri/animations.kdl;
     "niri/binds.kdl" = {
       source = ./dotfiles/config/niri/binds.kdl;
@@ -108,12 +106,12 @@
     "niri/__custom__.kdl".source = ./dotfiles/config/niri/__custom__.kdl;
     "niri/input__custom__.kdl".source = ./dotfiles/config/niri/input__custom__.kdl;
     "niri/scratchpad-items__custom__.toml".source = ./dotfiles/config/niri/scratchpad-items__custom__.toml;
-    # noctalia hook 脚本；config.toml 由 activation 复制为可写真实文件
+    # Noctalia hooks；config.toml 由 activation 提供可写副本。
     "noctalia/config.toml".force = true;
     "noctalia/theme-sync.sh".source = ./dotfiles/config/noctalia/theme-sync.sh;
     "noctalia/wallpaper-hook.sh".source = ./dotfiles/config/noctalia/wallpaper-hook.sh;
     "noctalia/mpv-hook.lua".source = ./dotfiles/config/noctalia/mpv-hook.lua;
-    # kitty（current-theme.conf 由 activation 种子写入）
+    # Kitty 配置；current-theme.conf 由 activation 初始化。
     "kitty/kitty.conf".source = ./dotfiles/config/kitty/kitty.conf;
     "kitty/__custom__.conf".source = ./dotfiles/config/kitty/__custom__.conf;
     "kitty/themes/noctalia.conf" = {
@@ -125,7 +123,7 @@
     "fish/conf.d/__custom__.fish".source = ./dotfiles/config/fish/conf.d/__custom__.fish;
     "fish/conf.d/shorin.fish".source = ./dotfiles/config/fish/conf.d/shorin.fish;
     "fish/completions/nyxniri.fish".source = ./dotfiles/config/fish/completions/nyxniri.fish;
-    # fastfetch / starship
+    # Fastfetch / Starship。
     "fastfetch/config.jsonc".source = ./dotfiles/config/fastfetch/config.jsonc;
     "starship.toml".source = ./dotfiles/config/starship.toml;
     "xdg-desktop-portal/niri-portals.conf".source = ./dotfiles/config/xdg-desktop-portal/niri-portals.conf;
