@@ -31,7 +31,7 @@
 │   │   ├── security-users.nix   # polkit 与用户账户
 │   │   └── secrets.nix          # agenix 加密 secrets 声明
 │   │
-│   ├── device/hardware/         # ── 硬件特定
+│   ├── device/                 # ── 硬件特定
 │   │   ├── hardware-config.nix  # nixos-generate-config 产物（勿手改）
 │   │   └── gpu.nix              # AMD GPU / ROCm
 │   │
