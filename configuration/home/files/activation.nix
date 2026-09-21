@@ -4,8 +4,18 @@
 {
   # Noctalia、Kitty 和 MangoHud 的可写配置初始化。
   home.activation.noctaliaV5Seed = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    copy_seed() {
+      seed_source="$1"
+      seed_target="$2"
+
+      if [ -L "$seed_target" ] || [ ! -e "$seed_target" ]; then
+        $DRY_RUN_CMD mkdir -p "$(dirname "$seed_target")"
+        $DRY_RUN_CMD rm -f "$seed_target"
+        $DRY_RUN_CMD cp -f "$seed_source" "$seed_target"
+      fi
+    }
+
     NIRI_DIR="$HOME/.config/niri"
-    KITTY_DIR="$HOME/.config/kitty"
     NOCT_DIR="$HOME/.config/noctalia"
 
     if [ ! -e "$NIRI_DIR/effects.kdl" ]; then
@@ -13,10 +23,7 @@
       $DRY_RUN_CMD ln -sfn "effects_normal.kdl" "$NIRI_DIR/effects.kdl"
     fi
 
-    if [ ! -e "$KITTY_DIR/current-theme.conf" ]; then
-      $DRY_RUN_CMD mkdir -p "$KITTY_DIR"
-      $DRY_RUN_CMD cp -f "${hmLib.seedKittyTheme}" "$KITTY_DIR/current-theme.conf"
-    fi
+    copy_seed "${hmLib.seedKittyTheme}" "$HOME/.config/kitty/current-theme.conf"
 
     if [ -L "$NOCT_DIR/config.toml" ] || [ ! -e "$NOCT_DIR/config.toml" ]; then
       $DRY_RUN_CMD mkdir -p "$NOCT_DIR"
@@ -24,20 +31,11 @@
       $DRY_RUN_CMD cp -f "${hmLib.seedNoctaliaConfig}" "$NOCT_DIR/config.toml"
     fi
 
-    if [ -L "$HOME/.config/starship.toml" ] || [ ! -e "$HOME/.config/starship.toml" ]; then
-      $DRY_RUN_CMD rm -f "$HOME/.config/starship.toml"
-      $DRY_RUN_CMD cp -f "${hmLib.seedStarship}" "$HOME/.config/starship.toml"
-    fi
-
-    if [ -L "$HOME/.config/MangoHud/MangoHud.conf" ] || [ ! -e "$HOME/.config/MangoHud/MangoHud.conf" ]; then
-      $DRY_RUN_CMD mkdir -p "$HOME/.config/MangoHud"
-      $DRY_RUN_CMD rm -f "$HOME/.config/MangoHud/MangoHud.conf"
-      $DRY_RUN_CMD cp -f "${hmLib.seedMangoHud}" "$HOME/.config/MangoHud/MangoHud.conf"
-      $DRY_RUN_CMD chmod 644 "$HOME/.config/MangoHud/MangoHud.conf"
-    fi
+    copy_seed "${hmLib.seedStarship}" "$HOME/.config/starship.toml"
+    copy_seed "${hmLib.seedMangoHud}" "$HOME/.config/MangoHud/MangoHud.conf"
+    $DRY_RUN_CMD chmod 644 "$HOME/.config/MangoHud/MangoHud.conf"
   '';
 
-  # 视频壁纸需要真实文件。
   home.activation.wallpaperRealFiles = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     WP="$HOME/Pictures/Wallpapers"
     for dest in "$WP/video/hatsune-miku.mp4" "$HOME/Videos/wallpaper/hatsune-miku.mp4"; do
