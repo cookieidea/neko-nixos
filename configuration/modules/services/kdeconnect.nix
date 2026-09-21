@@ -1,7 +1,4 @@
-# KDE Connect：手机 ↔ 电脑（文件互传/剪贴板同步/媒体控制）
-#
-# 归口理由：防火墙端口范围只服务于 KDE Connect。
-# HM 侧的服务定义见 configuration/home/desktop/default.nix。
+# KDE Connect：手机与电脑互联。防火墙端口与该服务一起管理。
 { ... }:
 
 {
