@@ -17,10 +17,19 @@ rec {
   # 编程工具的用户级 bin（进 PATH）
   devBinPath = [ "$HOME/.cargo/bin" "$HOME/.npm-global/bin" ];
 
-  # 共享库路径：systemdLibs（ABDM 托盘）+ pipewire-jack（ABDM/MC）
-  # shell 侧额外拼 gcc lib —— MC natives 的 shaderc/spirv-cross 等 dlopen 它
-  ldLibraryPath = "${pkgs.systemdLibs}/lib:${pkgs.pipewire.jack}/lib";
-  ldLibraryPathShell = "${ldLibraryPath}:${pkgs.stdenv.cc.cc.lib}/lib";
+  # ── 共享库路径 ──
+  #
+  # 不再挂到用户 session（原 ldLibraryPathShell 会污染所有动态链接程序）。
+  # 改为各自 wrapper 注入，故障域限定在需要它的程序：
+  #
+  #   systemdLibs    ABDM 托盘（JNA dlopen libLinuxTray.so → libsystemd.so.0）
+  #                  → 已由 ab-download-manager 的 makeWrapper 与其
+  #                    autostart drop-in 各自注入，无需全局
+  #   pipewire.jack  MC 的 libopenal.so 音频后端（dlopen libjack.so.0，可选后端）
+  #   gcc lib        MC 的 libopenal/libshaderc（NEEDED libstdc++.so.6/libgcc_s）
+  #                  → 这两项由 mcJavaLibPath 供 hmcl / lunarclient wrapper 使用
+  mcJavaLibPath =
+    "${pkgs.pipewire.jack}/lib:${pkgs.stdenv.cc.cc.lib}/lib";
 
   # Nautilus C 扩展目录（systemd 侧与系统会话侧同源）
   nautilusExtensionDir =
@@ -85,7 +94,8 @@ rec {
     postBuild = ''
       rm -f $out/bin/lunarclient
       makeWrapper ${pkgs.lunar-client}/bin/lunarclient $out/bin/lunarclient \
-        --set SDL_VIDEO_DRIVER wayland
+        --set SDL_VIDEO_DRIVER wayland \
+        --prefix LD_LIBRARY_PATH : "${mcJavaLibPath}"
     '';
   };
 

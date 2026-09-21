@@ -20,6 +20,11 @@ rec {
   nyxniri-scratch-menu = import ./desktop/nyxniri-scratch-menu { inherit pkgs; };
 
   # 工具 / 网络
+  # mark-shot 的 Python 环境（OCR / 扫码；取代 activation 里的 pip venv）
+  inherit (import ./tools/mark-shot-python { inherit pkgs; })
+    markShotOcr
+    markShotScan;
+
   ab-download-manager  = import ./tools/networking/ab-download-manager { inherit pkgs; };
   astral               = import ./tools/networking/astral { inherit pkgs; lib = pkgs.lib; fetchurl = pkgs.fetchurl; };
 

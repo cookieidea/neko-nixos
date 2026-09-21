@@ -1,5 +1,5 @@
-# activation 脚本（Noctalia seed、壁纸真实文件、mark-shot venv）
-{ hmLib, pkgs, lib, ... }:
+# activation 脚本（Noctalia seed、壁纸真实文件、mark-shot helper）
+{ hmLib, pkgs, lib, selfPackages, ... }:
 
 {
   # Noctalia V5 可写 seed（文件缺失或是 store 链接时复制）
@@ -55,66 +55,65 @@
     done
   '';
 
-  # mark-shot OCR + 扫码 venv
+  # mark-shot OCR / 扫码后端
+  #
+  # 原先在 activation 里 `python -m venv` + `pip install`（联网访问 PyPI、
+  # 依赖运行时解析、破坏可复现性，且 home-manager switch --offline 不可用）。
+  # 现改为 Nix 构建的 Python 环境：依赖全部固定、离线可用、无网络副作用。
+  #
+  # helper 脚本路径与调用接口保持不变（config.json 里 command 指向它们），
+  # 故 mark-shot 侧无需改动。
   home.activation.markShotSetup = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     MARK="$HOME/.local/share/mark-shot"
-    OCR_VENV="$MARK/ocr-venv"
-    SCAN_VENV="$MARK/code-scan-venv"
-    PYTHON="${pkgs.python3}/bin/python3"
-    LD_PATH="${pkgs.stdenv.cc.cc.lib}/lib:${pkgs.zlib.out}/lib:${pkgs.libgcc.lib}/lib:${pkgs.libxcb}/lib:${pkgs.libglvnd}/lib:${pkgs.glib.out}/lib"
+    $DRY_RUN_CMD mkdir -p "$MARK"
 
-    # OCR venv
-    if [ ! -f "$OCR_VENV/bin/python" ] || ! env LD_LIBRARY_PATH="$LD_PATH" "$OCR_VENV/bin/python" -c "import rapidocr" 2>/dev/null; then
-      $DRY_RUN_CMD rm -rf "$OCR_VENV"
-      $DRY_RUN_CMD $PYTHON -m venv "$OCR_VENV"
-      $DRY_RUN_CMD env LD_LIBRARY_PATH="$LD_PATH" "$OCR_VENV/bin/pip" install rapidocr onnxruntime
-    fi
-
-    # code-scan venv
-    if [ ! -f "$SCAN_VENV/bin/python" ] || ! env LD_LIBRARY_PATH="$LD_PATH" "$SCAN_VENV/bin/python" -c "import zxingcpp" 2>/dev/null; then
-      $DRY_RUN_CMD rm -rf "$SCAN_VENV"
-      $DRY_RUN_CMD $PYTHON -m venv "$SCAN_VENV"
-      $DRY_RUN_CMD env LD_LIBRARY_PATH="$LD_PATH" "$SCAN_VENV/bin/pip" install zxing-cpp pillow numpy
-    fi
-
-    # OCR helper script（mark-shot 调用入口，读图片路径 → rapidocr）
+    # OCR helper（mark-shot 调用入口，读图片路径 → rapidocr）
     $DRY_RUN_CMD cat > "$MARK/ocr-helper.sh" << 'OCRSCRIPT'
 #!/usr/bin/env bash
-export LD_LIBRARY_PATH="LIBPATH_PLACEHOLDER"
-$HOME/.local/share/mark-shot/ocr-venv/bin/python -c "
+exec ${selfPackages.markShotOcr}/bin/python3 -c '
 from rapidocr import RapidOCR
 import sys, json
-e = RapidOCR()
+# 显式指定模型路径：nixpkgs 的 rapidocr 包版本（3.8.1）与其内置模型不同步
+# （包内是 v1.1.0 的 *_infer.onnx，而 3.8.1 默认找 *_mobile 并要求联网下载）。
+# 不指定会尝试写入只读的 store 目录而失败。
+import glob as _g
+_M = _g.glob("${selfPackages.markShotOcr}/lib/python*/site-packages/rapidocr/models")[0]
+e = RapidOCR(params={
+    "Det.model_path": _M + "/ch_PP-OCRv4_det_infer.onnx",
+    "Rec.model_path": _M + "/ch_PP-OCRv4_rec_infer.onnx",
+    "Cls.model_path": _M + "/ch_ppocr_mobile_v2.0_cls_infer.onnx",
+})
 result = e(sys.argv[1])
 tokens = []
 if result and result.txts:
     for i, txt in enumerate(result.txts):
         box = result.boxes[i].tolist() if result.boxes is not None else []
-        tokens.append({'text': txt, 'confidence': float(result.scores[i]), 'box': box})
-print(json.dumps({'backend': 'rapidocr', 'tokens': tokens}))
-" "$1"
+        tokens.append({"text": txt, "confidence": float(result.scores[i]), "box": box})
+print(json.dumps({"backend": "rapidocr", "tokens": tokens}))
+' "$1"
 OCRSCRIPT
-    $DRY_RUN_CMD sed -i "s|LIBPATH_PLACEHOLDER|$LD_PATH|" "$MARK/ocr-helper.sh"
     $DRY_RUN_CMD chmod +x "$MARK/ocr-helper.sh"
 
-    # code-scan helper script（mark-shot 调用入口，用 {imagePath} 占位符）
+    # code-scan helper（用 {imagePath} 占位符）
     $DRY_RUN_CMD cat > "$MARK/code-scan-helper.sh" << 'SCANSCRIPT'
 #!/usr/bin/env bash
-export LD_LIBRARY_PATH="LIBPATH_PLACEHOLDER"
-$HOME/.local/share/mark-shot/code-scan-venv/bin/python -c "
+exec ${selfPackages.markShotScan}/bin/python3 -c '
 import zxingcpp, sys, json, numpy as np
 from PIL import Image
-img = Image.open(sys.argv[1]).convert('RGB')
+img = Image.open(sys.argv[1]).convert("RGB")
 arr = np.array(img)[:, :, ::-1]
 results = zxingcpp.read_barcodes(arr)
-output = {'backend': 'zxing', 'results': [], 'errors': []}
+output = {"backend": "zxing", "results": [], "errors": []}
 for r in results:
-    output['results'].append({'text': r.text, 'format': str(r.format)})
+    output["results"].append({"text": r.text, "format": str(r.format)})
 print(json.dumps(output))
-" "$1"
+' "$1"
 SCANSCRIPT
-    $DRY_RUN_CMD sed -i "s|LIBPATH_PLACEHOLDER|$LD_PATH|" "$MARK/code-scan-helper.sh"
     $DRY_RUN_CMD chmod +x "$MARK/code-scan-helper.sh"
+
+    # 清理旧 pip venv（已由 Nix 环境取代）
+    $DRY_RUN_CMD rm -rf "$MARK/ocr-venv" "$MARK/code-scan-venv"
+
     # xdg.configFile 创建的是 nix store symlink（只读），覆盖为真实文件再注入 agenix secrets
     CFG="$HOME/.config/mark-shot/config.json"
     if [ -L "$CFG" ] && [ -f "/run/agenix/mark-shot-sensitive" ]; then
