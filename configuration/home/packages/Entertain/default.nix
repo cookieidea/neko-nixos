@@ -13,6 +13,7 @@
     kdePackages.kcalc                            # kcalc（KDE 计算器）
     upscaler
     gimp                                      # gimp（图像编辑）
+    krita                                     # krita（绘画/数字艺术）
     pavucontrol
     easyeffects
     libreoffice                               # 勿 .override langs
