@@ -1,4 +1,4 @@
-# BedrockBoot（MC 基岩版启动器，Avalonia/.NET）
+# BedrockBoot（Avalonia/.NET）。
 { pkgs }:
 
 let
@@ -19,7 +19,7 @@ let
     exec ${extracted}/AppRun "$@"
   '';
 
-  # 自定义 xdg-open（走 portal 开系统浏览器）
+  # xdg-open 通过 portal 打开宿主浏览器。
   xdgOpenSupport = pkgs.stdenv.mkDerivation {
     pname = "bedrockboot-xdg-support";
     version = "1";
@@ -27,10 +27,9 @@ let
       mkdir -p $out/usr/bin
       cat > $out/usr/bin/xdg-open <<'EOF'
       #!/bin/sh
-      # 调试日志（$HOME/$XDG_CACHE_HOME 由运行时展开，脚本在 FHS 沙箱内执行）
+      # 调试日志路径由运行时环境展开。
       echo "xdg-open called: $@" >> "''${XDG_CACHE_HOME:-$HOME/.cache}/bedrockboot-xdg-open.log" 2>/dev/null || true
-      # 会话总线：优先用已有的 DBUS_SESSION_BUS_ADDRESS；否则由 XDG_RUNTIME_DIR 推导
-      # （不写死 UID，避免换用户后失效）
+      # 优先使用现有 session bus 地址，否则根据 XDG_RUNTIME_DIR 推导。
       if [ -z "''${DBUS_SESSION_BUS_ADDRESS:-}" ] && [ -n "''${XDG_RUNTIME_DIR:-}" ]; then
         export DBUS_SESSION_BUS_ADDRESS="unix:path=$XDG_RUNTIME_DIR/bus"
       fi
@@ -57,7 +56,7 @@ let
     extraBuildCommands = ''
       mkdir -p $out/usr/bin
       cp -a ${xdgOpenSupport}/usr/bin/* $out/usr/bin/
-      # wine 初始化 prefix
+      # 初始化 Wine prefix。
       for b in ${pkgs.wineWow64Packages.stable}/bin/*; do
         ln -sf "$b" $out/usr/bin/$(basename "$b")
       done
@@ -65,12 +64,12 @@ let
     '';
     runScript = pkgs.writeShellScript "bedrockboot-run" ''
       export GDK_BACKEND=x11
-      # 用 GDK-Proton 自带 wine
+      # 使用 GDK-Proton 提供的 Wine。
       export GDK_PROTON_DIR="$HOME/.config/RoundStudio/BedrockBoot2/BedrockBoot.Linux/xuserProject/proton/GDK-Proton-xuser"
       export PATH="$GDK_PROTON_DIR/files/bin-wow64:$PATH"
       export WINEDLLPATH="$GDK_PROTON_DIR/files/lib/wine/x86_64-unix''${WINEDLLPATH:+:$WINEDLLPATH}"
       export LD_LIBRARY_PATH="$GDK_PROTON_DIR/files/lib/x86_64-linux-gnu:/usr/lib64:/usr/lib:/usr/lib/x86_64-linux-gnu''${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
-      # 走宿主 RADV + wine 内置 D3D 栈
+      # 使用宿主 RADV 和 Wine D3D 栈。
       export WINEDLLOVERRIDES="d3d12=b;d3d12core=b;dxgi=b"
       exec ${appRun} "$@"
     '';
@@ -85,7 +84,7 @@ let
       pkgs.zlib
       pkgs.openssl
       pkgs.icu            # .NET ICU
-      # 图形 / 字体 / X11 / Wayland
+      # 图形、字体和显示协议依赖。
       pkgs.fontconfig
       pkgs.freetype
       pkgs.libx11
@@ -97,7 +96,7 @@ let
       pkgs.dbus
       pkgs.glib
       pkgs.gsettings-desktop-schemas
-      # Avalonia / X11
+      # Avalonia / X11 依赖。
       pkgs.libICE
       pkgs.libSM
       pkgs.libXt
@@ -128,7 +127,7 @@ pkgs.stdenv.mkDerivation {
     mkdir -p $out/bin $out/share/applications $out/share/pixmaps
     ln -s ${fhsEnv}/bin/bedrockboot $out/bin/bedrockboot
 
-    # 图标
+    # 应用图标。
     icon=$(find . -path "*icons*" -name "*.png" 2>/dev/null | head -1)
     [ -n "$icon" ] && cp "$icon" "$out/share/pixmaps/bedrockboot.png" || true
 
