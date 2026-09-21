@@ -1,11 +1,6 @@
 # Astral 组网客户端（Flutter GUI + Rust/EasyTier 核心）
-#
-# 直接取上游发布的 Linux x64 产物（GitHub Release），而非本机构建：
-# 上游是 Flutter + Rust，构建需联网（dart pub get / cargokit 调 cargo），
-# 无法在 Nix 沙箱内完成。此前用 path 输入指向 ~/.cache/astral/bundle，
-# 导致 flake 依赖本机 home 目录状态（换机 / 清理 cache / 换用户名即失效）。
-#
-# 升级：改 version + 重新生成 hash（nix store prefetch-file <url>）
+# 直接使用上游 Linux x64 Release，避免在 Nix sandbox 内重新构建 Flutter/Rust。
+# 升级时修改 version 并重新生成 hash。
 { pkgs, lib, fetchurl }:
 
 let
@@ -20,20 +15,15 @@ pkgs.stdenv.mkDerivation {
     hash = "sha256-nsPAZovdBcvUQ/uI/7ez6F4xbqZA4OS+tdsLJGsfCNw=";
   };
 
-  # 上游 tarball 是扁平结构（astral / astral-core / data/ / lib/），
-  # 解包后即为 bundle 根目录，无需 stripComponents。
+  # Release tarball 解包后就是 bundle 根目录。
   sourceRoot = ".";
 
   nativeBuildInputs = [
     pkgs.autoPatchelfHook
     pkgs.makeWrapper
     pkgs.wrapGAppsHook3
-    # 仅用于让 autoPatchelf 找到 libjvm.so（见下方 postPatch），
-    # 不进入运行时闭包（jdk 由 rpath 指向，wrapGAppsHook 不会拉入）
     pkgs.jdk
   ];
-
-
 
 
   buildInputs = with pkgs; [
@@ -89,19 +79,13 @@ pkgs.stdenv.mkDerivation {
     runHook preInstall
 
     mkdir -p $out/bin $out/share/applications $out/share/pixmaps
-    # sourceRoot="." 表示当前目录即 bundle 根（astral/astral-core/data/lib），
-    # 故直接复制 . 而非 $src（$src 在解包后是只读的 store 目录）
+    # 当前目录就是 bundle 根，直接复制其内容。
     mkdir -p $out/app
     cp -r . $out/app
     chmod -R u+w $out/app
     chmod +x $out/app/astral
 
-    # 上游 tarball 的 libdartjni.so 依赖 libjvm.so（JNI 桥；上游 CI 构建引入，
-    # 本机自建产物没有此依赖）。libjvm.so 在 JDK 的 lib/server/ 下，
-    # 而 autoPatchelfHook 只搜索 <pkg>/lib —— 复制进来使其可被解析，
-    # 同时让运行时 rpath（$ORIGIN/lib）自然命中。
-    # 注意：不同 JDK 发行版布局不同（zulu 在 lib/server/，openjdk 在
-    # lib/openjdk/lib/server/），故用 find 定位而非写死路径。
+    # libdartjni.so 需要 libjvm.so；JDK 布局因发行版而异，所以通过 find 定位。
     find ${pkgs.jdk} -name libjvm.so -print -quit | \
       xargs -r -I{} cp {} $out/app/lib/
 
@@ -121,7 +105,7 @@ EOF
   '';
 
   postFixup = ''
-    # TUN 需 cap_net_admin，装后手动 setcap（见 README）
+    # TUN 使用 cap_net_admin；安装后需要额外设置权限。
     makeWrapper $out/app/astral $out/bin/astral \
       --prefix LD_LIBRARY_PATH : "$out/app/lib:${
         lib.makeLibraryPath (with pkgs; [
