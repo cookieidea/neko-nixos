@@ -62,9 +62,9 @@
 │   │   │   ├── Entertain/       # 播放器、图像、办公、下载、浏览器
 │   │   │   ├── Desktop/         # niri、主题图标、文件管理器、剪贴板
 │   │   │   └── Utility/         # 系统信息、磁盘、代理、自建程序
-│   │   ├── programs/default.nix # HM 程序选项（git/starship/fish/noctalia…）
-│   │   ├── desktop/default.nix  # polkit、GTK 主题、KDE Connect、OBS
-│   │   ├── xdg/default.nix      # xdg.configFile / xdg.dataFile 部署
+│   │   ├── programs.nix          # HM 程序选项（git/starship/fish/noctalia…）
+│   │   ├── desktop.nix           # polkit、GTK 主题、KDE Connect、OBS
+│   │   ├── xdg.nix               # xdg.configFile / xdg.dataFile 部署
 │   │   ├── files/               # home.file 部署
 │   │   │   ├── default.nix      # JDK 链、图标、desktop 入口、镜像源
 │   │   │   └── activation.nix   # activation 脚本（Noctalia seed、壁纸、mark-shot helper）
