@@ -1,12 +1,8 @@
-# home 模块共用的 let 绑定（经 flake.nix extraSpecialArgs 注入为 hmLib）
+# Home 模块共享的派生工具和配置数据。
 { pkgs, selfPackages, username }:
 
 rec {
-  # ── 编程工具链环境（单一数据源）──
-  # 这些值需同时出现在两处，缺一不可：
-  #   ① home.sessionVariables      → 登录 shell（写进 ~/.profile）
-  #   ② systemd.user.sessionVariables → systemd 启动的服务（niri 不读 profile）
-  # 集中在 lib.nix 定义，避免两处各写一份导致漂移。
+  # 开发环境变量的唯一数据源；登录 shell 和 systemd user session 共用。
   devEnv = {
     JAVA_HOME = "${pkgs.zulu25}";          # 默认 JDK（HMCL 等多版本可自选）
     CARGO_HOME = "$HOME/.cargo";
@@ -14,29 +10,19 @@ rec {
     VAPOURSYNTH_EXTRA_PLUGIN_PATH = "${selfPackages.vapoursynth-with-plugins}/lib/vapoursynth";
   };
 
-  # 编程工具的用户级 bin（进 PATH）
+  # 用户级开发工具目录。
   devBinPath = [ "$HOME/.cargo/bin" "$HOME/.npm-global/bin" ];
 
-  # ── 共享库路径 ──
-  #
-  # 不再挂到用户 session（原 ldLibraryPathShell 会污染所有动态链接程序）。
-  # 改为各自 wrapper 注入，故障域限定在需要它的程序：
-  #
-  #   systemdLibs    ABDM 托盘（JNA dlopen libLinuxTray.so → libsystemd.so.0）
-  #                  → 已由 ab-download-manager 的 makeWrapper 与其
-  #                    autostart drop-in 各自注入，无需全局
-  #   pipewire.jack  MC 的 libopenal.so 音频后端（dlopen libjack.so.0，可选后端）
-  #   gcc lib        MC 的 libopenal/libshaderc（NEEDED libstdc++.so.6/libgcc_s）
-  #                  → 这两项由 mcJavaLibPath 供 hmcl / lunarclient wrapper 使用
+  # Minecraft 运行库只注入相关 wrapper，避免污染整个用户 session。
   mcJavaLibPath =
     "${pkgs.pipewire.jack}/lib:${pkgs.stdenv.cc.cc.lib}/lib";
 
-  # Nautilus C 扩展目录（systemd 侧与系统会话侧同源）
+  # Nautilus C 扩展目录。
   nautilusExtensionDir =
     "${selfPackages.nautilus-with-extensions}/lib/nautilus/extensions-4";
 
-  # ── 包管理器国内镜像（files.nix 部署为真实文件）──
-  # npm：prefix 用绝对路径——npm 不对 prefix 做 $HOME 展开
+  # 包管理器镜像配置；files.nix 负责部署真实文件。
+  # npm prefix 使用绝对路径。
   npmrc = ''
     registry=https://registry.npmmirror.com
     prefix=/home/${username}/.npm-global
@@ -60,7 +46,7 @@ rec {
     default = true
   '';
 
-  # mpv + RIFE 补帧（VapourSynth）
+  # mpv + VapourSynth/RIFE。
   mpvRife = pkgs.mpv.override {
     mpv-unwrapped = pkgs.mpv-unwrapped.override {
       lua = pkgs.luajit;
@@ -79,12 +65,9 @@ rec {
     '';
   };
 
-  # 可写种子源（activation 复制用）
+  # activation 使用的可写种子文件。
   seedKittyTheme     = builtins.toString ./dotfiles/config/kitty/themes/noctalia.conf;
-  # 注意：activation 会把此文件复制为可写的 ~/.config/noctalia/config.toml，
-  # 若直接用原始 dotfiles（含 9 处 /home/cookie），会覆盖掉 HM settings 里
-  # 已按 username 替换过的版本 —— 换用户名后配置又指回 cookie 的家目录。
-  # 故此处与 programs/default.nix 的 settings 用同一套替换。
+  # activation 会把配置复制为可写文件，因此这里先按 username 替换家目录。
   seedNoctaliaConfig = pkgs.writeText "noctalia-config.toml"
     (builtins.replaceStrings
       [ "/home/cookie" ]
@@ -94,7 +77,7 @@ rec {
   seedMangoHud       = builtins.toString ./dotfiles/config/MangoHud/MangoHud.conf;
   seedWallpaperVideo = builtins.toString ./dotfiles/Pictures/Wallpapers/video/hatsune-miku.mp4;
 
-  # Lunar Client 强制 SDL 原生 Wayland（niri 下走 XWayland 会崩）
+  # Lunar Client 强制使用原生 Wayland。
   lunarclientWayland = pkgs.symlinkJoin {
     name = "lunar-client-wayland";
     paths = [ pkgs.lunar-client ];
@@ -107,7 +90,7 @@ rec {
     '';
   };
 
-  # trash:// 等 gvfs URI 交给 gio
+  # 将 GVFS URI 交给 gio，其余路径继续使用 xdg-open。
   xdgOpenWithGio = pkgs.writeShellScriptBin "xdg-open" ''
     for arg in "$@"; do
       case "$arg" in
