@@ -147,7 +147,7 @@
         let
           pkgs = nixpkgs.legacyPackages.${system};
           # 只纳入本仓库自己维护的配置，排除第三方源码与 dotfiles
-          targets = "configuration/ATRI configuration/system configuration/modules configuration/home configuration/overlays flake.nix";
+          targets = "configuration/system configuration/modules configuration/home configuration/overlays flake.nix";
         in {
           deadnix = pkgs.runCommand "deadnix-check"
             { nativeBuildInputs = [ pkgs.deadnix ]; } ''
