@@ -38,7 +38,7 @@ local function on_file_loaded()
     
     -- Command to safely generate thumbnail using MD5 hash (avoid collisions) and set wallpaper
     local cmd = string.format([=[
-        # Check dependencies
+        # 检查依赖。
         if ! command -v ffmpeg >/dev/null 2>&1; then
             echo "mpv-hook error: ffmpeg not found in PATH" >&2
             exit 1
@@ -48,7 +48,7 @@ local function on_file_loaded()
             exit 1
         fi
 
-        # Set variables
+        # 设置变量。
         cache_dir=%s
         input_path=%s
 
