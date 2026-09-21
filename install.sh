@@ -9,9 +9,6 @@ set -euo pipefail
 
 REPO="cookieidea/neko-nixos"
 BRANCH="${BRANCH:-main}"
-# Host 名从 flake.nix 读取（唯一数据源），避免脚本与配置脱节
-FLAKE_HOST="${FLAKE_HOST:-$(sed -n 's/^ *hostname *= *"\([^"]*\)".*/\1/p' "$(dirname "$0")/flake.nix" 2>/dev/null | head -1)}"
-FLAKE_HOST="${FLAKE_HOST:-ATRI}"
 OLD_USER="cookie"
 
 if [[ $EUID -ne 0 ]]; then
@@ -57,6 +54,18 @@ else
   git clone --depth 1 --branch "$BRANCH" "https://github.com/$REPO" "$SRC"
 fi
 cd "$SRC"
+
+# Host 名从仓库内 flake.nix 读取（唯一数据源）。
+# 必须在 cd "$SRC" 之后提取 —— 否则从仓库外启动（走 git clone）时，
+# 读的是脚本原位置而非刚克隆的仓库。
+if [[ -z "${FLAKE_HOST:-}" ]]; then
+  FLAKE_HOST="$(sed -n 's/^ *hostname *= *"\([^"]*\)".*/\1/p' "$SRC/flake.nix" 2>/dev/null | head -1)"
+  if [[ -z "$FLAKE_HOST" ]]; then
+    echo "错误：无法从 $SRC/flake.nix 读取 hostname。" >&2
+    exit 1
+  fi
+  echo "==> 使用 Host: $FLAKE_HOST"
+fi
 
 # ---------- 替换硬编码用户名 cookie -> TARGET_USER ----------
 if [[ "$TARGET_USER" != "$OLD_USER" ]]; then
@@ -169,8 +178,18 @@ else
 
   echo "==> 校验通过，替换 $DEST ..."
   rm -rf "$BACKUP"
-  if [[ -d "$DEST" ]]; then mv "$DEST" "$BACKUP" || { rm -rf "$DEST"; }; fi
-  mv "$STAGE" "$DEST"
+  # 原子交换：先把旧目录移开，再把 staging 移入；任一步失败都回滚，绝不删原目录
+  if [[ -d "$DEST" ]]; then
+    if ! mv "$DEST" "$BACKUP"; then
+      echo "错误：无法移开 $DEST（权限或挂载问题），已放弃更新。" >&2
+      exit 1
+    fi
+  fi
+  if ! mv "$STAGE" "$DEST"; then
+    echo "错误：无法将 staging 移入 $DEST，正在回滚 ..." >&2
+    [[ -d "$BACKUP" ]] && mv "$BACKUP" "$DEST"
+    exit 1
+  fi
   trap - EXIT
   rm -rf "$BACKUP"
 

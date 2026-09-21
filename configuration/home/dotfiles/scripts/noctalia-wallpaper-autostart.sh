@@ -6,4 +6,4 @@ for _ in $(seq 1 30); do
     sleep 1
 done
 
-exec /home/cookie/.local/bin/random-anime-wallpaper-noctalia -s
+exec "$HOME/.local/bin/random-anime-wallpaper-noctalia" -s

@@ -1,5 +1,5 @@
 # XDG 数据/配置部署（nautilus 扩展、niri、fish、kitty、mpv…）
-{ pkgs, ... }:
+{ pkgs, username, ... }:
 
 {
   # nautilus Python 扩展部署（nautilus-python 扫描 ~/.local/share/nautilus-python/extensions）
@@ -40,7 +40,16 @@
     "fish/functions/fwatch.fish".source = ../dotfiles/config/fish/functions/fwatch.fish;
     "fontconfig/fonts.conf".source = ../dotfiles/config/fontconfig/fonts.conf;
     "fuzzel/fuzzel.ini".source = ../dotfiles/config/fuzzel/fuzzel.ini;
-    "gtk-3.0/bookmarks".source = ../dotfiles/config/gtk-3.0/bookmarks;
+    # 书签栏路径随用户名变化 → 由 Nix 生成而非静态文件
+    "gtk-3.0/bookmarks".text = ''
+      file:///home/${username}/Documents Documents
+      file:///home/${username}/Pictures Pictures
+      file:///home/${username}/Videos Videos
+      file:///home/${username}/Music Music
+      file:///home/${username}/Downloads Downloads
+      file:///home/${username}/.config .config
+      file:///home/${username}/.local
+    '';
     "gtk-3.0/gtk.css".source = ../dotfiles/config/gtk-3.0/gtk.css;
     "gtk-4.0/gtk.css".source = ../dotfiles/config/gtk-4.0/gtk.css;
     "mimeapps.list".source = ../dotfiles/config/mimeapps.list;

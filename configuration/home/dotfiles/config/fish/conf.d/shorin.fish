@@ -45,5 +45,5 @@ function raw
 end
 
 # Added by LM Studio CLI (lms)
-set -gx PATH $PATH /home/cookie/.lmstudio/bin
+set -gx PATH $PATH $HOME/.lmstudio/bin
 # End of LM Studio CLI section

@@ -21,8 +21,7 @@
 │   │   ├── system.nix           # 聚合：system/ + device/ + modules/
 │   │   ├── modules.nix          # 聚合：modules/{programs,services,virtualisation}
 │   │   ├── home.nix             # 聚合：home/ 下各 Home Manager 模块
-│   │   ├── device.nix           # 导入硬件配置
-│   │   └── packages.nix         # 导入自定义包（pkgs/）
+│   │   └── device.nix           # 导入硬件配置
 │   │
 │   ├── system/                  # ── 纯系统级配置
 │   │   ├── nix.nix              # Nix 守护进程、二进制缓存、垃圾回收、zram
