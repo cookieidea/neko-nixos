@@ -1,6 +1,6 @@
 { pkgs }:
 
-# SPlayer-Next（Electron 音乐播放器；注意非 nixpkgs 的 `splayer`）
+# SPlayer-Next（Electron 音乐播放器）。
 (pkgs.appimageTools.wrapType2 {
   pname = "splayer-next";
   version = "1.1.0";
@@ -11,7 +11,7 @@
   extraPkgs = pkgs: with pkgs; [ ffmpeg ];
 }).overrideAttrs (old: {
   postInstall = (old.postInstall or "") + ''
-    # 补标准路径 desktop
+    # 补充标准 desktop entry 路径。
     binname=$(basename "$(find "$out/bin" -maxdepth 1 -type f -executable | head -1)")
     mkdir -p "$out/share/applications" "$out/share/pixmaps"
     icon=$(find "$out" -path "*icons*" -name "*.png" 2>/dev/null | head -1)
