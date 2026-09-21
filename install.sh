@@ -1,10 +1,7 @@
 #!/usr/bin/env bash
-#
-# neko-nixos 一键安装/更新脚本
-#   全新安装： sudo bash install.sh <用户名> <挂载点>   （挂载点需已分区+generate-config）
-#   已装更新： sudo bash install.sh [用户名]
-# 用户名通过修改 flake.nix 的 `username` 单一数据源设置，
-# 其余模块均引用该值（家目录路径由 Nix 插值 / $HOME 展开，不做全仓库替换）
+## neko-nixos 安装与更新入口。
+# 新安装：install.sh <用户名> <挂载点>
+# 更新：install.sh [用户名]
 #
 set -euo pipefail
 
@@ -17,7 +14,7 @@ if [[ $EUID -ne 0 ]]; then
   exit 1
 fi
 
-# ---------- 参数 ----------
+# 参数校验。
 TARGET_USER="${1:-}"
 MNT="${2:-}"            # 非空 => 全新安装模式（minimal ISO）
 
@@ -29,9 +26,7 @@ if [[ -z "$TARGET_USER" || "$TARGET_USER" == "root" ]]; then
   echo "错误：用户名不能为空或 root。" >&2
   exit 1
 fi
-# 合法 Linux 用户名：小写字母/下划线开头，后接小写字母/数字/下划线/连字符。
-# 必须校验：该值会写入 flake.nix 并用于路径拼接，含空格、斜杠或 shell 元字符
-# 会导致替换异常甚至命令注入。
+# 用户名会写入 flake.nix 并参与路径拼接，因此只接受安全字符。
 if [[ ! "$TARGET_USER" =~ ^[a-z_][a-z0-9_-]*$ ]]; then
   echo "错误：非法 Linux 用户名 '$TARGET_USER'。" >&2
   echo "      要求：小写字母或下划线开头，仅含小写字母、数字、下划线、连字符。" >&2
@@ -43,7 +38,7 @@ if [[ -n "$MNT" && ! -d "$MNT" ]]; then
   exit 1
 fi
 
-# ---------- nix / flakes 检查 ----------
+# Nix / flakes 检查。
 if ! command -v nix >/dev/null 2>&1; then
   echo "错误：未检测到 nix 命令。" >&2
   exit 1
@@ -53,7 +48,7 @@ if ! grep -q "flakes" /etc/nix/nix.conf 2>/dev/null; then
   echo "      experimental-features = nix-command flakes"
 fi
 
-# ---------- 获取源码 ----------
+# 获取源码。
 echo "==> 获取仓库代码 ..."
 SRC=""
 if [[ -f flake.nix && -d configuration ]]; then
@@ -64,9 +59,7 @@ else
 fi
 cd "$SRC"
 
-# Host 名从仓库内 flake.nix 读取（唯一数据源）。
-# 必须在 cd "$SRC" 之后提取 —— 否则从仓库外启动（走 git clone）时，
-# 读的是脚本原位置而非刚克隆的仓库。
+# Host 从仓库内 flake.nix 读取。
 if [[ -z "${FLAKE_HOST:-}" ]]; then
   FLAKE_HOST="$(sed -n 's/^ *hostname *= *"\([^"]*\)".*/\1/p' "$SRC/flake.nix" 2>/dev/null | head -1)"
   if [[ -z "$FLAKE_HOST" ]]; then
@@ -76,17 +69,7 @@ if [[ -z "${FLAKE_HOST:-}" ]]; then
   echo "==> 使用 Host: $FLAKE_HOST"
 fi
 
-# ---------- 设置用户名（只改单一数据源） ----------
-# 用户名在 flake.nix 的 `username = "..."` 一处定义，其余模块均引用它。
-#
-# 这里刻意不做全仓库 `sed s/cookie/<new>/g`：那会连
-#   · GitHub 账号   cookieidea            → aliceidea
-#   · 插件命名空间  cookie/translator     → alice/translator
-# 一起改坏（两者都含 "cookie" 子串，但语义无关）。
-#
-# 家目录路径也不再需要替换：原先硬编码的 /home/cookie 已改为
-#   · Nix 插值（noctalia/mpv 的 settings、gtk bookmarks）
-#   · 运行时变量（$HOME / ~ 用于脚本与配置）
+# 只修改 flake.nix 中的 username，不做全仓库文本替换。
 if [[ "$TARGET_USER" != "$OLD_USER" ]]; then
   echo "==> 设置用户名为 $TARGET_USER（改 flake.nix 单一数据源）..."
   if ! grep -qE '^ *username = "' "$SRC/flake.nix"; then
@@ -103,19 +86,7 @@ else
   echo "==> 目标用户名即 cookie，跳过替换。"
 fi
 
-# ---------- 预构建自构建程序（flake 包）----------
-# 注：Astral 已改为 fetchurl 直接取上游 GitHub Release（见
-# configuration/pkgs/tools/networking/astral/default.nix），
-# 不再需要本机联网构建 bundle，故此处无 Astral 专属步骤。
-
-# 这些程序不在 nixpkgs 核心，由 ./configuration/pkgs 里的派生从源码 / 发布构建
-# 这些程序不在 nixpkgs 核心，由 ./configuration/pkgs 里的派生构建。这里先单独构建，
-# 便于把失败定位到具体某个包（直接跑 nixos-rebuild 只会给出一整片闭包错误）。
-# 后续 nixos-install / nixos-rebuild 会复用已构建的结果。
-#
-# 失败即中止：这 11 个包全部在系统闭包内（home.packages / HM 程序选项），
-# 任一构建失败都必然导致后续 rebuild 失败。继续跑只会浪费时间，
-# 并把真正的错误埋在几十行闭包输出里。
+# 先单独构建自定义包，便于定位失败；成功结果会被后续安装复用。
 SELF_PKGS=(niri-sidebar nyxniri-scratch-menu pins shorin-contrib splayer-next ab-download-manager tabby-terminal obs-vdoninja purevox bedrockboot astral)
 echo "==> 预构建自构建程序（flake 包）..."
 FAILED_PKGS=()
@@ -140,21 +111,11 @@ if (( ${#FAILED_PKGS[@]} > 0 )); then
 fi
 
 if [[ -n "$MNT" ]]; then
-  # ================= 全新安装模式（minimal ISO） =================
+  # 新安装模式。
   DEST="$MNT/etc/nixos"
-  # 先不创建 $DEST —— 硬件配置检查通过后再建，避免留下半安装状态的空目录
+  # 硬件配置检查通过后再创建目标目录。
 
-  # 保留目标机由 nixos-generate-config 生成的硬件配置。
-  #
-  # nixos-generate-config --root /mnt 写到 $MNT/etc/nixos/hardware-configuration.nix
-  # （源文件名；见 nixpkgs 的 nixos-generate-config.pl），而本仓库的结构是
-  # configuration/device/hardware-config.nix —— 需转换路径。
-  #
-  # 仓库里那份绑定 ATRI 的分区 UUID（/ 与 /boot 的 by-uuid），若不加处理
-  # 会被全量复制覆盖，导致新机器按 ATRI 的分区表安装。
-  #
-  # 检查必须在**任何写入 $DEST 之前**完成：否则用户漏跑
-  # nixos-generate-config 时，$DEST 会先被写入一半再报错，留下半安装状态。
+# 保留目标机生成的硬件配置，避免复用仓库中旧机器的分区 UUID。
   GEN_HW="$MNT/etc/nixos/hardware-configuration.nix"
   GEN_HW_ALT="$MNT/etc/nixos/configuration/device/hardware-config.nix"
   KEEP_HW=""
@@ -163,7 +124,7 @@ if [[ -n "$MNT" ]]; then
     cp -a "$GEN_HW" "$KEEP_HW"
     echo "      ✓ 保留目标机生成的 hardware-configuration.nix"
   elif [[ -f "$GEN_HW_ALT" ]]; then
-    # 兼容：目标位置已有本仓库结构的硬件配置
+    # 兼容已部署仓库结构。
     KEEP_HW="$(mktemp)"
     cp -a "$GEN_HW_ALT" "$KEEP_HW"
     echo "      ✓ 保留目标机已有的 hardware-config.nix"
@@ -183,12 +144,11 @@ if [[ -n "$MNT" ]]; then
   cp -r "$SRC/." "$DEST/"
   rm -rf "$DEST/.git"
 
-  # 目标机自己生成的硬件配置优先于仓库里 ATRI 的那份
+  # 目标机硬件配置优先。
   cp -a "$KEEP_HW" "$DEST/configuration/device/hardware-config.nix"
   rm -f "$KEEP_HW"
 
-  # 密码不在安装时注入（配置里已无 initialPassword 占位，sed 注入属失效逻辑）。
-  # 装完在 TTY 用 root 执行 passwd <用户> 设置即可，下方提示会说明。
+  # 不在安装阶段写入密码；安装后通过 passwd 设置。
 
   echo "==> 执行 nixos-install --flake $DEST/#$FLAKE_HOST ..."
   nixos-install --flake "$DEST/#$FLAKE_HOST"
@@ -199,22 +159,18 @@ if [[ -n "$MNT" ]]; then
   echo "    （TUN 需要该权限；core 更新后需重设。core 由 GUI 管理，无常驻服务、无自启。）"
   echo "    若首次登录密码留空，重启后在 TTY 用 root（或 live 环境）执行：passwd $TARGET_USER"
 else
-  # ================= 已装系统：rebuild =================
-  # 事务式更新：先在 staging 目录校验，通过后才替换 /etc/nixos。
-  # 避免旧写法 `rm -rf /etc/nixos` 在中途失败时留下残缺配置。
+  # 已安装系统更新模式。
+  # 先在 staging 中检查和 dry-build，通过后再替换目标目录。
   DEST="/etc/nixos"
-  # $DEST 可能是挂载点（/etc/nixos 常为 bind mount / 独立分区），
-  # 故 staging 放在同级的隐藏目录，保证最终 mv 是同一文件系统内的原子操作。
+  # staging 与目标保持同一文件系统，便于安全交换。
   STAGE="$(dirname "$DEST")/.nixos-staging.$$"
   BACKUP="$(dirname "$DEST")/.nixos-backup.$$"
-  # shellcheck disable=SC2064
   trap 'rm -rf "$STAGE"' EXIT
 
   echo "==> 准备 staging：$STAGE ..."
   rm -rf "$STAGE"; mkdir -p "$STAGE"
 
-  # 保留目标机现有的 hardware-config（含该机分区 UUID；仓库里那份属 ATRI，
-  # 换机时不应被覆盖）
+  # 保留当前机器的硬件配置。
   if [[ -f "$DEST/configuration/device/hardware-config.nix" ]]; then
     cp -a "$DEST/configuration/device/hardware-config.nix" "$STAGE/hardware-config.keep"
   fi
@@ -243,7 +199,7 @@ else
 
   echo "==> 校验通过，替换 $DEST ..."
   rm -rf "$BACKUP"
-  # 原子交换：先把旧目录移开，再把 staging 移入；任一步失败都回滚，绝不删原目录
+  # 交换目录；失败时回滚。
   if [[ -d "$DEST" ]]; then
     if ! mv "$DEST" "$BACKUP"; then
       echo "错误：无法移开 $DEST（权限或挂载问题），已放弃更新。" >&2
@@ -258,17 +214,13 @@ else
   trap - EXIT
 
   echo "==> 执行 nixos-rebuild switch --flake $DEST/#$FLAKE_HOST ..."
-  # backup 保留到 switch 成功之后：NixOS generation 可回滚，但 /etc/nixos
-  # 的源码树不会随之回退，故 switch 失败时一并恢复配置源。
+  # switch 成功前保留旧配置源，避免 generation 回滚与源码版本不一致。
   if ! nixos-rebuild switch --flake "$DEST/#$FLAKE_HOST"; then
     echo "" >&2
     echo "错误：nixos-rebuild switch 失败。" >&2
     if [[ -d "$BACKUP" ]]; then
       echo "      正在恢复原配置源：$BACKUP → $DEST" >&2
-      # 必须确认 $DEST 已真正移走再恢复。
-      # 若 $DEST 是挂载点 / 正被占用，mv 会失败，此时 $DEST 仍然存在；
-      # 再执行 `mv "$BACKUP" "$DEST"` 不会替换，而是把 BACKUP 整个移入
-      # $DEST/ 之下（mv 仍返回 0）→ 会被误报为「已恢复」。
+      # 只有确认目标路径已移走后才能恢复备份，避免 mv 嵌套目录。
       rm -rf "$DEST.rollback-tmp"
       if [[ -e "$DEST" ]] && ! mv "$DEST" "$DEST.rollback-tmp"; then
         echo "      ✗ 无法移开 $DEST（可能是挂载点或正被占用）。" >&2
@@ -282,7 +234,7 @@ else
         rm -rf "$DEST.rollback-tmp"
         echo "      ✓ 已恢复。可检查后重试。" >&2
       else
-        # 恢复到一半失败：把移开的旧目录放回去，至少不留空位
+        # 恢复失败时尽量把原目录放回原位。
         [[ -e "$DEST.rollback-tmp" && ! -e "$DEST" ]] && mv "$DEST.rollback-tmp" "$DEST"
         echo "      ✗ 恢复失败；原配置在：$BACKUP" >&2
         echo "        （$DEST.rollback-tmp 是失败前移开的中间态，请手工处理）" >&2
@@ -291,7 +243,7 @@ else
     exit 1
   fi
 
-  # switch 成功 → 清理 backup
+  # switch 成功后删除备份。
   rm -rf "$BACKUP"
   echo ""
   echo "==> 完成！重启或重新登录以进入 niri + Noctalia 桌面。"
