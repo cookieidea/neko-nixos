@@ -29,6 +29,8 @@ t() {
     if $IS_ZH; then echo -e "$zh"; else echo -e "$en"; fi
 }
 _mc_dryrun=0
+# 自动模式会 exec 重跑本脚本，dry-run 由上一次执行经环境变量带入
+[[ -n "${_MC_DRYRUN:-}" ]] && _mc_dryrun="$_MC_DRYRUN"
 
 _nyxniri_banner() {
     local MAGENTA='\033[0;35m'
@@ -70,7 +72,7 @@ _mc_help() {
   选项:
     -h, --help      显示帮助信息
     -v              显示版本信息
-    -p              仅清理软件包目录 (Pkg)
+    -p              仅清理 Nix store / 旧代际 (Pkg)
     -j              仅清理垃圾目录 (Junk)
     -d              仅清理开发环境缓存 (Dev)
     -c              仅清理容器缓存 (Container)
@@ -247,79 +249,27 @@ else
 fi
 
 _mc_check_sudopath() {
-    local _mc_canpath _sudo_path="$1"
-
-    [[ -n "$_sudo_path" && -e "$_sudo_path" && ! -L "$_sudo_path" ]] || { printf 'Warning: nonexistent or symlinked sudo command %s - Skipping sudo\n' "$_sudo_path" >&2; return 1; }
-
-    if command -v realpath >/dev/null 2>&1; then
-        _mc_canpath="$(realpath -- "$_sudo_path")" || { printf 'Warning: could not verify sudo path %s - Skipping sudo\n' "$_sudo_path" >&2; return 1; }
-    elif command -v readlink >/dev/null 2>&1; then
-        _mc_canpath="$(readlink -f -- "$_sudo_path")" || { printf 'Warning: could not verify sudo path %s - Skipping sudo\n' "$_sudo_path" >&2; return 1; }
-    else
-        printf 'Warning: could not verify sudo path %s - Skipping sudo\n' "$_sudo_path" >&2; return 1
-    fi
-
-    case "$_mc_canpath" in
-        /usr/bin/sudo|/bin/sudo|/usr/local/bin/sudo|/run/wrappers/*/sudo) ;;
-        *) printf 'Warning: sudo path not in allowlist: %s\n' "$_mc_canpath" >&2; return 1 ;;
-    esac
-
-    [[ -f "$_mc_canpath" && -x "$_mc_canpath" ]] || { printf 'Warning: non-executable or non-file sudo command %s - Skipping sudo\n' "$_sudo_path" >&2; return 1; }
-
-    # Parentdir check - inspect CANON path components to detect symlinks and bad perms
-    local dir statinfo uid _gid mode
-    dir="$_mc_canpath"
-
-    while [[ "$dir" != / ]]; do
-        dir="$(dirname -- "$dir")"
-        [[ -L "$dir" ]] && { printf 'Warning: symlink in path %s - Skipping sudo\n' "$dir" >&2; return 1; }
-
-        statinfo="$(stat -c '%u:%g:%a' -- "$dir" 2>/dev/null)" || { printf 'Warning: failed to stat %s - Skipping sudo\n' "$dir" >&2; return 1; }
-        IFS=: read -r uid _gid mode <<< "$statinfo"
-
-        # reject group-writable or world-writable
-        (( 8#$mode & 020 )) && { printf 'Warning: group writable sudo path %s - Skipping sudo\n' "$dir" >&2; return 1; }
-        (( 8#$mode & 002 )) && { printf 'Warning: others writable sudo path %s - Skipping sudo\n' "$dir" >&2; return 1; }
-        # optional ownership checks
-        (( uid != 0 )) && { printf 'Warning: sudo path not root-owned %s - Skipping sudo\n' "$dir" >&2; return 1; }
-    done
-
-    return 0
+    # NixOS：不做提权，固定为无 sudo 路径
+    _mc_sudo_path=""
+    _mc_elevate=""
+    return 1
 }
 
-_mc_presudo_path="$(command -v sudo 2>/dev/null || true)"
-if [[ -n "$_mc_presudo_path" ]] && _mc_check_sudopath "$_mc_presudo_path"; then
-    _mc_sudo_path="$_mc_presudo_path"
-else
-    for _sudo_apath in /usr/bin/sudo /bin/sudo /usr/local/bin/sudo; do
-        if [[ -x "$_sudo_apath" ]] && _mc_check_sudopath "$_sudo_apath"; then
-            _mc_sudo_path="$_sudo_apath"; break
-        fi
-    done
-fi
-
-## Safer Tools ##
-
 _mc_sudo_wrap() {
-
+    # NixOS 适配：原版在此处做 sudo 提权（清 /var/cache 等需要 root）。
+    # 本脚本已改为只清理用户可写位置 + Nix 用户级操作，均无需要 root；
+    # 且 NixOS 的 sudo 需密码、无 tty 时会直接失败。故此处退化为直接执行。
     if [[ $_mc_dryrun -eq 1 ]]; then
         case "$1" in
-            "rm"|"docker"|"flatpak"|"journalctl"|"pacman"|"pkcon"|"snap"|"pip"|"npm"|"yarn"|"bun"|"go"|"ccache"|"shelly")
-                printf "[Dry-Run] Would execute sudo: %s\n" "$*" >&2
-                return 0 ;;
+            -k|-v|-p) return 0 ;;
+            *) printf "[Dry-Run] Would execute: %s\n" "$*" >&2; return 0 ;;
         esac
     fi
+    # 跳过 sudo 自身的参数（-k 清缓存 / -v 校验 / -p 提示串）
     case "$1" in
-        "-k"|"-p"|"-v"|"rm"|"docker"|"du"|"find"|"flatpak"|"journalctl"|"pacman"|"pkcon"|"snap") ;;
-        *) printf 'Invalid command: %s\n' "$1" >&2 ; return 1 ;;
+        -k|-v|-p) return 0 ;;
     esac
-    if [[ -n "${_mc_sudo_path:-}" && -x "$_mc_sudo_path" ]]; then
-        "$_mc_sudo_path" "$@"
-    elif [[ $# -eq 1 && ("$1" == "-v" || "$1" == "-k") ]]; then
-        return 0
-    else
-        "$@"
-    fi
+    "$@"
 }
 
 _mc_rm_safer() {
@@ -1508,6 +1458,71 @@ _mc_devfuncts() {
     _mc_pipcache
 }
 
+## NixOS Functs ##
+
+_mc_nixfuncts() {
+
+    if ! command -v nix >/dev/null 2>&1; then
+        printf "Nix not found - skipping\n"
+        return 0
+    fi
+
+    # 回收无用 store 路径（已按 nix.gc.automatic 每周跑，这里手动补一次）
+    if _mc_confirm "$(t '回收 Nix store 中无引用的路径 (nix-collect-garbage)' 'Collect garbage in Nix store')"; then
+        if [[ $_mc_dryrun -eq 1 ]]; then
+            printf '[Dry-Run] Would run nix-collect-garbage -d\n'
+        else
+            nix-collect-garbage -d 2>/dev/null || printf "Failed (try with sudo if store is root-owned)\n"
+        fi
+        printf "Done\n"
+    fi
+
+    # 删除旧的系统代际（保留当前与上一个，避免无法回滚）
+    if _mc_confirm "$(t '删除旧的系统代际 (保留最近 2 个)' 'Delete old system generations (keep last 2)')"; then
+        if [[ $_mc_dryrun -eq 1 ]]; then
+            printf '[Dry-Run] Would keep the newest 2 system generations\n'
+        else
+            nix-env --profile /nix/var/nix/profiles/system \
+                --delete-generations +2 2>/dev/null \
+                || nix-collect-garbage --delete-older-than 14d 2>/dev/null \
+                || printf "Failed\n"
+        fi
+        printf "Done\n"
+    fi
+
+    # 删除旧的 home-manager 代际
+    if _mc_confirm "$(t '删除旧的 Home Manager 代际 (保留最近 2 个)' 'Delete old Home Manager generations (keep last 2)')"; then
+        if [[ $_mc_dryrun -eq 1 ]]; then
+            printf '[Dry-Run] Would delete old Home Manager generations\n'
+        else
+            local hmprof="/home/${USER:-$(id -un)}/.local/state/nix/profiles/home-manager"
+            [[ -d "$hmprof" ]] && nix-env --profile "$hmprof" --delete-generations +2 2>/dev/null || true
+        fi
+        printf "Done\n"
+    fi
+
+    # store 硬链接去重（auto-optimise-store 实时已做，此处补一次）
+    if _mc_confirm "$(t '对 Nix store 做硬链接去重 (nix-store --optimise)' 'Hard-link deduplicate the Nix store')"; then
+        if [[ $_mc_dryrun -eq 1 ]]; then
+            printf '[Dry-Run] Would run nix-store --optimise\n'
+        else
+            nix-store --optimise 2>/dev/null || printf "Failed\n"
+        fi
+        printf "Done\n"
+    fi
+
+    # 清理 nix 求值缓存与临时下载
+    if _mc_confirm "$(t '清理 Nix 求值缓存与临时下载' 'Clean Nix eval cache and temp downloads')"; then
+        if [[ $_mc_dryrun -eq 1 ]]; then
+            printf '[Dry-Run] Would clean Nix eval-cache / tmp downloads\n'
+        else
+            rm -rf "${XDG_CACHE_HOME:-$HOME/.cache}/nix/eval-cache-v*" 2>/dev/null || true
+            rm -rf /tmp/nix-build-* 2>/dev/null || true
+        fi
+        printf "Done\n"
+    fi
+}
+
 ## Pacman Functs ##
 
 _mc_pacmanfuncts() {
@@ -1579,7 +1594,9 @@ while getopts ":abcdjpvh" option; do
                 exec 4< <(timeout 600 yes)
                 trap '{ [[ -e /proc/$$/fd/4 ]] && exec 4<&-; }' RETURN EXIT
                 printf "\n"
-                _mc_auto=1 exec -- "$_mc_scr_path" -bcdp <&4
+                # 保留 dry-run：原版此处固定传 -bcdp，会丢掉 -n 设置
+                # 导致 -n 实际执行删除。改用环境变量带到 re-exec 后恢复。
+                _mc_auto=1 _MC_DRYRUN="$_mc_dryrun" exec -- "$_mc_scr_path" -bcdp <&4
                 exec 4<&-
             fi
             exit ;;
@@ -1598,11 +1615,8 @@ while getopts ":abcdjpvh" option; do
         j) # clean junk
             _mc_junker
             ;;
-        p) # clean pkg-related
-            _mc_pkgfiledata
-            _mc_packagekitdata
-            _mc_pamacdata
-            _mc_pacmanfuncts
+        p) # clean pkg-related (NixOS: nix store / generations)
+            _mc_nixfuncts
             ;;
         v) # display version
             printf '\nmaclean %s\n\n' "$_mc_vers"

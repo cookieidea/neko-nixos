@@ -35,7 +35,6 @@
     "fcitx5/conf/punctuation.conf".source = ./dotfiles/config/fcitx5/conf/punctuation.conf;
     "fcitx5/config".source = ./dotfiles/config/fcitx5/config;
     "fcitx5/profile".source = ./dotfiles/config/fcitx5/profile;
-    "fish/functions/apt.fish".source = ./dotfiles/config/fish/functions/apt.fish;
     "fish/functions/f.fish".source = ./dotfiles/config/fish/functions/f.fish;
     "fish/functions/fwatch.fish".source = ./dotfiles/config/fish/functions/fwatch.fish;
     "fontconfig/fonts.conf".source = ./dotfiles/config/fontconfig/fonts.conf;
@@ -118,12 +117,8 @@
       source = ./dotfiles/config/kitty/themes/noctalia.conf;
       force = true;
     };
-    "fish/conf.d/nyxniri-path.fish".source = ./dotfiles/config/fish/conf.d/nyxniri-path.fish;
-    "fish/conf.d/nyxniri.fish".source = ./dotfiles/config/fish/conf.d/nyxniri.fish;
-    "fish/conf.d/__custom__.fish".source = ./dotfiles/config/fish/conf.d/__custom__.fish;
-    "fish/conf.d/shorin.fish".source = ./dotfiles/config/fish/conf.d/shorin.fish;
-    "fish/completions/nyxniri.fish".source = ./dotfiles/config/fish/completions/nyxniri.fish;
-    # Fastfetch / Starship。
+            "fish/conf.d/__custom__.fish".source = ./dotfiles/config/fish/conf.d/__custom__.fish;
+        # Fastfetch / Starship。
     "fastfetch/config.jsonc".source = ./dotfiles/config/fastfetch/config.jsonc;
     "starship.toml".source = ./dotfiles/config/starship.toml;
     "xdg-desktop-portal/niri-portals.conf".source = ./dotfiles/config/xdg-desktop-portal/niri-portals.conf;

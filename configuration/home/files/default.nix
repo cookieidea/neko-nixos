@@ -133,6 +133,11 @@
       source = ../dotfiles/local/bin/random-anime-wallpaper-noctalia;
       executable = true;
     };
+    # 缓存清理（上游 maclean，已改为 NixOS 专用：去掉 pacman/sudo，加入 nix 清理）
+    ".local/bin/clean-cache" = {
+      source = ../dotfiles/local/bin/clean-cache;
+      executable = true;
+    };
     ".local/bin/quicksave" = {
       source = ../dotfiles/local/bin/quicksave;
       executable = true;
@@ -207,10 +212,6 @@
     # 星环菜单的绘制模块（被上面脚本 import，须部署到同目录）
     ".config/niri/scripts/scratch-menu-render.py" = {
       source = ../dotfiles/config/niri/scripts/scratch-menu-render.py;
-    };
-    ".config/fish/clean-cache" = {
-      source = ../dotfiles/config/fish/clean-cache;
-      executable = true;
     };
 
     # Fcitx5 动态主题模板。
