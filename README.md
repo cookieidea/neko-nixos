@@ -26,7 +26,7 @@
 │   ├── system/                  # ── 纯系统级配置
 │   │   ├── nix.nix              # Nix 守护进程、二进制缓存、垃圾回收、zram
 │   │   ├── boot.nix             # 内核、引导（GRUB/双系统）、休眠、内核参数
-│   │   ├── networking.nix       # 主机名、防火墙、DNS、组播回环
+│   │   ├── networking.nix       # 主机名、防火墙开关、DNS（端口归各功能模块）
 │   │   ├── i18n.nix             # 时区、locale、输入法（fcitx5 + rime-ice）
 │   │   ├── audio-bluetooth.nix  # 音频、蓝牙、电源管理
 │   │   ├── security-users.nix   # polkit 与用户账户

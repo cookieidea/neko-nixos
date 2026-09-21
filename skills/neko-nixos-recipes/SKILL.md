@@ -62,7 +62,7 @@ description: cookieidea/neko-nixos 主机 ATRI 的实战经验库。Use when wor
 - **lact fd 泄漏**：显示器热插拔事件积累 EMFILE → GPU 控制失效，重启 lactd 恢复
 - **flatpak 权限**：QQ/微信要 `--nosocket=fallback-x11 --socket=x11`，托盘应用要 `--socket=session-bus`
 
-## agenix（2026-10 配置）
+## agenix
 
 - 私钥 `/etc/age/key`（root 600，**不入 git**，重装需备份）；公钥在 `secrets.nix`
 - **agenix CLI 的 EDITOR 交互在无终端环境不可用**（cp 方式加密空文件陷阱）→ 直接 `age -r <公钥> -o secrets/foo.age <明文>` 等效

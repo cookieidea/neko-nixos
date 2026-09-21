@@ -54,8 +54,13 @@
     "gtk-4.0/gtk.css".source = ../dotfiles/config/gtk-4.0/gtk.css;
     "mimeapps.list".source = ../dotfiles/config/mimeapps.list;
     # mpv（配置本体是真实目录，watch_later 需写入）
+    # mpv.conf 含 bilibili cookies 路径（原为 /home/cookie/...），
+    # 用 readFile + 替换使路径随 username 变化
     "mpv/mpv.conf" = {
-      source = ../dotfiles/mpv/mpv.conf;
+      text = builtins.replaceStrings
+        [ "/home/cookie" ]
+        [ "/home/${username}" ]
+        (builtins.readFile ../dotfiles/mpv/mpv.conf);
       force = true;
     };
     "mpv/input.conf".source = ../dotfiles/mpv/input.conf;

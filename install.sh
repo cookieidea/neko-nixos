@@ -67,14 +67,29 @@ if [[ -z "${FLAKE_HOST:-}" ]]; then
   echo "==> 使用 Host: $FLAKE_HOST"
 fi
 
-# ---------- 替换硬编码用户名 cookie -> TARGET_USER ----------
+# ---------- 设置用户名（只改单一数据源） ----------
+# 用户名在 flake.nix 的 `username = "..."` 一处定义，其余模块均引用它。
+#
+# 这里刻意不做全仓库 `sed s/cookie/<new>/g`：那会连
+#   · GitHub 账号   cookieidea            → aliceidea
+#   · 插件命名空间  cookie/translator     → alice/translator
+# 一起改坏（两者都含 "cookie" 子串，但语义无关）。
+#
+# 家目录路径也不再需要替换：原先硬编码的 /home/cookie 已改为
+#   · Nix 插值（noctalia/mpv 的 settings、gtk bookmarks）
+#   · 运行时变量（$HOME / ~ 用于脚本与配置）
 if [[ "$TARGET_USER" != "$OLD_USER" ]]; then
-  echo "==> 将配置中的用户名 cookie 替换为 $TARGET_USER ..."
-  while IFS= read -r -d '' f; do
-    if grep -Iq "$OLD_USER" "$f" 2>/dev/null; then
-      sed -i "s/$OLD_USER/$TARGET_USER/g" "$f"
-    fi
-  done < <(find . -type f -not -path './.git/*' -print0)
+  echo "==> 设置用户名为 $TARGET_USER（改 flake.nix 单一数据源）..."
+  if ! grep -qE '^ *username = "' "$SRC/flake.nix"; then
+    echo "错误：在 $SRC/flake.nix 中找不到 username 定义，无法设置用户名。" >&2
+    exit 1
+  fi
+  sed -i -E "s|^( *username = )\"$OLD_USER\";|\1\"$TARGET_USER\";|" "$SRC/flake.nix"
+  if ! grep -qE "^ *username = \"$TARGET_USER\";" "$SRC/flake.nix"; then
+    echo "错误：用户名替换失败，请手工检查 $SRC/flake.nix。" >&2
+    exit 1
+  fi
+  echo "      ✓ username = \"$TARGET_USER\""
 else
   echo "==> 目标用户名即 cookie，跳过替换。"
 fi
@@ -112,10 +127,26 @@ if [[ -n "$MNT" ]]; then
   DEST="$MNT/etc/nixos"
   mkdir -p "$DEST"
   echo "==> 部署到 $DEST ..."
-  # 全量复制。hardware-config.nix 由 nixos-generate-config 生成（已被 git 跟踪，
-  # 内容是 ATRI 本机的分区 UUID），若目标机硬件不同需重新生成覆盖。
+
+  # 先取出目标机由 nixos-generate-config 生成的硬件配置。
+  # 仓库里那份 hardware-config.nix 绑定了 ATRI 的分区 UUID（含 / 与 /boot 的
+  # by-uuid），若不加处理会被下面的全量复制覆盖，导致新机器装出 ATRI 的分区表。
+  TARGET_HW="$MNT/etc/nixos/configuration/device/hardware/hardware-config.nix"
+  KEEP_HW=""
+  if [[ -f "$TARGET_HW" ]]; then
+    KEEP_HW="$(mktemp)"
+    cp -a "$TARGET_HW" "$KEEP_HW"
+    echo "      ✓ 保留目标机生成的 hardware-config"
+  fi
+
   cp -r "$SRC/." "$DEST/"
   rm -rf "$DEST/.git"
+
+  # 目标机自己生成的硬件配置优先于仓库里 ATRI 的那份
+  if [[ -n "$KEEP_HW" ]]; then
+    cp -a "$KEEP_HW" "$DEST/configuration/device/hardware/hardware-config.nix"
+    rm -f "$KEEP_HW"
+  fi
 
   if [[ ! -f "$DEST/configuration/device/hardware/hardware-config.nix" ]]; then
     echo "错误：$DEST/configuration/device/hardware/hardware-config.nix 不存在。" >&2
@@ -191,10 +222,29 @@ else
     exit 1
   fi
   trap - EXIT
-  rm -rf "$BACKUP"
 
   echo "==> 执行 nixos-rebuild switch --flake $DEST/#$FLAKE_HOST ..."
-  nixos-rebuild switch --flake "$DEST/#$FLAKE_HOST"
+  # backup 保留到 switch 成功之后：NixOS generation 可回滚，但 /etc/nixos
+  # 的源码树不会随之回退，故 switch 失败时一并恢复配置源。
+  if ! nixos-rebuild switch --flake "$DEST/#$FLAKE_HOST"; then
+    echo "" >&2
+    echo "错误：nixos-rebuild switch 失败。" >&2
+    if [[ -d "$BACKUP" ]]; then
+      echo "      正在恢复原配置源：$BACKUP → $DEST" >&2
+      rm -rf "$DEST.rollback-tmp"
+      mv "$DEST" "$DEST.rollback-tmp" 2>/dev/null || true
+      if mv "$BACKUP" "$DEST"; then
+        rm -rf "$DEST.rollback-tmp"
+        echo "      ✓ 已恢复。可检查后重试。" >&2
+      else
+        echo "      ✗ 恢复失败；原配置仍在 $BACKUP，请手工处理。" >&2
+      fi
+    fi
+    exit 1
+  fi
+
+  # switch 成功 → 清理 backup
+  rm -rf "$BACKUP"
   echo ""
   echo "==> 完成！重启或重新登录以进入 niri + Noctalia 桌面。"
   echo "    Astral core 若更新：GUI 里同步后跑 sudo setcap cap_net_admin=ep ~/.local/share/astral-core/app/astral-core，否则 TUN 起不来。"

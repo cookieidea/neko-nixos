@@ -1,5 +1,5 @@
 # Home Manager 托管的程序（git/starship/fish/noctalia…）
-{ pkgs, ... }:
+{ pkgs, username, ... }:
 
 {
   # Home Manager 托管的程序
@@ -28,10 +28,17 @@
     };
 
     # Noctalia V5（Wayland 桌面 shell；由 config.kdl 的 spawn-at-startup 拉起）
+    #
+    # settings 支持 raw TOML 字符串，故用 readFile + 替换硬编码的家目录路径。
+    # 上游 config.toml 里有 9 处 /home/cookie（主题模板、壁纸目录），
+    # 直接作为 path 传入会在非 cookie 用户下失效。
     noctalia = {
       enable = true;
       systemd.enable = false;
-      settings = ../dotfiles/config/noctalia/config.toml;
+      settings = builtins.replaceStrings
+        [ "/home/cookie" ]
+        [ "/home/${username}" ]
+        (builtins.readFile ../dotfiles/config/noctalia/config.toml);
     };
 
     # niri：配置走 dotfiles 的 kdl 拆分文件（见 xdg.configFile）

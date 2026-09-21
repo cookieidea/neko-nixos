@@ -24,19 +24,6 @@
         "url": "https://gitcode.com/ryantm/agenix.git"
       }
     },
-    "astral-bundle": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1788806667,
-        "narHash": "sha256-3hDqov1kZAXp9X68OFL2JD5bItOUWG9koIGSicHMSa4=",
-        "path": "/home/cookie/.cache/astral/bundle",
-        "type": "path"
-      },
-      "original": {
-        "path": "/home/cookie/.cache/astral/bundle",
-        "type": "path"
-      }
-    },
     "bestclient": {
       "inputs": {
         "nixpkgs": [
@@ -562,7 +549,6 @@
     "root": {
       "inputs": {
         "agenix": "agenix",
-        "astral-bundle": "astral-bundle",
         "bestclient": "bestclient",
         "bilihud": "bilihud",
         "cooknixvim": "cooknixvim",

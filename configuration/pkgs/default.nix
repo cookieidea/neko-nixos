@@ -1,5 +1,5 @@
 # 自构建包聚合（按用途分类在 desktop/tools/media/games/terminal/data/file-managers）
-{ pkgs, astral-bundle }:
+{ pkgs }:
 let
   vsPlugins = import ./media/vs-plugins { inherit pkgs; };
 in
@@ -21,7 +21,7 @@ rec {
 
   # 工具 / 网络
   ab-download-manager  = import ./tools/networking/ab-download-manager { inherit pkgs; };
-  astral               = import ./tools/networking/astral { inherit pkgs; lib = pkgs.lib; src = astral-bundle; };
+  astral               = import ./tools/networking/astral { inherit pkgs; lib = pkgs.lib; fetchurl = pkgs.fetchurl; };
 
   # 影音 / 直播
   splayer-next         = import ./media/splayer-next { inherit pkgs; };

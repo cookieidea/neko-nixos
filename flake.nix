@@ -59,10 +59,6 @@
     };
 
     # ⚠️ Astral 构建需联网（沙箱内无法完成），走 build.sh 产物；path 输入不入 git，换机需先跑 build.sh
-    astral-bundle = {
-      url = "path:/home/cookie/.cache/astral/bundle";
-      flake = false;
-    };
 
     # agenix：age 加密的声明式 secrets（GitCode 镜像）
     agenix = {
@@ -87,7 +83,7 @@
     };
   };
 
-  outputs = { nixpkgs, home-manager, cooknixvim, bilihud, nix-cachyos-kernel, noctalia, noctalia-greeter, agenix, bestclient, astral-bundle, mark-shot, llm-agents-nix, ... }:
+  outputs = { nixpkgs, home-manager, cooknixvim, bilihud, nix-cachyos-kernel, noctalia, noctalia-greeter, agenix, bestclient, mark-shot, llm-agents-nix, ... }:
     let
       system = "x86_64-linux";
       forAllSystems = nixpkgs.lib.genAttrs [ system ];
@@ -102,7 +98,7 @@
         config.allowUnfree = true;
       };
 
-      selfPackages = import ./configuration/pkgs { inherit pkgs astral-bundle; };
+      selfPackages = import ./configuration/pkgs { inherit pkgs; };
 
       # home 模块共用绑定（原 home.nix 顶部 let 块）→ 注入为 hmLib
       hmLib = import ./configuration/home/lib.nix { inherit pkgs selfPackages username; };
