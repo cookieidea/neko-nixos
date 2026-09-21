@@ -1,4 +1,4 @@
-# 聚合 programs / services / virtualisation 模块
+# 聚合系统功能模块（desktop / flatpak / services / virtualisation）
 { ... }:
 
 {
