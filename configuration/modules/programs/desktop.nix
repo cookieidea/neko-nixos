@@ -43,6 +43,12 @@ EOF
   xdg.portal.enable = true;
   programs.dconf.enable = true;   # home-manager gtk 模块依赖
 
+  # AppImage：注册 binfmt_misc，使 .AppImage 文件可直接执行（无需手动 appimage-run）
+  programs.appimage = {
+    enable = true;
+    binfmt = true;
+  };
+
   # Flatpak：启动时 one-shot 添加 remote + 自动装应用
   services.flatpak.enable = true;
   systemd.services.flatpak-repo = {
