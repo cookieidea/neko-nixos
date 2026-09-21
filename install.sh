@@ -95,17 +95,9 @@ else
 fi
 
 # ---------- 预构建自构建程序（flake 包）----------
-# ---------- Astral bundle（联网构建，flake path 输入所必需）----------
-# astral 的 bundle（约 75MB）不入 git；若本地没有，后面所有 nix 求值直接失败。
-# 检测到缺失就在此构建（约 20～30 分钟，无需值守）；build.sh 收尾会自动重锁 flake。
-BUNDLE_DIR="/home/$TARGET_USER/.cache/astral/bundle"
-if [[ ! -x "$BUNDLE_DIR/astral" || ! -x "$BUNDLE_DIR/astral-core" ]]; then
-  echo "==> Astral bundle 缺失，联网构建（约 20～30 分钟）..."
-  bash "$SRC/configuration/pkgs/tools/networking/astral/build.sh"
-  chown -R "$TARGET_USER" "$BUNDLE_DIR"
-else
-  echo "==> Astral bundle 已存在，跳过构建。"
-fi
+# 注：Astral 已改为 fetchurl 直接取上游 GitHub Release（见
+# configuration/pkgs/tools/networking/astral/default.nix），
+# 不再需要本机联网构建 bundle，故此处无 Astral 专属步骤。
 
 # 这些程序不在 nixpkgs 核心，由 ./configuration/pkgs 里的派生从源码 / 发布构建
 # 这些程序不在 nixpkgs 核心，由 ./configuration/pkgs 里的派生构建。这里先单独构建，便于提前暴露
@@ -128,15 +120,25 @@ if [[ -n "$MNT" ]]; then
   mkdir -p "$DEST"
   echo "==> 部署到 $DEST ..."
 
-  # 先取出目标机由 nixos-generate-config 生成的硬件配置。
-  # 仓库里那份 hardware-config.nix 绑定了 ATRI 的分区 UUID（含 / 与 /boot 的
-  # by-uuid），若不加处理会被下面的全量复制覆盖，导致新机器装出 ATRI 的分区表。
-  TARGET_HW="$MNT/etc/nixos/configuration/device/hardware/hardware-config.nix"
+  # 保留目标机由 nixos-generate-config 生成的硬件配置。
+  #
+  # nixos-generate-config --root /mnt 写到 $MNT/etc/nixos/hardware-configuration.nix
+  # （源文件名；见 nixpkgs 的 nixos-generate-config.pl），而本仓库的结构是
+  # configuration/device/hardware/hardware-config.nix —— 需转换路径。
+  #
+  # 仓库里那份绑定 ATRI 的分区 UUID（/ 与 /boot 的 by-uuid），若不加处理
+  # 会被全量复制覆盖，导致新机器按 ATRI 的分区表安装。
+  GEN_HW="$MNT/etc/nixos/hardware-configuration.nix"
   KEEP_HW=""
-  if [[ -f "$TARGET_HW" ]]; then
+  if [[ -f "$GEN_HW" ]]; then
     KEEP_HW="$(mktemp)"
-    cp -a "$TARGET_HW" "$KEEP_HW"
-    echo "      ✓ 保留目标机生成的 hardware-config"
+    cp -a "$GEN_HW" "$KEEP_HW"
+    echo "      ✓ 保留目标机生成的 hardware-configuration.nix"
+  elif [[ -f "$MNT/etc/nixos/configuration/device/hardware/hardware-config.nix" ]]; then
+    # 兼容：目标位置已有本仓库结构的硬件配置
+    KEEP_HW="$(mktemp)"
+    cp -a "$MNT/etc/nixos/configuration/device/hardware/hardware-config.nix" "$KEEP_HW"
+    echo "      ✓ 保留目标机已有的 hardware-config.nix"
   fi
 
   cp -r "$SRC/." "$DEST/"
