@@ -1,6 +1,6 @@
 { pkgs }:
 
-# Pins — 创建/编辑 .desktop 快捷方式（GTK4/libadwaita）
+# Pins：创建和编辑 .desktop 快捷方式。
 pkgs.stdenv.mkDerivation {
   pname = "pins";
   version = "2.4.5-unstable-2026-08-12";
