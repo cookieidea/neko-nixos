@@ -38,9 +38,7 @@ if [ "$(readlink "$EFFECTS_LINK" 2>/dev/null)" = "$EYECARE_EFFECTS" ]; then
     CURRENTLY_ON=true
 fi
 
-# Point effects.kdl at the given target, then explicitly reload niri so
-# window opacity/blur pick it up even if the file watcher misses the symlink
-# swap. Safe to call repeatedly/idempotently.
+# 切换 effects.kdl 后主动重载 niri，避免文件监听遗漏软链变化。
 apply_effects() {
     local target
     if [ "$1" = "on" ]; then
@@ -62,14 +60,8 @@ apply_effects() {
     fi
 }
 
-# --sync: idempotent reconciliation only (no toggling). Called from niri's
-# spawn-at-startup so a niri restart re-aligns wlsunset with whatever
-# effects.kdl actually points to (the persistent state), instead of staying
-# stuck on a stale process state until the next manual toggle.
-# Deterministic rebuild: unconditionally drop any leftover warm engine (a
-# wlsunset orphaned by a previous session still matches pgrep but its gamma
-# connection died with the old niri), then start a fresh one if EyeCare is ON.
-# This keeps EyeCare consistent across logout/login on the persisted symlink.
+# --sync 只做状态同步，不切换模式；用于 niri 启动时重新对齐 wlsunset。
+# 同步时先清理旧的 wlsunset，再按持久化状态重新启动。
 if [ "${1:-}" = "--sync" ]; then
     link_target="$(readlink "$EFFECTS_LINK" 2>/dev/null || true)"
     if [ "$link_target" != "$EYECARE_EFFECTS" ] && [ "$link_target" != "$NORMAL_EFFECTS" ]; then
@@ -81,7 +73,7 @@ if [ "${1:-}" = "--sync" ]; then
             niri msg action load-config-file >>"$LOG_FILE" 2>&1 || true
         fi
     fi
-    # 阻塞等待 1 秒，确保 Wayland 和 Noctalia IPC 完全启动
+    # 等待 Wayland 和 Noctalia IPC 就绪。
     sleep 1
     if [ "$HAS_NOCTALIA" = "true" ]; then
         noctalia msg nightlight-disable 2>/dev/null || true
@@ -95,7 +87,7 @@ if [ "${1:-}" = "--sync" ]; then
     exit 0
 fi
 
-# 1. Pre-execution Self-Healing: Force Noctalia to release Wayland gamma lock
+# 启动前先让 Noctalia 释放 gamma 控制。
 if [ "$HAS_NOCTALIA" = "true" ]; then
     noctalia msg nightlight-disable 2>/dev/null || true
 fi
@@ -104,21 +96,21 @@ pkill -x wlsunset 2>/dev/null || true
 IS_TURNING_ON=false
 
 if [ "$CURRENTLY_ON" = "true" ]; then
-    # --- Turning EyeCare Mode OFF ---
+    # 关闭护眼模式。
     apply_effects off
 else
-    # --- Turning EyeCare Mode ON ---
+    # 开启护眼模式。
     apply_effects on
     IS_TURNING_ON=true
 fi
 
-# 3. Smoothly ramp color temperature over 0.3s without GPU pipeline tearing
+# 平滑调整色温，避免画面闪烁。
 if [ "$IS_TURNING_ON" = "true" ]; then
     sleep 0.05
     nohup wlsunset -T 6500 -t "$EYECARE_TEMP" -d 0.3 -S 00:00 -s 00:00 >/dev/null 2>&1 9>&- &
 fi
 
-# 4. Visual Notification
+# 发送视觉提示。
 if [ "$IS_TURNING_ON" = "true" ]; then
     notify-send -t 2000 "Eye Care : On"
 else
