@@ -204,6 +204,10 @@
       source = ../dotfiles/config/niri/scripts/niri-scratch-menu.py;
       executable = true;
     };
+    # 星环菜单的绘制模块（被上面脚本 import，须部署到同目录）
+    ".config/niri/scripts/scratch-menu-render.py" = {
+      source = ../dotfiles/config/niri/scripts/scratch-menu-render.py;
+    };
     ".config/fish/clean-cache" = {
       source = ../dotfiles/config/fish/clean-cache;
       executable = true;
