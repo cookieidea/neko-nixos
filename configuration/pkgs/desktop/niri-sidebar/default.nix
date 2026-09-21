@@ -1,7 +1,7 @@
 { pkgs }:
 
-# niri-sidebar（Rust）— https://github.com/Vigintillionn/niri-sidebar
-# builtins.fetchGit：codeload tar.gz 哈希环境相关（VM 与宿主机实测不一致）
+# niri-sidebar（Rust）。
+# 使用 builtins.fetchGit，避免 codeload tarball hash 在不同环境间漂移。
 pkgs.rustPlatform.buildRustPackage (rec {
   pname = "niri-sidebar";
   version = "0.3.0-unstable-2026-08-12";
