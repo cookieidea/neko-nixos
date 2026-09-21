@@ -1,9 +1,9 @@
-# snapper 快照（btrfs @snapshots 子卷）
+# Snapper Btrfs 快照。
 { ... }:
 
 {
   services.snapper = {
-    # 每次开机产生一个 boot 快照
+    # 每次启动创建 boot 快照。
     snapshotRootOnBoot = true;
     configs."root" = {
       SUBVOLUME = "/";
@@ -14,7 +14,7 @@
       TIMELINE_LIMIT_MONTHLY = 0;
       TIMELINE_LIMIT_YEARLY = 0;
       EMPTY_PRE_POST_CLEANUP = true;
-      # boot 快照保留上限
+      # 限制 boot 快照数量。
       NUMBER_LIMIT = 50;
       NUMBER_MIN_AGE = 86400;   # 1 天内的不删
     };
