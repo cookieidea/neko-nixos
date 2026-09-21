@@ -1,8 +1,8 @@
-# 桌面会话：niri、Noctalia Greeter、XDG 门户、字体、系统包
+# 桌面会话、登录界面、门户和字体。
 { pkgs, lib, username, noctalia-greeter, selfPackages, ... }:
 
 {
-  # 显示服务器 + 登录：niri（Wayland 平铺）+ Noctalia Greeter（greetd）
+  # Wayland 桌面与 greetd 登录界面。
   imports = [
     noctalia-greeter.nixosModules.default
   ];
@@ -17,16 +17,16 @@
       keyboard.layout = "us";
     };
   };
-  # niri 系统模块
+  # niri。
   programs.niri.enable = true;
   programs.nautilus-open-any-terminal = {
     enable = true;
     terminal = "kitty";
   };
-  # nautilus C 扩展统一目录
+  # Nautilus C 扩展目录。
   environment.sessionVariables.NAUTILUS_4_EXTENSION_DIR = lib.mkForce
     "${selfPackages.nautilus-with-extensions}/lib/nautilus/extensions-4";
-  # 登录界面头像（AccountsService，greeter 读取）
+  # AccountsService 登录头像。
   system.activationScripts.noctaliaGreeterAvatar = lib.stringAfter [ "users" ] ''
     mkdir -p /var/lib/AccountsService/icons
     cp -f ${builtins.toString ../home/dotfiles/avatar.png} /var/lib/AccountsService/icons/${username}
@@ -39,18 +39,18 @@ Icon=/var/lib/AccountsService/icons/${username}
 EOF
   '';
 
-  # XDG 桌面门户（niri 模块已提供 gnome+gtk 与 gnome-keyring 配置，见 nixos/modules/programs/wayland/niri.nix）
+  # XDG desktop portal。
   xdg.portal.enable = true;
   programs.dconf.enable = true;   # home-manager gtk 模块依赖
 
-  # AppImage：注册 binfmt_misc，使 .AppImage 文件可直接执行（无需手动 appimage-run）
+  # 注册 AppImage 的 binfmt_misc 支持。
   programs.appimage = {
     enable = true;
     binfmt = true;
   };
 
 
-  # 系统级包
+  # 系统级桌面包。
   environment.systemPackages = with pkgs; [
     git
     tmux             # scratchpad
