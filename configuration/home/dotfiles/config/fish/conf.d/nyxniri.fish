@@ -2,10 +2,10 @@ if test -f /usr/share/cachyos-fish-config/cachyos-config.fish
     source /usr/share/cachyos-fish-config/cachyos-config.fish
 end
 
-# 代理配置 (Proxy Configuration) — 修改此处以适配你的代理端口
+# 代理配置。可通过 proxy_on 临时覆盖默认地址。
 set -g PROXY_ADDR "127.0.0.1:7890"
 
-# 开启代理 (支持自定义端口或地址，如: proxy_on 10808 或 proxy_on 192.168.1.5:7890)
+# 开启代理：可传端口号或完整的 host:port 地址。
 function proxy_on
     set -l addr "$PROXY_ADDR"
     if test (count $argv) -gt 0
@@ -25,7 +25,7 @@ function proxy_on
     echo "[+] 终端代理已开启 (Proxy: $addr)"
 end
 
-# 关闭代理
+# 清除当前 shell 中的代理环境变量。
 function proxy_off
     set -e http_proxy
     set -e https_proxy
@@ -36,7 +36,7 @@ function proxy_off
     echo "[-] 终端代理已关闭"
 end
 
-# 查看代理状态
+# 检查代理变量、外网连通性和公网 IP。
 function proxy_status
     echo "--- 代理环境变量 (Proxy Env) ---"
     for var in http_proxy https_proxy all_proxy HTTP_PROXY HTTPS_PROXY ALL_PROXY
@@ -81,9 +81,7 @@ function ask_agy
     agy $argv
 end
 
-# ==============================================================================
-# NyxNiri TUI Cheatsheet 助手 (唯一指令: nyxhelp)
-# ==============================================================================
+# NyxNiri 命令速查。nyxhelp 支持按 section 查看，也可进入 fzf 交互界面。
 function nyxhelp --description "NyxNiri Cheatsheet速查手册"
     set -l section ""
     if test (count $argv) -gt 0
@@ -158,7 +156,7 @@ function nyxhelp --description "NyxNiri Cheatsheet速查手册"
         return
     end
 
-    # Interactive TUI mode (when fzf is present & in interactive shell)
+    # 交互式 shell 且安装 fzf 时，进入选择菜单。
     if command -v fzf &>/dev/null; and status is-interactive
         set -l choices \
             "1. cli    NyxNiri CLI & 配置快照" \
@@ -179,7 +177,7 @@ function nyxhelp --description "NyxNiri Cheatsheet速查手册"
     end
 end
 
-# 私有包管理器感知助手 (Paru > Yay > Shelly > Pacman)
+# 按优先级选择可用的包管理器。
 function _nyxniri_pkg_helper
     if command -v paru &>/dev/null
         echo "paru"
@@ -192,7 +190,7 @@ function _nyxniri_pkg_helper
     end
 end
 
-# 私有搜索分流助手 (供 se 交互及 fzf change 动态 reload)
+# 根据 aur/pac 前缀把搜索请求分发到对应仓库。
 function _nyxniri_se_search --argument-names query helper
     set -l input (string trim -- "$query")
     set -l parts (string split -n -m 1 " " -- "$input")
@@ -226,34 +224,34 @@ function _nyxniri_se_search --argument-names query helper
 end
 
 if status is-interactive
-    # No greeting
+    # 禁用 Fish 默认欢迎语。
     set fish_greeting
 
-    # Tab 智能自动补全：优先采纳灰色历史建议，无建议时触发 Tab 列表补全
+    # Tab 优先接受 autosuggestion，没有建议时打开补全菜单。
     function custom_tab_complete
         if commandline -f accept-autosuggestion
-            # 成功采纳自动提示建议
+            # autosuggestion 已被接受，无需继续触发补全。
         else
             commandline -f complete
         end
     end
 
     function fish_user_key_bindings
-        # 绑定 Tab 键
+        # 使用自定义补全行为替换默认 Tab。
         bind \t custom_tab_complete
     end
 
-    # Use starship prompt (Disable in pure TTY to avoid Nerd Font square boxes)
+    # 在图形终端启用 Starship；Linux 纯 TTY 保留系统提示符，避免字体缺失。
     if test "$TERM" != "linux"; and command -v starship &>/dev/null
         starship init fish | source
     end
 
-    # Aliases
+    # 常用别名。
     alias clear "printf '\033[2J\033[3J\033[1;1H'" # fix: kitty doesn't clear scrollback properly
     alias celar "printf '\033[2J\033[3J\033[1;1H'"
     alias claer "printf '\033[2J\033[3J\033[1;1H'"
 
-    # 智能一键更新 (优先 paru/yay，自动防中途取消误触发)
+    # 系统更新：优先使用 AUR helper，失败时按需回退。
     function up --description "一键系统与软件包更新 (Arch / CachyOS)"
         set -l helper (_nyxniri_pkg_helper)
         set -l res 0
@@ -273,7 +271,7 @@ if status is-interactive
                 set res $status
         end
 
-        # 用户按 Ctrl+C / SIGINT (130) 或 SIGTERM (143) 取消操作时，安静退出
+        # 用户主动取消时保留取消状态，不显示额外错误。
         if test $res -eq 130 -o $res -eq 143
             set_color yellow; echo "[!] 更新操作已由用户取消"; set_color normal
             return 130
@@ -292,7 +290,7 @@ if status is-interactive
     end
     alias update='up'                             # 同上，完整拼写
 
-    # 智能安装 (无参自动触发 se 模糊搜索)
+    # 软件安装：无参数时直接进入交互式搜索。
     function in --description "智能安装软件包 (支持包名或交互搜索)"
         if test (count $argv) -eq 0
             se
@@ -336,11 +334,11 @@ if status is-interactive
 
     alias clean='~/.config/fish/clean-cache'      # 运行一键缓存清理脚本
 
-    # se：模糊搜索软件包 (支持 aur <kw> / pac <kw> 前缀) 并用 fzf 交互安装 (无 fzf 时自动降级)
+    # 模糊搜索并安装软件包；支持 aur/pac 前缀，没有 fzf 时回退到 CLI。
     function se --description "模糊搜索并安装软件包 (支持 aur <kw> / pac <kw> 前缀)"
         set -l helper (_nyxniri_pkg_helper)
 
-        # 无 fzf 时的降级处理
+        # 没有 fzf 时使用包管理器自身的搜索界面。
         if not command -v fzf &>/dev/null
             set_color yellow; echo "[!] 未检测到 fzf，切换至标准 CLI 搜索..."; set_color normal
             switch "$helper"
@@ -356,7 +354,7 @@ if status is-interactive
             return
         end
 
-        # 构建 fzf 选项与搜索预填
+        # 构造 fzf 查询、预览命令和动态 reload。
         set -l fzf_query ""
         if test (count $argv) -gt 0
             set fzf_query "$argv"
@@ -388,7 +386,7 @@ if status is-interactive
         end
     end
 
-    # un：模糊搜索已安装的包并用 fzf 交互卸载 (无 fzf 时自动降级)
+    # 模糊选择已安装的软件包并卸载；没有 fzf 时回退到 pacman -Qs。
     function un --description "模糊搜索并卸载已安装软件包"
         set -l helper (_nyxniri_pkg_helper)
 
