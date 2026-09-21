@@ -1,4 +1,4 @@
-# OpenSSH 服务
+# OpenSSH。
 { ... }:
 
 {
