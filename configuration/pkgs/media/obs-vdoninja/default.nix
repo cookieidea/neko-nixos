@@ -1,5 +1,5 @@
-# VDO.Ninja OBS 插件（预编译 .so，RPATH 指向构建机 → autoPatchelf 修依赖）
-# libdatachannel 需 override v0.20.2（插件按 soname .so.0.20 链接）
+# VDO.Ninja OBS 插件（预编译 .so，构建时用 autoPatchelf 修复依赖）。
+# 插件按 .so.0.20 链接，需要固定 libdatachannel 0.20.2。
 { pkgs }:
 
 let
@@ -14,8 +14,7 @@ in
 
 pkgs.stdenv.mkDerivation {
   pname = "obs-vdoninja";
-  # ⚠️ 不要升 v1.1.65+（libobs 32.2 编译，当前 OBS 32.1.2 不兼容）；
-  # 升 OBS 需 unstable nixpkgs，闭包 3.8GB 超磁盘
+  # 保持当前 libdatachannel 版本，直到 OBS ABI 一起升级。
   version = "1.1.63";
 
   src = pkgs.fetchurl {
@@ -25,7 +24,7 @@ pkgs.stdenv.mkDerivation {
 
   nativeBuildInputs = [ pkgs.autoPatchelfHook ];
 
-  # tar 平铺结构（无单一根目录）
+  # 上游 tarball 为扁平目录。
   sourceRoot = ".";
   dontWrapQtApps = true;
 
