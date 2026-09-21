@@ -1,8 +1,8 @@
-# gvfs：虚拟文件系统（系统层启用）
+# gvfs 虚拟文件系统。
 { pkgs, ... }:
 
 {
-  # 与 home.nix 的 GIO_EXTRA_MODULES 用同一个 gvfs
+  # 与 Home Manager 的 GIO_EXTRA_MODULES 保持同源。
   services.gvfs = {
     enable = true;
     package = pkgs.gvfs;
