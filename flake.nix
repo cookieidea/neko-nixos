@@ -133,7 +133,8 @@
       };
 
       # nix fmt：格式化所有 .nix
-      formatter = forAllSystems (system: nixpkgs.legacyPackages.${system}.nixfmt-rfc-style);
+      # 注：nixfmt-rfc-style 已并入 pkgs.nixfmt（两者同版本），用后者避免废弃警告
+      formatter = forAllSystems (system: nixpkgs.legacyPackages.${system}.nixfmt);
 
       # nix flake check —— 静态分析
       #

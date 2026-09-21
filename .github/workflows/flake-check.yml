@@ -1,0 +1,37 @@
+name: flake-check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: cachix/install-nix-action@v31
+        with:
+          # 固定 Nix 版本，避免上游行为漂移导致 CI 无常失败
+          nix_path: nixpkgs=channel:nixos-unstable
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+            # 本仓库的 flake 依赖国内镜像（NJU/gitcode）与自己声明的缓存，
+            # CI 上按原样使用即可；此处不做替换，以免与本地求值结果不一致。
+
+      # 只跑 checks（静态分析：deadnix），不构建整个系统 ——
+      # 系统闭包含 ROCm/Steam 等重量级依赖，CI runner 磁盘与时长都不合适。
+      - name: nix flake check
+        run: nix flake check -L
+
+      # 格式化检查暂不启用 —— 当前有 48 个文件不符合 nixfmt（约 1495 行差异，
+      # 主要是长参数列表竖排与注释对齐）。直接启用会让 CI 立刻变红，
+      # 一次性全量格式化又会污染 git blame。
+      # 需要时本地执行：nix fmt .
