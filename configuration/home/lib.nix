@@ -1,12 +1,17 @@
 # Home 模块共享的派生工具和配置数据。
 { pkgs, selfPackages, username }:
 
+# 需要 rec：mpvRifeWrapped 引用同级的 mpvRife
 rec {
+  # Python site-packages 相对路径，由 nixpkgs 推导（如 lib/python3.13/site-packages）。
+  # 不要硬编码 python3.13 —— 上游升到 3.14 时路径会失效且求值不报错。
+  pySite = pkgs.python3.sitePackages;
+
   # 开发环境变量的唯一数据源；登录 shell 和 systemd user session 共用。
   devEnv = {
     JAVA_HOME = "${pkgs.zulu25}";          # 默认 JDK（HMCL 等多版本可自选）
     CARGO_HOME = "$HOME/.cargo";
-    PYTHONPATH = "${pkgs.python3Packages.pygobject3}/lib/python3.13/site-packages:${selfPackages.k7sfunc}/lib/python3.13/site-packages:${pkgs.python3Packages.vapoursynth}/lib/python3.13/site-packages";
+    PYTHONPATH = "${pkgs.python3Packages.pygobject3}/${pySite}:${selfPackages.k7sfunc}/${pySite}:${pkgs.python3Packages.vapoursynth}/${pySite}";
     VAPOURSYNTH_EXTRA_PLUGIN_PATH = "${selfPackages.vapoursynth-with-plugins}/lib/vapoursynth";
   };
 
@@ -60,7 +65,7 @@ rec {
     postBuild = ''
       rm -f "$out/bin/mpv"
       makeWrapper "${mpvRife}/bin/mpv" "$out/bin/mpv" \
-        --prefix PYTHONPATH : "${selfPackages.k7sfunc}/lib/python3.13/site-packages:${pkgs.python3Packages.vapoursynth}/lib/python3.13/site-packages" \
+        --prefix PYTHONPATH : "${selfPackages.k7sfunc}/${pySite}:${pkgs.python3Packages.vapoursynth}/${pySite}" \
         --set VAPOURSYNTH_EXTRA_PLUGIN_PATH "${selfPackages.vapoursynth-with-plugins}/lib/vapoursynth"
     '';
   };

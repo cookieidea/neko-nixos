@@ -44,10 +44,12 @@
     rocmSupport = true;   # ROCm/HIP GPU 计算
   };
 
-  # 自动垃圾回收和 store 去重。
+  # 自动垃圾回收。
   nix.gc.automatic = true;
   nix.gc.dates = "weekly";
-  nix.optimise.automatic = true;
+  # store 去重只用实时机制：auto-optimise-store 在每次写入 store 时就做硬链接。
+  # 原先还开了 nix.optimise.automatic（systemd timer 定时跑 nix-store --optimise），
+  # 但实测该任务每次都是 "0 files freed" —— 实时机制已覆盖，定时属冗余。
   nix.settings.auto-optimise-store = true;
 
   # zram 压缩交换。

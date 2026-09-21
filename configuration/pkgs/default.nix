@@ -3,7 +3,9 @@
 let
   vsPlugins = import ./media/vs-plugins { inherit pkgs; };
 in
-rec {
+# 非 rec：块内各属性互不引用（全部是独立的 import / inherit）。
+# 若日后新增属性间引用（如 A 的取值用到 B），需改回 rec。
+{
   # VapourSynth / RIFE。
   inherit (vsPlugins)
     l-smash

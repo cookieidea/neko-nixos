@@ -1,7 +1,6 @@
 {
-  description = "Shorin Arch Setup (shorin-arch-setup) → NixOS + Home Manager conversion";
+  description = "ATRI —— 个人 NixOS + Home Manager 配置（niri 桌面）";
 
-  
   nixConfig = {
     extra-substituters = [
       "https://mirrors.ustc.edu.cn/nix-channels/store"
@@ -113,7 +112,8 @@
         # 实体机配置。硬件文件由安装目标机生成。
         ${hostname} = nixpkgs.lib.nixosSystem {
           inherit system;
-          specialArgs = { inherit noctalia-greeter; };
+          # hostname 由上方 let 绑定提供（单一数据源），供 system/ 下模块引用
+          specialArgs = { inherit hostname noctalia-greeter; };
           modules = [
             ./configuration/system.nix
             hmModule
