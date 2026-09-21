@@ -1,10 +1,10 @@
-# 自构建包聚合（按用途分类在 desktop/tools/media/games/terminal/data/file-managers）
+# 自构建包聚合。
 { pkgs }:
 let
   vsPlugins = import ./media/vs-plugins { inherit pkgs; };
 in
 rec {
-  # VapourSynth 插件集（mpv RIFE 补帧）
+  # VapourSynth / RIFE。
   inherit (vsPlugins)
     l-smash
     vapoursynth-lsmash
@@ -13,14 +13,14 @@ rec {
     k7sfunc
     vapoursynth-with-plugins;
 
-  # 桌面与窗口管理
+  # 桌面和窗口管理。
   niri-sidebar         = import ./desktop/niri-sidebar   { inherit pkgs; };
   pins                 = import ./desktop/pins           { inherit pkgs; };
   shorin-contrib       = import ./desktop/shorin-contrib { inherit pkgs; };
   nyxniri-scratch-menu = import ./desktop/nyxniri-scratch-menu { inherit pkgs; };
 
-  # 工具 / 网络
-  # mark-shot 的 Python 环境（OCR / 扫码；取代 activation 里的 pip venv）
+  # 工具和网络。
+  # mark-shot Python 环境。
   inherit (import ./tools/mark-shot-python { inherit pkgs; })
     markShotOcr
     markShotScan;
@@ -28,25 +28,22 @@ rec {
   ab-download-manager  = import ./tools/networking/ab-download-manager { inherit pkgs; };
   astral               = import ./tools/networking/astral { inherit pkgs; lib = pkgs.lib; fetchurl = pkgs.fetchurl; };
 
-  # 影音 / 直播
+  # 影音和直播。
   splayer-next         = import ./media/splayer-next { inherit pkgs; };
   obs-vdoninja         = import ./media/obs-vdoninja { inherit pkgs; };
   purevox              = import ./media/purevox      { inherit pkgs; };
 
-  # 游戏
+  # 游戏。
   bedrockboot          = import ./games/bedrockboot { inherit pkgs; };
 
-  # 终端
+  # 终端。
   tabby-terminal       = import ./terminal/tabby { inherit pkgs; };
 
-  # 资源 / 字体
+  # 数据和字体。
   harmonyos-sans-sc    = import ./data/fonts/harmonyos-sans-sc { inherit pkgs; };
 
-  # 文件管理器扩展
-  # 该目录产出两个派生（image-converter C 扩展 + nautilus-with-extensions），
-  # 故在此平铺展开而非嵌套 —— flake 的 packages.<system> 只接受 derivation，
-  # 嵌套 attrset 会让 `nix flake check` / `nix build .#<name>` 报
-  # "is not a derivation"。
+  # 文件管理器扩展。
+  # 此处平铺导出 derivation，供 flake packages 直接消费。
   inherit (import ./file-managers/nautilus-extensions { inherit pkgs; })
     nautilus-image-converter
     nautilus-with-extensions;
