@@ -41,7 +41,7 @@ description: 用户 cookie 的偏好与协作方式画像。Use when starting an
 ## 红线
 
 - **Steam 相关目录不要动**（"不要动"——compatibilitytools.d 的 5.2G Proton 变体保留）
-- astral-core 保持开机自启（生命周期管理试验失败后撤回了）
+- astral-core 由 GUI 管理（无常驻服务、无自启）；上游 tarball 自带 core，已弃用 build.sh 自建路线
 - 系统配置全部走 git 提交记录，不留未提交状态过夜（"把修改都提交一下吧"是高频指令）
 - 敏感信息（密码/密钥/token）**永远不写入**任何可能提交的文件——sudo 密码在会话内使用，不落盘
 

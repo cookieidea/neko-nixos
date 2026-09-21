@@ -29,7 +29,7 @@ description: cookieidea/neko-nixos 主机 ATRI 的实战经验库。Use when wor
 | wrapType2 AppImage | Electron/预编译 | tabby、splayer-next |
 | extract + FHS | 需要系统库闭包 | bedrockboot、purevox |
 | 源码 buildRustPackage | 上游有 nix 方案 | axolotl（已弃用换 hmcl） |
-| path 输入 bundle | 沙箱内无法联网构建 | astral（build.sh 联网构建 + flake 输入引用） |
+| 上游发布二进制 | 沙箱内无法联网构建 | astral（fetchurl 取 GitHub Release + 固定 hash；曾用 path 输入指向 ~/.cache，因破坏可复现性而废弃） |
 
 - **AppImage 的 FHS**：`appimageTools.extract` + `buildFHSEnv`；wrapType2 的 init 硬编码 extracted 路径，extraInstallCommands 改 AppRun 不生效（purevox 踩坑）
 - **buildEnv 冲突**：多个同类包（多个 JDK）顶层同名文件冲突 → `lib.setPrio` 逐级递减（**数值越小优先级越高**，方向别搞反：zulu25=-20 > 21=-15 > 17=-10 > 8=-5）

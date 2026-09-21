@@ -82,25 +82,20 @@ echo "      ✓ $NEW_OUT"
 echo "==> rebuild ..."
 nixos-rebuild switch --flake "$REPO_ROOT"
 
-# 运行中的 core 来自 GUI 首次启动时自动部署的副本（~/.local/share/astral-core），
-# 需同步更新并重设 cap_net_admin（TUN 依赖），否则仍跑旧 core。
-NEW_CORE="$NEW_OUT/app/astral-core"
-echo "==> 同步运行中的 core ..."
-pkill -x astral-core 2>/dev/null || true
-sleep 2
-pkill -9 -x astral-core 2>/dev/null || true
-sleep 1
-
-sudo -H -u "$TARGET_USER" "$NEW_CORE" service install --user \
-  --listen 127.0.0.1:50051 --program "$NEW_CORE"
-setcap cap_net_admin=ep "$TARGET_HOME/.local/share/astral-core/app/astral-core"
-getcap "$TARGET_HOME/.local/share/astral-core/app/astral-core"
-sudo -H -u "$TARGET_USER" env XDG_RUNTIME_DIR="$XDG_RUNTIME_DIR" \
-  DBUS_SESSION_BUS_ADDRESS="$DBUS_SESSION_BUS_ADDRESS" \
-  systemctl --user restart astral-core
-sudo -H -u "$TARGET_USER" env XDG_RUNTIME_DIR="$XDG_RUNTIME_DIR" \
-  DBUS_SESSION_BUS_ADDRESS="$DBUS_SESSION_BUS_ADDRESS" \
-  systemctl --user is-active astral-core
+# core 的生命周期由 GUI 自行管理（启动 GUI 时由它拉起同级的 astral-core，
+# 退出即结束），本仓库不再安装 astral-core.service，也不设开机自启。
+#
+# 若 GUI 之前已把 core 部署到 ~/.local/share/astral-core（可写副本 + setcap），
+# 升级后该副本仍是旧版 —— 删掉它，GUI 下次启动会从新包重新部署并设权限。
+LOCAL_CORE_DIR="$TARGET_HOME/.local/share/astral-core"
+if [[ -d "$LOCAL_CORE_DIR" ]]; then
+  echo "==> 清除 GUI 部署的旧 core 副本（将由 GUI 重新部署）..."
+  pkill -x astral-core 2>/dev/null || true
+  sleep 1
+  pkill -9 -x astral-core 2>/dev/null || true
+  rm -rf "$LOCAL_CORE_DIR"
+  echo "      ✓ 已删除 $LOCAL_CORE_DIR"
+fi
 
 # ---------- 7. 推缓存 + 提交 ----------
 echo "==> 推缓存 ..."

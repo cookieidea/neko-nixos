@@ -1,4 +1,4 @@
-# systemd user 服务与 session 环境（astral 超时、随机壁纸）
+# systemd user 服务与 session 环境（随机壁纸等）
 { hmLib, pkgs, ... }:
 
 {
@@ -13,15 +13,6 @@
   systemd.user.sessionVariables = hmLib.devEnv // {
     GI_TYPELIB_PATH = "${pkgs.nautilus}/lib/girepository-1.0";
     NAUTILUS_4_EXTENSION_DIR = hmLib.nautilusExtensionDir;
-  };
-
-  # astral 关机超时（SIGTERM 后 100ms 未退出即 SIGKILL）
-  xdg.configFile."systemd/user/astral-core.service.d/10-timeout.conf" = {
-    force = true;
-    text = ''
-      [Service]
-      TimeoutStopSec=100ms
-    '';
   };
 
   # 开机随机壁纸（noctalia IPC）

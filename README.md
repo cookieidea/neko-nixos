@@ -53,7 +53,7 @@
 │   │   ├── lib.nix              # 共用 let 绑定（经 extraSpecialArgs 注入为 hmLib）
 │   │   ├── session/             # 会话变量 + systemd user 服务
 │   │   │   ├── default.nix      # PATH / PYTHONPATH / GIO / JAVA_HOME…
-│   │   │   └── systemd.nix      # astral 超时、随机壁纸等 user 服务
+│   │   │   └── systemd.nix      # 随机壁纸等 user 服务
 │   │   ├── packages/            # home.packages，按用途分类
 │   │   │   ├── default.nix      # 聚合入口
 │   │   │   ├── Terminal/        # shell、提示符、TUI、终端模拟器

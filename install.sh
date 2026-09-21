@@ -164,7 +164,9 @@ if [[ -n "$MNT" ]]; then
   nixos-install --flake "$DEST/#$FLAKE_HOST"
   echo ""
   echo "==> 安装完成！重启即可进入 greetd → niri + Noctalia。"
-  echo "    Astral 首次使用前：进 GUI 连一次自动部署 core，之后跑：sudo setcap cap_net_admin=ep ~/.local/share/astral-core/app/astral-core（否则 TUN 起不来；每次更新 core 都要重跑一次）。"
+  echo "    Astral 首次使用：打开 GUI 会自动把 core 部署到 ~/.local/share/astral-core，"
+  echo "    之后执行：sudo setcap cap_net_admin=ep ~/.local/share/astral-core/app/astral-core"
+  echo "    （TUN 需要该权限；core 更新后需重设。core 由 GUI 管理，无常驻服务、无自启。）"
   echo "    若首次登录密码留空，重启后在 TTY 用 root（或 live 环境）执行：passwd $TARGET_USER"
 else
   # ================= 已装系统：rebuild =================
@@ -249,6 +251,7 @@ else
   rm -rf "$BACKUP"
   echo ""
   echo "==> 完成！重启或重新登录以进入 niri + Noctalia 桌面。"
-  echo "    Astral core 若更新：GUI 里同步后跑 sudo setcap cap_net_admin=ep ~/.local/share/astral-core/app/astral-core，否则 TUN 起不来。"
+  echo "    Astral：core 由 GUI 管理（无常驻服务/自启）。GUI 内更新 core 后需重设权限："
+  echo "    sudo setcap cap_net_admin=ep ~/.local/share/astral-core/app/astral-core"
   echo "    若 Home Manager 部分未生效，可再以该用户运行：home-manager switch --flake $DEST/#$FLAKE_HOST"
 fi
