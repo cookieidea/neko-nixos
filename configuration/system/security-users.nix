@@ -1,9 +1,9 @@
-# 安全：polkit 与用户账户
+# 安全策略、polkit 和用户账户。
 { username, ... }:
 
 {
   security.polkit.enable = true;
-  # Noctalia greeter 外观同步（pkexec）免密放行 wheel
+  # Noctalia greeter 外观同步允许 wheel 免密调用 pkexec。
   security.polkit.extraConfig = ''
     polkit.addRule(function(action, subject) {
         if (action.id == "org.noctalia.greeter.sync-appearance" &&
