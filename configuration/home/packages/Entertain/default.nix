@@ -2,11 +2,11 @@
 
 {
   imports = [
-    ./player
-    ./video
-    ./graphics
-    ./audio
-    ./office-transfer
-    ./browser
+    ./player.nix
+    ./video.nix
+    ./graphics.nix
+    ./audio.nix
+    ./office-transfer.nix
+    ./browser.nix
   ];
 }

@@ -2,8 +2,8 @@
 
 {
   imports = [
-    ./launchers
-    ./performance
-    ./minecraft
+    ./launchers.nix
+    ./performance.nix
+    ./minecraft.nix
   ];
 }

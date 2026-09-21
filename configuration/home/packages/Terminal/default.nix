@@ -2,8 +2,8 @@
 
 {
   imports = [
-    ./shell
-    ./tools
-    ./media-tui
+    ./shell.nix
+    ./tools.nix
+    ./media-tui.nix
   ];
 }

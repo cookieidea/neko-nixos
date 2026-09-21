@@ -2,12 +2,12 @@
 
 {
   imports = [
-    ./editors
-    ./languages
-    ./build-tools
-    ./git
-    ./ai
-    ./containers
-    ./tooling
+    ./editors.nix
+    ./languages.nix
+    ./build-tools.nix
+    ./git.nix
+    ./ai.nix
+    ./containers.nix
+    ./tooling.nix
   ];
 }

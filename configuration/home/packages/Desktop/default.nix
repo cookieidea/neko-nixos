@@ -2,11 +2,11 @@
 
 {
   imports = [
-    ./niri
-    ./files
-    ./wayland
-    ./theme
-    ./input
-    ./multimedia
+    ./niri.nix
+    ./files.nix
+    ./wayland.nix
+    ./theme.nix
+    ./input.nix
+    ./multimedia.nix
   ];
 }
