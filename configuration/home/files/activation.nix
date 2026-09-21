@@ -7,7 +7,8 @@
     copy_seed() {
       seed_source="$1"
       seed_target="$2"
-      seed_mode="${3:-}"
+      seed_mode="$3"
+      [ "$#" -lt 3 ] && seed_mode=""
 
       if [ -L "$seed_target" ] || [ ! -e "$seed_target" ]; then
         $DRY_RUN_CMD mkdir -p "$(dirname "$seed_target")"
