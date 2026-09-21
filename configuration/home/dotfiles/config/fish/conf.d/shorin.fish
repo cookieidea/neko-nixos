@@ -1,4 +1,4 @@
-# SHORiN rice（源自原 config.fish，用户名已适配为 cookie）
+# SHORiN 配置迁移。
 set fish_greeting ""
 fish_add_path ~/.local/bin
 
@@ -27,11 +27,11 @@ function la
 	command eza -l --icons=auto -- $argv
 end
 
-# grub
+# GRUB 工具。
 abbr grub 'LANGUAGE=en_US.UTF-8 LANG=en_US.UTF-8 sudo grub-mkconfig -o /boot/grub/grub.cfg'
-# 小黄鸭补帧 需要steam安装正版小黄鸭
+# 小黄鸭补帧。
 abbr lsfg 'LSFG_PROCESS="miyu"'
-# fa运行fastfetch
+# fa：运行 Fastfetch。
 abbr fa fastfetch
 abbr reboot 'systemctl reboot'
 function sl
@@ -44,6 +44,6 @@ function raw
 	command ~/.local/bin/random-anime-wallpaper-noctalia $argv
 end
 
-# Added by LM Studio CLI (lms)
+# LM Studio CLI。
 set -gx PATH $PATH $HOME/.lmstudio/bin
-# End of LM Studio CLI section
+
