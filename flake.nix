@@ -85,16 +85,9 @@
       url = "github:numtide/llm-agents.nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-
-    # Denial：Flutter 原生 Wayland 合成器（可选登录会话，与 niri 并存）
-    # 不 follows nixpkgs：其 Flutter 引擎须匹配上游 pin 的 nixpkgs 才命中官方缓存
-    # （否则需源码构建，上游称需 64G+ 空间）
-    denial = {
-      url = "github:denialwm/denial";
-    };
   };
 
-  outputs = { self, nixpkgs, home-manager, cooknixvim, bilihud, nix-cachyos-kernel, noctalia, noctalia-greeter, agenix, bestclient, astral-bundle, mark-shot, llm-agents-nix, denial, ... }:
+  outputs = { self, nixpkgs, home-manager, cooknixvim, bilihud, nix-cachyos-kernel, noctalia, noctalia-greeter, agenix, bestclient, astral-bundle, mark-shot, llm-agents-nix, ... }:
     let
       system = "x86_64-linux";
       username = "cookie";   # 你的用户名（用于 home 目录 / autoLogin）
@@ -131,7 +124,7 @@
         # 实体机；硬件配置见 configuration/device/hardware/hardware-config.nix（需 git add）
         ${hostname} = nixpkgs.lib.nixosSystem {
           inherit system;
-          specialArgs = { inherit noctalia-greeter denial; };
+          specialArgs = { inherit noctalia-greeter; };
           modules = [
             ./configuration/ATRI/system.nix
             hmModule
