@@ -1,8 +1,8 @@
-# Sunshine 串流（Moonlight；capSysAdmin + uinput）
+# Sunshine 串流（Moonlight）。
 { ... }:
 
 {
-  # Sunshine（Moonlight 串流）：capSysAdmin 供 KMS 抓屏，uinput 模拟键鼠/手柄
+  # 使用 KMS 抓屏和 uinput 输入注入。
   services.sunshine = {
     enable = true;
     autoStart = false;
