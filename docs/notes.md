@@ -46,7 +46,7 @@ plugins = [ { name = "autopair"; src = pkgs.fishPlugins.autopair.src; } ];
 | 包 | 注意 |
 |----|------|
 | obs-vdoninja | pin v1.1.63（更高版本要求 libobs 32.2） |
-| astral | 需联网 build.sh，装后 setcap，升级后重跑 |
+| astral | fetchurl 取上游 Release（含官方 core）；core 由 GUI 管理，TUN 需手动 setcap cap_net_admin |
 | nautilus-extensions | .ui 自维护，GtkDialog 不能设 margin |
 | tabby / splayer-next | 与 nixpkgs 同名包不同 |
 

@@ -3,7 +3,8 @@
 # neko-nixos 一键安装/更新脚本
 #   全新安装： sudo bash install.sh <用户名> <挂载点>   （挂载点需已分区+generate-config）
 #   已装更新： sudo bash install.sh [用户名]
-# 会把配置里硬编码的用户名 cookie 与 /home/cookie 路径替换成你的用户名（默认 cookie）
+# 用户名通过修改 flake.nix 的 `username` 单一数据源设置，
+# 其余模块均引用该值（家目录路径由 Nix 插值 / $HOME 展开，不做全仓库替换）
 #
 set -euo pipefail
 
@@ -117,8 +118,7 @@ done
 if [[ -n "$MNT" ]]; then
   # ================= 全新安装模式（minimal ISO） =================
   DEST="$MNT/etc/nixos"
-  mkdir -p "$DEST"
-  echo "==> 部署到 $DEST ..."
+  # 先不创建 $DEST —— 硬件配置检查通过后再建，避免留下半安装状态的空目录
 
   # 保留目标机由 nixos-generate-config 生成的硬件配置。
   #
@@ -128,34 +128,40 @@ if [[ -n "$MNT" ]]; then
   #
   # 仓库里那份绑定 ATRI 的分区 UUID（/ 与 /boot 的 by-uuid），若不加处理
   # 会被全量复制覆盖，导致新机器按 ATRI 的分区表安装。
+  #
+  # 检查必须在**任何写入 $DEST 之前**完成：否则用户漏跑
+  # nixos-generate-config 时，$DEST 会先被写入一半再报错，留下半安装状态。
   GEN_HW="$MNT/etc/nixos/hardware-configuration.nix"
+  GEN_HW_ALT="$MNT/etc/nixos/configuration/device/hardware/hardware-config.nix"
   KEEP_HW=""
   if [[ -f "$GEN_HW" ]]; then
     KEEP_HW="$(mktemp)"
     cp -a "$GEN_HW" "$KEEP_HW"
     echo "      ✓ 保留目标机生成的 hardware-configuration.nix"
-  elif [[ -f "$MNT/etc/nixos/configuration/device/hardware/hardware-config.nix" ]]; then
+  elif [[ -f "$GEN_HW_ALT" ]]; then
     # 兼容：目标位置已有本仓库结构的硬件配置
     KEEP_HW="$(mktemp)"
-    cp -a "$MNT/etc/nixos/configuration/device/hardware/hardware-config.nix" "$KEEP_HW"
+    cp -a "$GEN_HW_ALT" "$KEEP_HW"
     echo "      ✓ 保留目标机已有的 hardware-config.nix"
+  else
+    echo "错误：未找到目标机的硬件配置，已中止（未写入 $DEST）。" >&2
+    echo "      期望其一：" >&2
+    echo "        $GEN_HW" >&2
+    echo "        $GEN_HW_ALT" >&2
+    echo "      请先在分区并挂载到 $MNT 后运行：" >&2
+    echo "        nixos-generate-config --root $MNT" >&2
+    echo "      （该命令生成 hardware-configuration.nix，含根分区挂载 / EFI / swap）" >&2
+    exit 1
   fi
 
+  mkdir -p "$DEST"
+  echo "==> 部署到 $DEST ..."
   cp -r "$SRC/." "$DEST/"
   rm -rf "$DEST/.git"
 
   # 目标机自己生成的硬件配置优先于仓库里 ATRI 的那份
-  if [[ -n "$KEEP_HW" ]]; then
-    cp -a "$KEEP_HW" "$DEST/configuration/device/hardware/hardware-config.nix"
-    rm -f "$KEEP_HW"
-  fi
-
-  if [[ ! -f "$DEST/configuration/device/hardware/hardware-config.nix" ]]; then
-    echo "错误：$DEST/configuration/device/hardware/hardware-config.nix 不存在。" >&2
-    echo "请先在分区并挂载到 $MNT 后运行：  nixos-generate-config --root $MNT" >&2
-    echo "（该命令会生成 hardware-configuration.nix，含根分区挂载 / EFI / swap 等）" >&2
-    exit 1
-  fi
+  cp -a "$KEEP_HW" "$DEST/configuration/device/hardware/hardware-config.nix"
+  rm -f "$KEEP_HW"
 
   # 密码不在安装时注入（配置里已无 initialPassword 占位，sed 注入属失效逻辑）。
   # 装完在 TTY 用 root 执行 passwd <用户> 设置即可，下方提示会说明。
@@ -235,13 +241,27 @@ else
     echo "错误：nixos-rebuild switch 失败。" >&2
     if [[ -d "$BACKUP" ]]; then
       echo "      正在恢复原配置源：$BACKUP → $DEST" >&2
+      # 必须确认 $DEST 已真正移走再恢复。
+      # 若 $DEST 是挂载点 / 正被占用，mv 会失败，此时 $DEST 仍然存在；
+      # 再执行 `mv "$BACKUP" "$DEST"` 不会替换，而是把 BACKUP 整个移入
+      # $DEST/ 之下（mv 仍返回 0）→ 会被误报为「已恢复」。
       rm -rf "$DEST.rollback-tmp"
-      mv "$DEST" "$DEST.rollback-tmp" 2>/dev/null || true
+      if [[ -e "$DEST" ]] && ! mv "$DEST" "$DEST.rollback-tmp"; then
+        echo "      ✗ 无法移开 $DEST（可能是挂载点或正被占用）。" >&2
+        echo "        原配置完整保留在：$BACKUP" >&2
+        echo "        请手工恢复，例如：" >&2
+        echo "          rm -rf '$DEST' && mv '$BACKUP' '$DEST'" >&2
+        echo "        （若 $DEST 是挂载点，先 umount）" >&2
+        exit 1
+      fi
       if mv "$BACKUP" "$DEST"; then
         rm -rf "$DEST.rollback-tmp"
         echo "      ✓ 已恢复。可检查后重试。" >&2
       else
-        echo "      ✗ 恢复失败；原配置仍在 $BACKUP，请手工处理。" >&2
+        # 恢复到一半失败：把移开的旧目录放回去，至少不留空位
+        [[ -e "$DEST.rollback-tmp" && ! -e "$DEST" ]] && mv "$DEST.rollback-tmp" "$DEST"
+        echo "      ✗ 恢复失败；原配置在：$BACKUP" >&2
+        echo "        （$DEST.rollback-tmp 是失败前移开的中间态，请手工处理）" >&2
       fi
     fi
     exit 1
