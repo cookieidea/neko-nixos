@@ -150,17 +150,15 @@ cd neko-nixos
 sudo bash install.sh cookie /mnt
 ```
 
-省略用户名时：
+本仓库的脚本参数顺序固定为：第一个参数是用户名，第二个参数是挂载点。
 
-```bash
-sudo bash install.sh /mnt
-```
-
-注意：脚本参数的第一个位置是用户名，第二个位置才是挂载点。因此推荐始终显式写成：
+推荐始终显式写成：
 
 ```bash
 sudo bash install.sh <用户名> /mnt
 ```
+
+不传用户名时，脚本会交互式询问用户名；在新装模式下仍需把挂载点作为第二个参数传入。
 
 安装脚本会：
 
