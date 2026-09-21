@@ -81,7 +81,15 @@ rec {
 
   # 可写种子源（activation 复制用）
   seedKittyTheme     = builtins.toString ./dotfiles/config/kitty/themes/noctalia.conf;
-  seedNoctaliaConfig = builtins.toString ./dotfiles/config/noctalia/config.toml;
+  # 注意：activation 会把此文件复制为可写的 ~/.config/noctalia/config.toml，
+  # 若直接用原始 dotfiles（含 9 处 /home/cookie），会覆盖掉 HM settings 里
+  # 已按 username 替换过的版本 —— 换用户名后配置又指回 cookie 的家目录。
+  # 故此处与 programs/default.nix 的 settings 用同一套替换。
+  seedNoctaliaConfig = pkgs.writeText "noctalia-config.toml"
+    (builtins.replaceStrings
+      [ "/home/cookie" ]
+      [ "/home/${username}" ]
+      (builtins.readFile ./dotfiles/config/noctalia/config.toml));
   seedStarship       = builtins.toString ./dotfiles/config/starship.toml;
   seedMangoHud       = builtins.toString ./dotfiles/config/MangoHud/MangoHud.conf;
   seedWallpaperVideo = builtins.toString ./dotfiles/Pictures/Wallpapers/video/hatsune-miku.mp4;

@@ -67,7 +67,7 @@
 │   │   ├── xdg/default.nix      # xdg.configFile / xdg.dataFile 部署
 │   │   ├── files/               # home.file 部署
 │   │   │   ├── default.nix      # JDK 链、图标、desktop 入口、镜像源
-│   │   │   └── activation.nix   # activation 脚本（Noctalia seed、壁纸、mark-shot venv）
+│   │   │   └── activation.nix   # activation 脚本（Noctalia seed、壁纸、mark-shot helper）
 │   │   └── dotfiles/            # 被上面各模块 source 引用的实际配置文件
 │   │       ├── config/          # → ~/.config（niri、noctalia、fish、kitty…）
 │   │       ├── local/           # → ~/.local（bin 脚本、图标、fcitx5 主题）

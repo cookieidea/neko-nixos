@@ -42,7 +42,7 @@ description: cookieidea/neko-nixos 主机 ATRI 的实战经验库。Use when wor
 - **nix-ld**：跑预编译二进制（游戏/工具）的兜底；`programs.nix-ld.enable = true`，库注入用 **`NIX_LD_LIBRARY_PATH` 前缀**（`--prefix` 语义，shim 在 exec 时拼回）
 - **32 位陷阱**：store 里有 multilib 副本（wayland/xkbcommon/libdecor），glibc **静默跳过 ELF class 不符**的候选 → dlopen 失败但 error=null。`makeLibraryPath` 取的是 64 位，别手动指错
 - **LD_LIBRARY_PATH 被重置**：外部启动器（HMCL）给子进程设自己的库清单 → 注入失效 → **LD_PRELOAD** 强制全局可见（HMCL libstdc++ 终极解法）
-- **LD_PRELOAD 链**：sessionVariables 会被 HM/desktop 继承，但子进程重置 LD_LIBRARY_PATH 时 preload 不受影响
+- **LD_PRELOAD 链**：注入放程序 wrapper（如 hmcl）而非全局 sessionVariables；子进程重置 LD_LIBRARY_PATH 时 preload 不受影响，故对「会重置库路径的启动器」有效
 - **SDL3/Wayland**：niri 缺 fifo-v1 → SDL 默认回退 XWayland 锁帧 → `SDL_VIDEO_DRIVER=wayland` 强制原生（Vulkan 自管 vsync）；配套 natives 依赖 libstdc++/libudev 要注入
 - **wine/XWayland 相对指针**：xwayland-satellite 的 XGrabPointer/EnterNotify 路径有 bug（上游 #482），wine 游戏（UWP/GDK）输入失效无解，等上游重写
 - **dlopen 报错 error=null**（LWJGL/Minecraft）：要么缺依赖（ldd 查），要么 .so 无执行权限（HMCL 每次重解压会重置，需 chmod +x）
