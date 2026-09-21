@@ -81,7 +81,7 @@
     $DRY_RUN_CMD cat > "$MARK/ocr-helper.sh" << 'OCRSCRIPT'
 #!/usr/bin/env bash
 export LD_LIBRARY_PATH="LIBPATH_PLACEHOLDER"
-/home/cookie/.local/share/mark-shot/ocr-venv/bin/python -c "
+$HOME/.local/share/mark-shot/ocr-venv/bin/python -c "
 from rapidocr import RapidOCR
 import sys, json
 e = RapidOCR()
@@ -101,7 +101,7 @@ OCRSCRIPT
     $DRY_RUN_CMD cat > "$MARK/code-scan-helper.sh" << 'SCANSCRIPT'
 #!/usr/bin/env bash
 export LD_LIBRARY_PATH="LIBPATH_PLACEHOLDER"
-/home/cookie/.local/share/mark-shot/code-scan-venv/bin/python -c "
+$HOME/.local/share/mark-shot/code-scan-venv/bin/python -c "
 import zxingcpp, sys, json, numpy as np
 from PIL import Image
 img = Image.open(sys.argv[1]).convert('RGB')

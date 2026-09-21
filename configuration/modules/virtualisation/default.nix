@@ -1,5 +1,5 @@
 # 游戏与虚拟化：Steam、libvirtd、Waydroid、Docker、distrobox
-{ pkgs, ... }:
+{ pkgs, username, ... }:
 
 {
   programs.gamemode.enable = true; # 游戏性能优化服务
@@ -41,4 +41,14 @@
   environment.etc."distrobox/distrobox.conf".text = ''
     container_additional_volumes="/nix/store:/nix/store:ro /etc/profiles/per-user:/etc/profiles/per-user:ro /etc/static/profiles/per-user:/etc/static/profiles/per-user:ro"
   '';
+
+  # 本模块启用功能所需的用户组
+  users.users.${username}.extraGroups = [
+    "libvirtd"    # virt-manager 免 sudo
+    "docker"      # docker 免 sudo
+    "uinput"      # Waydroid / 手柄模拟输入
+    "adbusers"    # adb / Waydroid
+    "gamemode"    # gamemoded 性能调度
+  ];
+
 }

@@ -29,9 +29,24 @@
     "cook-nixvim.cachix.org-1:LjCZ3VSYrcwTQxHpd834EIswdkfHoSd/EsKUYLRruF4="
     "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
   ];
-  # 允许本用户使用 --substituters 等客户端缓存设置（否则被忽略：not a trusted user）
-  # root 由 nixos/modules/config/nix.nix 默认提供，无需重复
-  nix.settings.trusted-users = [ username ];
+  # 允许**普通用户**在命令行启用上述缓存（--substituters）。
+  #
+  # 依据 nix.conf(5)：Nix 使用某个 substituter 需满足二者之一 ——
+  #   · 该 substituter 在 trusted-substituters 列表中
+  #   · 调用 Nix 的用户在 trusted-users 列表中
+  # 两者作用不等价：trusted-users 还能连 daemon 执行特权操作（近似 root），
+  # 而我们的目的仅是「用缓存」，故采用前者，不用 trusted-users。
+  # root 由 nixos/modules/config/nix.nix 默认提供，无需重复。
+  nix.settings.trusted-substituters = [
+    "https://mirrors.ustc.edu.cn/nix-channels/store"
+    "https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store"
+    "https://attic.xuyh0120.win/lantian"
+    "https://noctalia.cachix.org"
+    "https://nekobox.cachix.org"
+    "https://cache.numtide.com"
+    "https://cook-nixvim.cachix.org"
+    "https://nix-community.cachix.org"
+  ];
 
   nixpkgs.config = {
     allowUnfree = true;   # 允许非自由软件（steam/wechat-uos 等）

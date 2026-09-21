@@ -27,8 +27,13 @@ let
       mkdir -p $out/usr/bin
       cat > $out/usr/bin/xdg-open <<'EOF'
       #!/bin/sh
-      echo "xdg-open called: $@" >> /home/cookie/.cache/bedrockboot-xdg-open.log
-      export DBUS_SESSION_BUS_ADDRESS="${"unix:path=/run/user/1000/bus"}"
+      # 调试日志（$HOME/$XDG_CACHE_HOME 由运行时展开，脚本在 FHS 沙箱内执行）
+      echo "xdg-open called: $@" >> "''${XDG_CACHE_HOME:-$HOME/.cache}/bedrockboot-xdg-open.log" 2>/dev/null || true
+      # 会话总线：优先用已有的 DBUS_SESSION_BUS_ADDRESS；否则由 XDG_RUNTIME_DIR 推导
+      # （不写死 UID，避免换用户后失效）
+      if [ -z "''${DBUS_SESSION_BUS_ADDRESS:-}" ] && [ -n "''${XDG_RUNTIME_DIR:-}" ]; then
+        export DBUS_SESSION_BUS_ADDRESS="unix:path=$XDG_RUNTIME_DIR/bus"
+      fi
       for arg in "$@"; do
         case "$arg" in
           http://*|https://*) 
