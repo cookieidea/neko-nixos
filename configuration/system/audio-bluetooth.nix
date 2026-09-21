@@ -1,8 +1,8 @@
-# 音频、蓝牙、电源管理
+# 音频、蓝牙和电源管理。
 { ... }:
 
 {
-  # 音频：PipeWire（pulse/alsa/jack）
+  # PipeWire（PulseAudio / ALSA / JACK）。
   security.rtkit.enable = true;
   services.pipewire = {
     enable = true;
