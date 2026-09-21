@@ -1,22 +1,22 @@
-# polkit、OBS、KDE Connect、GTK 主题
+# 桌面权限、OBS、KDE Connect 和 GTK。
 { pkgs, selfPackages, ... }:
 
 {
   services.polkit-gnome.enable = true;
 
-  # OBS Studio（插件经 wrapOBS 注入）
+  # OBS Studio 及其插件。
   programs.obs-studio = {
     enable = true;
     plugins = [ selfPackages.obs-vdoninja ];
   };
 
-  # KDE Connect（手机 ↔ 电脑）
+  # KDE Connect。
   services.kdeconnect = {
     enable = true;
     indicator = true;
   };
 
-  # GTK 主题 / 图标
+  # GTK 主题和图标。
   gtk = {
     enable = true;
     iconTheme = {
@@ -52,7 +52,7 @@
       gtk-application-prefer-dark-theme = "1";
     };
     gtk4.extraConfig = {
-      # libadwaita 不支持 gtk-application-prefer-dark-theme
+      # libadwaita 不使用 GTK3 的暗色偏好键。
     };
   };
 }
