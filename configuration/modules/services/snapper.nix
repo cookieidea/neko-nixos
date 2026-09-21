@@ -1,5 +1,5 @@
 # snapper 快照（btrfs @snapshots 子卷）
-{ pkgs, ... }:
+{ ... }:
 
 {
   services.snapper = {

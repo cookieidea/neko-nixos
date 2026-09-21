@@ -1,5 +1,5 @@
 # XDG 数据/配置部署（nautilus 扩展、niri、fish、kitty、mpv…）
-{ hmLib, pkgs, config, lib, username, selfPackages, noctalia, ... }:
+{ pkgs, ... }:
 
 {
   # nautilus Python 扩展部署（nautilus-python 扫描 ~/.local/share/nautilus-python/extensions）

@@ -1,5 +1,5 @@
 # home.file 部署：JDK 链、图标、desktop 入口、脚本、镜像源
-{ hmLib, pkgs, config, lib, username, selfPackages, ... }:
+{ hmLib, pkgs, ... }:
 
 {
   imports = [ ./activation.nix ];

@@ -1,5 +1,5 @@
 # ATRI 系统配置入口：聚合 system/ + device/ + modules/{programs,services,virtualisation,pkgs}
-{ config, pkgs, lib, username, noctalia-greeter, selfPackages, ... }:
+{ ... }:
 
 {
   imports = [

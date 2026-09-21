@@ -1,5 +1,5 @@
 # Home Manager 托管的程序（git/starship/fish/noctalia…）
-{ hmLib, pkgs, username, selfPackages, noctalia, ... }:
+{ pkgs, ... }:
 
 {
   # Home Manager 托管的程序

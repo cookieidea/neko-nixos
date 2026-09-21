@@ -3,20 +3,22 @@
 
 {
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
-  # 二进制缓存：国内镜像优先。cache.nixos.org 由 nixos/modules/config/nix.nix
-  # 用 mkAfter 自动追加到末尾兜底，无需手写（手写会重复）
+  # 二进制缓存。按「基础 / 第三方」两类分组，便于排查
+  # 「这个 cache 为什么必须信任」——每一项都对应一个明确的来源。
   nix.settings.substituters = [
+    # ── 基础：nixpkgs 分发通道 ──
+    # cache.nixos.org 由 nixos/modules/config/nix.nix 以 mkAfter 自动追加到末尾，
+    # 无需手写（手写会产生重复项）。以下两个是其国内镜像，靠前以加速。
     "https://mirrors.ustc.edu.cn/nix-channels/store"
     "https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store"
-    "https://attic.xuyh0120.win/lantian"
-    "https://noctalia.cachix.org"
-    "https://nekobox.cachix.org"
-    # llm-agents.nix 官方缓存（dsh / opencode；实测可省 4 个 derivation 的编译）
-    "https://cache.numtide.com"
-    # CookNixvim 官方缓存（nvim 及其插件）
-    "https://cook-nixvim.cachix.org"
-    # nix-community 通用缓存（unfree 可再分发包 + 社区包，官方源不构建这类）
-    "https://nix-community.cachix.org"
+
+    # ── 第三方：各自对应一个 flake input ──
+    "https://attic.xuyh0120.win/lantian"    # nix-cachyos-kernel（内核）
+    "https://noctalia.cachix.org"           # noctalia / noctalia-greeter
+    "https://nekobox.cachix.org"            # 本仓库自建包（cachix 推送目标）
+    "https://cache.numtide.com"             # llm-agents-nix（dsh / opencode）
+    "https://cook-nixvim.cachix.org"        # CookNixvim（nvim 及其插件）
+    "https://nix-community.cachix.org"      # nix-community（unfree 可再分发包）
   ];
   # 同理，cache.nixos.org 的 key 由模块默认提供，此处只列额外缓存
   nix.settings.trusted-public-keys = [

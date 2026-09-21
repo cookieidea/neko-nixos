@@ -87,9 +87,10 @@
     };
   };
 
-  outputs = { self, nixpkgs, home-manager, cooknixvim, bilihud, nix-cachyos-kernel, noctalia, noctalia-greeter, agenix, bestclient, astral-bundle, mark-shot, llm-agents-nix, ... }:
+  outputs = { nixpkgs, home-manager, cooknixvim, bilihud, nix-cachyos-kernel, noctalia, noctalia-greeter, agenix, bestclient, astral-bundle, mark-shot, llm-agents-nix, ... }:
     let
       system = "x86_64-linux";
+      forAllSystems = nixpkgs.lib.genAttrs [ system ];
       username = "cookie";   # 你的用户名（用于 home 目录 / autoLogin）
       hostname = "ATRI";
       desktop  = "niri";
@@ -129,36 +130,36 @@
             ./configuration/ATRI/system.nix
             hmModule
             agenix.nixosModules.default
-            # CachyOS 内核 overlay（pinned 命中缓存）+ 修 nvim.desktop：
-            # 原版 Terminal=true 图形启动器打不开 → 覆盖为 kitty 打开
-            {
-              nixpkgs.overlays = [
-                nix-cachyos-kernel.overlays.pinned
-                (final: prev: {
-                  neovim = prev.neovim.overrideAttrs (old: {
-                    postInstall = (old.postInstall or "") + ''
-                      rm -f "$out/share/applications/nvim.desktop"
-                      cat > "$out/share/applications/nvim.desktop" <<'DESKTOP'
-[Desktop Entry]
-Name=Neovim wrapper
-GenericName=Text Editor
-Comment=Edit text files
-TryExec=nvim
-Exec=kitty -e nvim %F
-Icon=nvim
-Type=Application
-Terminal=false
-Categories=Utility;TextEditor;Development;
-MimeType=text/plain;text/x-makefile;application/x-shellscript;text/x-c;text/x-c++src;
-StartupNotify=false
-DESKTOP
-                    '';
-                  });
-                })
-              ];
-            }
+            # overlays 见 configuration/overlays/default.nix
+            (import ./configuration/overlays { inherit nix-cachyos-kernel; })
           ];
         };
       };
+
+      # nix fmt：格式化所有 .nix
+      formatter = forAllSystems (system: nixpkgs.legacyPackages.${system}.nixfmt-rfc-style);
+
+      # nix flake check —— 静态分析
+      #
+      # deadnix：未使用的 let 绑定与 lambda 参数（本仓库重构时曾漏过引用）。
+      #   排除 pkgs/ 下的第三方派生与 dev-shell（上游代码，不该由本仓库的风格约束）。
+      #
+      # statix：Nix 反模式。默认只当**警告**（不阻塞），因为其 W20 会把
+      #   `services.a = ...; services.b = ...;` 这种合法的点号语法误报为
+      #   「重复键」（已实测：a.b/a.c 会 desugar 成嵌套 attrset，完全合法）。
+      #   想看得更严可跑：nix run nixpkgs#statix -- check .
+      checks = forAllSystems (system:
+        let
+          pkgs = nixpkgs.legacyPackages.${system};
+          # 只纳入本仓库自己维护的配置，排除第三方源码与 dotfiles
+          targets = "configuration/ATRI configuration/system configuration/modules configuration/home configuration/overlays flake.nix";
+        in {
+          deadnix = pkgs.runCommand "deadnix-check"
+            { nativeBuildInputs = [ pkgs.deadnix ]; } ''
+            cd ${./.}
+            deadnix --fail --no-underscore ${targets}
+            touch $out
+          '';
+        });
     };
 }

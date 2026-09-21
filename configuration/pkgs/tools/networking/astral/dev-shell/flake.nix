@@ -3,7 +3,7 @@
 
   inputs.nixpkgs.url = "git+https://mirrors.nju.edu.cn/git/nixpkgs.git?ref=nixos-26.05&shallow=1";
 
-  outputs = { self, nixpkgs }:
+  outputs = { nixpkgs }:
     let
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};

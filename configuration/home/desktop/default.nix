@@ -1,5 +1,5 @@
 # polkit、OBS、KDE Connect、GTK 主题
-{ hmLib, pkgs, config, lib, username, selfPackages, ... }:
+{ pkgs, selfPackages, ... }:
 
 {
   services.polkit-gnome.enable = true;

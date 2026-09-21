@@ -38,5 +38,11 @@ rec {
   harmonyos-sans-sc    = import ./data/fonts/harmonyos-sans-sc { inherit pkgs; };
 
   # 文件管理器扩展
-  nautilus-extensions  = import ./file-managers/nautilus-extensions { inherit pkgs; };
+  # 该目录产出两个派生（image-converter C 扩展 + nautilus-with-extensions），
+  # 故在此平铺展开而非嵌套 —— flake 的 packages.<system> 只接受 derivation，
+  # 嵌套 attrset 会让 `nix flake check` / `nix build .#<name>` 报
+  # "is not a derivation"。
+  inherit (import ./file-managers/nautilus-extensions { inherit pkgs; })
+    nautilus-image-converter
+    nautilus-with-extensions;
 }

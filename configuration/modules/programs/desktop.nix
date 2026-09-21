@@ -25,7 +25,7 @@
   };
   # nautilus C 扩展统一目录
   environment.sessionVariables.NAUTILUS_4_EXTENSION_DIR = lib.mkForce
-    "${selfPackages.nautilus-extensions.nautilus-with-extensions}/lib/nautilus/extensions-4";
+    "${selfPackages.nautilus-with-extensions}/lib/nautilus/extensions-4";
   # 登录界面头像（AccountsService，greeter 读取）
   system.activationScripts.noctaliaGreeterAvatar = lib.stringAfter [ "users" ] ''
     mkdir -p /var/lib/AccountsService/icons

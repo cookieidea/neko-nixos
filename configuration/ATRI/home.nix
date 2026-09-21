@@ -1,5 +1,5 @@
 # Home Manager 用户配置入口：聚合 configuration/home/ 下的各模块
-{ config, pkgs, lib, desktop, username, cooknixvim, bilihud, selfPackages, noctalia, bestclient, mark-shot, llm-agents-nix, ... }:
+{ noctalia, ... }:
 
 {
   imports = [

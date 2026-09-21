@@ -1,5 +1,5 @@
 # 由 nixos-generate-config 生成，请勿手动修改
-{ config, lib, pkgs, modulesPath, ... }:
+{ config, lib, modulesPath, ... }:
 
 {
   imports =

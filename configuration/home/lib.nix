@@ -24,7 +24,7 @@ rec {
 
   # Nautilus C 扩展目录（systemd 侧与系统会话侧同源）
   nautilusExtensionDir =
-    "${selfPackages.nautilus-extensions.nautilus-with-extensions}/lib/nautilus/extensions-4";
+    "${selfPackages.nautilus-with-extensions}/lib/nautilus/extensions-4";
 
   # ── 包管理器国内镜像（files.nix 部署为真实文件）──
   # npm：prefix 用绝对路径——npm 不对 prefix 做 $HOME 展开

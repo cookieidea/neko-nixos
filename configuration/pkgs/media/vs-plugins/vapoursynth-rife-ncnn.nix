@@ -1,4 +1,4 @@
-{ lib, stdenv, autoPatchelfHook, fetchurl, p7zip, libgcc, gcc-unwrapped, vulkan-loader, vapoursynth }:
+{ lib, stdenv, autoPatchelfHook, fetchurl, p7zip, gcc-unwrapped, vulkan-loader }:
 
 stdenv.mkDerivation rec {
   pname = "vapoursynth-rife-ncnn";

@@ -1,5 +1,5 @@
 # 开发工具链（编辑器、语言运行时、Git、AI Agent、容器）
-{ pkgs, lib, llm-agents-nix, ... }:
+{ pkgs, llm-agents-nix, ... }:
 
 {
   home.packages = with pkgs; [

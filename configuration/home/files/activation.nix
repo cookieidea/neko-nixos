@@ -1,5 +1,5 @@
 # activation 脚本（Noctalia seed、壁纸真实文件、mark-shot venv）
-{ hmLib, pkgs, config, lib, username, selfPackages, ... }:
+{ hmLib, pkgs, lib, ... }:
 
 {
   # Noctalia V5 可写 seed（文件缺失或是 store 链接时复制）

@@ -1,5 +1,5 @@
 # systemd user 服务与 session 环境（astral 超时、随机壁纸）
-{ hmLib, pkgs, username, selfPackages, ... }:
+{ hmLib, pkgs, ... }:
 
 {
   # systemd user 服务（登录图形会话后自启）

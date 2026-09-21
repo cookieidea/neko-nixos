@@ -3,7 +3,7 @@
 { pkgs }:
 
 let
-  libdatachannel-020 = pkgs.libdatachannel.overrideAttrs (old: {
+  libdatachannel-020 = pkgs.libdatachannel.overrideAttrs (_old: {
     version = "0.20.2";
     src = builtins.fetchGit {
       url = "https://github.com/paullouisageneau/libdatachannel";
