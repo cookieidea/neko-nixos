@@ -1,4 +1,4 @@
-# 桌面会话：niri、Noctalia Greeter、XDG 门户、Flatpak、字体、系统包
+# 桌面会话：niri、Noctalia Greeter、XDG 门户、字体、系统包
 { pkgs, lib, username, noctalia-greeter, selfPackages, ... }:
 
 {
