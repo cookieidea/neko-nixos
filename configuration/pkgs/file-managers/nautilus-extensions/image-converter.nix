@@ -1,4 +1,4 @@
-# Nautilus Image Converter（GTK4，右键缩放/旋转/转格式/压缩/合并 PDF）
+# Nautilus Image Converter（GTK4）。
 { pkgs }:
 pkgs.stdenv.mkDerivation rec {
   pname = "nautilus-image-converter";
@@ -24,23 +24,23 @@ pkgs.stdenv.mkDerivation rec {
     nautilus
   ];
 
-  # 替换 /usr/bin/convert 为 store 绝对路径
+  # 使用 Nix store 中的 convert。
   postPatch = ''
     substituteInPlace meson.build --replace-fail \
       "nautilus_extension_dir = libnautilus_extension.get_pkgconfig_variable('extensiondir')" \
       "nautilus_extension_dir = join_paths(get_option('prefix'), 'lib', 'nautilus', 'extensions-4')"
     substituteInPlace src/nautilus-image-resizer.c src/nautilus-image-rotator.c src/nautilus-image-format-changer.c \
       --replace-fail '/usr/bin/convert' '${pkgs.imagemagick}/bin/convert'
-    # 补 .ui 的 translatable 标记
+    # 补充 UI 翻译标记。
     sed -i -E 's|<property name="(label\|title)">|<property name="\1" translatable="yes">|g' \
       data/nautilus-image-resize.ui data/nautilus-image-rotate.ui data/nautilus-image-format-change.ui
-    # 用自维护 .ui 覆盖上游（GtkGrid + GtkSizeGroup 统一列宽）
+    # 使用维护版本的 UI，统一表单列宽。
     cp ${./ui}/nautilus-image-resize.ui data/nautilus-image-resize.ui
     cp ${./ui}/nautilus-image-rotate.ui data/nautilus-image-rotate.ui
     cp ${./ui}/nautilus-image-format-change.ui data/nautilus-image-format-change.ui
   '';
 
-  # 中文翻译
+  # 中文翻译。
   postInstall = ''
     mkdir -p $out/share/locale/zh_CN/LC_MESSAGES
     msgfmt -o $out/share/locale/zh_CN/LC_MESSAGES/nautilus-image-converter.mo \
