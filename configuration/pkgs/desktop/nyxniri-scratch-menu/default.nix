@@ -1,4 +1,4 @@
-# NyxNiri 星环菜单（GTK3 + GtkLayerShell + pygobject）
+# NyxNiri 星环菜单（GTK3 + GtkLayerShell + PyGObject）。
 { pkgs }:
 let
   pythonEnv = pkgs.python3.withPackages (ps: [ ps.pygobject3 ps.pycairo ]);
