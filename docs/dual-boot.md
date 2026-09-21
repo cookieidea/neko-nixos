@@ -1,4 +1,4 @@
-`# Windows + NixOS 双系统
+# Windows + NixOS 双系统
 
 本文针对 UEFI + GPT 的 Windows + NixOS 双系统，并配合本仓库当前的 GRUB、Btrfs 与独立 SWAP 设计。
 
