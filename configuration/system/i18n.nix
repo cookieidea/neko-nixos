@@ -1,11 +1,11 @@
-# 时区、locale、输入法（fcitx5 + rime-ice）
+# 时区、locale 和输入法。
 { pkgs, ... }:
 
 {
   time.timeZone = "Asia/Shanghai";
   i18n.defaultLocale = "zh_CN.UTF-8";
 
-  # 输入法 fcitx5：rime + 雾凇拼音（rime-ice）
+  # Fcitx5 + Rime / 雾凇拼音。
   i18n.inputMethod = {
     enable = true;
     type = "fcitx5";
@@ -15,7 +15,7 @@
         (fcitx5-rime.override {
           rimeDataPkgs = [ rime-data rime-ice ];
         })
-        # fcitx5-chinese-addons 不用：硬依赖 qtwebengine，其在 GCC 15 下编译崩溃
+        # 不使用 fcitx5-chinese-addons：其 QtWebEngine 依赖在当前工具链下无法构建。
       ];
     };
   };
