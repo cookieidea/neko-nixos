@@ -849,14 +849,6 @@ _mc_docker() {
             printf "\nWARNING! This will remove:\n  - all stopped containers\n  - all networks not used by at least one container\n  - all images without at least one container associated to them\n  - all build cache\n"
             if _mc_confirm "Continue with removal"; then
                 local _mc_quicksums=0 _mc_quicksums2=0 _mc_diff=0 _tmp _pid
-                _mc_sudo_wrap -v || return 0
-                if ! systemctl is-active --quiet docker.service && ! systemctl is-active --quiet docker.socket; then
-                    if _mc_confirm "Start docker.socket to list and remove docker images and data"; then
-                        systemctl start docker.socket
-                    else
-                        printf "Skipped\n"
-                    fi
-                fi
                 if systemctl --user is-active --quiet docker.service 2>/dev/null; then
                     _tmp=$(mktemp) || return 1
                     { LANG=C DOCKER_HOST="unix://${XDG_RUNTIME_DIR}/docker.sock" docker system prune -af | awk '/Total reclaimed/ { s = $4; sub(/B$/, "", s); print s }' | LC_ALL=C numfmt --from=si >"$_tmp" ; } & _pid="$!"
@@ -867,6 +859,7 @@ _mc_docker() {
                     printf "Done\n"
                     _mc_calcdif
                 elif systemctl is-active --quiet docker.service || systemctl is-active --quiet docker.socket; then
+                    _mc_sudo_wrap -v || return 0
                     _tmp=$(mktemp) || return 1
                     { LANG=C _mc_sudo_wrap docker system prune -af | awk '/Total reclaimed/ { s = $4; sub(/B$/, "", s); print s }' | LC_ALL=C numfmt --from=si >"$_tmp" ; } & _pid="$!"
                     _mc_loading "Working.." "$_pid" || { rm -f "$_tmp" ; return 1 ; }
