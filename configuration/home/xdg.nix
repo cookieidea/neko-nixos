@@ -118,6 +118,7 @@
       force = true;
     };
             "fish/conf.d/__custom__.fish".source = ./dotfiles/config/fish/conf.d/__custom__.fish;
+    "fish/conf.d/shorin.fish".source = ./dotfiles/config/fish/conf.d/shorin.fish;
         # Fastfetch / Starship。
     "fastfetch/config.jsonc".source = ./dotfiles/config/fastfetch/config.jsonc;
     "starship.toml".source = ./dotfiles/config/starship.toml;
