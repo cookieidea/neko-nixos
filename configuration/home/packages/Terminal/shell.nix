@@ -1,10 +1,8 @@
-# shell 相关。fish / zoxide 由 programs.fish、programs.zoxide 安装与配置
-# （Home Manager 模块会自动装包），此处只列模块不提供的：
-# starship 的 HM 模块只写配置、不装包，故仍需在此安装。
-{ pkgs, ... }:
+# shell 相关包全部由 Home Manager 模块提供：
+#   fish / zoxide  → programs.fish、programs.zoxide
+#   starship       → programs.starship（模块内 home.packages 会装入 cfg.package）
+# 故此处无需再列任何包。
+{ ... }:
 
 {
-  home.packages = with pkgs; [
-    starship
-  ];
 }

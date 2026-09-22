@@ -71,7 +71,6 @@ EOF
     rclone bindfs    # waydroid-helper 依赖
     libva-utils      # vainfo 硬解诊断
     radeontop        # AMD 占用监控
-    gamemode         # gamemoderun（Proton 性能优化）
     ripgrep tree wget unzip zip yq b3sum
     cachix
   ];
