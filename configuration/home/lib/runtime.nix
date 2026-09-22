@@ -4,8 +4,7 @@
 # 现集中在此并只注入对应程序的 wrapper（故障域限定）。
 { pkgs, selfPackages }:
 
-# 需要 rec：mpvRifeWrapped 引用同级的 mpvRife
-rec {
+{
   # Python site-packages 相对路径（供 mpvRifeWrapped 注入 PYTHONPATH）
   pySite = pkgs.python3.sitePackages;
 
@@ -14,9 +13,6 @@ rec {
   mcJavaLibPath =
     "${pkgs.pipewire.jack}/lib:${pkgs.stdenv.cc.cc.lib}/lib";
 
-  # Nautilus C 扩展目录。
-  nautilusExtensionDir =
-    "${selfPackages.nautilus-with-extensions}/lib/nautilus/extensions-4";
 
   # mpv + VapourSynth/RIFE。
   # 从 mpv-unwrapped 直接构建最终 wrapper，避免“已包装 mpv 再套 wrapper”。
