@@ -50,31 +50,6 @@ EOF
   };
 
 
-  # 系统级桌面包。
-  environment.systemPackages = with pkgs; [
-    git
-    tmux             # scratchpad
-    wlsunset         # 护眼
-    inotify-tools    # 壁纸同步
-    ddcutil          # 显示器亮度
-    gparted dosfstools exfatprogs f2fs-tools udftools xfsprogs   # 磁盘工具
-    qemu swtpm       # virt-manager 后端
-    dnsmasq          # libvirt NAT 网络依赖
-    xwayland-satellite   # X11 兼容（微信/QQ 等）
-    gamescope        # 基岩版鼠标修复（--force-grab-cursor）
-    wl-clipboard     # Waydroid 剪贴板共享
-    grim             # Wayland 截图（mark-shot/niri 依赖）
-    kdePackages.layer-shell-qt  # Qt6 Wayland layer-shell（mark-shot overlay）
-    gtk-layer-shell  # GTK Wayland layer-shell
-    android-tools    # adb（Waydroid GPS 转发）
-    waydroid-helper  # Waydroid 配置 GUI
-    rclone bindfs    # waydroid-helper 依赖
-    libva-utils      # vainfo 硬解诊断
-    radeontop        # AMD 占用监控
-    ripgrep tree wget unzip zip yq b3sum
-    cachix
-  ];
-
   fonts.packages = with pkgs; [
     noto-fonts-cjk-sans
     noto-fonts-color-emoji

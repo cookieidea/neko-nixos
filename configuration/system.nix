@@ -11,6 +11,7 @@
     ./system/audio-bluetooth.nix
     ./system/security-users.nix
     ./system/secrets.nix
+    ./system/packages.nix        # 系统级工具包（全局可见）
 
     # --- 硬件特定 ---
     ./device.nix
