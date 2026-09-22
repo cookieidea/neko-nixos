@@ -45,6 +45,9 @@ if [[ ! -f "$STAGE/configuration/device/hardware-config.nix" ]]; then
     echo "      若这是全新安装（minimal ISO），请改用：bash install.sh <用户> <挂载点>"
 fi
 
+# staging 已保留本机 hardware-config，故此处构建的是本机真实配置。
+prebuild_packages "$STAGE"
+
 echo "==> 校验 staging 配置 ..."
 if ! (cd "$STAGE" && nix flake check 2>&1 | tail -20); then
     echo "错误：staging 配置未通过 nix flake check，已放弃更新（$DEST 未被改动）。" >&2

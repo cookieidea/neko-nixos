@@ -1,24 +1,45 @@
-# 休眠恢复设备：由 swapDevices 推导，不在此重复写 UUID。
+# 休眠恢复设备：从 swapDevices 推导，避免 UUID 两处重复维护。
 #
-# 背景：boot.resumeDevice 原先硬编码在 system/boot.nix，而 swapDevices 在
-# device/hardware-config.nix —— 同一个分区写两遍。换 swap 分区时若只改一处，
-# 会出现「正常 swap 可用、休眠恢复静默失效」的配置漂移（这类失败很难察觉）。
+# 背景：boot.resumeDevice 原先硬编码在 system/boot.nix，与
+# device/hardware-config.nix 的 swapDevices 是同一个分区却写两遍；
+# 换 swap 分区时若漏改一处，会出现「正常 swap 可用、休眠恢复静默失效」的漂移。
 #
-# 这里从 config.swapDevices 取第一个块设备推导，保持单一数据源：
-# 只需维护 hardware-config.nix（本就不该手改，由 nixos-generate-config 生成）。
-#
-# 说明：沿用 by-uuid 而非 by-label —— UUID 由 mkswap 生成后基本不变，
-# 而 LABEL 可被 swaplabel 或重新格式化改掉。
+# 适用范围（刻意收窄，不做「看似通用的推导器」）：
+#   支持：恰好一个块设备 swap（如本机的独立 swap 分区，by-uuid）。
+#   不支持：swapfile（休眠还需 swapfile offset，不能只给路径）、多个 swap
+#           （无法判断哪个才是 resume 目标）、LUKS/LVM 等需要映射后设备的场景。
+#   遇到不支持的情况会通过 assertions 明确报错，而不是悄悄推导出错误的值 ——
+#   届时在 system/boot.nix 显式写 boot.resumeDevice 即可。
 { config, lib, ... }:
 
 let
-  # swapDevices 的 device 字段可能是路径字符串；只取字符串形式的块设备
-  # （排除 swapfile 之类），首个即用作 resume 目标。
-  swapDevices = map (s: s.device) (builtins.filter (s: s ? device) config.swapDevices);
-  resumeDevice = if swapDevices == [ ] then null else builtins.head swapDevices;
+  # 块设备 swap：NixOS 内部同样以 "/dev/" 前缀区分设备与 swapfile
+  # （见 swap.nix 的 isDevice），不能只判断 device 字段是否存在 ——
+  # swapfile 同样带 device 字段。
+  blockSwaps = builtins.filter (s: lib.hasPrefix "/dev/" s.device) config.swapDevices;
 in
 {
-  # boot.resumeDevice 是 types.str（默认 ""），故用 mkIf 控制是否赋值，
-  # 不能直接写 null。
-  boot.resumeDevice = lib.mkIf (resumeDevice != null) resumeDevice;
+  assertions = [
+    {
+      assertion = builtins.length blockSwaps <= 1;
+      message = ''
+        device/resume.nix 只支持「单个块设备 swap」。
+        当前检测到 ${toString (builtins.length blockSwaps)} 个，无法判断哪个用于休眠恢复。
+        请在 configuration/system/boot.nix 中显式设置 boot.resumeDevice，
+        或停用 device/resume.nix 的导入。
+      '';
+    }
+    {
+      assertion = config.swapDevices == [ ] || blockSwaps != [ ];
+      message = ''
+        device/resume.nix 检测到有 swapDevices，但没有一个是块设备（形如 /dev/...），
+        推测只配置了 swapfile。休眠恢复需要块设备，仅给 swapfile 路径不足以恢复
+        （还需 swapfile offset）。请显式设置 boot.resumeDevice，
+        或停用 device/resume.nix 的导入。
+      '';
+    }
+  ];
+
+  # boot.resumeDevice 是 types.str（默认 ""），用 mkIf 控制是否赋值。
+  boot.resumeDevice = lib.mkIf (blockSwaps != [ ]) (builtins.head blockSwaps).device;
 }

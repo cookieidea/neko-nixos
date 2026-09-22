@@ -85,12 +85,13 @@ set_username() {
 # 未使用的 public 包自然不会被牵扯进来。
 # 若失败，再逐个尝试自定义包，以便把问题定位到具体包（保留原有的可诊断性）。
 prebuild_packages() {
+    local target="${1:-$SRC}"   # 要构建的配置目录（新装=$DEST，更新=$STAGE）
     local log_dir failed=() p
     log_dir="$(mktemp -d "${TMPDIR:-/tmp}/neko-nixos-build.XXXXXX")"
 
-    echo "==> 预构建系统闭包（nixosConfigurations.${FLAKE_HOST}）..."
+    echo "==> 预构建系统闭包（$target 的 nixosConfigurations.${FLAKE_HOST}）..."
     echo "    首次安装需要下载/构建整个系统闭包，耗时较长属正常。"
-    if nix build ".#nixosConfigurations.${FLAKE_HOST}.config.system.build.toplevel" \
+    if nix build "$target#nixosConfigurations.${FLAKE_HOST}.config.system.build.toplevel" \
          --no-link 2>"$log_dir/toplevel.log"; then
         echo "      ✓ 系统闭包构建完成"
         rm -rf "$log_dir"
@@ -103,15 +104,15 @@ prebuild_packages() {
 
     local system pkgs=()
     if system="$(nix eval --raw --impure --expr \
-          "(builtins.getFlake \"$SRC\").nixosConfigurations.\"$FLAKE_HOST\".pkgs.stdenv.hostPlatform.system" \
+          "(builtins.getFlake \"$target\").nixosConfigurations.\"$FLAKE_HOST\".pkgs.stdenv.hostPlatform.system" \
           2>/dev/null)" && [[ -n "$system" ]]; then
         mapfile -t pkgs < <(nix eval --raw --impure --expr \
-              "builtins.concatStringsSep \"\\n\" (builtins.attrNames (builtins.getFlake \"$SRC\").packages.\"$system\")" \
+              "builtins.concatStringsSep \"\\n\" (builtins.attrNames (builtins.getFlake \"$target\").packages.\"$system\")" \
               2>/dev/null) || true
     fi
 
     for p in "${pkgs[@]}"; do
-        nix build ".#$p" --no-link 2>"$log_dir/build-$p.log" || failed+=("$p")
+        nix build "$target#$p" --no-link 2>"$log_dir/build-$p.log" || failed+=("$p")
     done
 
     if (( ${#failed[@]} > 0 )); then

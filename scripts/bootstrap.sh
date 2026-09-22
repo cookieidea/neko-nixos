@@ -58,6 +58,10 @@ rm -rf "$DEST/.git"
 cp -a "$KEEP_HW" "$DEST/configuration/device/hardware-config.nix"
 rm -f "$KEEP_HW"
 
+# 此时 $DEST 已用目标机的 hardware-config 覆盖，故构建的是目标机真实配置。
+# 必须在注入之后调用 —— 否则构建的是仓库里原机器的硬件配置。
+prebuild_packages "$DEST"
+
 echo "==> 执行 nixos-install --flake $DEST/#$FLAKE_HOST ..."
 nixos-install --flake "$DEST/#$FLAKE_HOST"
 

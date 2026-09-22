@@ -70,10 +70,11 @@ fi
 
 set_username "$TARGET_USER"
 
-# ---- 两种模式共同的前置：先构建自定义包，便于把失败定位到具体包 ----
-prebuild_packages
-
 # ---- 分发 ----
+# 注意：prebuild 不在此处调用 —— 全新安装时目标机的 hardware-config 要由
+# bootstrap.sh 注入后才可用，在注入前构建会用到仓库里原机器的硬件配置
+# （构建 system.build.toplevel 时这会直接构建错配置）。
+# 两个子脚本各自在「配置已就绪」之后调用 prebuild_packages。
 if [[ -n "$MNT" ]]; then
     bash "$HERE/scripts/bootstrap.sh" "$TARGET_USER" "$MNT" "$SRC" "$FLAKE_HOST"
 else
