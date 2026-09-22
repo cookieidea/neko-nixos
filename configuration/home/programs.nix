@@ -31,7 +31,7 @@
       enable = true;
       systemd.enable = false;
       settings = builtins.replaceStrings
-        [ "/home/cookie" ]
+        [ "__NEKO_HOME__" ]
         [ "/home/${username}" ]
         (builtins.readFile ./dotfiles/config/noctalia/config.toml);
     };

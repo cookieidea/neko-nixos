@@ -55,7 +55,7 @@
     # mpv.conf 需要按 username 替换路径；运行时数据目录保持可写。
     "mpv/mpv.conf" = {
       text = builtins.replaceStrings
-        [ "/home/cookie" ]
+        [ "__NEKO_HOME__" ]
         [ "/home/${username}" ]
         (builtins.readFile ./dotfiles/mpv/mpv.conf);
       force = true;

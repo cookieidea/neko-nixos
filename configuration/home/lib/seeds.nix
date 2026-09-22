@@ -9,7 +9,7 @@
   # activation 会把配置复制为可写文件，因此这里先按 username 替换家目录。
   seedNoctaliaConfig = pkgs.writeText "noctalia-config.toml"
     (builtins.replaceStrings
-      [ "/home/cookie" ]
+      [ "__NEKO_HOME__" ]
       [ "/home/${username}" ]
       (builtins.readFile ./../dotfiles/config/noctalia/config.toml));
   seedStarship       = builtins.toString ./../dotfiles/config/starship.toml;

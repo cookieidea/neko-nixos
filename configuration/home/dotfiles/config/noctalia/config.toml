@@ -208,25 +208,25 @@ builtin_ids = ["kitty", "qt", "starship"]
 community_ids = []
 
 # NyxMellow 动态 fcitx5 皮肤（mellow 形状 + Material You 自动取色）
-# 下段路径为硬编码 /home/cookie，仅在用户名为 cookie 时有效
+# 下段路径使用占位符，由 programs.nix 部署时按 username 替换。
 [theme.templates.user.nyxmellow_theme]
 index = 0
-input_path = "/home/cookie/.local/share/fcitx5/themes/nyxmellow/templates/theme.conf"
-output_path = "/home/cookie/.local/share/fcitx5/themes/nyxmellow/theme.conf"
+input_path = "__NEKO_HOME__/.local/share/fcitx5/themes/nyxmellow/templates/theme.conf"
+output_path = "__NEKO_HOME__/.local/share/fcitx5/themes/nyxmellow/theme.conf"
 
 [theme.templates.user.nyxmellow_panel]
 index = 1
-input_path = "/home/cookie/.local/share/fcitx5/themes/nyxmellow/templates/panel.svg"
-output_path = "/home/cookie/.local/share/fcitx5/themes/nyxmellow/panel.svg"
+input_path = "__NEKO_HOME__/.local/share/fcitx5/themes/nyxmellow/templates/panel.svg"
+output_path = "__NEKO_HOME__/.local/share/fcitx5/themes/nyxmellow/panel.svg"
 
 [theme.templates.user.nyxmellow_highlight]
 index = 2
-input_path = "/home/cookie/.local/share/fcitx5/themes/nyxmellow/templates/highlight.svg"
-output_path = "/home/cookie/.local/share/fcitx5/themes/nyxmellow/highlight.svg"
+input_path = "__NEKO_HOME__/.local/share/fcitx5/themes/nyxmellow/templates/highlight.svg"
+output_path = "__NEKO_HOME__/.local/share/fcitx5/themes/nyxmellow/highlight.svg"
 post_hook = "if pgrep -x fcitx5 >/dev/null 2>&1; then pkill -x fcitx5; sleep 1; fcitx5 -d >/dev/null 2>&1 & fi"
 
 [wallpaper]
-directory = "/home/cookie/Pictures/Wallpapers"
+directory = "__NEKO_HOME__/Pictures/Wallpapers"
 fill_mode = "crop"
 
 
@@ -265,4 +265,4 @@ target_lang = "zh"
 [plugin_settings."noctalia/mpvpaper"]
 mpv_options = "--script=~/.config/noctalia/mpv-hook.lua no-audio loop-file=inf hwdec=auto osc=no osd-level=0 load-scripts=no"
 picker_placement = "floating"
-video_directory = "/home/cookie/Pictures/Wallpapers/video"
+video_directory = "__NEKO_HOME__/Pictures/Wallpapers/video"

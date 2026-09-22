@@ -176,8 +176,10 @@ sudo bash install.sh cookie /mnt
 - 保留目标机器生成的 `hardware-configuration.nix`
 - 将配置部署到 `/mnt/etc/nixos`
 - 执行 `nixos-install --flake`
+- 提示交互式设置登录密码（`nixos-enter --root /mnt -c 'passwd <用户名>'`）
 
-首次安装后需要自行设置用户密码，脚本不会把密码写进配置。
+密码不会被写进配置——安装过程中即时输入，以交互方式设置。
+若该步骤失败，可在重启前手动重跑上面那条命令。
 
 ### 已安装系统更新
 
