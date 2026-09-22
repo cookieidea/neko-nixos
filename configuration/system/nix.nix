@@ -24,16 +24,10 @@
     "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
   ];
 
-  nix.settings.trusted-substituters = [
-    "https://mirrors.ustc.edu.cn/nix-channels/store"
-    "https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store"
-    "https://attic.xuyh0120.win/lantian"
-    "https://noctalia.cachix.org"
-    "https://nekobox.cachix.org"
-    "https://cache.numtide.com"
-    "https://cook-nixvim.cachix.org"
-    "https://nix-community.cachix.org"
-  ];
+  # 不设 trusted-substituters：它是上面 substituters 的逐字重复。
+  # 该项只影响「非信任用户能否自行指定 substituters」，而本机是单一用户、
+  # 且 substituters 已在系统级配置 —— daemon 会直接使用，无需额外授权。
+  # （若日后需要以普通用户临时覆盖 substituters，再加回并写明用途。）
 
   nixpkgs.config = {
     allowUnfree = true;

@@ -9,6 +9,10 @@
   services.displayManager.noctalia-greeter = {
     enable = true;
     greeter-args = "--session niri";
+    # 允许本用户免密执行「仅外观」的同步（greeter 与桌面之间同步主题等）。
+    # 用上游选项而非自定义 polkit 规则：上游会额外限定 action、
+    # 目标须为 root，且调用者须为本地活跃会话中的允许用户。
+    passwordless-sync-users = [ username ];
     settings = {
       cursor = {
         theme = "Adwaita";

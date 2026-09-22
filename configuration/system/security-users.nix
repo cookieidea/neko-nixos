@@ -3,15 +3,10 @@
 
 {
   security.polkit.enable = true;
-  # Noctalia greeter 外观同步允许 wheel 免密调用 pkexec。
-  security.polkit.extraConfig = ''
-    polkit.addRule(function(action, subject) {
-        if (action.id == "org.noctalia.greeter.sync-appearance" &&
-            subject.isInGroup("wheel")) {
-            return polkit.Result.YES;
-        }
-    });
-  '';
+  # Noctalia greeter 的免密外观同步不在此处配置 —— 见 modules/desktop.nix 的
+  # services.displayManager.noctalia-greeter.passwordless-sync-users。
+  # （原先用 extraConfig 自行放行整个 wheel 组的该 action，授权范围比上游宽：
+  #   上游会额外限定 action、目标须为 root、且调用者须为本地活跃会话中的允许用户。）
 
   users.users.${username} = {
     isNormalUser = true;
