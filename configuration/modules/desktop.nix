@@ -2,7 +2,7 @@
 { pkgs, lib, username, noctalia-greeter, selfPackages, ... }:
 
 {
-  # Wayland 桌面与 greetd 登录界面。
+  # Wayland 桌面与 Noctalia 登录界面。
   imports = [
     noctalia-greeter.nixosModules.default
   ];
