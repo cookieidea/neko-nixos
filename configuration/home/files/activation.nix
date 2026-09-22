@@ -2,6 +2,149 @@
 { hmLib, pkgs, lib, selfPackages, ... }:
 
 {
+  # NyxNiri Dunder Protocol 兼容层。
+  #
+  # - 名称包含 "__custom__" 的文件/目录跨 Home Manager generation 保留。
+  # - 旧的 /nix/store symlink 仅作为初始模板，首次迁移时物化为可编辑文件。
+  # - Niri 的 monitor.kdl / effects.kdl 属于固定文件名保留项，单独保护。
+  #
+  # 使用“先快照、再 linkGeneration、后恢复”的顺序，
+  # 避免 Home Manager 更新时把用户覆盖重新指回 /nix/store。
+  home.activation.nyxniriDunderPrepare = lib.hm.dag.entryBefore [ "linkGeneration" ] ''
+    NEKO_DUNDER_SNAPSHOT="$(mktemp -d "${TMPDIR:-/tmp}/neko-nixos-dunder.XXXXXX")"
+    export NEKO_DUNDER_SNAPSHOT
+
+    preserve_dunder_root() {
+      local root_name="$1"
+      local root="$HOME/.config/$root_name"
+      local snapshot_root="$NEKO_DUNDER_SNAPSHOT/$root_name"
+      local manifest="$snapshot_root/.manifest"
+      local src rel target resolved parent_rel parent_name skip
+
+      if [ ! -d "$root" ]; then
+        return 0
+      fi
+
+      run mkdir -p "$snapshot_root"
+      : > "$manifest"
+
+      while IFS= read -r -d '' src; do
+        rel="${src#"$root"/}"
+        skip=0
+        parent_rel="$rel"
+
+        while [[ "$parent_rel" == */* ]]; do
+          parent_rel="${parent_rel%/*}"
+          parent_name="${parent_rel##*/}"
+          if [[ "$parent_name" == *__custom__* ]]; then
+            skip=1
+            break
+          fi
+        done
+        [ "$skip" -eq 1 ] && continue
+
+        target="$snapshot_root/$rel"
+        run mkdir -p "$(dirname "$target")"
+
+        if [ -L "$src" ]; then
+          resolved="$(readlink -f -- "$src" 2>/dev/null || true)"
+          case "$resolved" in
+            /nix/store/*)
+              run cp -aL -- "$src" "$target"
+              ;;
+            *)
+              run cp -a -- "$src" "$target"
+              ;;
+          esac
+        else
+          run cp -a -- "$src" "$target"
+        fi
+
+        printf '%s\\0' "$rel" >> "$manifest"
+      done < <(${pkgs.findutils}/bin/find "$root" -mindepth 1 -name '*__custom__*' -print0)
+    }
+
+    preserve_niri_file() {
+      local name="$1"
+      local root="$HOME/.config/niri"
+      local src="$root/$name"
+      local snapshot_root="$NEKO_DUNDER_SNAPSHOT/niri"
+      local target="$snapshot_root/$name"
+      local resolved
+
+      if [ ! -e "$src" ] && [ ! -L "$src" ]; then
+        return 0
+      fi
+
+      run mkdir -p "$snapshot_root"
+
+      if [ -L "$src" ]; then
+        resolved="$(readlink -f -- "$src" 2>/dev/null || true)"
+        case "$resolved" in
+          /nix/store/*)
+            run cp -aL -- "$src" "$target"
+            ;;
+          *)
+            run cp -a -- "$src" "$target"
+            ;;
+        esac
+      else
+        run cp -a -- "$src" "$target"
+      fi
+    }
+
+    preserve_dunder_root "niri"
+    preserve_dunder_root "kitty"
+    preserve_dunder_root "fish"
+    preserve_niri_file "monitor.kdl"
+    preserve_niri_file "effects.kdl"
+  '';
+
+  home.activation.nyxniriDunderRestore = lib.hm.dag.entryAfter [ "linkGeneration" ] ''
+    if [ -n "${NEKO_DUNDER_SNAPSHOT:-}" ] && [ -d "$NEKO_DUNDER_SNAPSHOT" ]; then
+      restore_dunder_root() {
+        local root_name="$1"
+        local root="$HOME/.config/$root_name"
+        local snapshot_root="$NEKO_DUNDER_SNAPSHOT/$root_name"
+        local manifest="$snapshot_root/.manifest"
+        local rel src dest
+
+        [ -f "$manifest" ] || return 0
+
+        while IFS= read -r -d '' rel; do
+          src="$snapshot_root/$rel"
+          dest="$root/$rel"
+          [ -e "$src" ] || [ -L "$src" ] || continue
+
+          run rm -rf -- "$dest"
+          run mkdir -p "$(dirname "$dest")"
+          run cp -a -- "$src" "$(dirname "$dest")/"
+        done < "$manifest"
+      }
+
+      restore_niri_file() {
+        local name="$1"
+        local src="$NEKO_DUNDER_SNAPSHOT/niri/$name"
+        local dest="$HOME/.config/niri/$name"
+
+        if [ -e "$src" ] || [ -L "$src" ]; then
+          run rm -rf -- "$dest"
+          run mkdir -p "$(dirname "$dest")"
+          run cp -a -- "$src" "$(dirname "$dest")/"
+        fi
+      }
+
+      restore_dunder_root "niri"
+      restore_dunder_root "kitty"
+      restore_dunder_root "fish"
+      restore_niri_file "monitor.kdl"
+      restore_niri_file "effects.kdl"
+
+      run rm -rf -- "$NEKO_DUNDER_SNAPSHOT"
+      unset NEKO_DUNDER_SNAPSHOT
+    fi
+  '';
+
   # Noctalia、Kitty 和 MangoHud 的可写配置初始化。
   home.activation.noctaliaV5Seed = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     copy_seed() {
