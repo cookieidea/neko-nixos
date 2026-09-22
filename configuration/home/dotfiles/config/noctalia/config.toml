@@ -259,7 +259,7 @@ capsule = false
 [widget.mpvpaper]
 type = "noctalia/mpvpaper:mpvpaper"
 
-[plugin_settings."noctalia/translator"]
+[plugin_settings."cookie/translator"]
 target_lang = "zh"
 
 [plugin_settings."noctalia/mpvpaper"]
