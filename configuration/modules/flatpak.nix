@@ -8,6 +8,7 @@
     remotes = [
       {
         name = "flathub";
+        # USTC 提供 Flathub 缓存；未命中时仍可能访问 Flathub 源站。
         location = "https://mirrors.ustc.edu.cn/flathub";
         gpg-import = "/etc/flatpak/flathub.gpg";
       }
@@ -28,13 +29,13 @@
       };
     };
 
-    # 未声明的应用和 override 会在 activation 时删除。
+    # 配置即状态：未声明应用和未声明 override 会在 activation 时清理。
     uninstallUnmanaged = true;
     overrides.pruneUnmanagedOverrides = true;
     update.auto.enable = false;
   };
 
-  # 保证已有 flathub remote 使用配置中的镜像地址。
+  # 兼容已有系统中的 flathub remote，确保地址与声明保持一致。
   systemd.services.flatpak-mirror = {
     description = "Point the flathub remote at the USTC mirror";
     wantedBy = [ "multi-user.target" ];
