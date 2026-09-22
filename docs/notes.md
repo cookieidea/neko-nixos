@@ -107,7 +107,7 @@ switch
 
 `registry-mirrors` 只影响 Docker Hub。GHCR 等其他 registry 不会自动经过 Docker Hub mirror。
 
-当前只保留两个实际使用的国内 Docker Hub mirror，避免堆积过多公共服务依赖。
+普通用户默认走 rootless Docker；rootful docker.service 保留供 sudo 场景使用。Docker Hub 仍使用两个实际使用的国内 mirror。
 
 ## Flatpak
 
@@ -160,7 +160,7 @@ users.users.<name>.openssh.authorizedKeys.keys
 
 ## Wayland
 
-桌面主环境是 Wayland，niri 使用 xwayland-satellite 提供 X11 应用兼容。
+桌面主环境是 Wayland，niri 使用 xwayland-satellite 提供 X11 应用兼容。Niri 启动脚本使用构建期绝对路径，避免 compositor 直接 spawn 时依赖 shell 的 ~ 展开。
 
 ## GPU
 
@@ -196,6 +196,27 @@ KDE Connect → modules/services/kdeconnect.nix
 systemd user 会话与 login shell 的环境可能不同。
 
 需要特殊环境变量的 user service，应确认 session environment 是否包含所需变量。
+
+## NyxNiri Dunder Protocol
+
+`configuration/home/files/activation.nix` 实现两套保留规则：
+
+- **Dunder**：`niri`、`kitty`、`fish` 下名称包含 `__custom__` 的文件/目录跨 generation 保留。
+- **Named preserve**：Niri 的 `monitor.kdl`、`effects.kdl` 单独保留，因为它们被固定文件名引用或承载运行时状态。
+
+激活顺序：
+
+```text
+现有用户配置
+↓
+Dunder / named preserve 快照
+↓
+Home Manager linkGeneration
+↓
+恢复用户覆盖
+```
+
+旧的 `/nix/store` symlink 会在首次迁移时物化为真实文件。
 
 ## Home Manager
 
