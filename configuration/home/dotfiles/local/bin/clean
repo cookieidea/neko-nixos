@@ -256,20 +256,21 @@ _mc_check_sudopath() {
 }
 
 _mc_sudo_wrap() {
-    # NixOS 适配：原版在此处做 sudo 提权（清 /var/cache 等需要 root）。
-    # 本脚本已改为只清理用户可写位置 + Nix 用户级操作，均无需要 root；
-    # 且 NixOS 的 sudo 需密码、无 tty 时会直接失败。故此处退化为直接执行。
+    # 仅在脚本明确需要 root 时提权；普通用户默认保持非特权。
     if [[ $_mc_dryrun -eq 1 ]]; then
         case "$1" in
             -k|-v|-p) return 0 ;;
-            *) printf "[Dry-Run] Would execute: %s\n" "$*" >&2; return 0 ;;
+            *) printf "[Dry-Run] Would execute with sudo: %s\n" "$*" >&2; return 0 ;;
         esac
     fi
-    # 跳过 sudo 自身的参数（-k 清缓存 / -v 校验 / -p 提示串）
     case "$1" in
-        -k|-v|-p) return 0 ;;
+        -k|-v|-p)
+            sudo "$@" >/dev/null
+            ;;
+        *)
+            sudo -- "$@"
+            ;;
     esac
-    "$@"
 }
 
 _mc_rm_safer() {
@@ -856,7 +857,16 @@ _mc_docker() {
                         printf "Skipped\n"
                     fi
                 fi
-                if systemctl is-active --quiet docker.service || systemctl is-active --quiet docker.socket; then
+                if systemctl --user is-active --quiet docker.service 2>/dev/null; then
+                    _tmp=$(mktemp) || return 1
+                    { LANG=C DOCKER_HOST="unix://${XDG_RUNTIME_DIR}/docker.sock" docker system prune -af | awk '/Total reclaimed/ { s = $4; sub(/B$/, "", s); print s }' | LC_ALL=C numfmt --from=si >"$_tmp" ; } & _pid="$!"
+                    _mc_loading "Working.." "$_pid" || { rm -f "$_tmp" ; return 1 ; }
+                    read -r _mc_diff <"$_tmp" || _mc_diff=0
+                    rm -f "$_tmp"
+                    [[ $_mc_diff =~ ^[0-9]+$ ]] || _mc_diff=0
+                    printf "Done\n"
+                    _mc_calcdif
+                elif systemctl is-active --quiet docker.service || systemctl is-active --quiet docker.socket; then
                     _tmp=$(mktemp) || return 1
                     { LANG=C _mc_sudo_wrap docker system prune -af | awk '/Total reclaimed/ { s = $4; sub(/B$/, "", s); print s }' | LC_ALL=C numfmt --from=si >"$_tmp" ; } & _pid="$!"
                     _mc_loading "Working.." "$_pid" || { rm -f "$_tmp" ; return 1 ; }
