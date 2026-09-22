@@ -7,6 +7,7 @@
     ./modules/desktop.nix
     ./modules/minecraft.nix    # MC 联机端口 + 组播路由
     ./modules/dsh.nix          # dsh web 端口
+    ./modules/flatpak.nix      # Flatpak 声明式管理（remote/应用/权限）
 
     # 系统服务。
     ./modules/services/openssh.nix

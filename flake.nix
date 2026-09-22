@@ -87,9 +87,18 @@
       url = "github:numtide/llm-agents.nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    # Flatpak 的声明式管理（remote / 应用 / 权限 override）。
+    # nixpkgs 的 services.flatpak 只有 enable 一个选项，无法声明式描述
+    # 装哪些应用；此模块补上 remotes / packages / overrides，
+    # 使 flatpak 状态随 generation 一起回滚。
+    nix-flatpak = {
+      # 该 flake 无 inputs（纯 module，用宿主的 pkgs），故不设 follows。
+      url = "github:gmodena/nix-flatpak";
+    };
   };
 
-  outputs = { nixpkgs, home-manager, cooknixvim, bilihud, nix-cachyos-kernel, noctalia, noctalia-greeter, agenix, bestclient, mark-shot, llm-agents-nix, ... }:
+  outputs = { nixpkgs, home-manager, cooknixvim, bilihud, nix-cachyos-kernel, noctalia, noctalia-greeter, agenix, bestclient, mark-shot, llm-agents-nix, nix-flatpak, ... }:
     let
       system = "x86_64-linux";
       forAllSystems = nixpkgs.lib.genAttrs [ system ];
@@ -146,6 +155,7 @@
             agenix.nixosModules.default
             # 平台 overlays。
             (import ./configuration/overlays { inherit nix-cachyos-kernel; })
+            nix-flatpak.nixosModules.nix-flatpak
           ];
         };
       };
