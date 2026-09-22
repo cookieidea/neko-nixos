@@ -36,6 +36,20 @@
         (builtins.readFile ./dotfiles/config/noctalia/config.toml);
     };
 
+    # Discord（Vencord/Equicord）的声明式封装。
+    # 取代此前的 flatpak Discord，使其进入 generation 管理。
+    # user / homeDirectory / xdgConfigHome 由模块以 mkDefault 取自 HM 配置。
+    nixcord = {
+      enable = true;
+      discord.enable = true;
+    };
+
+    # VSCodium：扩展通过 nix-vscode-extensions 声明式管理。
+    vscode = {
+      enable = true;
+      package = pkgs.vscodium;
+    };
+
     # niri 配置由 xdg.configFile 部署。
   };
 }

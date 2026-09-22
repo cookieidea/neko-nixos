@@ -31,7 +31,12 @@
     ];
   };
 
+  # inputs 必须写成字面 attrset —— Nix 的 flake 解析器不接受 import 或顶层 let
+  # （实测：`inputs = import ./x.nix` 报 "expected a set but got a thunk"；
+  #   顶层 let 绑定则报 "must be an attribute set"）。
+  # 因此这里按用途分区并加注释，而不是拆到 configuration/flakes/ 下的文件。
   inputs = {
+    # ── 基础 ──
     # nixpkgs 使用国内 Git 镜像，锁定的 rev 仍由 flake.lock 保证。
     nixpkgs.url = "git+https://mirrors.nju.edu.cn/git/nixpkgs.git?ref=nixos-26.05&shallow=1";
     # Home Manager 使用镜像地址；上游仓库已迁移到 nix-community。
@@ -40,65 +45,81 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    # ── 桌面 ──
+    # CachyOS 内核使用项目自身固定的 nixpkgs。
+    nix-cachyos-kernel = {
+      url = "git+https://github.com/xddxdd/nix-cachyos-kernel?ref=release";
+    };
+    # Noctalia 使用官方 Cachix 分支。
+    noctalia = {
+      url = "git+https://github.com/noctalia-dev/noctalia.git?ref=cachix";
+    };
+    noctalia-greeter = {
+      url = "git+https://github.com/noctalia-dev/noctalia-greeter?ref=main";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    # Flatpak 的声明式管理：nixpkgs 的 services.flatpak 只有 enable，
+    # 此模块补上 remotes / packages / overrides，使状态随 generation 回滚。
+    nix-flatpak = {
+      # 无 inputs（纯 module，用宿主 pkgs），故不设 follows。
+      url = "github:gmodena/nix-flatpak";
+    };
+
+    # ── 开发 ──
     cooknixvim = {
       url = "git+https://github.com/Youthdreamer/CookNixvim";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    # Rust 工具链：可按版本/日期选择并支持 nightly。
+    fenix = {
+      url = "github:nix-community/fenix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    # VSCodium 扩展的 Nix 化来源，使扩展也能声明式管理与回滚。
+    nix-vscode-extensions = {
+      url = "github:nix-community/nix-vscode-extensions";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
+    # ── 应用 ──
     # bilihud：B 站直播弹幕浮窗。
     bilihud = {
       url = "github:locez/bilihud";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-
-    # CachyOS 内核使用项目自身固定的 nixpkgs。
-    nix-cachyos-kernel = {
-      url = "git+https://github.com/xddxdd/nix-cachyos-kernel?ref=release";
-    };
-
-    # Noctalia 使用官方 Cachix 分支。
-    noctalia = {
-      url = "git+https://github.com/noctalia-dev/noctalia.git?ref=cachix";
-    };
-
-    noctalia-greeter = {
-      url = "git+https://github.com/noctalia-dev/noctalia-greeter?ref=main";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    # agenix：声明式 age secrets。
-    agenix = {
-      url = "git+https://gitcode.com/ryantm/agenix.git?ref=main";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     # BestClient：预编译 DDNet fork。
     bestclient = {
       url = "git+https://github.com/BestProjectTeam/BestClient";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-
     mark-shot = {
       url = "git+https://github.com/jswysnemc/mark-shot";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-
+    # Discord 客户端（Vencord 的 Nix 封装），取代此前的 flatpak Discord。
+    nixcord = {
+      url = "github:4evy/nixcord";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     llm-agents-nix = {
       url = "github:numtide/llm-agents.nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # Flatpak 的声明式管理（remote / 应用 / 权限 override）。
-    # nixpkgs 的 services.flatpak 只有 enable 一个选项，无法声明式描述
-    # 装哪些应用；此模块补上 remotes / packages / overrides，
-    # 使 flatpak 状态随 generation 一起回滚。
-    nix-flatpak = {
-      # 该 flake 无 inputs（纯 module，用宿主的 pkgs），故不设 follows。
-      url = "github:gmodena/nix-flatpak";
+    # ── 系统 ──
+    # agenix：声明式 age secrets。
+    agenix = {
+      url = "git+https://gitcode.com/ryantm/agenix.git?ref=main";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
   };
 
-  outputs = { nixpkgs, home-manager, cooknixvim, bilihud, nix-cachyos-kernel, noctalia, noctalia-greeter, agenix, bestclient, mark-shot, llm-agents-nix, nix-flatpak, ... }:
+  outputs = {
+      nixpkgs, home-manager, cooknixvim, bilihud, nix-cachyos-kernel,
+      noctalia, noctalia-greeter, agenix, bestclient, mark-shot,
+      llm-agents-nix, nix-flatpak, fenix, nix-vscode-extensions, nixcord,
+      ...
+    }:
     let
       system = "x86_64-linux";
       forAllSystems = nixpkgs.lib.genAttrs [ system ];
@@ -134,8 +155,11 @@
 
         home-manager.useGlobalPkgs = true;
         home-manager.useUserPackages = true;
+        # nixcord 提供的是 Home Manager 类模块（_class = "homeManager"），
+        # 不能放进本 NixOS 模块，故经 sharedModules 注入 HM 用户模块链。
+        home-manager.sharedModules = [ nixcord.homeModules.nixcord ];
         home-manager.users.${username} = import ./configuration/home.nix;
-        home-manager.extraSpecialArgs = { inherit desktop username cooknixvim bilihud selfPackages noctalia bestclient mark-shot llm-agents-nix hmLib; };
+        home-manager.extraSpecialArgs = { inherit desktop username cooknixvim bilihud selfPackages noctalia bestclient mark-shot llm-agents-nix hmLib fenix nix-vscode-extensions nixcord; };
       };
     in {
       # 只导出成品包（selfPackages.public），支持单独 nix build。
