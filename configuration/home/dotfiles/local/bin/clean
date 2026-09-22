@@ -1467,7 +1467,7 @@ _mc_nixfuncts() {
         return 0
     fi
 
-    # 回收无用 store 路径（已按 nix.gc.automatic 每周跑，这里手动补一次）
+    # 手动回收无用 store 路径；系统的每周 GC 由 NixOS 配置统一调度。
     if _mc_confirm "$(t '回收 Nix store 中无引用的路径 (nix-collect-garbage)' 'Collect garbage in Nix store')"; then
         if [[ $_mc_dryrun -eq 1 ]]; then
             printf '[Dry-Run] Would run nix-collect-garbage -d\n'
