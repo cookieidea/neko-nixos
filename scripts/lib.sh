@@ -4,6 +4,12 @@
 REPO="cookieidea/neko-nixos"
 BRANCH="${BRANCH:-main}"
 
+# 引导阶段显式追加缓存，避免 live environment 尚未应用系统 nix.nix 时退回纯本地构建。
+# 正式系统的缓存仍由 configuration/system/nix.nix 管理。
+BOOTSTRAP_NIX_CONFIG='extra-substituters = https://mirrors.ustc.edu.cn/nix-channels/store https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store https://attic.xuyh0120.win/lantian https://noctalia.cachix.org https://nekobox.cachix.org https://cache.numtide.com https://cook-nixvim.cachix.org https://nix-community.cachix.org
+extra-trusted-public-keys = lantian:EeAUQ+W+6r7EtwnmYjeVwx5kOGEBpjlBfPlzGlTNvHc= noctalia.cachix.org-1:pCOR47nnMeo5thcxNDtzWpOxNFQsBRglJzxWPp3dkU4= nekobox.cachix.org-1:bRpp0vZK2Uq/vnydXC+uuOmFJW3W6fN4PI5PDy4iD+s= niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g= cook-nixvim.cachix.org-1:LjCZ3VSYrcwTQxHpd834EIswdkfHoSd/EsKUYLRruF4= nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs='
+export NIX_CONFIG="${NIX_CONFIG:+$NIX_CONFIG$'\n'}$BOOTSTRAP_NIX_CONFIG"
+
 require_root() {
     if [[ $EUID -ne 0 ]]; then
         echo "错误：请使用 root 运行（例如 sudo -E bash install.sh ...）。" >&2
