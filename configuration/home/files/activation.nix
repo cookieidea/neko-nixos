@@ -64,11 +64,12 @@
     # 现改由 Nix 环境提供（见 pkgs/tools/mark-shot-python），此处只负责收尾。
     $DRY_RUN_CMD rm -rf "$MARK/ocr-venv" "$MARK/code-scan-venv"
 
-    # 将 HM 的只读 config symlink 转为真实文件后再注入 secret。
+    # HM 配置是 /nix/store 的只读 symlink；先物化到用户目录，再注入 secret。
     CFG="$HOME/.config/mark-shot/config.json"
     if [ -L "$CFG" ] && [ -f "/run/agenix/mark-shot-sensitive" ]; then
       LINK_TARGET=$(${pkgs.coreutils}/bin/readlink -f "$CFG")
-      $DRY_RUN_CMD ${pkgs.python3}/bin/python3 ${../dotfiles/config/mark-shot/inject-secrets.py} "$CFG" "$LINK_TARGET"
+      $DRY_RUN_CMD ${pkgs.coreutils}/bin/cp -f "$LINK_TARGET" "$CFG"
+      $DRY_RUN_CMD ${pkgs.python3}/bin/python3 ${../dotfiles/config/mark-shot/inject-secrets.py} "$CFG" "$CFG"
     fi
   '';
 }
