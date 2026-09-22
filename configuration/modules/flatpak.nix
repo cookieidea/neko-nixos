@@ -35,21 +35,7 @@
     update.auto.enable = false;
   };
 
-  # 兼容已有系统中的 flathub remote，确保地址与声明保持一致。
-  systemd.services.flatpak-mirror = {
-    description = "Point the flathub remote at the USTC mirror";
-    wantedBy = [ "multi-user.target" ];
-    before = [ "flatpak-managed-install.service" ];
-    path = [ pkgs.flatpak ];
-    serviceConfig = {
-      Type = "oneshot";
-      RemainAfterExit = true;
-    };
-    script = ''
-      ${pkgs.flatpak}/bin/flatpak remote-modify --system \
-        flathub --url=https://mirrors.ustc.edu.cn/flathub || true
-    '';
-  };
+  # flathub remote 由 nix-flatpak 的 remotes 声明统一管理，无需额外 systemd 同步服务。
 
   environment.etc."flatpak/flathub.gpg".source = pkgs.fetchurl {
     url = "https://flathub.org/repo/flathub.gpg";
