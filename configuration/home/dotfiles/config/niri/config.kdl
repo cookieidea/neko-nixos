@@ -60,7 +60,7 @@ environment {
 spawn-at-startup "noctalia"
 
 // 护眼模式同步（对齐 effects.kdl 软链接状态）
-spawn-at-startup "~/.config/niri/scripts/toggle-eyecare.sh" "--sync"
+spawn-at-startup "__NEKO_HOME__/.config/niri/scripts/toggle-eyecare.sh" "--sync"
 
 // 输入法
 spawn-at-startup "fcitx5"
