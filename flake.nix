@@ -29,6 +29,7 @@
 
     cooknixvim = {
       url = "git+https://github.com/Youthdreamer/CookNixvim";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
 
     # bilihud：B 站直播弹幕浮窗。

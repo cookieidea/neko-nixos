@@ -31,6 +31,17 @@ jobs:
       - name: nix flake check
         run: nix flake check -L
 
+      # 求值系统 toplevel：nix flake check 只跑 checks 里的 derivation，
+      # 不保证 nixosConfigurations.<host> 能否构建。此步只做 eval（不 build），
+      # 能拦住「eval 过但 build 炸」这类问题，耗时与资源都远小于完整构建。
+      - name: eval nixosConfiguration toplevel
+        run: |
+          nix eval --impure --raw --expr \
+            '(builtins.getFlake "${{ github.workspace }}").nixosConfigurations.ATRI.config.system.build.toplevel.drvPath' \
+            > /tmp/toplevel.drv
+          echo "toplevel drv: $(cat /tmp/toplevel.drv)"
+          test -s /tmp/toplevel.drv
+
       # 格式化检查暂不启用 —— 当前有 48 个文件不符合 nixfmt（约 1495 行差异，
       # 主要是长参数列表竖排与注释对齐）。直接启用会让 CI 立刻变红，
       # 一次性全量格式化又会污染 git blame。
