@@ -9,7 +9,6 @@
 include "monitor.kdl"
 // 动态引入视觉特效样式 (普通模式 vs 护眼模式)
 include "effects.kdl"
-// 引入输入设备与手势配置（Dunder Protocol：更新自动保留）
 include optional=true "input__custom__.kdl"
 // 引入布局设置
 include "layout.kdl"
@@ -116,6 +115,6 @@ recent-windows {
 }
 
 // ==========================================================
-// 用户自定义配置（Dunder Protocol：更新时自动保留）
+// 用户自定义配置
 // ==========================================================
 include "__custom__.kdl"
