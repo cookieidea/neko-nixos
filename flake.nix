@@ -97,10 +97,20 @@
       hostname = "ATRI";
       desktop  = "niri";
 
-      # 自构建包显式启用 allowUnfree，只影响 selfPackages。
+      # 这里的 pkgs 供 selfPackages 与 hmLib 使用。
+      #
+      # 配置必须与 NixOS 侧的 nixpkgs.config / nixpkgs.overlays 一致，
+      # 否则会形成两个配置不同的 pkgs 实例：selfPackages 走一套，
+      # 系统与 Home Manager（useGlobalPkgs）走另一套，排查版本差异时很难定位。
+      #   · allowUnfree / rocmSupport 对应 system/nix.nix 的 nixpkgs.config
+      #   · overlays 与 configuration/overlays/ 共用同一份 list.nix
       pkgs = import nixpkgs {
         inherit system;
-        config.allowUnfree = true;
+        config = {
+          allowUnfree = true;
+          rocmSupport = true;
+        };
+        overlays = import ./configuration/overlays/list.nix { inherit nix-cachyos-kernel; };
       };
 
       selfPackages = import ./configuration/pkgs { inherit pkgs; };
@@ -119,8 +129,10 @@
         home-manager.extraSpecialArgs = { inherit desktop username cooknixvim bilihud selfPackages noctalia bestclient mark-shot llm-agents-nix hmLib; };
       };
     in {
-      # 导出自构建包，支持单独 nix build。
-      packages.${system} = selfPackages;
+      # 只导出成品包（selfPackages.public），支持单独 nix build。
+      # 内部部件（selfPackages.internal）仍可被引用，但不作为 flake 顶层包 ——
+      # 安装脚本的预构建据此只构建真正的成品。
+      packages.${system} = selfPackages.public;
 
       nixosConfigurations = {
         # 实体机配置。硬件文件由安装目标机生成。
