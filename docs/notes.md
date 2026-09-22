@@ -197,29 +197,6 @@ systemd user 会话与 login shell 的环境可能不同。
 
 需要特殊环境变量的 user service，应确认 session environment 是否包含所需变量。
 
-## NyxNiri 开源许可证与 Dunder Protocol
-
-NyxNiri 本身采用 **GNU GPL v3**；本仓库在复用其相关实现或概念时，许可证与第三方代码边界应分别处理。`configuration/home/files/activation.nix` 实现的是兼容层中的两套配置保留规则：
-
-- **Dunder**：`niri`、`kitty`、`fish` 下名称包含 `__custom__` 的文件/目录跨 generation 保留。
-- **Named preserve**：Niri 的 `monitor.kdl`、`effects.kdl` 单独保留，因为它们被固定文件名引用或承载运行时状态。
-
-激活顺序：
-
-```text
-现有用户配置
-↓
-Dunder / named preserve 快照
-↓
-Home Manager linkGeneration
-↓
-恢复用户覆盖
-```
-
-旧的 `/nix/store` symlink 会在首次迁移时物化为真实文件。
-
-本仓库原创配置、脚本和代码采用 **GPL-3.0-only**；直接分发的第三方文件继续遵循其各自许可证。
-
 ## Home Manager
 
 当前同时使用：
