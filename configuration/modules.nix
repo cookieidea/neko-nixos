@@ -17,6 +17,7 @@
     ./modules/services/sunshine.nix
     ./modules/services/lact-smartd.nix
     ./modules/services/kdeconnect.nix   # KDE Connect 端口范围
+    ./modules/services/astral.nix        # Astral core 自动设置 TUN capability
 
     # 虚拟化和游戏运行时。
     ./modules/virtualisation.nix
