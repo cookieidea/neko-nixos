@@ -1,12 +1,13 @@
-# 内核、引导、休眠和内核参数。
+# 内核、GRUB 和启动参数。
 { pkgs, ... }:
 
 {
   boot.kernelPackages = pkgs.cachyosKernels.linuxPackages-cachyos-rt-bore;
 
-  boot.kernel.sysctl."vm.max_map_count" = 2147483642;
-  boot.loader.timeout = 10;
+  # Chromium、Java、Waydroid 等高 VMA 应用使用更大的映射上限。
+  boot.kernel.sysctl."vm.max_map_count" = 262144;
 
+  boot.loader.timeout = 10;
   boot.loader.grub = {
     enable = true;
     useOSProber = true;
@@ -20,9 +21,9 @@
   boot.supportedFilesystems = [ "btrfs" ];
   boot.initrd.supportedFilesystems = [ "btrfs" ];
 
+  # LACT 的 AMD Overdrive 功能需要开放 amdgpu power feature mask。
+  # 不在这里关闭 split-lock / CPUID 等内核安全或兼容性机制。
   boot.kernelParams = [
-    "split_lock_mitigate=0"
     "amdgpu.ppfeaturemask=0xffffffff"
-    "clearcpuid=514"
   ];
 }
