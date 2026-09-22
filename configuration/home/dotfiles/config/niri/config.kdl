@@ -1,6 +1,6 @@
 // =============================================================
 // niri 配置（迁移自 NyxNiri ech678/NyxNiri，v2/niri）
-// 已针对 NixOS 适配：保留原 Shorin 的 fcitx5/xsettingsd/xhost/mpvpaper 等自启，
+// 已针对 NixOS 适配：保留原 Shorin 的 fcitx5/xsettingsd/mpvpaper 等自启，
 // 桌面 shell 改用 Noctalia V5（nixpkgs/flake 的 noctalia 包）。
 // 快捷键绑定保留本机原有的 binds.kdl（仅 IPC 命令适配 V5）。
 // =============================================================
@@ -67,9 +67,6 @@ spawn-at-startup "fcitx5"
 
 // GTK 主题/字体经 XSETTINGS 注入应用（niri 无 DE，靠它让 Thunar 等 GTK 程序统一主题）
 spawn-at-startup "xsettingsd"
-
-// 允许 root 通过用户的 xwayland 打开窗口
-spawn-at-startup "xhost" "+si:localuser:root"
 
 // X11 兼容层：xwayland-satellite（niri 25.08+ 开箱集成，binary 在 PATH 时按需拉起）
 xwayland-satellite {
