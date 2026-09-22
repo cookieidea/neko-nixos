@@ -117,31 +117,6 @@ sudo bash /etc/nixos/install.sh cookie
 
 这些缓存不是重复配置。不同项目会发布不同构建产物，因此按项目保留多个 cache 是有意设计。
 
-## NyxNiri Dunder Protocol
-
-仓库兼容 NyxNiri 的 **Dunder Protocol**，用于保护个人桌面配置覆盖，避免 Home Manager 更新时把用户配置重新指向 `/nix/store`。
-
-当前受保护的配置根目录：
-
-```text
-~/.config/niri/
-~/.config/kitty/
-~/.config/fish/
-```
-
-- 名称包含 `__custom__` 的文件和目录，在 Home Manager 更新前自动快照，更新完成后恢复。
-- 旧 generation 中如果是指向 `/nix/store` 的 `__custom__` symlink，会在首次迁移时自动物化为用户可编辑的真实文件。
-- Niri 的 `monitor.kdl` / `effects.kdl` 是固定文件名保留项，也会跨 generation 保留。
-- 协议只负责“保留”，具体加载仍由应用自身负责：Niri / Kitty 使用 include，Fish 使用 `conf.d`。
-
-因此覆盖关系为：
-
-```text
-默认配置 → __custom__ 用户覆盖
-```
-
-普通非 `__custom__` 配置仍由 Home Manager 声明式管理。
-
 ## 运行时与 Wrapper
 
 仓库采用“最小作用域”的运行时环境原则：
@@ -246,6 +221,6 @@ sudo nixos-rebuild switch --rollback
 
 ## 许可
 
-本仓库由作者创作的配置、脚本和代码采用 **GPL-3.0-only**。仓库中复制、修改或随配置分发的第三方文件不因顶层 GPL 许可证变化而自动转为 GPL；它们继续遵循各自文件中的原始版权与许可证声明。
+本仓库由作者创作的配置、脚本和代码采用 **MIT License**。仓库中复制、修改或随配置分发的第三方文件不因顶层许可证变化而自动转为 MIT；它们继续遵循各自文件中的原始版权与许可证声明。
 
 详见 [LICENSE](LICENSE) 与 [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md)。
