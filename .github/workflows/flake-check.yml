@@ -21,12 +21,8 @@ jobs:
 
       - uses: cachix/install-nix-action@v31
         with:
-          # 设置 NIX_PATH，兼容部分依赖传统查找方式的工具。
-          nix_path: nixpkgs=channel:nixos-unstable
           extra_nix_config: |
             experimental-features = nix-command flakes
-            # 本仓库的 flake 依赖国内镜像（NJU/gitcode）与自己声明的缓存，
-            # CI 上按原样使用即可；此处不做替换，以免与本地求值结果不一致。
 
       # 只跑 checks（静态分析：deadnix），不构建整个系统。
       # 系统闭包含 ROCm/Steam 等重量级依赖，CI runner 磁盘与时长都不适合完整构建。
