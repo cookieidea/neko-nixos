@@ -28,7 +28,7 @@ jobs:
 
       # 只跑 checks（静态分析：deadnix），不构建整个系统。
       # 系统闭包含 ROCm/Steam 等重量级依赖，CI runner 磁盘与时长都不适合完整构建。
-            - name: nix flake check
+      - name: nix flake check
         run: nix flake check -L
 
       # 求值系统 toplevel：nix flake check 只跑 checks 里的 derivation，
