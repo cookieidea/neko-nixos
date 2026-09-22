@@ -2,19 +2,32 @@
   description = "ATRI —— 个人 NixOS + Home Manager 配置（niri 桌面）";
 
   nixConfig = {
+    # 与 configuration/system/nix.nix 的 substituters 保持一致。
+    # 这份 nixConfig 在**安装阶段就生效**（那时 system/nix.nix 尚未部署），
+    # 自定义包的预构建依赖它命中缓存，缺项会导致源码编译。
+    # 注意：本 flake 作为 input 被引用时 nixConfig 不生效（需 --accept-flake-config）。
     extra-substituters = [
+      # nixpkgs 国内镜像。
       "https://mirrors.ustc.edu.cn/nix-channels/store"
       "https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store"
-      "https://attic.xuyh0120.win/lantian"
-      "https://noctalia.cachix.org"
-      "https://nekobox.cachix.org"
+      # 第三方输入对应的缓存。
+      "https://attic.xuyh0120.win/lantian"    # nix-cachyos-kernel
+      "https://noctalia.cachix.org"           # noctalia / noctalia-greeter
+      "https://nekobox.cachix.org"            # 本仓库自建包
+      "https://cache.numtide.com"             # llm-agents-nix
+      "https://cook-nixvim.cachix.org"        # CookNixvim
+      "https://nix-community.cachix.org"      # nix-community
     ];
     extra-trusted-public-keys = [
       "lantian:EeAUQ+W+6r7EtwnmYjeVwx5kOGEBpjlBfPlzGlTNvHc="
       "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
       "noctalia.cachix.org-1:pCOR47nnMEo5thcxNDtzWpOxNFQsBRglJzxWPp3dkU4="
       "nekobox.cachix.org-1:bRpp0vZK2Uq/vnydXC+uuOmFJW3W6fN4PI5PDy4iD+s="
+      # numtide 的缓存（cache.numtide.com）即由该 key 签名 ——
+      # key 名与 URL 不同属正常，已实测能验证其内容。
       "niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g="
+      "cook-nixvim.cachix.org-1:LjCZ3VSYrcwTQxHpd834EIswdkfHoSd/EsKUYLRruF4="
+      "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
     ];
   };
 
