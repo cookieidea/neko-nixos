@@ -26,9 +26,9 @@ jobs:
             # 本仓库的 flake 依赖国内镜像（NJU/gitcode）与自己声明的缓存，
             # CI 上按原样使用即可；此处不做替换，以免与本地求值结果不一致。
 
-      # 只跑 checks（静态分析：deadnix），不构建整个系统 ——
-      # 系统闭包含 ROCm/Steam 等重量级依赖，CI runner 磁盘与时长都不合适。
-      - name: nix flake check
+      # 只跑 checks（静态分析：deadnix），不构建整个系统。
+      # 系统闭包含 ROCm/Steam 等重量级依赖，CI runner 磁盘与时长都不适合完整构建。
+            - name: nix flake check
         run: nix flake check -L
 
       # 求值系统 toplevel：nix flake check 只跑 checks 里的 derivation，
@@ -42,7 +42,5 @@ jobs:
           echo "toplevel drv: $(cat /tmp/toplevel.drv)"
           test -s /tmp/toplevel.drv
 
-      # 格式化检查暂不启用 —— 当前有 48 个文件不符合 nixfmt（约 1495 行差异，
-      # 主要是长参数列表竖排与注释对齐）。直接启用会让 CI 立刻变红，
-      # 一次性全量格式化又会污染 git blame。
+      # 暂不在 CI 强制 nixfmt，避免一次性格式化大量历史配置。
       # 需要时本地执行：nix fmt .
