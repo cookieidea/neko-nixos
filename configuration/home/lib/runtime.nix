@@ -27,17 +27,6 @@
         "--set" "VAPOURSYNTH_EXTRA_PLUGIN_PATH" "${selfPackages.vapoursynth-with-plugins}/lib/vapoursynth"
       ];
     };
-  mpvRifeWrapped = pkgs.symlinkJoin {
-    name = "mpv-rife";
-    paths = [ mpvRife ];
-    nativeBuildInputs = [ pkgs.makeWrapper ];
-    postBuild = ''
-      rm -f "$out/bin/mpv"
-      makeWrapper "${mpvRife}/bin/mpv" "$out/bin/mpv" \
-        --prefix PYTHONPATH : "${selfPackages.k7sfunc}/${pySite}:${pkgs.python3Packages.vapoursynth}/${pySite}" \
-        --set VAPOURSYNTH_EXTRA_PLUGIN_PATH "${selfPackages.vapoursynth-with-plugins}/lib/vapoursynth"
-    '';
-  };
 
   # Lunar Client 强制使用原生 Wayland，并补 MC 所需运行库。
   lunarclientWayland = pkgs.symlinkJoin {
