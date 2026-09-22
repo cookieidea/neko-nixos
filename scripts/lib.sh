@@ -119,6 +119,7 @@ prebuild_packages() {
 }
 
 print_astral_hint() {
-    echo "    Astral：core 由 GUI 管理（无常驻服务/自启）。首次打开 GUI 后需设权限："
-    echo "    sudo setcap cap_net_admin=ep ~/.local/share/astral-core/app/astral-core"
+    echo "    Astral：core 仍由 GUI 管理（无常驻服务/自启）。"
+    echo "    TUN 的 cap_net_admin 由 astral-core-capability.path 自动监听并设置。"
+    echo "    如首次安装后尚未生效：sudo systemctl restart astral-core-capability.service"
 }
