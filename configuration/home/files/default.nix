@@ -134,8 +134,8 @@
       executable = true;
     };
     # 缓存清理（上游 maclean，已改为 NixOS 专用：去掉 pacman/sudo，加入 nix 清理）
-    ".local/bin/clean-cache" = {
-      source = ../dotfiles/local/bin/clean-cache;
+    ".local/bin/clean" = {
+      source = ../dotfiles/local/bin/clean;
       executable = true;
     };
     ".local/bin/quicksave" = {

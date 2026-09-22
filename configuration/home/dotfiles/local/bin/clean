@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# maclean
+# clean —— 上游为 maclean（Manjaro 的缓存清理脚本），已改造为 NixOS 专用
 #
 # A script to automate some relatively safe cleaning activities
 #
@@ -63,11 +63,11 @@ trap '{ [[ -e /proc/$$/fd/3 ]] && exec 3<&-; }; { [[ -e /proc/$$/fd/4 ]] && exec
 _mc_help() {
     if $IS_ZH; then
         cat <<'EOF'
-  clean-cache (Powered by Maclean)
+  clean (Powered by Maclean)
 
   自动化、高安全性的系统与缓存清理工具
 
-  用法: clean-cache [选项]
+  用法: clean [选项]
 
   选项:
     -h, --help      显示帮助信息
@@ -83,15 +83,15 @@ EOF
     else
     cat <<'EOF'
 
- maclean
+ clean
 
  A script to automate some relatively safe cleaning activities
 
- Usage: maclean [options]
+ Usage: clean [options]
 
  Extra Options:
    -h     Print this Help
-   -v     Print maclean version
+   -v     Print clean version
    -p     Clean only the pkg directories
    -j     Clean only the junk directories
    -d     Clean only the developer directories
@@ -107,14 +107,14 @@ EOF
 
 _mc_scr_path="${BASH_SOURCE[0]}"
 _xdg_base_config="${XDG_CONFIG_HOME:-$HOME/.config}"
-_mc_config_dir="$_xdg_base_config/maclean"
-_mc_config_file="$_mc_config_dir/maclean.conf"
+_mc_config_dir="$_xdg_base_config/clean"
+_mc_config_file="$_mc_config_dir/clean.conf"
 install -d -m0755 "$_mc_config_dir"
 
 _mc_deffcon() {
     install -m0644 /dev/null "$1"
     cat > "$1" <<'EOF'
-## maclean conf file ##
+## clean conf file ##
 
 ## Directories to be considered junk. Additional folders may be added.
 ## One path on each line. Please Use Caution. Targets will be deleted.
@@ -1619,7 +1619,7 @@ while getopts ":abcdjpvh" option; do
             _mc_nixfuncts
             ;;
         v) # display version
-            printf '\nmaclean %s\n\n' "$_mc_vers"
+            printf '\nclean %s\n\n' "$_mc_vers"
             exit ;;
         h) # display Help
             _mc_help

@@ -102,13 +102,13 @@ case "$TARGET_APP" in
             TARGET_APP="${TARGET_APP/#\~/$HOME}"
         fi
 
-        if [ "$TARGET_APP" = "clean-cache" ] &&
-            [ -x "$HOME/.config/fish/clean-cache" ]; then
-            TARGET_APP="$HOME/.config/fish/clean-cache"
+        if [ "$TARGET_APP" = "clean" ] &&
+            [ -x "$HOME/.local/bin/clean" ]; then
+            TARGET_APP="$HOME/.local/bin/clean"
         fi
 
-        if [ "$TARGET_APP" = "$HOME/.config/fish/clean-cache" ] ||
-            [[ "$TARGET_APP" == *clean-cache* ]]; then
+        if [ "$TARGET_APP" = "$HOME/.local/bin/clean" ] ||
+            [[ "$TARGET_APP" == *bin/clean* ]]; then
             niri msg action spawn -- kitty --app-id scratchpad -e bash "$TARGET_APP"
         elif [ -x "$TARGET_APP" ] || command -v "$TARGET_APP" >/dev/null 2>&1; then
             niri msg action spawn -- "$TARGET_APP"
