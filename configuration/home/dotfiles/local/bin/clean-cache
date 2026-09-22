@@ -32,7 +32,7 @@ _mc_dryrun=0
 # 自动模式会 exec 重跑本脚本，dry-run 由上一次执行经环境变量带入
 [[ -n "${_MC_DRYRUN:-}" ]] && _mc_dryrun="$_MC_DRYRUN"
 
-_nyxniri_banner() {
+_atri_banner() {
     local MAGENTA='\033[0;35m'
     local BOLD='\033[1m'
     local NC='\033[0m'
@@ -50,7 +50,7 @@ _nyxniri_banner() {
     fi
     echo "  ──────────────────────────────────────────────────"
 }
-_nyxniri_banner
+_atri_banner
 
 ## Begin Script ##
 

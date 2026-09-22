@@ -1,1 +1,3 @@
 .git/
+# pnpm 缓存（本地状态，勿入库）
+.pnpm-store/
