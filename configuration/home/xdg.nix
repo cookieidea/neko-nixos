@@ -92,10 +92,10 @@
       source = ./dotfiles/config/niri/binds.kdl;
       force = true;
     };
-    "niri/config.kdl" = {
-      source = ./dotfiles/config/niri/config.kdl;
-      force = true;
-    };
+    "niri/config.kdl".text = builtins.replaceStrings
+      [ "__NEKO_GIO_EXTRA_MODULES__" ]
+      [ "${pkgs.gvfs}/lib/gio/modules:${pkgs.dconf}/lib/gio/modules" ]
+      (builtins.readFile ./dotfiles/config/niri/config.kdl);
     "niri/cursor.kdl".source = ./dotfiles/config/niri/cursor.kdl;
     "niri/layout.kdl".source = ./dotfiles/config/niri/layout.kdl;
     "niri/monitor.kdl".source = ./dotfiles/config/niri/monitor.kdl;

@@ -2,6 +2,3 @@
 # pnpm 缓存（本地状态，勿入库）
 .pnpm-store/
 
-# 安装脚本生成的临时构建日志。
-.pkglist.log
-.build-*.log
