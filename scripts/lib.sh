@@ -80,7 +80,7 @@ set_username() {
 prebuild_packages() {
     local system pkgs=() failed=() p
     local log_dir
-    log_dir="$(mktemp -d "\${TMPDIR:-/tmp}/neko-nixos-build.XXXXXX")"
+    log_dir="$(mktemp -d "${TMPDIR:-/tmp}/neko-nixos-build.XXXXXX")"
 
     echo "==> 读取 flake 暴露的包列表 ..."
     if ! system="$(nix eval --raw --impure --expr \
@@ -95,14 +95,14 @@ prebuild_packages() {
         echo "错误：无法读取 flake 包列表（详见 $log_dir/pkglist.log）。" >&2
         exit 1
     fi
-    if (( \${#pkgs[@]} == 0 )); then
+    if (( ${#pkgs[@]} == 0 )); then
         echo "错误：flake 包列表为空。" >&2
         exit 1
     fi
 
-    echo "      system=$system，共 \${#pkgs[@]} 个包"
+    echo "      system=$system，共 ${#pkgs[@]} 个包"
     echo "==> 预构建自构建程序（flake 包）..."
-    for p in "\${pkgs[@]}"; do
+    for p in "${pkgs[@]}"; do
         echo "    • 构建 $p ..."
         if nix build ".#$p" --no-link 2>"$log_dir/build-$p.log"; then
             echo "      ✓ $p 构建成功"
@@ -112,11 +112,11 @@ prebuild_packages() {
         fi
     done
 
-    if (( \${#failed[@]} > 0 )); then
+    if (( ${#failed[@]} > 0 )); then
         echo "" >&2
         echo "错误：以下包构建失败，已中止：" >&2
         echo "      构建日志目录：$log_dir" >&2
-        for p in "\${failed[@]}"; do
+        for p in "${failed[@]}"; do
             echo "        · $p    （$log_dir/build-$p.log）" >&2
         done
         echo "      这些包都在系统闭包内，继续只会让 rebuild 稍后以更难读的方式失败。" >&2
@@ -126,8 +126,7 @@ prebuild_packages() {
 
     rm -rf "$log_dir"
 }
-# 打印 Astral 的首次使用提示
-（两处共用）。
+# 打印 Astral 的首次使用提示（两处共用）。
 print_astral_hint() {
     echo "    Astral：core 由 GUI 管理（无常驻服务/自启）。首次打开 GUI 后需设权限："
     echo "    sudo setcap cap_net_admin=ep ~/.local/share/astral-core/app/astral-core"
