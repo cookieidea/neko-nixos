@@ -41,7 +41,12 @@
     # user / homeDirectory / xdgConfigHome 由模块以 mkDefault 取自 HM 配置。
     nixcord = {
       enable = true;
-      discord.enable = true;
+      discord = {
+        enable = true;
+        # 必须显式启用 Vencord，否则装出来的只是原版 Discord
+        # （两者都关时 nixcord 会给出 warning）。
+        vencord.enable = true;
+      };
     };
 
     # VSCodium：扩展经 nix-vscode-extensions 声明式管理。

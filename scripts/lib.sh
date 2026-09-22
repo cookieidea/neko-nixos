@@ -75,59 +75,58 @@ set_username() {
     echo "      ✓ username = \"$target\""
 }
 
-# 预构建 flake 暴露的全部自定义包。
-# 包列表从 flake 派生，不手写 —— 手写会与 configuration/pkgs 脱节。
+# 预构建系统闭包。
+#
+# 原先遍历 packages.<system> 逐个构建「全部 public 包」—— 但 public 只是
+# 「对外可单独 nix build」的集合，不等于系统实际用到的东西。结果是某个
+# 根本没装进系统的自定义包一旦构建失败，就会阻断整个安装。
+#
+# 改为直接构建 system.build.toplevel：这正是系统真正需要的闭包，
+# 未使用的 public 包自然不会被牵扯进来。
+# 若失败，再逐个尝试自定义包，以便把问题定位到具体包（保留原有的可诊断性）。
 prebuild_packages() {
-    local system pkgs=() failed=() p
-    local log_dir
+    local log_dir failed=() p
     log_dir="$(mktemp -d "${TMPDIR:-/tmp}/neko-nixos-build.XXXXXX")"
 
-    echo "==> 读取 flake 暴露的包列表 ..."
-    if ! system="$(nix eval --raw --impure --expr \
-          "(builtins.getFlake \"$SRC\").nixosConfigurations.\"$FLAKE_HOST\".pkgs.stdenv.hostPlatform.system" \
-          2>"$log_dir/pkglist.log")" || [[ -z "$system" ]]; then
-        echo "错误：无法确定 system（详见 $log_dir/pkglist.log）。" >&2
-        exit 1
-    fi
-    # 用 nix eval --raw + concatStringsSep 直接取换行分隔的包名，
-    # 避免依赖宿主的 jq（干净的安装环境未必有）。
-    if ! mapfile -t pkgs < <(nix eval --raw --impure --expr \
-          "builtins.concatStringsSep \"\\n\" (builtins.attrNames (builtins.getFlake \"$SRC\").packages.\"$system\")" \
-          2>>"$log_dir/pkglist.log"); then
-        echo "错误：无法读取 flake 包列表（详见 $log_dir/pkglist.log）。" >&2
-        exit 1
-    fi
-    if (( ${#pkgs[@]} == 0 )); then
-        echo "错误：flake 包列表为空。" >&2
-        exit 1
+    echo "==> 预构建系统闭包（nixosConfigurations.${FLAKE_HOST}）..."
+    echo "    首次安装需要下载/构建整个系统闭包，耗时较长属正常。"
+    if nix build ".#nixosConfigurations.${FLAKE_HOST}.config.system.build.toplevel" \
+         --no-link 2>"$log_dir/toplevel.log"; then
+        echo "      ✓ 系统闭包构建完成"
+        rm -rf "$log_dir"
+        return 0
     fi
 
-    echo "      system=$system，共 ${#pkgs[@]} 个包"
-    echo "==> 预构建自构建程序（flake 包）..."
+    echo "" >&2
+    echo "错误：系统闭包构建失败（完整日志：$log_dir/toplevel.log）。" >&2
+    echo "      正在逐个尝试自定义包以定位问题 ..." >&2
+
+    local system pkgs=()
+    if system="$(nix eval --raw --impure --expr \
+          "(builtins.getFlake \"$SRC\").nixosConfigurations.\"$FLAKE_HOST\".pkgs.stdenv.hostPlatform.system" \
+          2>/dev/null)" && [[ -n "$system" ]]; then
+        mapfile -t pkgs < <(nix eval --raw --impure --expr \
+              "builtins.concatStringsSep \"\\n\" (builtins.attrNames (builtins.getFlake \"$SRC\").packages.\"$system\")" \
+              2>/dev/null) || true
+    fi
+
     for p in "${pkgs[@]}"; do
-        echo "    • 构建 $p ..."
-        if nix build ".#$p" --no-link 2>"$log_dir/build-$p.log"; then
-            echo "      ✓ $p 构建成功"
-        else
-            echo "      ✗ $p 构建失败" >&2
-            failed+=("$p")
-        fi
+        nix build ".#$p" --no-link 2>"$log_dir/build-$p.log" || failed+=("$p")
     done
 
     if (( ${#failed[@]} > 0 )); then
-        echo "" >&2
-        echo "错误：以下包构建失败，已中止：" >&2
-        echo "      构建日志目录：$log_dir" >&2
+        echo "      以下自定义包构建失败，很可能就是闭包失败的原因：" >&2
         for p in "${failed[@]}"; do
             echo "        · $p    （$log_dir/build-$p.log）" >&2
         done
-        echo "      这些包都在系统闭包内，继续只会让 rebuild 稍后以更难读的方式失败。" >&2
-        echo "      修复后可重跑（已成功构建的包会被缓存，不会重复构建）。" >&2
-        exit 1
+    else
+        echo "      自定义包均可单独构建，问题可能出在系统模块或其它依赖；" >&2
     fi
-
-    rm -rf "$log_dir"
+    echo "      请查阅 $log_dir/toplevel.log 定位。" >&2
+    echo "      修复后可重跑（已成功的部分会被缓存，不会重复构建）。" >&2
+    exit 1
 }
+
 # 打印 Astral 的首次使用提示（两处共用）。
 print_astral_hint() {
     echo "    Astral：core 由 GUI 管理（无常驻服务/自启）。首次打开 GUI 后需设权限："

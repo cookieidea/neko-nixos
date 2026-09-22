@@ -16,7 +16,10 @@
       EMPTY_PRE_POST_CLEANUP = true;
       # 限制 boot 快照数量。
       NUMBER_LIMIT = 50;
-      NUMBER_MIN_AGE = 86400;   # 1 天内的不删
+      # 置 0 才能让 NUMBER_LIMIT 真正生效：原为 86400（1 天内的不删），
+      # 而一次集中改造（例如连续几十次 rebuild）产生的快照都落在同一天，
+      # 于是越过 50 的上限不断累积（曾达 204 个）。
+      NUMBER_MIN_AGE = 0;
     };
 
     # /home 是独立子卷（@home），root 配置只覆盖 @，故需单独建一个配置，
@@ -32,7 +35,7 @@
       TIMELINE_LIMIT_YEARLY = 0;
       EMPTY_PRE_POST_CLEANUP = true;
       NUMBER_LIMIT = 50;
-      NUMBER_MIN_AGE = 86400;
+      NUMBER_MIN_AGE = 0;
     };
   };
 }
