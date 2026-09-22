@@ -9,7 +9,7 @@
       postBuild = ''
         wrapProgram "$out/bin/nautilus" \
           --set NAUTILUS_4_EXTENSION_DIR "${selfPackages.nautilus-with-extensions}/lib/nautilus/extensions-4" \
-          --prefix PATH : "${pkgs.lib.makeBinPath ["
+          --prefix PATH : "${pkgs.lib.makeBinPath [
             pkgs.imagemagick
             pkgs.jpegoptim
             pkgs.pngquant
