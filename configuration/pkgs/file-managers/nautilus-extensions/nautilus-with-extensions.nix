@@ -19,6 +19,7 @@ pkgs.symlinkJoin {
     # 成品只保留这一层自定义 wrapper；不再由 Home Manager 再包一层。
     wrapProgram "$out/bin/nautilus" \
       --set NAUTILUS_4_EXTENSION_DIR "$out/lib/nautilus/extensions-4" \
+      --prefix GI_TYPELIB_PATH : "${pkgs.nautilus}/lib/girepository-1.0" \
       --prefix PATH : "${pkgs.lib.makeBinPath [
         pkgs.imagemagick
         pkgs.jpegoptim
