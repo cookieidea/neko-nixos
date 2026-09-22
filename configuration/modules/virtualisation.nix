@@ -27,11 +27,17 @@
   systemd.services.waydroid-mount.wantedBy = [ "multi-user.target" ];
 
   virtualisation.docker.enable = true;
-  # registry-mirrors 只作用于 Docker Hub；其他 registry 仍使用其自己的地址。
-  virtualisation.docker.daemon.settings.registry-mirrors = [
-    "https://docker.1ms.run"
-    "https://docker.m.daocloud.io"
-  ];
+
+  # 普通用户默认使用 rootless Docker，避免 docker 组直接获得 root-equivalent daemon 访问。
+  # rootful docker.service 仍保留；需要管理宿主机 daemon 时使用 sudo docker。
+  virtualisation.docker.rootless = {
+    enable = true;
+    setSocketVariable = true;
+    daemon.settings.registry-mirrors = [
+      "https://docker.1ms.run"
+      "https://docker.m.daocloud.io"
+    ];
+  };
 
   environment.etc."distrobox/distrobox.conf".text = ''
     container_additional_volumes="/nix/store:/nix/store:ro /etc/profiles/per-user:/etc/profiles/per-user:ro /etc/static/profiles/per-user:/etc/static/profiles/per-user:ro"
@@ -39,7 +45,6 @@
 
   users.users.${username}.extraGroups = [
     "libvirtd"
-    "docker"
     "uinput"
     "adbusers"
     "gamemode"
