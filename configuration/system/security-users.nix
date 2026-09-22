@@ -16,12 +16,9 @@
   users.users.${username} = {
     isNormalUser = true;
     description = username;
-    # 基础组。功能相关组由各功能模块自行追加（见下方注释），
-    # 这样停用某功能时其权限会一并消失。
-    #   libvirtd/docker     → modules/virtualisation/default.nix
-    #   uinput/adbusers     → 同上（Waydroid 需要）
-    #   gamemode            → 同上
-    #   i2c                 → device/hardware/gpu.nix（DDC 亮度控制）
+    # 功能相关组由对应模块追加；停用功能时权限也会随模块移除。
+    #   libvirtd/docker/uinput/adbusers/gamemode → modules/virtualisation.nix
+    #   i2c                                   → device/gpu.nix
     #   video/audio         → 基础（显卡/声卡设备访问）
     extraGroups = [ "networkmanager" "wheel" "video" "audio" ];
   };
