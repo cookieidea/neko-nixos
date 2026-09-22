@@ -424,6 +424,8 @@ sudo nixos-rebuild dry-build --flake /etc/nixos#ATRI
 
 ## 19. 格式化与检查
 
+系统的每周 Nix store GC 与旧代际清理由 `nix-generation-cleanup` 统一负责；日常手动清理可继续使用 `clean -p`。
+
 格式化：
 
 ```bash
