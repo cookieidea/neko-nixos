@@ -58,11 +58,17 @@ rm -rf "$DEST/.git"
 cp -a "$KEEP_HW" "$DEST/configuration/device/hardware-config.nix"
 rm -f "$KEEP_HW"
 
-# 不在安装阶段写入密码；装后通过 passwd 设置。
-
 echo "==> 执行 nixos-install --flake $DEST/#$FLAKE_HOST ..."
 nixos-install --flake "$DEST/#$FLAKE_HOST"
+
+echo ""
+echo "==> 设置 $TARGET_USER 的登录密码 ..."
+if ! nixos-enter --root "$MNT" -c "passwd $TARGET_USER"; then
+    echo "错误：用户密码设置失败。系统已安装，但请在重启前运行：" >&2
+    echo "      nixos-enter --root $MNT -c 'passwd $TARGET_USER'" >&2
+    exit 1
+fi
+
 echo ""
 echo "==> 安装完成！重启即可进入 Noctalia Greeter → niri + Noctalia。"
 print_astral_hint
-echo "    若首次登录密码留空，重启后在 TTY 用 root（或 live 环境）执行：passwd $TARGET_USER"
