@@ -1,5 +1,5 @@
 # 桌面会话、登录界面、门户和字体。
-{ pkgs, lib, username, noctalia-greeter, ... }:
+{ pkgs, lib, username, noctalia-greeter, selfPackages, ... }:
 
 {
   # Wayland 桌面与 Noctalia 登录界面。
