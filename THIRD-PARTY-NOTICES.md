@@ -9,7 +9,7 @@
 
 - 上游：https://github.com/tomasklaen/uosc
 - 本仓库路径：`configuration/home/dotfiles/mpv/scripts/uosc/`
-- 许可证：LGPL-2.1
+- 许可证：LGPL-2.1-or-later
 - 上游许可证文件：`LICENSE.LGPL`
 
 ### Anime4K
@@ -34,7 +34,7 @@
 ### Adaptive Sharpen
 
 - 文件：`configuration/home/dotfiles/mpv/shaders/Adaptive_sharpen/Adaptive_sharpen_lite_RT.glsl`
-- 文件内保留原作者版权和 BSD 风格许可证声明。
+- 文件内保留原作者版权和 2-Clause BSD 风格许可证声明。
 
 ## Nautilus 扩展
 
