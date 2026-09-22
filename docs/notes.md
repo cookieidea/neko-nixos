@@ -1,6 +1,6 @@
 # 维护说明
 
-本文只记录本仓库的实现约定。
+本文记录本仓库的实现约定。
 
 ## 目录边界
 
@@ -25,13 +25,17 @@ configuration/
 nixos-generate-config --root /mnt
 ```
 
-安装脚本会把目标机生成的 `hardware-configuration.nix` 保存到仓库结构中的 `configuration/device/hardware-config.nix`。
+安装脚本会把目标机生成的硬件配置部署到：
+
+```text
+configuration/device/hardware-config.nix
+```
 
 不要复制其他机器的 UUID。
 
 ## flake
 
-`flake.nix` 是以下数据的入口：
+`flake.nix` 统一管理：
 
 - username
 - hostname
@@ -52,29 +56,27 @@ nixos-generate-config --root /mnt
 ```text
 检查
 ↓
-读取 hostname
+准备源码
 ↓
-更新 username
+设置 username
 ↓
 注入 hardware-config
 ↓
-构建目标 system.build.toplevel
+预构建
 ↓
 nixos-install
 ↓
-设置用户密码
+设置密码
 ```
-
-完整闭包失败时，再单独构建 flake 暴露的自定义 package 定位问题。
 
 ### 系统更新
 
 ```text
 staging
 ↓
-保留本机 hardware-config
+保留 hardware-config
 ↓
-构建目标 system.build.toplevel
+预构建
 ↓
 flake check
 ↓
@@ -85,23 +87,37 @@ dry-build
 switch
 ```
 
-switch 失败时恢复原配置源。
+`switch` 失败时恢复旧配置源。
 
-## 运行时库
+引导阶段通过 `NIX_CONFIG` 临时追加缓存；正式系统由 `system/nix.nix` 管理。引导配置不会写入 live environment 的 `/etc/nix/nix.conf`。
 
-不要在整个用户 session 设置 `LD_LIBRARY_PATH`。
+## Nix 缓存
 
-程序需要额外库时优先使用专用 wrapper。
+正式系统使用 Nix 默认的 `cache.nixos.org`，并通过 `extra-substituters` 追加国内 mirror 和项目 Cachix。
+
+新增缓存时记录：
+
+- URL
+- 用途
+- public key
+
+不要把未验证的第三方镜像当作官方源替代品。
+
+## Docker
+
+`registry-mirrors` 只影响 Docker Hub。GHCR 等其他 registry 不会自动经过 Docker Hub mirror。
+
+当前只保留两个实际使用的国内 Docker Hub mirror，避免堆积过多公共服务依赖。
 
 ## Flatpak
 
 Flatpak 由 `configuration/modules/flatpak.nix` 管理。
 
+当前 Flathub remote 使用 USTC 缓存；它不是完整镜像，缓存未命中时仍可能访问 Flathub 源站。
+
 `flake.lock` 不锁定 Flatpak 应用版本，除非配置明确指定 commit。
 
 当前使用 `uninstallUnmanaged = true`，未声明应用会在 activation 时被移除。
-
-Flatpak 数据位于 `/var/lib/flatpak` 和用户目录，不等同于 Nix store。
 
 ## Snapper
 
@@ -114,17 +130,21 @@ home → /home
 
 `NUMBER_LIMIT` 与 `NUMBER_MIN_AGE` 控制快照清理。
 
+## Generation
+
+系统每周执行一次 generation 清理，当前保留最近 10 个 system / Home Manager generations。
+
+generation 回滚：
+
+```bash
+sudo nixos-rebuild switch --rollback
+```
+
 ## 休眠
 
 当前 `configuration/device/resume.nix` 只自动处理一个直接块设备 swap。
 
-不适用：
-
-- swapfile
-- 多个 swap
-- 需要映射后的 LUKS/LVM swap
-
-这些情况显式设置 `boot.resumeDevice`。swapfile 还需要 offset。
+swapfile、多 swap、LUKS/LVM 映射设备需要显式设置 `boot.resumeDevice`；swapfile 还需要 offset。
 
 ## SSH
 
@@ -140,7 +160,7 @@ users.users.<name>.openssh.authorizedKeys.keys
 
 ## Wayland
 
-桌面主环境是 Wayland，niri 使用 xwayland-satellite 提供 X11 兼容。
+桌面主环境是 Wayland，niri 使用 xwayland-satellite 提供 X11 应用兼容。
 
 ## GPU
 
@@ -154,6 +174,10 @@ GPU 配置位于 `configuration/device/gpu.nix`，包括：
 - Ollama
 - I2C / DDC
 
+`configuration/system/boot.nix` 保留 `amdgpu.ppfeaturemask=0xffffffff`，因为本机 LACT Overdrive 依赖该 power feature mask。
+
+不再使用 `split_lock_mitigate=0` 或 `clearcpuid=514` 这类全局内核参数。
+
 ## 网络端口
 
 `configuration/system/networking.nix` 只设置基础防火墙。
@@ -162,6 +186,7 @@ GPU 配置位于 `configuration/device/gpu.nix`，包括：
 
 ```text
 Minecraft → modules/minecraft.nix
+SSH → modules/services/openssh.nix
 dsh → modules/dsh.nix
 KDE Connect → modules/services/kdeconnect.nix
 ```
@@ -201,12 +226,6 @@ nix build .#niri-sidebar
 
 简单 wrapper 不建立深层目录。
 
-## Cache
-
-当前使用 nixpkgs mirror 和多个 Cachix。
-
-新增 cache 时记录 URL、用途和 public key。
-
 ## 更新
 
 ```bash
@@ -224,7 +243,7 @@ nix flake check
 nix fmt
 ```
 
-当前 flake check 主要执行 deadnix。
+CI 主要执行静态检查和 NixOS 配置求值，不等同于完整桌面闭包构建；完整构建由安装/更新脚本在目标机执行。
 
 ## 排障
 
