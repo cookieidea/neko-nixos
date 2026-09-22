@@ -93,8 +93,8 @@
       force = true;
     };
     "niri/config.kdl".text = builtins.replaceStrings
-      [ "__NEKO_GIO_EXTRA_MODULES__", "__NEKO_HOME__" ]
-      [ "${pkgs.gvfs}/lib/gio/modules:${pkgs.dconf}/lib/gio/modules", "/home/${username}" ]
+      [ "__NEKO_GIO_EXTRA_MODULES__" "__NEKO_HOME__" ]
+      [ "${pkgs.gvfs}/lib/gio/modules:${pkgs.dconf}/lib/gio/modules" "/home/${username}" ]
       (builtins.readFile ./dotfiles/config/niri/config.kdl);
     "niri/cursor.kdl".source = ./dotfiles/config/niri/cursor.kdl;
     "niri/layout.kdl".source = ./dotfiles/config/niri/layout.kdl;
