@@ -12,11 +12,11 @@
         safe.directory = "/etc/nixos";
       };
     };
-    starship.enable = true;       # starship
-    zoxide.enable = true;         # zoxide
-    eza.enable = true;            # eza
-    bat.enable = true;            # bat
-    fzf.enable = true;            # fzf
+    starship.enable = true;
+    zoxide.enable = true;
+    eza.enable = true;
+    bat.enable = true;
+    fzf.enable = true;
     # Fish 及其插件。
     fish = {
       enable = true;
