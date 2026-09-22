@@ -56,7 +56,7 @@
     memoryPercent = 50;
   };
 
-  # 每周清理旧代际并执行垃圾回收。
+  # 每周清理旧代际并执行垃圾回收；本服务统一负责这两项工作。
   systemd.services.nix-generation-cleanup = {
     description = "Prune old NixOS/Home-Manager generations";
     serviceConfig = {
