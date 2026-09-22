@@ -3,22 +3,18 @@
 
 {
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
-  # 二进制缓存按基础源和第三方源分组，便于维护信任关系。
+
   nix.settings.substituters = [
-    # nixpkgs 分发缓存。
-    # cache.nixos.org 由 NixOS 模块自动追加；这里仅配置国内镜像。
     "https://mirrors.ustc.edu.cn/nix-channels/store"
     "https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store"
-
-    # 第三方输入对应的缓存。
-    "https://attic.xuyh0120.win/lantian"    # nix-cachyos-kernel（内核）
-    "https://noctalia.cachix.org"           # noctalia / noctalia-greeter
-    "https://nekobox.cachix.org"            # 本仓库自建包（cachix 推送目标）
-    "https://cache.numtide.com"             # llm-agents-nix（dsh / opencode）
-    "https://cook-nixvim.cachix.org"        # CookNixvim（nvim 及其插件）
-    "https://nix-community.cachix.org"      # nix-community（unfree 可再分发包）
+    "https://attic.xuyh0120.win/lantian"
+    "https://noctalia.cachix.org"
+    "https://nekobox.cachix.org"
+    "https://cache.numtide.com"
+    "https://cook-nixvim.cachix.org"
+    "https://nix-community.cachix.org"
   ];
-  # cache.nixos.org 的公钥由 NixOS 默认提供，这里只声明额外缓存。
+
   nix.settings.trusted-public-keys = [
     "lantian:EeAUQ+W+6r7EtwnmYjeVwx5kOGEBpjlBfPlzGlTNvHc="
     "noctalia.cachix.org-1:pCOR47nnMeo5thcxNDtzWpOxNFQsBRglJzxWPp3dkU4="
@@ -27,7 +23,7 @@
     "cook-nixvim.cachix.org-1:LjCZ3VSYrcwTQxHpd834EIswdkfHoSd/EsKUYLRruF4="
     "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
   ];
-  # 允许普通用户使用这些额外 substituter；不授予 trusted-users 权限。
+
   nix.settings.trusted-substituters = [
     "https://mirrors.ustc.edu.cn/nix-channels/store"
     "https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store"
@@ -40,23 +36,18 @@
   ];
 
   nixpkgs.config = {
-    allowUnfree = true;   # 允许非自由软件（steam/wechat-uos 等）
-    rocmSupport = true;   # ROCm/HIP GPU 计算
+    allowUnfree = true;
+    rocmSupport = true;
   };
 
-  # store 去重只用实时机制：auto-optimise-store 在每次写入 store 时就做硬链接。
-  # 原先还开了 nix.optimise.automatic（systemd timer 定时跑 nix-store --optimise），
-  # 但实测该任务每次都是 "0 files freed" —— 实时机制已覆盖，定时属冗余。
   nix.settings.auto-optimise-store = true;
 
-  # zram 压缩交换。
   zramSwap = {
     enable = true;
     algorithm = "zstd";
     memoryPercent = 50;
   };
 
-  # 每周清理旧代际并执行垃圾回收；本服务统一负责这两项工作。
   systemd.services.nix-generation-cleanup = {
     description = "Prune old NixOS/Home-Manager generations";
     serviceConfig = {
@@ -69,6 +60,7 @@
       ''}";
     };
   };
+
   systemd.timers.nix-generation-cleanup = {
     wantedBy = [ "timers.target" ];
     timerConfig = {
