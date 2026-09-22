@@ -19,12 +19,18 @@ rec {
     "${selfPackages.nautilus-with-extensions}/lib/nautilus/extensions-4";
 
   # mpv + VapourSynth/RIFE。
-  mpvRife = pkgs.mpv.override {
-    mpv-unwrapped = pkgs.mpv-unwrapped.override {
+  # 从 mpv-unwrapped 直接构建最终 wrapper，避免“已包装 mpv 再套 wrapper”。
+  mpvRifeWrapped = pkgs.wrapMpv
+    (pkgs.mpv-unwrapped.override {
       lua = pkgs.luajit;
       vapoursynthSupport = true;
+    })
+    {
+      extraMakeWrapperArgs = [
+        "--prefix" "PYTHONPATH" ":" "${selfPackages.k7sfunc}/${pySite}:${pkgs.python3Packages.vapoursynth}/${pySite}"
+        "--set" "VAPOURSYNTH_EXTRA_PLUGIN_PATH" "${selfPackages.vapoursynth-with-plugins}/lib/vapoursynth"
+      ];
     };
-  };
   mpvRifeWrapped = pkgs.symlinkJoin {
     name = "mpv-rife";
     paths = [ mpvRife ];
