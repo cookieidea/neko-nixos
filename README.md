@@ -246,6 +246,6 @@ sudo nixos-rebuild switch --rollback
 
 ## 许可
 
-本仓库由作者创作的配置、脚本和代码采用 **GPL-3.0-only**。仓库中复制、修改或随配置分发的第三方文件不因顶层许可证变化而自动转为 MIT；它们继续遵循各自文件中的原始版权与许可证声明。
+本仓库由作者创作的配置、脚本和代码采用 **GPL-3.0-only**。仓库中复制、修改或随配置分发的第三方文件不因顶层 GPL 许可证变化而自动转为 GPL；它们继续遵循各自文件中的原始版权与许可证声明。
 
 详见 [LICENSE](LICENSE) 与 [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md)。
