@@ -218,7 +218,7 @@ binds {
     Print  hotkey-overlay-title=null { spawn "mark-shot"; }
     Ctrl+Print  hotkey-overlay-title=null { spawn "mark-shot" "--fullscreen"; }
     Shift+Print  hotkey-overlay-title=null { spawn "mark-shot" "--all-outputs"; }
-    Mod+Shift+S  hotkey-overlay-title="截图标注 Edit screenshot" { spawn-sh 'shot="$(mktemp "$XDG_RUNTIME_DIR/clipboard-shot.XXXXXX.png")" && wl-paste > "$shot" && mark-shot "$shot"; rc=$?; rm -f "$shot"; exit $rc'; }
+    Mod+Shift+S  hotkey-overlay-title="截图标注 Edit screenshot" { spawn-sh "shot=\"$(mktemp \\\"$XDG_RUNTIME_DIR/clipboard-shot.XXXXXX.png\\\")\" && wl-paste > \\\"$shot\\\" && mark-shot \\\"$shot\\\"; rc=$?; rm -f \\\"$shot\\\"; exit $rc"; }
 
     Mod+Escape allow-inhibiting=false { toggle-keyboard-shortcuts-inhibit; }
     Mod+Shift+E hotkey-overlay-title="退出niri Quit niri" { quit; }
