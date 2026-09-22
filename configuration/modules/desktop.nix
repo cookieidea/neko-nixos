@@ -42,6 +42,10 @@ EOF
 
   # XDG desktop portal。
   xdg.portal.enable = true;
+  xdg.portal.extraPortals = with pkgs; [
+    xdg-desktop-portal-gnome
+    xdg-desktop-portal-gtk
+  ];
   programs.dconf.enable = true;   # home-manager gtk 模块依赖
 
   # 注册 AppImage 的 binfmt_misc 支持。
