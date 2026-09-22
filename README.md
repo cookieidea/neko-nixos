@@ -27,7 +27,11 @@
 .
 ├── flake.nix                    # flake 入口：inputs / 主机 / 用户 / package / checks
 ├── flake.lock                   # 所有 flake inputs 的锁定版本
-├── install.sh                   # 全新安装与已安装系统更新
+├── install.sh                   # 入口：参数校验 + 环境检查 + 分发
+├── scripts/                     # 安装/更新子脚本
+│   ├── lib.sh                   #   共用函数（源码准备、用户名、预构建包）
+│   ├── bootstrap.sh             #   全新安装（挂载点 → nixos-install）
+│   └── update.sh                #   已装系统更新（staging → 原子替换 → switch）
 ├── LICENSE
 ├── README.md
 │
