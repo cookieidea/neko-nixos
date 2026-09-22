@@ -43,7 +43,7 @@ environment {
     QT_QPA_PLATFORM "wayland;xcb"
     QT_WAYLAND_DISABLE_WINDOWDECORATION "1"
     ELECTRON_OZONE_PLATFORM_HINT "auto"
-    // 回收站（gvfs）：niri 会话不会自动继承 Home Manager 的 sessionVariables，
+    // 回收站（gvfs）：Noctalia Greeter 会话不会自动继承 Home Manager 的 sessionVariables，
     // 因此这里显式提供 GIO 模块路径。实际路径由 xdg.nix 在部署时按当前 pkgs 生成。
     GIO_EXTRA_MODULES "__NEKO_GIO_EXTRA_MODULES__"
     // 默认文本编辑器
