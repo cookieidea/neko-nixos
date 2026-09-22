@@ -3,9 +3,8 @@
 // 已适配 Noctalia V5：原 `noctalia-shell ipc call ...`（v4 quickshell IPC）
 // 全部替换为 V5 的 `noctalia msg ...`。桌面 shell 由 config.kdl 的
 // `spawn-at-startup "noctalia"` 拉起。
-// 部分绑定依赖 SHORiN 私有脚本（~/.config/niri/scripts/ 下、
-// ~/.local/bin/random-anime-wallpaper-noctalia、
-// quicksave、quickload、niri-sidebar 等），未纳入迁移，相关绑定会静默失败。
+// 相关辅助脚本已经纳入本仓库；用户私有扩展可通过 __custom__ 文件继续覆盖。
+// ~/.config/niri/scripts/ 与 ~/.local/bin/ 下的脚本由 Home Manager 部署。
 // =============================================================
 
 binds {
