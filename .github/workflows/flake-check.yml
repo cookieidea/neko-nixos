@@ -19,7 +19,7 @@ jobs:
 
       - uses: cachix/install-nix-action@v31
         with:
-          # 固定 Nix 版本，避免上游行为漂移导致 CI 无常失败
+          # 设置 NIX_PATH，兼容部分依赖传统查找方式的工具。
           nix_path: nixpkgs=channel:nixos-unstable
           extra_nix_config: |
             experimental-features = nix-command flakes
