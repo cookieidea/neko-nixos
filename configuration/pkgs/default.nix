@@ -24,7 +24,9 @@ in
   # mark-shot Python 环境。
   inherit (import ./tools/mark-shot-python { inherit pkgs; })
     markShotOcr
-    markShotScan;
+    markShotScan
+    markShotOcrHelper
+    markShotScanHelper;
 
   ab-download-manager  = import ./tools/networking/ab-download-manager { inherit pkgs; };
   astral               = import ./tools/networking/astral { inherit pkgs; lib = pkgs.lib; fetchurl = pkgs.fetchurl; };

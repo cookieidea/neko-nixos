@@ -55,47 +55,10 @@
     MARK="$HOME/.local/share/mark-shot"
     $DRY_RUN_CMD mkdir -p "$MARK"
 
-    # OCR helper。
-    $DRY_RUN_CMD cat > "$MARK/ocr-helper.sh" << 'OCRSCRIPT'
-#!/usr/bin/env bash
-exec ${selfPackages.markShotOcr}/bin/python3 -c '
-from rapidocr import RapidOCR
-import sys, json
-# rapidocr 包内模型版本与 Python API 默认名称不一致，因此显式指定模型文件。
-import glob as _g
-_M = _g.glob("${selfPackages.markShotOcr}/lib/python*/site-packages/rapidocr/models")[0]
-e = RapidOCR(params={
-    "Det.model_path": _M + "/ch_PP-OCRv4_det_infer.onnx",
-    "Rec.model_path": _M + "/ch_PP-OCRv4_rec_infer.onnx",
-    "Cls.model_path": _M + "/ch_ppocr_mobile_v2.0_cls_infer.onnx",
-})
-result = e(sys.argv[1])
-tokens = []
-if result and result.txts:
-    for i, txt in enumerate(result.txts):
-        box = result.boxes[i].tolist() if result.boxes is not None else []
-        tokens.append({"text": txt, "confidence": float(result.scores[i]), "box": box})
-print(json.dumps({"backend": "rapidocr", "tokens": tokens}))
-' "$1"
-OCRSCRIPT
-    $DRY_RUN_CMD chmod +x "$MARK/ocr-helper.sh"
-
-    # Barcode / QR helper。
-    $DRY_RUN_CMD cat > "$MARK/code-scan-helper.sh" << 'SCANSCRIPT'
-#!/usr/bin/env bash
-exec ${selfPackages.markShotScan}/bin/python3 -c '
-import zxingcpp, sys, json, numpy as np
-from PIL import Image
-img = Image.open(sys.argv[1]).convert("RGB")
-arr = np.array(img)[:, :, ::-1]
-results = zxingcpp.read_barcodes(arr)
-output = {"backend": "zxing", "results": [], "errors": []}
-for r in results:
-    output["results"].append({"text": r.text, "format": str(r.format)})
-print(json.dumps(output))
-' "$1"
-SCANSCRIPT
-    $DRY_RUN_CMD chmod +x "$MARK/code-scan-helper.sh"
+    # OCR / 扫码 helper：安装 Nix 构建好的脚本（Python 代码见
+    # pkgs/tools/mark-shot-python/*.py），此处不再内联生成。
+    $DRY_RUN_CMD ln -sfn "${selfPackages.markShotOcrHelper}/bin/ocr-helper.py" "$MARK/ocr-helper.sh"
+    $DRY_RUN_CMD ln -sfn "${selfPackages.markShotScanHelper}/bin/code-scan-helper.py" "$MARK/code-scan-helper.sh"
 
     # 清理遗留的 pip venv：早期版本在此创建 venv 装 OCR/扫码依赖，
     # 现改由 Nix 环境提供（见 pkgs/tools/mark-shot-python），此处只负责收尾。
