@@ -153,13 +153,13 @@
       # Nix 格式化器。
       formatter = forAllSystems (system: nixpkgs.legacyPackages.${system}.nixfmt);
 
-      # 静态检查只覆盖仓库自维护的 Nix 配置。
-      # deadnix 检查未使用绑定；statix 保持非阻塞使用。
+      # 静态检查仓库自身维护的 Nix 配置。
+      # deadnix 检查未使用绑定；更复杂的风格检查继续手动执行。
       checks = forAllSystems (system:
         let
           pkgs = nixpkgs.legacyPackages.${system};
-          # 只检查本仓库维护的配置。
-          targets = "configuration/system configuration/modules configuration/home configuration/overlays flake.nix";
+          # configuration/ 下包含系统、硬件、Home Manager 与自定义 package。
+          targets = "configuration flake.nix";
         in {
           deadnix = pkgs.runCommand "deadnix-check"
             { nativeBuildInputs = [ pkgs.deadnix ]; } ''
