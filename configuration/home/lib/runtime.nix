@@ -4,7 +4,8 @@
 # 现集中在此并只注入对应程序的 wrapper（故障域限定）。
 { pkgs, selfPackages }:
 
-{
+# 需要 rec：mpvRifeWrapped 的 extraMakeWrapperArgs 引用同级的 pySite。
+rec {
   # Python site-packages 相对路径（供 mpvRifeWrapped 注入 PYTHONPATH）
   pySite = pkgs.python3.sitePackages;
 
@@ -15,18 +16,22 @@
 
 
   # mpv + VapourSynth/RIFE。
-  # 从 mpv-unwrapped 直接构建最终 wrapper，避免“已包装 mpv 再套 wrapper”。
-  mpvRifeWrapped = pkgs.wrapMpv
-    (pkgs.mpv-unwrapped.override {
+  #
+  # 注意：nixpkgs 没有 `wrapMpv` 这个属性 —— pkgs.mpv 本身就是 callPackage
+  # 出的函数，接受 mpv-unwrapped、extraMakeWrapperArgs 等参数。故用两级
+  # override：先换 mpv-unwrapped，再补 wrapper 参数，一次得到最终包装
+  # （不再对其结果二次 symlinkJoin 包装）。
+  mpvRifeWrapped = (pkgs.mpv.override {
+    mpv-unwrapped = pkgs.mpv-unwrapped.override {
       lua = pkgs.luajit;
       vapoursynthSupport = true;
-    })
-    {
-      extraMakeWrapperArgs = [
-        "--prefix" "PYTHONPATH" ":" "${selfPackages.k7sfunc}/${pySite}:${pkgs.python3Packages.vapoursynth}/${pySite}"
-        "--set" "VAPOURSYNTH_EXTRA_PLUGIN_PATH" "${selfPackages.vapoursynth-with-plugins}/lib/vapoursynth"
-      ];
     };
+  }).override {
+    extraMakeWrapperArgs = [
+      "--prefix" "PYTHONPATH" ":" "${selfPackages.k7sfunc}/${pySite}:${pkgs.python3Packages.vapoursynth}/${pySite}"
+      "--set" "VAPOURSYNTH_EXTRA_PLUGIN_PATH" "${selfPackages.vapoursynth-with-plugins}/lib/vapoursynth"
+    ];
+  };
 
   # Lunar Client 强制使用原生 Wayland，并补 MC 所需运行库。
   lunarclientWayland = pkgs.symlinkJoin {
