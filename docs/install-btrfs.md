@@ -204,13 +204,15 @@ sudo snapper -c root list
 
 仓库配置不会把普通用户密码硬编码进 flake。
 
-安装完成后可以在 TTY 中设置：
+安装脚本在 `nixos-install` 完成后会进入目标系统环境并交互式执行：
 
 ```bash
-passwd cookie
+passwd <用户名>
 ```
 
-换成其他用户名时使用实际用户名。
+因此正常安装完成后，重启前已经具备登录 Noctalia Greeter 所需的用户密码。
+
+若密码设置步骤失败，脚本会停止并提示重新执行该命令。
 
 ## 8. 休眠
 
