@@ -6,5 +6,6 @@
     baobab
     file
     mission-center
+    gnome-clocks
   ];
 }

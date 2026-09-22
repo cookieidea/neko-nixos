@@ -8,7 +8,7 @@
 
 这不是一套通用发行版模板，而是一份完整的个人工作站配置。主要覆盖：
 
-- Wayland 桌面：niri、Noctalia、greetd/Noctalia Greeter
+- Wayland 桌面：niri、Noctalia、Noctalia Greeter
 - 音频与输入法：PipeWire、Bluetooth、fcitx5 + Rime
 - 游戏：Steam、Proton-GE、GameMode、Minecraft、MangoHud
 - Android / 虚拟化：Waydroid、libvirt、Docker、distrobox
@@ -48,14 +48,15 @@
 │   │   ├── i18n.nix             # 时区、locale、fcitx5
 │   │   ├── audio-bluetooth.nix  # PipeWire、蓝牙、电源管理
 │   │   ├── security-users.nix   # polkit、用户和基础用户组
-│   │   └── secrets.nix          # agenix secret 声明
+│   │   ├── secrets.nix          # agenix secret 声明
+│   │   └── packages.nix         # 系统功能依赖与跨用户工具
 │   │
 │   ├── device/
 │   │   ├── hardware-config.nix  # 本机生成的硬件/文件系统配置
 │   │   └── gpu.nix              # AMD GPU、ROCm、Ollama、I2C
 │   │
 │   ├── modules/                 # 按功能划分的系统模块
-│   │   ├── desktop.nix          # niri、Greeter、portal、系统级桌面包
+│   │   ├── desktop.nix          # niri、Greeter、portal、桌面集成
 │   │   ├── flatpak.nix          # Flatpak remote、应用与权限策略
 │   │   ├── minecraft.nix        # Minecraft 联机端口与组播路由
 │   │   ├── dsh.nix              # dsh Web 端口

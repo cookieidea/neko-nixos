@@ -119,7 +119,7 @@
     };
     "fish/conf.d/__custom__.fish".source = ./dotfiles/config/fish/conf.d/__custom__.fish;
     "fish/conf.d/ATRI.fish".source = ./dotfiles/config/fish/conf.d/ATRI.fish;
-        # Fastfetch / Starship。
+    # Fastfetch / Starship。
     "fastfetch/config.jsonc".source = ./dotfiles/config/fastfetch/config.jsonc;
     "starship.toml".source = ./dotfiles/config/starship.toml;
     "xdg-desktop-portal/niri-portals.conf".source = ./dotfiles/config/xdg-desktop-portal/niri-portals.conf;

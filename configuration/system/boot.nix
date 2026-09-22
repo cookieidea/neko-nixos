@@ -26,5 +26,8 @@
   boot.resumeDevice = "/dev/disk/by-label/SWAP";
   # LACT / AMD 调优所需内核参数。
   boot.kernelParams = [
-    "split_lock_mitigate=0" "amdgpu.ppfeaturemask=0xffffffff" "clearcpuid=514" ];
+    "split_lock_mitigate=0"
+    "amdgpu.ppfeaturemask=0xffffffff"
+    "clearcpuid=514"
+  ];
 }
