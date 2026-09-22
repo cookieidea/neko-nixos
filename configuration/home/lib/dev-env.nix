@@ -1,14 +1,12 @@
-# 开发工具的环境变量与包管理器镜像。
-{ pkgs, selfPackages, username }:
+# 开发工具的默认环境与包管理器镜像。
+{ pkgs, username, ... }:
 
-rec {
-  pySite = pkgs.python3.sitePackages;
-
+{
+  # 这两个变量属于用户级开发环境，保留全局设置。
+  # Python / VapourSynth 的专用路径改由对应程序 wrapper 注入，避免污染整个 session。
   devEnv = {
     JAVA_HOME = "${pkgs.zulu25}";
     CARGO_HOME = "$HOME/.cargo";
-    PYTHONPATH = "${pkgs.python3Packages.pygobject3}/${pySite}:${selfPackages.k7sfunc}/${pySite}:${pkgs.python3Packages.vapoursynth}/${pySite}";
-    VAPOURSYNTH_EXTRA_PLUGIN_PATH = "${selfPackages.vapoursynth-with-plugins}/lib/vapoursynth";
   };
 
   devBinPath = [ "$HOME/.cargo/bin" "$HOME/.npm-global/bin" ];
