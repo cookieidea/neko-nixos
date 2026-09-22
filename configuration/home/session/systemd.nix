@@ -1,4 +1,4 @@
-{ hmLib, pkgs, ... }:
+{ hmLib, ... }:
 
 {
   systemd.user.sessionVariables = hmLib.devEnv // {
