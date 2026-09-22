@@ -6,7 +6,8 @@
     ./video.nix
     ./graphics.nix
     ./audio.nix
-    ./office-transfer.nix
+    ./office.nix
+    ./transfer.nix
     ./browser.nix
   ];
 }

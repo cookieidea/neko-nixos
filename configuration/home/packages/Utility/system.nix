@@ -6,6 +6,5 @@
     baobab
     file
     mission-center
-    pipewire
   ];
 }

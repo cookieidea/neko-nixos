@@ -10,6 +10,5 @@
     adw-gtk3
     nwg-look
     matugen
-    gnome-keyring
   ];
 }
