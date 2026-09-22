@@ -7,7 +7,15 @@
       paths = [ pkgs.nautilus ];
       nativeBuildInputs = [ pkgs.makeWrapper ];
       postBuild = ''
-        wrapProgram $out/bin/nautilus           --set NAUTILUS_4_EXTENSION_DIR "${selfPackages.nautilus-with-extensions}/lib/nautilus/extensions-4"           --prefix PATH : "${pkgs.lib.makeBinPath [ pkgs.imagemagick pkgs.jpegoptim pkgs.pngquant pkgs.ffmpeg pkgs.coreutils ]}"
+        wrapProgram "$out/bin/nautilus" \
+          --set NAUTILUS_4_EXTENSION_DIR "${selfPackages.nautilus-with-extensions}/lib/nautilus/extensions-4" \
+          --prefix PATH : "${pkgs.lib.makeBinPath ["
+            pkgs.imagemagick
+            pkgs.jpegoptim
+            pkgs.pngquant
+            pkgs.ffmpeg
+            pkgs.coreutils
+          ]}"
       '';
     })
     nautilus-python
