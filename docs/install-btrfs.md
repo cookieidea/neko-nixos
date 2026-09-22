@@ -1,6 +1,6 @@
 # Btrfs + GRUB/UEFI 安装
 
-本文针对本仓库的 NixOS 单机配置：UEFI + GPT、Btrfs、独立 swap、GRUB。
+本文针对本仓库的单机配置：UEFI + GPT、Btrfs、独立 swap、GRUB。
 
 ## 适用范围
 
@@ -33,7 +33,7 @@ Btrfs 子卷：
 @snapshots  → /.snapshots
 ```
 
-休眠需要可用于保存内存镜像的 swap。当前仓库的自动 `resumeDevice` 逻辑仅支持一个直接块设备 swap；swapfile、多个 swap、LUKS/LVM 映射需要手动处理。
+当前自动 `resumeDevice` 逻辑仅支持一个直接块设备 swap；swapfile、多个 swap、LUKS/LVM 映射需要手动处理。
 
 ## 1. 启动安装介质
 
@@ -116,7 +116,7 @@ nixos-generate-config --root /mnt
 
 **不要复制其他机器的 hardware configuration。**
 
-本仓库安装脚本会把目标机生成的文件保存为：
+本仓库安装脚本会把目标机生成的文件部署为：
 
 ```text
 /mnt/etc/nixos/configuration/device/hardware-config.nix
@@ -132,27 +132,27 @@ cd neko-nixos
 sudo bash install.sh cookie /mnt
 ```
 
+安装阶段通过 `NIX_CONFIG` 临时追加仓库配置的 Nix mirror / Cachix，因此 live environment 尚未应用系统 Nix 配置时也可以使用这些缓存。
+
 新装流程：
 
 ```text
-校验参数
+检查参数
   ↓
-读取 hostname
+准备源码与 hostname
   ↓
-更新 username
+设置 username
   ↓
 保留目标 hardware-config
   ↓
 复制仓库到 /mnt/etc/nixos
   ↓
-构建目标 system.build.toplevel
+预构建 system.build.toplevel
   ↓
 nixos-install
   ↓
 设置用户密码
 ```
-
-完整闭包构建失败时，脚本会再单独构建 flake 暴露的自定义 package 用于定位失败范围。
 
 ## 6. 首次启动
 
@@ -213,7 +213,7 @@ cat /proc/cmdline
 systemctl hibernate
 ```
 
-`boot.resumeDevice` 应对应实际用于保存休眠镜像的 swap 设备。swapfile 需要 offset；LUKS/LVM 等映射设备通常需要显式指定 resume 设备。
+`boot.resumeDevice` 应对应实际保存休眠镜像的 swap 设备。swapfile 需要 offset；LUKS/LVM 等映射设备通常需要显式配置。
 
 ## 9. Snapper
 
@@ -259,7 +259,7 @@ findmnt /mnt/home
 findmnt /mnt/nix
 ```
 
-并检查生成的 hardware configuration 中的 UUID 与 subvolume。
+并检查生成的 hardware configuration 中 UUID 与 subvolume。
 
 ### 休眠失败
 
