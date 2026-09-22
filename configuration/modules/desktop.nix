@@ -1,5 +1,5 @@
 # 桌面会话、登录界面、门户和字体。
-{ pkgs, lib, username, noctalia-greeter, selfPackages, ... }:
+{ pkgs, lib, username, noctalia-greeter, ... }:
 
 {
   # Wayland 桌面与 Noctalia 登录界面。
@@ -27,9 +27,6 @@
     enable = true;
     terminal = "kitty";
   };
-  # Nautilus C 扩展目录。
-  environment.sessionVariables.NAUTILUS_4_EXTENSION_DIR = lib.mkForce
-    "${selfPackages.nautilus-with-extensions}/lib/nautilus/extensions-4";
   # AccountsService 登录头像。
   system.activationScripts.noctaliaGreeterAvatar = lib.stringAfter [ "users" ] ''
     mkdir -p /var/lib/AccountsService/icons
