@@ -1,9 +1,22 @@
 # Flatpak：声明式管理 remote、应用与权限 override。
 #
-# 用 nix-flatpak（flake input）取代原先「systemd 脚本调 flatpak CLI」的写法 ——
-# 那种写法属于运行时修改状态：回滚 NixOS generation 时 flatpak 内容不会跟着
-# 回去，系统不再是完整的 transactional state。改由 Nix 描述后，remote / 应用 /
-# override 都随 generation 回滚。
+# 用 nix-flatpak（flake input）取代原先「systemd 脚本调 flatpak CLI」的写法。
+#
+# 关于「回滚」的准确边界（依 nix-flatpak 实现核实，勿过度宣称）：
+#   Nix 管理的是**声明集** —— 哪些 remote、哪些 appId、哪些 override。
+#   状态记录在 gcroots 下的 flatpak-state.json（字段含 appId/origin/commit）。
+#
+#   回滚 generation 会恢复：
+#     · 声明集：多出的 app 被卸载（见下方 uninstallUnmanaged），缺失的被安装
+#     · remotes 与 overrides
+#
+#   回滚 generation **不会**恢复：
+#     · 已装应用的实际内容/版本 —— 因为未指定 commit（默认 null），
+#       安装走 remote 的当前版本；也就是说应用内容不在 Nix store 里，
+#       /var/lib/flatpak 不受 generation 管理。
+#     · 若确需锁定某个版本，可为该 app 指定 `commit`（nix-flatpak 支持）。
+#
+#   另：update.onActivation 默认 false，故反复 switch 不会顺带升级应用。
 #
 # 关于下载：用 USTC 镜像（各镜像实测比较后最快的一个）。
 #   参考数据：装 Flatseal + org.gnome.Platform 等 runtime 共 1.6G，
@@ -56,11 +69,15 @@
       };
     };
 
-    # 清理不再由本配置声明的应用与 override，使 flatpak 状态真正跟随 generation。
+    # Declarative-only 策略：activation 时会**删除**任何不在上面 packages
+    # 列表里的 flatpak 应用，以及非声明的 override。
+    # 即「手动 flatpak install 的应用会被下次 switch 清掉」—— 这是刻意选择，
+    # 以保证状态收敛到声明值；若想保留手动安装的应用，把这两项改为 false。
     uninstallUnmanaged = true;
     overrides.pruneUnmanagedOverrides = true;
 
-    # 不自动更新：应用更新会脱离 generation 语义，需要时手动 flatpak update。
+    # 不启用定时自动更新：应用版本本就不由 generation 管理，
+    # 自动更新只会让它更偏离声明时的状态；需要时手动 flatpak update。
     update.auto.enable = false;
   };
 

@@ -2,3 +2,6 @@
 # pnpm 缓存（本地状态，勿入库）
 .pnpm-store/
 
+# Nix 本地构建产物（软链接，勿入库）
+result
+result-*

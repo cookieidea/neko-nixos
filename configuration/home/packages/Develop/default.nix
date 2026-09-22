@@ -2,7 +2,6 @@
 
 {
   imports = [
-    ./editors.nix
     ./languages.nix
     ./build-tools.nix
     ./git.nix

@@ -1,5 +1,5 @@
 # Home Manager 程序配置。
-{ pkgs, username, ... }:
+{ pkgs, username, nix-vscode-extensions, ... }:
 
 {
   programs = {
@@ -44,10 +44,22 @@
       discord.enable = true;
     };
 
-    # VSCodium：扩展通过 nix-vscode-extensions 声明式管理。
-    vscode = {
+    # VSCodium：扩展经 nix-vscode-extensions 声明式管理。
+    # 安装包本身由本模块负责，故 home.packages 里不再重复声明 vscodium。
+    #
+    # 必须用 programs.vscodium 而非 programs.vscode + package = pkgs.vscodium：
+    # programs.vscode 固定按 VS Code 的路径写（~/.vscode、Code/User），
+    # 而 VSCodium 实际读 .vscode-oss（其 product.json 的 dataFolderName）。
+    # 用错模块会导致扩展落在 ~/.vscode/extensions 而 VSCodium 永远看不到 ——
+    # HM 对此有明确提示，要求改用对应 fork 的专用模块。
+    vscodium = {
       enable = true;
-      package = pkgs.vscodium;
+      profiles.default.extensions =
+        with nix-vscode-extensions.extensions.${pkgs.stdenv.hostPlatform.system}.vscode-marketplace;
+        [
+          # 简体中文语言包。
+          ms-ceintl.vscode-language-pack-zh-hans
+        ];
     };
 
     # niri 配置由 xdg.configFile 部署。

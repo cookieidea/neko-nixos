@@ -89,9 +89,11 @@ prebuild_packages() {
         echo "错误：无法确定 system（详见 $log_dir/pkglist.log）。" >&2
         exit 1
     fi
-    if ! mapfile -t pkgs < <(nix eval --json --impure --expr \
-          "builtins.attrNames (builtins.getFlake \"$SRC\").packages.\"$system\"" \
-          2>>"$log_dir/pkglist.log" | jq -r '.[]'); then
+    # 用 nix eval --raw + concatStringsSep 直接取换行分隔的包名，
+    # 避免依赖宿主的 jq（干净的安装环境未必有）。
+    if ! mapfile -t pkgs < <(nix eval --raw --impure --expr \
+          "builtins.concatStringsSep \"\\n\" (builtins.attrNames (builtins.getFlake \"$SRC\").packages.\"$system\")" \
+          2>>"$log_dir/pkglist.log"); then
         echo "错误：无法读取 flake 包列表（详见 $log_dir/pkglist.log）。" >&2
         exit 1
     fi

@@ -59,7 +59,9 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # Flatpak 的声明式管理：nixpkgs 的 services.flatpak 只有 enable，
-    # 此模块补上 remotes / packages / overrides，使状态随 generation 回滚。
+    # 此模块补上 remotes / packages / overrides。
+    # 注意管理边界：声明集随 generation 回滚，但应用内容在 /var/lib/flatpak，
+    # 不随 generation 回退（未指定 commit 时安装的是 remote 当前版本）。
     nix-flatpak = {
       # 无 inputs（纯 module，用宿主 pkgs），故不设 follows。
       url = "github:gmodena/nix-flatpak";
