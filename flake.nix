@@ -2,7 +2,6 @@
   description = "ATRI —— 个人 NixOS + Home Manager 配置（niri 桌面）";
 
   nixConfig = {
-    # 安装阶段使用的缓存；系统部署后由 system/nix.nix 管理。
     extra-substituters = [
       "https://mirrors.ustc.edu.cn/nix-channels/store"
       "https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store"
