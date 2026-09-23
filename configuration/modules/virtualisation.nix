@@ -1,5 +1,5 @@
 # 游戏与虚拟化：Steam、libvirtd、Waydroid、Docker、distrobox。
-{ pkgs, username, ... }:
+{ pkgs, lib, username, ... }:
 
 {
   programs.gamemode.enable = true;
@@ -37,6 +37,26 @@
       "https://docker.1ms.run"
       "https://docker.m.daocloud.io"
     ];
+  };
+
+  # rootless Docker 只在真实图形会话中启动。
+  #
+  # 背景：nixpkgs 的 rootless 单元 wantedBy = [ "default.target" ]，因此
+  # **greeter 会话也会拉起它** —— 而登录界面并不需要容器，此时
+  # user@1000 的 app.slice 与运行时目录尚未就绪，导致连续失败 4 次
+  # （实测 15:33:35/38/40/42，间隔约 2 秒），直到真正的用户会话建立
+  # （15:36:11）才成功。虽最终可用，但属无谓的启动竞态与日志噪音。
+  #
+  # 改为 PartOf + After graphical-session.target：随图形会话启停，
+  # 且在会话就绪后才启动，greeter 会话不再触发。
+  systemd.user.services.docker = {
+    # NixOS 的 systemd 单元用顶层 wantedBy（生成 <target>.wants/ 符号链接），
+    # 不是 Install.WantedBy。
+    # 必须用 mkForce：nixpkgs 已设 wantedBy = [ "default.target" ]，列表会**合并**
+    # 而非覆盖，那样 greeter 会话仍会拉起它（本次修改即失效）。
+    wantedBy = lib.mkForce [ "graphical-session.target" ];
+    partOf = [ "graphical-session.target" ];
+    after = [ "graphical-session.target" ];
   };
 
   environment.etc."distrobox/distrobox.conf".text = ''
