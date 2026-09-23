@@ -5,9 +5,19 @@
 let
   libdatachannel-020 = pkgs.libdatachannel.overrideAttrs (_old: {
     version = "0.20.2";
-    src = builtins.fetchGit {
+    # pkgs.fetchgit（固定输出派生）取代 builtins.fetchGit —— 后者在求值期联网，
+    # 会强制 flake 以 --impure 求值，网络不可达时求值失败。
+    #
+    # fetchSubmodules = false：本仓库的 deps/*（json/libjuice/libsrtp/plog/
+    # usrsctp）是 git submodule，但 nixpkgs 的 libdatachannel 用**外部依赖**
+    # （plog、usrsctp 等由 nixpkgs 提供，见其 package.nix），构建并不需要
+    # submodule 内容。默认 true 会额外联网逐个 clone 子模块（实测因
+    # GitHub 连接不稳而失败），故显式关闭。
+    src = pkgs.fetchgit {
       url = "https://github.com/paullouisageneau/libdatachannel";
       rev = "0b1074a9effeb8d9d3f4eca704d3fe3d2f9bc7e5";  # v0.20.2
+      hash = "sha256-bBSsD845iwCMA7TdMBxzezjNbMaGwvRq6rvY/8NLYRU=";
+      fetchSubmodules = false;
     };
   });
 in
