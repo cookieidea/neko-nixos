@@ -1,10 +1,8 @@
-# Nix daemon、缓存、垃圾回收和 zram。
 { pkgs, username, ... }:
 
 {
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
-  # extra-* 保留 Nix 默认的 cache.nixos.org，同时追加国内 mirror 和项目专用缓存。
   nix.settings.extra-substituters = [
     "https://mirrors.ustc.edu.cn/nix-channels/store"
     "https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store"
@@ -38,7 +36,6 @@
     memoryPercent = 50;
   };
 
-  # 保留 10 个 system / Home Manager generations，给复杂桌面栈留出回滚空间。
   systemd.services.nix-generation-cleanup = {
     description = "Prune old NixOS/Home-Manager generations";
     serviceConfig = {
