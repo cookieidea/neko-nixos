@@ -9,7 +9,8 @@
   - `configuration/home/dotfiles/config/niri/` 中来自 NyxNiri 的配置与脚本
   - `configuration/home/dotfiles/config/fish/conf.d/ATRI.fish` 中明确标注源自 NyxNiri 的部分
   - 其他文件如保留 NyxNiri 原始版权/许可证声明，应以文件自身声明为准。
-- 上游完整许可证文本：`THIRD-PARTY-LICENSES/NyxNiri-GPL-3.0.txt`
+- 上游完整许可证文本：见 https://github.com/ech678/NyxNiri 的 `LICENSE` 文件。
+  （本仓库不再随附其副本；GPL-3.0 全文亦见 https://www.gnu.org/licenses/gpl-3.0.txt）
 
 这个仓库的顶层 `LICENSE` 仅适用于本仓库作者原创的配置、脚本和代码。
 仓库中直接分发的第三方文件继续遵循其原始版权和许可证；文件自身已有的 license header 优先。
@@ -21,7 +22,9 @@
 - 上游：https://github.com/tomasklaen/uosc
 - 本仓库路径：`configuration/home/dotfiles/mpv/scripts/uosc/`
 - 许可证：LGPL-2.1-or-later
-- 上游许可证文件：`LICENSE.LGPL`
+- 本仓库未随附其许可证副本（上游的 `LICENSE.LGPL` 未一并纳入）；
+  完整文本见 https://github.com/tomasklaen/uosc 或
+  https://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt
 
 ### Anime4K
 
