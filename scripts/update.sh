@@ -30,7 +30,9 @@ trap 'rm -rf "$STAGE"' EXIT
 echo "==> 准备 staging：$STAGE ..."
 rm -rf "$STAGE"; mkdir -p "$STAGE"
 
-# 保留当前机器的硬件配置（不在 git 中，含本机 UUID）。
+# 保留当前机器的硬件配置。
+# 注：该文件实际**被 git 跟踪**（仓库里是原机器的 UUID），因此更新时必须
+# 用本机的覆盖它 —— 否则会把原机器的分区 UUID 部署到本机。
 if [[ -f "$DEST/configuration/device/hardware-config.nix" ]]; then
     cp -a "$DEST/configuration/device/hardware-config.nix" "$STAGE/hardware-config.keep"
 fi
