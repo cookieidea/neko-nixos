@@ -228,9 +228,7 @@ binds {
     Mod+Alt+V hotkey-overlay-title="剪贴板 Clipboard" {spawn-sh "noctalia msg panel-toggle clipboard";} 
     // 锁屏
     Mod+Alt+L hotkey-overlay-title="锁屏 Lock Screen" {spawn "noctalia" "msg" "session" "lock"; }
-    // 锁屏并挂起。不再先调用 power-off-monitors：suspend 本身就会让显示器
-    // 进入省电状态，多一次显式的电源状态转换没有收益，只增加一次
-    // connector 状态变更的机会。
+    // 锁屏并挂起。
     Mod+Alt+P hotkey-overlay-title="挂起 Suspend" { spawn-sh "noctalia msg session lock && systemctl suspend";}
 
     // === 媒体控制 ===
