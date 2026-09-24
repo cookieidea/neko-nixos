@@ -18,7 +18,7 @@ set -euo pipefail
 #   -h: 显示帮助信息
 # 
 # 依赖:
-#   curl, file, notify-send, ImageMagick (magick 或 convert), noctalia-shell (quickshell 封装)
+#   curl, file, notify-send, ImageMagick (magick 或 convert), noctalia
 # =============================================================================
 
 # ================= 默认配置 =================
