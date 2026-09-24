@@ -121,6 +121,19 @@
     "fish/conf.d/ATRI.fish".source = ./dotfiles/config/fish/conf.d/ATRI.fish;
     # Fastfetch / Starship。
     "fastfetch/config.jsonc".source = ./dotfiles/config/fastfetch/config.jsonc;
+    "mark-shot/config.json".text = builtins.toJSON {
+      upload = {
+        env = {
+          MARK_SHOT_UPLOAD_FIELD_key = "";
+        };
+      };
+      translation = {
+        youdao = {
+          appKey = "";
+          appSecret = "";
+        };
+      };
+    };
     "starship.toml".source = ./dotfiles/config/starship.toml;
     "xdg-desktop-portal/niri-portals.conf".source = ./dotfiles/config/xdg-desktop-portal/niri-portals.conf;
     "xdg-terminals.list".source = ./dotfiles/config/xdg-terminals.list;
