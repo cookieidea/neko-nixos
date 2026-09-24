@@ -12,9 +12,6 @@
 - 上游完整许可证文本：见 https://github.com/ech678/NyxNiri 的 `LICENSE` 文件。
   （本仓库不再随附其副本；GPL-3.0 全文亦见 https://www.gnu.org/licenses/gpl-3.0.txt）
 
-这个仓库的顶层 `LICENSE` 仅适用于本仓库作者原创的配置、脚本和代码。
-仓库中直接分发的第三方文件继续遵循其原始版权和许可证；文件自身已有的 license header 优先。
-
 ## MPV / 视频处理
 
 ### uosc
