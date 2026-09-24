@@ -4,7 +4,7 @@
 
 ## 概览
 
-| 项目 | 当前值 |
+| 项目 | 工具 |
 |---|---|
 | 架构 | **x86_64-linux** |
 | 桌面 | **niri + Noctalia** |
@@ -71,11 +71,11 @@ sudo nixos-rebuild switch --rollback
 
 | 文档 | 内容 |
 |---|---|
-| [install-btrfs.md](docs/install-btrfs.md) | NixOS ISO、Btrfs、swap、休眠、Snapper、安装 |
-| [dual-boot.md](docs/dual-boot.md) | Windows + NixOS 双系统 |
-| [keybindings.md](docs/keybindings.md) | niri 快捷键 |
-| [notes.md](docs/notes.md) | 维护约定和已知事项 |
-| [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md) | 第三方代码与许可证边界 |
+| [安装教程](docs/install-btrfs.md) | NixOS ISO、Btrfs、swap、休眠、Snapper、安装 |
+| [双系统教程](docs/dual-boot.md) | Windows + NixOS 双系统 |
+| [快捷键](docs/keybindings.md) | niri 快捷键 |
+| [维护](docs/notes.md) | 维护约定和已知事项 |
+| [第三方许可证](THIRD-PARTY-NOTICES.md) | 第三方代码与许可证边界 |
 
 ## 许可
 
