@@ -28,6 +28,12 @@
 
   virtualisation.docker.enable = true;
 
+  # Docker 29 的 nftables 后端需要 nft 可执行文件，否则无法创建/清理规则：
+  #   Failed to find nft tool: exec: "nft": executable file not found in $PATH
+  # rootful 与 rootless 两个单元都补上。
+  systemd.services.docker.path = [ pkgs.nftables ];
+  systemd.user.services.docker.path = [ pkgs.nftables ];
+
   # 普通用户默认使用 rootless Docker，避免 docker 组直接获得 root-equivalent daemon 访问。
   # rootful docker.service 仍保留；需要管理宿主机 daemon 时使用 sudo docker。
   virtualisation.docker.rootless = {
