@@ -32,6 +32,16 @@
   services.ollama = {
     enable = true;
     package = pkgs.ollama-rocm;
+    # 6750 GRE 10GB 报告为 gfx1032，而 ollama-rocm 附带的 rocblas 只提供
+    # gfx1030 内核（实测 rocblas/library 下 gfx1032 文件数为 0），
+    # 故让 ROCm 按 gfx1030 加载。
     rocmOverrideGfx = "10.3.0";
+    # ollama 把 HIP 后端放在 lib/ollama/rocm_v7_2/libggml-hip.so，但它默认
+    # 只在 lib/ollama 下扫描后端，导致启动时只加载 CPU 后端：
+    #   common_param: - CPU : 12th Gen Intel(R) Core(TM) i5-12400F
+    #   load_tensors: CPU model buffer size = ...
+    # 表现为推理全部在 CPU 上跑。显式指向该后端文件后设备可见：
+    #   ROCm0: AMD Radeon RX 6750 GRE 10GB (10224 MiB, 10182 MiB free)
+    environmentVariables.GGML_BACKEND_PATH = "${pkgs.ollama-rocm}/lib/ollama/rocm_v7_2/libggml-hip.so";
   };
 }
