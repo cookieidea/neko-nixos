@@ -1,16 +1,12 @@
-# 桌面权限、OBS、KDE Connect 和 GTK。
+# OBS、KDE Connect 和 GTK。
 { pkgs, selfPackages, ... }:
 
 {
-  services.polkit-gnome.enable = true;
-
-  # OBS Studio 及其插件。
   programs.obs-studio = {
     enable = true;
     plugins = [ selfPackages.obs-vdoninja ];
   };
 
-  # KDE Connect。
   services.kdeconnect = {
     enable = true;
     indicator = true;
