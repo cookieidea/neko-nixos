@@ -1,7 +1,6 @@
 // =============================================================
 // niri 按键绑定（保留本机原有绑定，不改键位）
-// 已适配 Noctalia V5：原 `noctalia-shell ipc call ...`（v4 quickshell IPC）
-// 全部替换为 V5 的 `noctalia msg ...`。桌面 shell 由 config.kdl 的
+// 使用 Noctalia V5 的 `noctalia msg ...` IPC。桌面 shell 由 config.kdl 的
 // `spawn-at-startup "noctalia"` 拉起。
 // 相关辅助脚本已经纳入本仓库。
 // ~/.config/niri/scripts/ 与 ~/.local/bin/ 下的脚本由 Home Manager 部署。
