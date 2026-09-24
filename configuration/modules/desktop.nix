@@ -30,7 +30,7 @@
   # AccountsService 登录头像。
   system.activationScripts.noctaliaGreeterAvatar = lib.stringAfter [ "users" ] ''
     mkdir -p /var/lib/AccountsService/icons
-    cp -f ${builtins.toString ../home/dotfiles/avatar.png} /var/lib/AccountsService/icons/${username}
+    cp -f ${../home/dotfiles/avatar.png} /var/lib/AccountsService/icons/${username}
     chmod 0644 /var/lib/AccountsService/icons/${username}
     chown ${username}:${username} /var/lib/AccountsService/icons/${username} 2>/dev/null || true
     cat > /var/lib/AccountsService/users/${username} <<'EOF'
