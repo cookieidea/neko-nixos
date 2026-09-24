@@ -1,14 +1,55 @@
-import json, sys
+import json
+import os
+import sys
+import tempfile
 
-output_path = sys.argv[1]  # ~/.config/mark-shot/config.json (writable)
-source_path = sys.argv[2]  # /nix/store/... (read-only base config)
+config_path = sys.argv[1]
+secret_path = "/run/agenix/mark-shot-sensitive"
 
-secret = json.load(open("/run/agenix/mark-shot-sensitive"))
-config = json.load(open(source_path))
+with open(secret_path, encoding="utf-8") as file:
+    secret = json.load(file)
 
-# 注入敏感值
-config["translation"]["youdao"]["appKey"] = secret.get("youdaoAppKey", "")
-config["translation"]["youdao"]["appSecret"] = secret.get("youdaoAppSecret", "")
-config["upload"]["env"]["MARK_SHOT_UPLOAD_FIELD_key"] = secret.get("freeimageKey", "")
+with open(config_path, encoding="utf-8") as file:
+    config = json.load(file)
 
-json.dump(config, open(output_path, "w"), indent=4, ensure_ascii=False)
+translation = config.get("translation")
+if not isinstance(translation, dict):
+    translation = {}
+    config["translation"] = translation
+
+youdao = translation.get("youdao")
+if not isinstance(youdao, dict):
+    youdao = {}
+    translation["youdao"] = youdao
+
+upload = config.get("upload")
+if not isinstance(upload, dict):
+    upload = {}
+    config["upload"] = upload
+
+upload_env = upload.get("env")
+if not isinstance(upload_env, dict):
+    upload_env = {}
+    upload["env"] = upload_env
+
+youdao["appKey"] = secret.get("youdaoAppKey", "")
+youdao["appSecret"] = secret.get("youdaoAppSecret", "")
+upload_env["MARK_SHOT_UPLOAD_FIELD_key"] = secret.get("freeimageKey", "")
+
+fd, temp_path = tempfile.mkstemp(
+    dir=os.path.dirname(config_path),
+    prefix=".mark-shot-config.",
+    text=True,
+)
+try:
+    with os.fdopen(fd, "w", encoding="utf-8") as file:
+        json.dump(config, file, indent=4, ensure_ascii=False)
+        file.write("\n")
+    os.chmod(temp_path, 0o600)
+    os.replace(temp_path, config_path)
+except Exception:
+    try:
+        os.unlink(temp_path)
+    except FileNotFoundError:
+        pass
+    raise
