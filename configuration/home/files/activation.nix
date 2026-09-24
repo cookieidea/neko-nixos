@@ -59,17 +59,20 @@
 
     $DRY_RUN_CMD rm -rf "$MARK/ocr-venv" "$MARK/code-scan-venv"
 
+    # 配置含注入的密钥，必须是可写副本，故用 seed 而非只读符号链接。
+    # 与其他可写配置一致：模板来自 seeds.nix，这里复制到 $HOME。
+    # 注意 copy_seed 定义在 noctaliaV5Seed 里，两个 activation 各自生成
+    # 独立脚本，函数不共享，故这里内联同样的逻辑。
     CFG="$HOME/.config/mark-shot/config.json"
     SECRET="/run/agenix/mark-shot-sensitive"
-    if [ -f "$SECRET" ]; then
-      if [ -L "$CFG" ]; then
-        LINK_TARGET=$(${pkgs.coreutils}/bin/readlink -f "$CFG")
-        $DRY_RUN_CMD rm -f "$CFG"
-        $DRY_RUN_CMD ${pkgs.coreutils}/bin/cp -f "$LINK_TARGET" "$CFG"
-      fi
-      if [ -f "$CFG" ]; then
-        $DRY_RUN_CMD ${pkgs.python3}/bin/python3 ${../dotfiles/config/mark-shot/inject-secrets.py} "$CFG"
-      fi
+    if [ -L "$CFG" ] || [ ! -e "$CFG" ]; then
+      $DRY_RUN_CMD mkdir -p "$(dirname "$CFG")"
+      $DRY_RUN_CMD rm -f "$CFG"
+      $DRY_RUN_CMD cp -f "${hmLib.seedMarkShotConfig}" "$CFG"
+    fi
+
+    if [ -f "$SECRET" ] && [ -f "$CFG" ]; then
+      $DRY_RUN_CMD ${pkgs.python3}/bin/python3 ${../dotfiles/config/mark-shot/inject-secrets.py} "$CFG"
     fi
   '';
 }

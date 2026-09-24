@@ -15,4 +15,18 @@
   seedStarship       = "${./../dotfiles/config/starship.toml}";
   seedMangoHud       = "${./../dotfiles/config/MangoHud/MangoHud.conf}";
   seedWallpaperVideo = "${./../dotfiles/Pictures/Wallpapers/video/hatsune-miku.mp4}";
+  # mark-shot 的配置含密钥，由 activation 注入，因此必须是可写副本。
+  seedMarkShotConfig = pkgs.writeText "mark-shot-config.json" (builtins.toJSON {
+    upload = {
+      env = {
+        MARK_SHOT_UPLOAD_FIELD_key = "";
+      };
+    };
+    translation = {
+      youdao = {
+        appKey = "";
+        appSecret = "";
+      };
+    };
+  });
 }
