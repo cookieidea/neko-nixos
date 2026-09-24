@@ -64,7 +64,9 @@ DESKTOP
           hash = "sha256-KKMWUoJ3QJxwdRm65pj5VyhX9WLe5up1OxFYhmRsgZc=";
         };
         buildInputs = (old.buildInputs or [ ]) ++ [ prev.libdisplay-info ];
-        doCheck = false;
+        # 只跳过 tests::apply_settings —— 它需要挂载 mock fs（FUSE），在
+        # 本仓库的构建沙箱里不可用。其余 59 个测试照常运行。
+        cargoTestFlags = [ "--" "--skip" "tests::apply_settings" ];
       });
     })
 ]

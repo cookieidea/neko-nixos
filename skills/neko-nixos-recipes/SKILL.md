@@ -50,9 +50,10 @@ description: cookieidea/neko-nixos 主机 ATRI 的实战经验库。Use when wor
 ## 桌面/输入
 
 - niri 配置在 dotfiles/config/niri/*.kdl（HM 管理）；**Alt+Tab 默认绑了启动器**，窗口切换是 recent-windows 块
-- 熄屏/挂起：Noctalia config.toml `[idle]` 行为链（lock 300s / screen-off 360s / lock_and_suspend 900s）
+- 熄屏/挂起：Noctalia config.toml `[idle]` 行为链（lock 300s / screen-off 360s / lock_and_suspend 900s），按 `behavior_order` 顺序生效
 - HMCL Java 列表：扫 `~/.jdks`（home.file 软链各 zulu）
-- 组播路由：cachyos 内核需显式 `ip route add 224.0.0.0/4 dev lo`（MC 局域网联机）
+- 组播路由：MC 局域网发现只需把 `224.0.2.60/32` 指到 lo（systemd 单元 minecraft-multicast-loopback）。
+  **不要写 `224.0.0.0/4`** —— 那会把整个 IPv4 组播段（含 mDNS 224.0.0.251、SSDP 239.255.255.250）改走 lo，破坏 avahi 等服务
 
 ## 系统维护
 

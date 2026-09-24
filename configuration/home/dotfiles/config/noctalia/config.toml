@@ -234,9 +234,14 @@ fill_mode = "crop"
 enabled = ["noctalia/kaomoji", "noctalia/mpvpaper", "8bury/mini-docker", "cookie/translator"]
 
 # 自定义翻译插件源（cookie/translator，MyMemory 后端国内直连）
+#
+# 固定 commit：不固定时 Noctalia 每次解析 HEAD，插件仓库一更新就会改变
+# 已部署的插件内容，与 Nix 配置「同一份配置收敛到同一状态」的前提冲突，
+# 出问题时也难以复现。升级插件时改这一行的 sha 即可。
 [[plugins.source]]
 kind = "git"
 location = "https://github.com/cookieidea/noctalia-plugins"
+commit = "b3ac6cc1513f0d868b20aa773a7aa7b3bed2b6f7"
 name = "custom"
 
 [widget.active_window]

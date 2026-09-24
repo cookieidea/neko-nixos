@@ -7,7 +7,7 @@ description: 用户 cookie 的偏好与协作方式画像。Use when starting an
 
 ## 基本环境
 
-- 主机 ATRI（NixOS 26.05，niri + Noctalia，AMD RX 6600，双系统 Win/GRUB）
+- 主机 ATRI（NixOS 26.05，niri + Noctalia，AMD RX 6750 GRE 10GB，双系统 Win/GRUB）
 - 中文交流，技术词中英混用；回复保持中文、简洁直接
 - 主力项目：neko-nixos（系统配置 flake）、Breeze（Flutter fork）、若干自打包应用
 - 桌面用法偏重度：MC（Java+基岩）、Steam 游戏、OBS、音频处理（PureVox）
