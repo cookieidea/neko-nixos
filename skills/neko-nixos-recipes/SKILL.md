@@ -5,7 +5,7 @@ description: cookieidea/neko-nixos 主机 ATRI 的实战经验库。Use when wor
 
 # neko-nixos 实战经验（ATRI / NixOS 26.05）
 
-本机上下文：flake 在 `/etc/nixos`（root 所有，改动需 sudo；`home.nix`/`flake.nix`/`configuration.nix` 不可直接编辑——先 cp 到 /tmp 改完 parse 校验再 sudo cp 回）。用户 `cookie`。niri + Noctalia 桌面，AMD RX 6600，双系统 GRUB。
+本机上下文：flake 在 `/etc/nixos`（root 所有，改动需 sudo；`home.nix`/`flake.nix`/`configuration.nix` 不可直接编辑——先 cp 到 /tmp 改完 parse 校验再 sudo cp 回）。用户 `cookie`。niri + Noctalia 桌面，AMD RX 6750 GRE 10GB，双系统 GRUB。
 
 ## 构建/部署铁律
 
@@ -19,7 +19,7 @@ description: cookieidea/neko-nixos 主机 ATRI 的实战经验库。Use when wor
 - nixpkgs 源：`git+https://mirrors.nju.edu.cn/git/nixpkgs.git?ref=nixos-26.05&shallow=1`；home-manager：GitCode
 - substituters：USTC 优先 + TUNA（TUNA 的 `nix-cache-info` 常年 403，warning 无害）+ nekobox.cachix.org（自建）
 - cachix 推送：`cachix push nekobox <store-path>`；nixpkgs 标准包（如 zulu JDK）官方缓存已有，**不要重复推**
-- builtins.fetchGit 优于 fetchFromGitHub codeload：tar.gz 哈希环境相关（VM 与宿主机不一致），git 协议按 commit 寻址确定
+- pkgs.fetchgit 优于 builtins.fetchGit：固定输出且不在求值期联网；相比 GitHub codeload tarball，git commit 寻址更稳定
 - maven/gradle：GDK-Proton 的 wine 版本 json 在 installer jar 里（`unzip installer.jar version.json`）
 
 ## 打包模式（pkgs/ 目录）
@@ -49,8 +49,8 @@ description: cookieidea/neko-nixos 主机 ATRI 的实战经验库。Use when wor
 
 ## 桌面/输入
 
-- niri 配置在 dotfiles/config/niri/*.kdl（HM 管理）；**Alt+Tab 默认绑了启动器**，窗口切换是 recent-windows 块
-- 熄屏/挂起：Noctalia config.toml `[idle]` 行为链（lock 300s / screen-off 360s / lock_and_suspend 900s），按 `behavior_order` 顺序生效
+- niri 配置在 dotfiles/config/niri/*.kdl（HM 管理）；窗口切换使用 recent-windows 块
+- 熄屏/挂起：Noctalia config.toml `[idle]` 行为链：lock 300s / screen-off 360s / lock_and_suspend 900s
 - HMCL Java 列表：扫 `~/.jdks`（home.file 软链各 zulu）
 - 组播路由：MC 局域网发现只需把 `224.0.2.60/32` 指到 lo（systemd 单元 minecraft-multicast-loopback）。
   **不要写 `224.0.0.0/4`** —— 那会把整个 IPv4 组播段（含 mDNS 224.0.0.251、SSDP 239.255.255.250）改走 lo，破坏 avahi 等服务
