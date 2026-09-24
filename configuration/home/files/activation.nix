@@ -31,7 +31,7 @@
     if [ -L "$NOCT_DIR/config.toml" ] || [ ! -e "$NOCT_DIR/config.toml" ]; then
       $DRY_RUN_CMD mkdir -p "$NOCT_DIR"
       $DRY_RUN_CMD rm -f "$NOCT_DIR/config.toml" "$NOCT_DIR/noctalia-config.toml"
-      $DRY_RUN_CMD cp -f "${hmLib.seedNoctaliaConfig}" "$NOCT_DIR/config.toml"
+      copy_seed "${hmLib.seedNoctaliaConfig}" "$NOCT_DIR/config.toml" 644
     fi
 
     copy_seed "${hmLib.seedStarship}" "$HOME/.config/starship.toml"
@@ -59,16 +59,14 @@
 
     $DRY_RUN_CMD rm -rf "$MARK/ocr-venv" "$MARK/code-scan-venv"
 
-    # 配置含注入的密钥，必须是可写副本，故用 seed 而非只读符号链接。
-    # 与其他可写配置一致：模板来自 seeds.nix，这里复制到 $HOME。
-    # 注意 copy_seed 定义在 noctaliaV5Seed 里，两个 activation 各自生成
-    # 独立脚本，函数不共享，故这里内联同样的逻辑。
+    # mark-shot 配置含密钥，使用可写 seed；此 activation 不共享上面的 copy_seed。
     CFG="$HOME/.config/mark-shot/config.json"
     SECRET="/run/agenix/mark-shot-sensitive"
     if [ -L "$CFG" ] || [ ! -e "$CFG" ]; then
       $DRY_RUN_CMD mkdir -p "$(dirname "$CFG")"
       $DRY_RUN_CMD rm -f "$CFG"
       $DRY_RUN_CMD cp -f "${hmLib.seedMarkShotConfig}" "$CFG"
+      $DRY_RUN_CMD chmod 600 "$CFG"
     fi
 
     if [ -f "$SECRET" ] && [ -f "$CFG" ]; then
