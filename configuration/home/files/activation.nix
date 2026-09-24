@@ -64,6 +64,7 @@
     if [ -f "$SECRET" ]; then
       if [ -L "$CFG" ]; then
         LINK_TARGET=$(${pkgs.coreutils}/bin/readlink -f "$CFG")
+        $DRY_RUN_CMD rm -f "$CFG"
         $DRY_RUN_CMD ${pkgs.coreutils}/bin/cp -f "$LINK_TARGET" "$CFG"
       fi
       if [ -f "$CFG" ]; then
