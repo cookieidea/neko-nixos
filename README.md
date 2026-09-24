@@ -1,6 +1,6 @@
 # neko-nixos
 
-个人 NixOS + Home Manager 桌面配置，以 Flake 管理单机系统。
+个人 NixOS配置
 
 ## 概览
 
