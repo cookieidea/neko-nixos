@@ -37,4 +37,34 @@ DESKTOP
       '';
     });
   })
+
+    # LACT 0.9.1 修了重新加载 AMD GPU 时泄漏 DRI 文件描述符的问题。
+    # 本仓库 pinned 的 nixpkgs 仍是 0.9.0，而事故日志里出现过
+    #   could not initialize GPU controller: Could not read 'uevent':
+    #   Too many open files (os error 24)
+    # 说明每次 DRM 事件重新加载 GPU 都在累积 fd，故本地补到 0.10.1。
+    # 0.10.1 新增了 libdisplay-info 依赖，且其 apply_settings 单元测试需要
+    # 挂载 mock fs，在本仓库构建环境里不可用，故关闭测试。
+    (_final: prev: {
+      lact = prev.lact.overrideAttrs (old: {
+        version = "0.10.1";
+        src = prev.fetchFromGitHub {
+          owner = "ilya-zlobintsev";
+          repo = "LACT";
+          tag = "v0.10.1";
+          hash = "sha256-e5imWq5+LOySCLAQRNkL6cMznAlaXv24vZuzG8giS7s=";
+        };
+        cargoDeps = prev.rustPlatform.fetchCargoVendor {
+          src = prev.fetchFromGitHub {
+            owner = "ilya-zlobintsev";
+            repo = "LACT";
+            tag = "v0.10.1";
+            hash = "sha256-e5imWq5+LOySCLAQRNkL6cMznAlaXv24vZuzG8giS7s=";
+          };
+          hash = "sha256-KKMWUoJ3QJxwdRm65pj5VyhX9WLe5up1OxFYhmRsgZc=";
+        };
+        buildInputs = (old.buildInputs or [ ]) ++ [ prev.libdisplay-info ];
+        doCheck = false;
+      });
+    })
 ]
