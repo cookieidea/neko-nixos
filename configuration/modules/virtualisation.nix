@@ -28,9 +28,7 @@
 
   virtualisation.docker.enable = true;
 
-  # Docker 29 的 nftables 后端需要 nft 可执行文件，否则无法创建/清理规则：
-  #   Failed to find nft tool: exec: "nft": executable file not found in $PATH
-  # rootful 与 rootless 两个单元都补上。
+  # nftables 后端需要 nft 在 PATH 里，rootful 与 rootless 都要补
   systemd.services.docker.path = [ pkgs.nftables ];
   systemd.user.services.docker.path = [ pkgs.nftables ];
 
@@ -45,21 +43,10 @@
     ];
   };
 
-  # rootless Docker 只在真实图形会话中启动。
-  #
-  # 背景：nixpkgs 的 rootless 单元 wantedBy = [ "default.target" ]，因此
-  # **greeter 会话也会拉起它** —— 而登录界面并不需要容器，此时
-  # user@1000 的 app.slice 与运行时目录尚未就绪，导致连续失败 4 次
-  # （实测 15:33:35/38/40/42，间隔约 2 秒），直到真正的用户会话建立
-  # （15:36:11）才成功。虽最终可用，但属无谓的启动竞态与日志噪音。
-  #
-  # 改为 PartOf + After graphical-session.target：随图形会话启停，
-  # 且在会话就绪后才启动，greeter 会话不再触发。
+  # 默认 wantedBy 是 default.target，greeter 会话也会拉起它并在 app.slice
+  # 就绪前失败，改为随图形会话启停
   systemd.user.services.docker = {
-    # NixOS 的 systemd 单元用顶层 wantedBy（生成 <target>.wants/ 符号链接），
-    # 不是 Install.WantedBy。
-    # 必须用 mkForce：nixpkgs 已设 wantedBy = [ "default.target" ]，列表会**合并**
-    # 而非覆盖，那样 greeter 会话仍会拉起它（本次修改即失效）。
+    # 列表会与 nixpkgs 的默认值合并而非覆盖，必须 mkForce
     wantedBy = lib.mkForce [ "graphical-session.target" ];
     partOf = [ "graphical-session.target" ];
     after = [ "graphical-session.target" ];

@@ -15,9 +15,7 @@
   networking.nameservers = [ "119.29.29.29" "2402:4e00::" ];
 
   services.resolved.settings.Resolve = {
-    # mDNS 交给 Avahi（Sunshine / KDE Connect 依赖它的服务发布能力）。
-    # 两套实现同时监听 5353 会互相争抢主机名，实测 Avahi 会一路退让到
-    # ATRI-4.local，且每次启动多花几秒重试。
+    # 交给 Avahi，两套实现同开会争抢主机名
     MulticastDNS = false;
     FallbackDNS = [
       "223.5.5.5"

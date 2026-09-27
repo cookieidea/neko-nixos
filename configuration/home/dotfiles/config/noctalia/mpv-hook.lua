@@ -70,11 +70,7 @@ local function on_file_loaded()
 
         # Apply native wallpaper to trigger color extraction.
         #
-        # 幂等保护（重要）：noctalia 在每次 wallpaper-set 后都会重启 mpvpaper，
-        # 而 mpvpaper 重启又经 file-loaded 回到这里 —— 若无条件调用
-        # wallpaper-set 就形成每 6 秒一轮的闭环（实测曾持续 22 天，
-        # 同一缩略图被处理 7835 次，mpvpaper 每次仅存活 6 秒）。
-        # 故仅在当前壁纸不是这张缩略图时才设置。
+        # 已是目标壁纸就跳过，否则与 noctalia 形成重启闭环
         if [ -f "$dest" ]; then
             current=$(noctalia msg wallpaper-get 2>/dev/null)
             if [ "$current" = "$dest" ]; then

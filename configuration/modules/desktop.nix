@@ -26,17 +26,9 @@ in
     };
   };
 
-  # greeter 的 wlroots 合成器逐个探测 DRM 格式/修饰符组合，对不支持的组合各打
-  # 一条 ERROR。AMD 上 DCC 修饰符无法用于 scanout，实测一次启动刷出约 429 万行
-  # （占该次启动日志总量的 99.2%）：
-  #   [backend/drm/fb.c] Buffer format 0x34325241 with modifier ... cannot be scanned out
-  #   [backend/drm/drm.c] connector HDMI-A-1: Failed to import buffer for scan-out
-  # 不影响功能（greeter 正常启动、登录成功），只是噪音。
-  # WLR_DRM_NO_MODIFIERS 让 wlroots 直接用线性格式，跳过这些探测。
-  # 注意要用 services.greetd.settings（greetd 的会话配置），而不是上面
-  # noctalia-greeter 自己的 greeter.toml —— 后者没有 environment/command 之类
-  # 的会话字段。greetd 只认 command/user，故这里用 env 前缀注入；
-  # noctalia-greeter-session 对未列出的环境变量是继承的。
+  # AMD 的 DCC 修饰符无法用于 scanout，wlroots 逐个探测时每条刷一行 ERROR，
+  # 一次启动能到数百万行。写 services.greetd.settings，greeter 自己的
+  # greeter.toml 没有 command 字段。
   services.greetd.settings.default_session.command = lib.mkForce (
     "env WLR_DRM_NO_MODIFIERS=1 ${packages.default}/bin/noctalia-greeter-session"
     + " -- --session niri"

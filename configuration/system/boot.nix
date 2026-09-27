@@ -25,8 +25,7 @@
   # 不在这里关闭 split-lock / CPUID 等内核安全或兼容性机制。
   boot.kernelParams = [
     "amdgpu.ppfeaturemask=0xffffffff"
-    # zram 与 zswap 都做压缩交换，功能重叠；同时启用时 zswap 会先压缩一遍
-    # 再交给 zram，事故日志里 zspages 一度涨到 3.9 GiB。保留 zram。
+    # 与 zram 功能重叠，保留 zram
     "zswap.enabled=0"
   ];
 
