@@ -1,7 +1,4 @@
-# activation 使用的可写种子文件。
-#
-# 这些文件会被 activation 复制到 $HOME 成为可写副本（应用需自行改写），
-# 故不能用只读的 store symlink 直接部署。
+# activation 复制到 $HOME 的可写种子文件。
 { pkgs, username }:
 
 {

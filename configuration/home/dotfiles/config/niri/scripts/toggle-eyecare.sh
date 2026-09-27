@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# NyxNiri EyeCare One-shot Self-Healing Toggle & Sync Script
+# 切换护眼模式，单次运行后退出。
 # Zero background process besides wlsunset itself. Runs in < 2ms then exits.
 #
 # shellcheck disable=SC2317  # commands invoked via ||/&& intentional control flow
@@ -8,14 +8,7 @@ set -uo pipefail
 # Ensure strict serialization to prevent any race conditions during rapid toggles or startup.
 exec 9> "${XDG_RUNTIME_DIR:-/tmp}/nyxniri-eyecare.lock"
 flock -w 5 9 || exit 1
-#
-# On/off state is derived from where effects.kdl points (eyecare target = ON)
-# rather than tracked in a separate state file or inferred from the wlsunset
-# process. effects.kdl survives niri restarts and is reset to Normal only by a
-# config redeploy, so it is the persistent source of truth; wlsunset is the
-# fragile runtime side (it can die or be missing on a fresh install) and is
-# reconciled to the symlink state in --sync, so a dead wlsunset can never
-# trap the toggle in EyeCare mode.
+# 开关状态以 effects.kdl 指向的目标为准。
 
 NIRI_DIR="$HOME/.config/niri"
 EFFECTS_LINK="$NIRI_DIR/effects.kdl"

@@ -2,13 +2,7 @@
 { pkgs, ... }:
 
 let
-  # 微信在 bwrap 沙箱内运行（AppImage + XWayland），没有走 Wayland 原生的
-  # text-input 协议，因此需要 GTK_IM_MODULE 才能加载 fcitx immodule 输入中文。
-  #
-  # 这里用 wrapper 只为该程序注入，而不是设成全局会话变量 ——
-  # 全局强制 immodule 会让 Wayland 原生程序绕开 text-input 协议，
-  # fcitx5 会因此发出「Wayland 诊断」告警。
-  # 与仓库既有的故障域限定做法一致（见 home/lib/runtime.nix 的 mpv / lunarclient）。
+  # 微信（AppImage + XWayland）的输入法环境，仅注入该程序。
   wechatWithIme = pkgs.symlinkJoin {
     name = "wechat-with-ime";
     paths = [ pkgs.wechat ];
@@ -30,9 +24,6 @@ in
     # 注意 wechat 与 wechat-uos 是两个不同包：此处按需求用 wechat。
     wechatWithIme
 
-    # QQ 暂时无法启用：nixpkgs 的 qq 固定到 2026-05-28 的构建，
-    # 而腾讯已下架该 deb（URL 404，官方页与 web.archive.org 均无）。
-    # 待 nixpkgs 更新 sources.nix 后再加入 qq。
-    # qq
+      # QQ 暂不可用：nixpkgs 固定的下载 URL 已被腾讯下架。
   ];
 }

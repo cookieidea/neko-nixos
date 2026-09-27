@@ -1,11 +1,4 @@
-# nixpkgs overlays 列表（供 flake 与 NixOS 模块共用）。
-#
-# 抽成独立文件的原因：flake.nix 需要用它构造自己的 pkgs 实例，而 NixOS 的
-# nixpkgs.overlays 选项只在 module 系统里可见 —— 两边必须用同一份定义，
-# 否则会退化成「两个 pkgs 实例配置不一致」（hmLib/selfPackages 走 flake pkgs，
-# 系统与 Home Manager 走 NixOS pkgs）。
-#
-# 返回 overlay 列表（每个元素为 final: prev: {...} 形式的函数）。
+  # nixpkgs overlays 列表，flake 与 NixOS 模块共用。
 { nix-cachyos-kernel }:
 
 [

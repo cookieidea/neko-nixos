@@ -49,14 +49,7 @@
       };
     };
 
-    # VSCodium：扩展经 nix-vscode-extensions 声明式管理。
-    # 安装包本身由本模块负责，故 home.packages 里不再重复声明 vscodium。
-    #
-    # 必须用 programs.vscodium 而非 programs.vscode + package = pkgs.vscodium：
-    # programs.vscode 固定按 VS Code 的路径写（~/.vscode、Code/User），
-    # 而 VSCodium 实际读 .vscode-oss（其 product.json 的 dataFolderName）。
-    # 用错模块会导致扩展落在 ~/.vscode/extensions 而 VSCodium 永远看不到 ——
-    # HM 对此有明确提示，要求改用对应 fork 的专用模块。
+    # VSCodium 与其声明式扩展，用 fork 专用模块以匹配 .vscode-oss 路径。
     vscodium = {
       enable = true;
       profiles.default.extensions =

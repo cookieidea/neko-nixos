@@ -73,11 +73,7 @@
       url = "github:4evy/nixcord";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    # 刻意不 follows nixpkgs：该 input 跟踪 nixpkgs-unstable，部分包
-    # （如 t3code）已依赖 electron_44，而 26.05 分支最高只有 electron_43。
-    # 若让它 follows 本仓库的 nixpkgs，packages 属性集的求值会整体失败：
-    #   Function called without required argument "electron_44"
-    # 与 nix-cachyos-kernel 同理，用其自带 nixpkgs 才能正常求值。
+      # 用该 input 自带的 nixpkgs：它跟踪 unstable，部分包需要 26.05 还没有的依赖。
     llm-agents-nix = {
       url = "github:numtide/llm-agents.nix";
     };

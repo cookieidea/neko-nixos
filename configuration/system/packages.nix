@@ -1,7 +1,4 @@
-# 系统级工具包：进 /run/current-system/sw，对所有用户可见。
-#
-# 只放「系统功能真正依赖」或「跨用户共享」的工具。用户自己的日常软件
-# 应放 configuration/home/packages/（Home Manager 用户环境）。
+# 系统级工具包，对所有用户可见。日常软件放 home/packages/。
 { pkgs, ... }:
 
 {

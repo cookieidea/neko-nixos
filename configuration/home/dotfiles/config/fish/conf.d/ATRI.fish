@@ -1,8 +1,4 @@
-# ATRI 的 fish 交互配置：别名、函数与代理开关。
-#
-# 由原先 shorin.fish 与 nyxniri.fish 合并而来 —— 两者都源自 NyxNiri，
-# 命名与 ATRI 无关且内含 Arch 专用逻辑。此处只保留 NixOS 下可用的部分，
-# 并按 ATRI 重新命名。
+# ATRI 的 fish 配置：别名、函数与代理开关。
 
 set fish_greeting ""
 fish_add_path ~/.local/bin

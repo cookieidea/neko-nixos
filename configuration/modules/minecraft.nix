@@ -1,7 +1,4 @@
-# Minecraft：局域网联机所需的网络配置。
-#
-# 归口理由：这些端口/路由只为 Minecraft 联机存在。放在功能模块里，
-# 删掉 MC 时相关副作用会一起消失，不会在 networking.nix 里留下孤儿规则。
+# Minecraft 局域网联机的端口与组播路由。
 { pkgs, ... }:
 
 {
@@ -14,12 +11,7 @@
     allowedUDPPorts = [ 4445 ];
   };
 
-  # 让 MC 的局域网发现组播在本机环回投递（同一台机器上的客户端要能
-  # 看到本机开启的局域网世界）。
-  #
-  # 只针对 MC 使用的组播组 224.0.2.60/32 —— 不要写成 224.0.0.0/4：
-  # 那会把整个 IPv4 组播段（含 mDNS 224.0.0.251、SSDP 239.255.255.250 等）
-  # 全部改走 lo，影响 avahi 等依赖组播的服务。
+    # MC 局域网发现的组播组走 lo，只针对 224.0.2.60/32。
   systemd.services.minecraft-multicast-loopback = {
     description = "Route Minecraft LAN-discovery multicast group to lo";
     wantedBy = [ "multi-user.target" ];

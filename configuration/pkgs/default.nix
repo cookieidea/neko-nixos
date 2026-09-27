@@ -1,15 +1,4 @@
-# 自构建包聚合。
-#
-# 分为两组：
-#   public    —— 用户可直接 `nix build .#<name>` 的成品，也是 flake 的
-#                packages.<system> 输出（见 flake.nix）。
-#   internal  —— 仅被其他派生引用的构建部件（如 vapoursynth 的各插件、
-#                mark-shot 的 Python 运行环境）。它们仍可被引用，但不再
-#                出现在 flake 顶层，安装脚本的预构建也就不会把它们当成
-#                独立成品逐个构建。
-#
-# 顶层仍扁平展开两组属性（末尾的 // internal），这样消费方依旧写
-# selfPackages.k7sfunc，无需改成 selfPackages.internal.k7sfunc。
+# 自构建包：public 进 flake 顶层，internal 只供内部引用。
 { pkgs }:
 let
   vsPlugins = import ./media/vs-plugins { inherit pkgs; };
