@@ -32,6 +32,8 @@
     # 配置即状态：未声明应用和未声明 override 会在 activation 时清理。
     uninstallUnmanaged = true;
     overrides.pruneUnmanagedOverrides = true;
+    # 每次 rebuild 顺带更新 flatpak 应用版本。
+    update.onActivation = true;
     update.auto.enable = false;
   };
 
