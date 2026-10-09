@@ -8,17 +8,16 @@
     configs."root" = {
       SUBVOLUME = "/";
       TIMELINE_CREATE = true;
-      TIMELINE_LIMIT_HOURLY = 24;
-      TIMELINE_LIMIT_DAILY = 7;
-      TIMELINE_LIMIT_WEEKLY = 4;
+      TIMELINE_LIMIT_HOURLY = 6;
+      TIMELINE_LIMIT_DAILY = 3;
+      TIMELINE_LIMIT_WEEKLY = 0;
       TIMELINE_LIMIT_MONTHLY = 0;
       TIMELINE_LIMIT_YEARLY = 0;
       EMPTY_PRE_POST_CLEANUP = true;
-      # 限制 boot 快照数量。
-      NUMBER_LIMIT = 50;
-      # 置 0 才能让 NUMBER_LIMIT 真正生效：原为 86400（1 天内的不删），
-      # 而一次集中改造（例如连续几十次 rebuild）产生的快照都落在同一天，
-      # 于是越过 50 的上限不断累积（曾达 204 个）。
+      # 快照总量上限（含 timeline 与 boot）。
+      NUMBER_LIMIT = 20;
+      # 置 0 才能让 NUMBER_LIMIT 真正生效：非零时会在该时长内跳过清理，
+      # 集中 rebuild 产生的快照落在同一天，于是越过上限不断累积。
       NUMBER_MIN_AGE = 0;
     };
 
@@ -28,13 +27,13 @@
     configs."home" = {
       SUBVOLUME = "/home";
       TIMELINE_CREATE = true;
-      TIMELINE_LIMIT_HOURLY = 24;
-      TIMELINE_LIMIT_DAILY = 7;
-      TIMELINE_LIMIT_WEEKLY = 4;
+      TIMELINE_LIMIT_HOURLY = 6;
+      TIMELINE_LIMIT_DAILY = 3;
+      TIMELINE_LIMIT_WEEKLY = 0;
       TIMELINE_LIMIT_MONTHLY = 0;
       TIMELINE_LIMIT_YEARLY = 0;
       EMPTY_PRE_POST_CLEANUP = true;
-      NUMBER_LIMIT = 50;
+      NUMBER_LIMIT = 20;
       NUMBER_MIN_AGE = 0;
     };
   };
