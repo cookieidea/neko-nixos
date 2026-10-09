@@ -18,11 +18,11 @@ in
 pkgs.stdenv.mkDerivation {
   pname = "obs-vdoninja";
   # 保持当前 libdatachannel 版本，直到 OBS ABI 一起升级。
-  version = "1.1.63";
+  version = "1.1.74";
 
   src = pkgs.fetchurl {
     url = "https://github.com/steveseguin/ninja-obs-plugin/releases/download/v1.1.63/obs-vdoninja-linux-x86_64.tar.gz";
-    sha256 = "sha256-GPYPmgcaUpXujiryQMKuYLcumx8QPcATSlTov/a1Kbk=";
+    sha256 = "sha256-zTbmY6pPG/8Ac2JcD5SbwGOButoT9RjON6OndocLOHg=";
   };
 
   nativeBuildInputs = [ pkgs.autoPatchelfHook ];
