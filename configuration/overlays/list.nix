@@ -30,29 +30,4 @@ DESKTOP
       '';
     });
   })
-
-    # 0.9.1 起修复重载 AMD GPU 时的 DRI fd 泄漏，pinned 的 nixpkgs 仍是 0.9.0
-    (_final: prev: {
-      lact = prev.lact.overrideAttrs (old: {
-        version = "0.10.1";
-        src = prev.fetchFromGitHub {
-          owner = "ilya-zlobintsev";
-          repo = "LACT";
-          tag = "v0.10.1";
-          hash = "sha256-e5imWq5+LOySCLAQRNkL6cMznAlaXv24vZuzG8giS7s=";
-        };
-        cargoDeps = prev.rustPlatform.fetchCargoVendor {
-          src = prev.fetchFromGitHub {
-            owner = "ilya-zlobintsev";
-            repo = "LACT";
-            tag = "v0.10.1";
-            hash = "sha256-e5imWq5+LOySCLAQRNkL6cMznAlaXv24vZuzG8giS7s=";
-          };
-          hash = "sha256-KKMWUoJ3QJxwdRm65pj5VyhX9WLe5up1OxFYhmRsgZc=";
-        };
-        buildInputs = (old.buildInputs or [ ]) ++ [ prev.libdisplay-info ];
-        # 只跳过需要挂载 mock fs 的那个测试
-        cargoTestFlags = [ "--" "--skip" "tests::apply_settings" ];
-      });
-    })
 ]

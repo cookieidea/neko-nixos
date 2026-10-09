@@ -172,6 +172,12 @@ window-rule {
     open-floating true
 }
 
+// 隐私：QQ 窗口不进录屏
+window-rule {
+    match app-id="QQ"
+    block-out-from "screencast"
+}
+
 // imv 轻量图片查看器
 window-rule {
     match app-id="imv"

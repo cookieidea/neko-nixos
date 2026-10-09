@@ -24,9 +24,9 @@
   };
 
   inputs = {
-    nixpkgs.url = "git+https://mirrors.nju.edu.cn/git/nixpkgs.git?ref=nixos-26.05&shallow=1";
+    nixpkgs.url = "git+https://mirrors.nju.edu.cn/git/nixpkgs.git?ref=nixos-unstable&shallow=1";
     home-manager = {
-      url = "git+https://gitcode.com/nix-community/home-manager.git?ref=release-26.05";
+      url = "git+https://gitcode.com/nix-community/home-manager.git?ref=master";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 

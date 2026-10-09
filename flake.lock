@@ -275,16 +275,16 @@
         ]
       },
       "locked": {
-        "lastModified": 1790742243,
-        "narHash": "sha256-kaNo6xHiL31AbNNEreG0OTKf4j6Cxlo5bPawjX7lnbQ=",
-        "ref": "release-26.05",
-        "rev": "e5fcd298a00f08b6e8390baf04aa8edb62203070",
-        "revCount": 6837,
+        "lastModified": 1790742230,
+        "narHash": "sha256-5399J1/O3DyLSsYGVa950JtOUDB9Reqvy7FhfDuTVzk=",
+        "ref": "master",
+        "rev": "0aefa652eb6fd8b7396af25e8c81cb0790f12cc2",
+        "revCount": 7382,
         "type": "git",
         "url": "https://gitcode.com/nix-community/home-manager.git"
       },
       "original": {
-        "ref": "release-26.05",
+        "ref": "master",
         "type": "git",
         "url": "https://gitcode.com/nix-community/home-manager.git"
       }
@@ -569,16 +569,16 @@
     },
     "nixpkgs_4": {
       "locked": {
-        "lastModified": 1790635395,
-        "narHash": "sha256-bNyvoIyOCu7lzoCpWKWGIsHpTtERUWzqYWFPlN++WTw=",
-        "ref": "nixos-26.05",
-        "rev": "7fc6f2c20af09cdcaf48b92ec3121860139ec668",
+        "lastModified": 1791456040,
+        "narHash": "sha256-H83yz/do+hjOO0uujHyH8RgtIQP2v7Mw+cLwcZK/xKc=",
+        "ref": "nixos-unstable",
+        "rev": "e7439b6b14ad3cc35d05608ebca9bce01a25f5f8",
         "shallow": true,
         "type": "git",
-        "url": "https://mirrors.nju.edu.cn/git/nixpkgs.git"
+        "url": "https://github.com/NixOS/nixpkgs.git"
       },
       "original": {
-        "ref": "nixos-26.05",
+        "ref": "nixos-unstable",
         "shallow": true,
         "type": "git",
         "url": "https://mirrors.nju.edu.cn/git/nixpkgs.git"
