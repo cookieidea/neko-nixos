@@ -10,22 +10,12 @@
 
 import sys
 import json
-import glob
 
 from rapidocr import RapidOCR
 
-# rapidocr 包内模型文件名与 Python API 默认查找的名称不一致，需显式指定。
-# 从 sys.prefix 推导，避免硬编码 store 哈希或 python 版本号。
-_CANDIDATES = glob.glob(sys.prefix + "/lib/python*/site-packages/rapidocr/models")
-_M = _CANDIDATES[0] if _CANDIDATES else ""
-
-e = RapidOCR(
-    params={
-        "Det.model_path": _M + "/ch_PP-OCRv4_det_infer.onnx",
-        "Rec.model_path": _M + "/ch_PP-OCRv4_rec_infer.onnx",
-        "Cls.model_path": _M + "/ch_ppocr_mobile_v2.0_cls_infer.onnx",
-    }
-)
+# rapidocr 3.x 自带默认模型（PP-OCRv6），直接用默认初始化；
+# 旧版硬编码的 v4 模型文件名在 3.9.2 里已不存在。
+e = RapidOCR(params={"Global.log_level": "critical"})
 
 result = e(sys.argv[1])
 tokens = []
