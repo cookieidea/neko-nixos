@@ -17,14 +17,12 @@
     packages = [
       "io.github.kolunmi.Bazaar"
       "com.github.tchx84.Flatseal"
-      "com.qq.QQ"
       "io.github.yucling.open-orpheus"
       "io.github.Predidit.Kazumi"
     ];
 
     overrides = {
       settings = {
-        "com.qq.QQ".Context.sockets = [ "!fallback-x11" "x11" ];
         "io.github.yucling.open-orpheus".Context.sockets = [ "session-bus" ];
       };
     };
