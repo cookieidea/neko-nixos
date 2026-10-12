@@ -84,10 +84,6 @@
       source = ../dotfiles/icons/hicolor/256x256/apps/tabby.png;
       force = true;
     };
-    ".local/share/icons/hicolor/256x256/apps/splayer-next.png" = {
-      source = ../dotfiles/icons/hicolor/256x256/apps/splayer-next.png;
-      force = true;
-    };
     ".local/share/icons/hicolor/256x256/apps/lunarclient.png" = {
       source = ../dotfiles/icons/hicolor/256x256/apps/lunarclient.png;
       force = true;
@@ -104,19 +100,6 @@
         Icon=tabby
         Terminal=false
         Categories=System;TerminalEmulator;
-      '';
-      force = true;
-    };
-    ".local/share/applications/splayer-next.desktop" = {
-      text = ''
-        [Desktop Entry]
-        Type=Application
-        Name=SPlayer-Next
-        Comment=Cross-platform desktop music player
-        Exec=splayer-next
-        Icon=splayer-next
-        Terminal=false
-        Categories=AudioVideo;Audio;Player;
       '';
       force = true;
     };

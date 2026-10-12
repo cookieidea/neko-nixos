@@ -15,8 +15,7 @@ let
     ab-download-manager  = import ./tools/networking/ab-download-manager { inherit pkgs; };
     astral               = import ./tools/networking/astral { inherit pkgs; lib = pkgs.lib; fetchurl = pkgs.fetchurl; };
 
-    # 影音和直播。
-    splayer-next         = import ./media/splayer-next { inherit pkgs; };
+    # 影音和直播。splayer-next 已由 nixpkgs 提供（同为 1.1.0），不再自建。
     obs-vdoninja         = import ./media/obs-vdoninja { inherit pkgs; };
     purevox              = import ./media/purevox      { inherit pkgs; };
 

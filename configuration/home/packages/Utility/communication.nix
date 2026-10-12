@@ -19,6 +19,7 @@ in
 {
   home.packages = with pkgs; [
     ayugram-desktop   # Telegram（AyuGram 分支）
+    qq                # QQ：nixpkgs 包（原为 flatpak）
 
     # 微信：nixpkgs 包（原为 flatpak），外面套一层输入法 wrapper。
     # 注意 wechat 与 wechat-uos 是两个不同包：此处按需求用 wechat。
