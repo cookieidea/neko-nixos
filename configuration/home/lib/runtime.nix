@@ -13,9 +13,10 @@ rec {
 
 
   # mpv + VapourSynth/RIFE。
+  # 上游把 mpv-unwrapped 的 lua 参数改名为 lua5_2_compat，此处跟随。
   mpvRifeWrapped = (pkgs.mpv.override {
     mpv-unwrapped = pkgs.mpv-unwrapped.override {
-      lua = pkgs.luajit;
+      lua5_2_compat = pkgs.luajit;
       vapoursynthSupport = true;
     };
   }).override {
