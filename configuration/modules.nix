@@ -5,6 +5,7 @@
     # 桌面与应用
     ./modules/desktop.nix
     ./modules/minecraft.nix
+    ./modules/ddnet.nix
     ./modules/dsh.nix
     ./modules/flatpak.nix
 
