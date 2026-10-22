@@ -5,19 +5,24 @@
   # Nautilus Python 扩展。
   xdg.dataFile = {
     "nautilus-python/extensions/video-to-audio.py".source = ./dotfiles/config/nautilus-python/video-to-audio.py;
-    # Lunar Client desktop entry 覆盖。
-    "applications/lunarclient.desktop".text = ''
-      [Desktop Entry]
-      Name=Lunar Client
-      Exec=lunarclient %u
-      Terminal=false
-      Type=Application
-      Icon=lunarclient
-      StartupWMClass=Lunar Client
-      Comment=Electron launcher for Lunar Client
-      MimeType=application/x-lcpack;x-scheme-handler/lunarclient;x-scheme-handler/discord-562286213059444737;
-      Categories=Game;
-    '';
+    # Lunar Client desktop entry 覆盖。Lunar Client 每次启动会重写
+    # 此文件，home-manager 激活时就会报 clobber 失败 —— force 让
+    # nix 强制接管，不再被它挡路。
+    "applications/lunarclient.desktop" = {
+      text = ''
+        [Desktop Entry]
+        Name=Lunar Client
+        Exec=lunarclient %u
+        Terminal=false
+        Type=Application
+        Icon=lunarclient
+        StartupWMClass=Lunar Client
+        Comment=Electron launcher for Lunar Client
+        MimeType=application/x-lcpack;x-scheme-handler/lunarclient;x-scheme-handler/discord-562286213059444737;
+        Categories=Game;
+      '';
+      force = true;
+    };
   };
 
   xdg.configFile = {
