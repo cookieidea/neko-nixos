@@ -18,7 +18,6 @@ let
     # 影音和直播。splayer-next 已由 nixpkgs 提供（同为 1.1.0），不再自建。
     obs-vdoninja         = import ./media/obs-vdoninja { inherit pkgs; };
     purevox              = import ./media/purevox      { inherit pkgs; };
-    qq-voice-latency     = import ./media/qq-voice-latency { inherit pkgs; };
 
     # 游戏。
     bedrockboot          = import ./games/bedrockboot { inherit pkgs; };

@@ -82,12 +82,20 @@
       url = "git+https://gitcode.com/ryantm/agenix.git?ref=main";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    # 修 Linux QQ 在 Wayland 下的屏幕共享、剪贴板、截图，以及语音通话
+    # 录音分片过大导致的延迟（v0.2.15 起）。
+    linuxqq-wayland-fix = {
+      url = "github:SHORiN-KiWATA/linuxqq-wayland-fix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = {
       nixpkgs, home-manager, cooknixvim, bilihud, nix-cachyos-kernel,
       noctalia, noctalia-greeter, agenix, bestclient, mark-shot,
       llm-agents-nix, nix-flatpak, fenix, nix-vscode-extensions, nixcord,
+      linuxqq-wayland-fix,
       ...
     }:
     let
@@ -133,6 +141,7 @@
             agenix.nixosModules.default
             (import ./configuration/overlays { inherit nix-cachyos-kernel; })
             nix-flatpak.nixosModules.nix-flatpak
+            linuxqq-wayland-fix.nixosModules.default
           ];
         };
       };

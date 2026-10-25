@@ -311,6 +311,26 @@
         "type": "github"
       }
     },
+    "linuxqq-wayland-fix": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1792770968,
+        "narHash": "sha256-uxTwR3P0DejaLGiB/O+5AfsMHlFWbOIrW3WJFVlQL+E=",
+        "owner": "SHORiN-KiWATA",
+        "repo": "linuxqq-wayland-fix",
+        "rev": "56a13c678b1637d25e656aa92f1a718deda11017",
+        "type": "github"
+      },
+      "original": {
+        "owner": "SHORiN-KiWATA",
+        "repo": "linuxqq-wayland-fix",
+        "type": "github"
+      }
+    },
     "llm-agents-nix": {
       "inputs": {
         "bun2nix": "bun2nix",
@@ -659,6 +679,7 @@
         "cooknixvim": "cooknixvim",
         "fenix": "fenix",
         "home-manager": "home-manager",
+        "linuxqq-wayland-fix": "linuxqq-wayland-fix",
         "llm-agents-nix": "llm-agents-nix",
         "mark-shot": "mark-shot",
         "nix-cachyos-kernel": "nix-cachyos-kernel",
