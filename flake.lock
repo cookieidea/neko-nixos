@@ -49,11 +49,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1788342964,
-        "narHash": "sha256-FNMNQUvaDXa7keswTvSzvS69SQqIqw+UwTTINFMY/HU=",
+        "lastModified": 1794328909,
+        "narHash": "sha256-8jAQ1wENbwGi5sN+TQS8bLtWIIsCbJk0tRwUU+uo708=",
         "owner": "locez",
         "repo": "bilihud",
-        "rev": "87e6440028733e052bc8ed99855b33929d5c1e38",
+        "rev": "6d56596502094ded9b8ad04775b786ed4d0771f0",
         "type": "github"
       },
       "original": {
@@ -275,11 +275,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1790742230,
-        "narHash": "sha256-5399J1/O3DyLSsYGVa950JtOUDB9Reqvy7FhfDuTVzk=",
+        "lastModified": 1792896866,
+        "narHash": "sha256-/0tELNnhdSnP+bHSdWiEe6KpfSwi6WrTnT9cm/jNkjA=",
         "ref": "master",
-        "rev": "0aefa652eb6fd8b7396af25e8c81cb0790f12cc2",
-        "revCount": 7382,
+        "rev": "c216bf5a1f173b0481bd5c8c489ebe5595ecc68c",
+        "revCount": 7565,
         "type": "git",
         "url": "https://gitcode.com/nix-community/home-manager.git"
       },
@@ -583,10 +583,10 @@
     },
     "nixpkgs_4": {
       "locked": {
-        "lastModified": 1791734076,
-        "narHash": "sha256-i5qk1kLiit98rRbh1AXmWBNT9QXC/y4l5Wk/u5EdpDQ=",
+        "lastModified": 1794042290,
+        "narHash": "sha256-ziZn2PvCJE5JEEpqTdxXwJpPB+L3YqoCpTAMCzyaP3U=",
         "ref": "nixos-unstable",
-        "rev": "7fd4004d0511991fff3a0524856a9be09e28c5f0",
+        "rev": "f4a03c008967841f2a0b3cb7c436fc6fc31671f6",
         "shallow": true,
         "type": "git",
         "url": "https://mirrors.nju.edu.cn/git/nixpkgs.git"

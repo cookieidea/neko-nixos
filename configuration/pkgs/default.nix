@@ -15,7 +15,9 @@ let
     ab-download-manager  = import ./tools/networking/ab-download-manager { inherit pkgs; };
     astral               = import ./tools/networking/astral { inherit pkgs; lib = pkgs.lib; fetchurl = pkgs.fetchurl; };
 
-    # 影音和直播。splayer-next 已由 nixpkgs 提供（同为 1.1.0），不再自建。
+    # 影音和直播。nixpkgs 的 splayer-next 在当前版本构建失败
+    # （aws-lc-sys 找不到系统 AWS-LC），继续用自建 AppImage 包。
+    splayer-next         = import ./media/splayer-next { inherit pkgs; };
     obs-vdoninja         = import ./media/obs-vdoninja { inherit pkgs; };
     purevox              = import ./media/purevox      { inherit pkgs; };
 

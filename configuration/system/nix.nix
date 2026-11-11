@@ -26,6 +26,9 @@
   nixpkgs.config = {
     allowUnfree = true;
     rocmSupport = true;
+    # 新版 nixpkgs 把 gtk+（gtk2）标记为 broken；只作为传递依赖出现，
+    # 降级为警告，避免整个系统求值失败。
+    problems.handlers."gtk+".broken = "warn";
   };
 
   nix.settings.auto-optimise-store = true;

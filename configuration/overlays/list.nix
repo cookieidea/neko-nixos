@@ -30,4 +30,13 @@ DESKTOP
       '';
     });
   })
+
+  # terracotta（hmcl 的依赖）构建时 zstd-sys 要探测 pkg-config 和 libzstd，
+  # 上游该版本两者都没给，补上。
+  (_final: prev: {
+    terracotta = prev.terracotta.overrideAttrs (old: {
+      nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ [ prev.pkg-config ];
+      buildInputs = (old.buildInputs or [ ]) ++ [ prev.zstd ];
+    });
+  })
 ]

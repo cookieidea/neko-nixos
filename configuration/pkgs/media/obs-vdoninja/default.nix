@@ -21,7 +21,7 @@ pkgs.stdenv.mkDerivation {
   version = "1.1.74";
 
   src = pkgs.fetchurl {
-    url = "https://github.com/steveseguin/ninja-obs-plugin/releases/download/v1.1.63/obs-vdoninja-linux-x86_64.tar.gz";
+    url = "https://github.com/steveseguin/ninja-obs-plugin/releases/download/v1.1.74/obs-vdoninja-linux-x86_64.tar.gz";
     sha256 = "sha256-zTbmY6pPG/8Ac2JcD5SbwGOButoT9RjON6OndocLOHg=";
   };
 

@@ -110,6 +110,9 @@
         config = {
           allowUnfree = true;
           rocmSupport = true;
+          # 新版 nixpkgs 把 gtk+（gtk2）标记为 broken；这里只依赖它的
+          # 传递闭包，降级为警告而不是求值失败。
+          problems.handlers."gtk+".broken = "warn";
         };
         overlays = import ./configuration/overlays/list.nix { inherit nix-cachyos-kernel; };
       };
