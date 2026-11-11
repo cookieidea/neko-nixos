@@ -12,7 +12,7 @@ in
     selfPackages.niri-sidebar
     selfPackages.nyxniri-scratch-menu
     selfPackages.pins
-    selfPackages.splayer-next
+    splayer-next
     selfPackages.ab-download-manager
     selfPackages.tabby-terminal
     selfPackages.astral

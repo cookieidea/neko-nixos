@@ -39,4 +39,13 @@ DESKTOP
       buildInputs = (old.buildInputs or [ ]) ++ [ prev.zstd ];
     });
   })
+
+  # splayer-next 的 Rust 依赖 aws-lc-sys 在 nixpkgs 的 cargo-setup-hook 里
+  # 被强制走系统库（AWS_LC_SYS_USE_SYSTEM=1），但包本身没提供 aws-lc，
+  # 补上即可正常构建。
+  (_final: prev: {
+    splayer-next = prev.splayer-next.overrideAttrs (old: {
+      buildInputs = (old.buildInputs or [ ]) ++ [ prev.aws-lc ];
+    });
+  })
 ]
