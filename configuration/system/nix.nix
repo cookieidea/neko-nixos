@@ -6,7 +6,7 @@
   nix.settings.extra-substituters = [
     "https://mirrors.ustc.edu.cn/nix-channels/store"
     "https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store"
-    "https://attic.xuyh0120.win/lantian"
+    "https://cache.lantian.pub/lantian"
     "https://noctalia.cachix.org"
     "https://nekobox.cachix.org"
     "https://cache.numtide.com"
@@ -16,6 +16,7 @@
 
   nix.settings.extra-trusted-public-keys = [
     "lantian:EeAUQ+W+6r7EtwnmYjeVwx5kOGEBpjlBfPlzGlTNvHc="
+    "lantian:WVGO7vsRMSEN+h7Lp7kv6SAmrkEXgUGbbXm7jMDjBuQ="
     "noctalia.cachix.org-1:pCOR47nnMeo5thcxNDtzWpOxNFQsBRglJzxWPp3dkU4="
     "nekobox.cachix.org-1:bRpp0vZK2Uq/vnydXC+uuOmFJW3W6fN4PI5PDy4iD+s="
     "niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g="
