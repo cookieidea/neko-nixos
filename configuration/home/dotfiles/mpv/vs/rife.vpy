@@ -18,5 +18,12 @@ gpu = 0
 gpu_t = 1
 
 # mpv 的 vapoursynth vf 会预置 clip。
+# mpv 0.4x 起 vapoursynth vf 只注入 video_in，不再预置 clip；
+# 旧版本已预置 clip 时保持原样。
+try:
+    clip = video_in
+except NameError:
+    pass
+
 clip = k7sfunc.RIFE_STD(clip, model, turbo, fnum, fden, sc_mode, 60.0, gpu, gpu_t)
 clip.set_output()

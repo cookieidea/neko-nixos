@@ -23,6 +23,9 @@ rec {
     extraMakeWrapperArgs = [
       "--prefix" "PYTHONPATH" ":" "${selfPackages.k7sfunc}/${pySite}:${pkgs.python3Packages.vapoursynth}/${pySite}"
       "--set" "VAPOURSYNTH_EXTRA_PLUGIN_PATH" "${selfPackages.vapoursynth-with-plugins}/lib/vapoursynth"
+      # mpv 的 vapoursynth vf 在运行时 dlopen libvapoursynth-script.so，
+      # 该库不在默认搜索路径里，需显式加入。
+      "--prefix" "LD_LIBRARY_PATH" ":" "${pkgs.vapoursynth}/lib:${selfPackages.vapoursynth-with-plugins}/lib"
     ];
   };
 
