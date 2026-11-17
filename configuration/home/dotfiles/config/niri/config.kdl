@@ -7,6 +7,10 @@
 
 // 引入由 nwg-displays 生成的显示器配置（本机手写 monitor.kdl）
 include "monitor.kdl"
+// Noctalia 主题模板写入的配色（由 noctalia 自己生成/覆盖，故此处只引入）。
+// 提前写好 include，noctalia 的 niri 模板就只会更新 noctalia.kdl，不再尝试
+// 改写本文件（本文件在 Nix store 里只读）。
+include optional=true "noctalia.kdl"
 // 动态引入视觉特效样式 (普通模式 vs 护眼模式)
 include "effects.kdl"
 include optional=true "input__custom__.kdl"

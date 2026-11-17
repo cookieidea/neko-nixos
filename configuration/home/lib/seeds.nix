@@ -3,6 +3,8 @@
 
 {
   seedKittyTheme     = "${./../dotfiles/config/kitty/themes/noctalia.conf}";
+  # Noctalia 的 kitty 模板要往 kitty.conf 里维护 include 行，故部署为可写副本。
+  seedKittyConf      = "${./../dotfiles/config/kitty/kitty.conf}";
   # activation 会把配置复制为可写文件，因此这里先按 username 替换家目录。
   seedNoctaliaConfig = pkgs.writeText "noctalia-config.toml"
     (builtins.replaceStrings

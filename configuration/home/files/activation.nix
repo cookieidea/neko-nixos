@@ -27,6 +27,7 @@
     fi
 
     copy_seed "${hmLib.seedKittyTheme}" "$HOME/.config/kitty/current-theme.conf"
+    copy_seed "${hmLib.seedKittyConf}" "$HOME/.config/kitty/kitty.conf" 644
 
     if [ -L "$NOCT_DIR/config.toml" ] || [ ! -e "$NOCT_DIR/config.toml" ]; then
       $DRY_RUN_CMD mkdir -p "$NOCT_DIR"

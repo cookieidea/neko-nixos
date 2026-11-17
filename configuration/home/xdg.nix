@@ -115,13 +115,11 @@
     "noctalia/theme-sync.sh".source = ./dotfiles/config/noctalia/theme-sync.sh;
     "noctalia/wallpaper-hook.sh".source = ./dotfiles/config/noctalia/wallpaper-hook.sh;
     "noctalia/mpv-hook.lua".source = ./dotfiles/config/noctalia/mpv-hook.lua;
-    # Kitty 配置；current-theme.conf 由 activation 初始化。
-    "kitty/kitty.conf".source = ./dotfiles/config/kitty/kitty.conf;
+    # Kitty 配置：kitty.conf 由 activation 部署为可写种子（Noctalia 要维护
+    # 其中的 include 行），current-theme.conf 同样由 activation 初始化。
     "kitty/__custom__.conf".source = ./dotfiles/config/kitty/__custom__.conf;
-    "kitty/themes/noctalia.conf" = {
-      source = ./dotfiles/config/kitty/themes/noctalia.conf;
-      force = true;
-    };
+    # themes/noctalia.conf 由 Noctalia 自己生成并覆盖，不在此声明，
+    # 否则软链指向只读 store，Noctalia 写主题时报错。
     "fish/conf.d/__custom__.fish".source = ./dotfiles/config/fish/conf.d/__custom__.fish;
     "fish/conf.d/ATRI.fish".source = ./dotfiles/config/fish/conf.d/ATRI.fish;
     # Fastfetch / Starship。

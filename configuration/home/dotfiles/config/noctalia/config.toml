@@ -15,7 +15,7 @@ order = ["bar"]
 background_opacity = 0.0
 border_width = 0.0
 capsule = true
-capsule_border = "outline"
+capsule_border = "outline_variant"
 capsule_foreground = "secondary"
 capsule_opacity = 0.79
 capsule_padding = 10.0
@@ -256,9 +256,6 @@ pinned = ["Fcitx"]
 
 [widget.mini-docker]
 type = "8bury/mini-docker:mini-docker"
-
-[widget."ray/echolyrics:echolyrics"]
-capsule = false
 
 [widget.mpvpaper]
 type = "noctalia/mpvpaper:mpvpaper"
