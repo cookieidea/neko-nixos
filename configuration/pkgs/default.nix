@@ -14,6 +14,7 @@ let
     # 工具和网络。
     ab-download-manager  = import ./tools/networking/ab-download-manager { inherit pkgs; };
     astral               = import ./tools/networking/astral { inherit pkgs; lib = pkgs.lib; fetchurl = pkgs.fetchurl; };
+    uuyc                 = import ./tools/networking/uuyc { inherit pkgs; };
 
     obs-vdoninja         = import ./media/obs-vdoninja { inherit pkgs; };
     purevox              = import ./media/purevox      { inherit pkgs; };
