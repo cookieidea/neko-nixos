@@ -4,7 +4,16 @@
 {
   programs.obs-studio = {
     enable = true;
-    plugins = [ selfPackages.obs-vdoninja ];
+    plugins = [
+      selfPackages.obs-vdoninja
+      # OBS 自带没有按应用抓音频，Linux 侧用 PipeWire 节点实现。
+      pkgs.obs-studio-plugins.obs-pipewire-audio-capture
+      pkgs.obs-studio-plugins.obs-composite-blur
+      pkgs.obs-studio-plugins.obs-source-record
+      pkgs.obs-studio-plugins.obs-vkcapture
+      pkgs.obs-studio-plugins.input-overlay
+      pkgs.obs-studio-plugins.obs-wayland-hotkeys
+    ];
   };
 
   services.kdeconnect = {

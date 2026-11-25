@@ -48,4 +48,24 @@ DESKTOP
       buildInputs = (old.buildInputs or [ ]) ++ [ prev.aws-lc ];
     });
   })
+
+  # 给两个 obs 插件补上游缺失的 zh-CN 翻译。
+  (_final: prev: {
+    obs-studio-plugins = prev.obs-studio-plugins // {
+      obs-pipewire-audio-capture =
+        prev.obs-studio-plugins.obs-pipewire-audio-capture.overrideAttrs
+          (old: {
+            postInstall = (old.postInstall or "") + ''
+              install -Dm644 ${../pkgs/media/obs-plugin-locales/pipewire-audio.zh-CN.ini} \
+                $out/share/obs/obs-plugins/linux-pipewire-audio/locale/zh-CN.ini
+            '';
+          });
+      obs-vkcapture = prev.obs-studio-plugins.obs-vkcapture.overrideAttrs (old: {
+        postInstall = (old.postInstall or "") + ''
+          install -Dm644 ${../pkgs/media/obs-plugin-locales/vkcapture.zh-CN.ini} \
+            $out/share/obs/obs-plugins/linux-vkcapture/locale/zh-CN.ini
+        '';
+      });
+    };
+  })
 ]

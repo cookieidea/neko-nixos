@@ -8,7 +8,7 @@ let
     # libdatachannel 0.20.2 源码，不取 submodule。
     src = pkgs.fetchgit {
       url = "https://github.com/paullouisageneau/libdatachannel";
-      rev = "0b1074a9effeb8d9d3f4eca704d3fe3d2f9bc7e5";  # v0.20.2
+      rev = "0b1074a9effeb8d9d3f4eca704d3fe3d2f9bc7e5"; # v0.20.2
       hash = "sha256-bBSsD845iwCMA7TdMBxzezjNbMaGwvRq6rvY/8NLYRU=";
       fetchSubmodules = false;
     };
@@ -17,12 +17,12 @@ in
 
 pkgs.stdenv.mkDerivation {
   pname = "obs-vdoninja";
-  # 保持当前 libdatachannel 版本，直到 OBS ABI 一起升级。
-  version = "1.1.74";
+  # 1.1.85 对应 OBS 32.2；仍链接 libdatachannel 0.20，保持下面的固定版本。
+  version = "1.1.85";
 
   src = pkgs.fetchurl {
-    url = "https://github.com/steveseguin/ninja-obs-plugin/releases/download/v1.1.74/obs-vdoninja-linux-x86_64.tar.gz";
-    sha256 = "sha256-zTbmY6pPG/8Ac2JcD5SbwGOButoT9RjON6OndocLOHg=";
+    url = "https://github.com/steveseguin/ninja-obs-plugin/releases/download/v1.1.85/obs-vdoninja-linux-x86_64.tar.gz";
+    sha256 = "sha256-VzKqgggRKJuUk0p59lAfc+cDIJmwGL6a6XkqGECBksw=";
   };
 
   nativeBuildInputs = [ pkgs.autoPatchelfHook ];
