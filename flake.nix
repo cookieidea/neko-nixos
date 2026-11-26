@@ -90,13 +90,19 @@
       url = "github:SHORiN-KiWATA/linuxqq-wayland-fix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    # 自构建包独立仓库；带 source.ts 的包由其中 CI 用 nix-repin 更新。
+    neko-pkgs = {
+      url = "github:cookieidea/nur-packages";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = {
       nixpkgs, home-manager, cooknixvim, bilihud, nix-cachyos-kernel,
       noctalia, noctalia-greeter, agenix, bestclient, mark-shot,
       llm-agents-nix, nix-flatpak, fenix, nix-vscode-extensions, nixcord,
-      linuxqq-wayland-fix,
+      linuxqq-wayland-fix, neko-pkgs,
       ...
     }:
     let
@@ -115,7 +121,8 @@
           # 传递闭包，降级为警告而不是求值失败。
           problems.handlers."gtk+".broken = "warn";
         };
-        overlays = import ./configuration/overlays/list.nix { inherit nix-cachyos-kernel; };
+        overlays = (import ./configuration/overlays/list.nix { inherit nix-cachyos-kernel; })
+          ++ [ neko-pkgs.overlays.default ];
       };
 
       selfPackages = import ./configuration/pkgs { inherit pkgs; };

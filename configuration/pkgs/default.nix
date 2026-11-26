@@ -1,56 +1,53 @@
-# 自构建包：public 进 flake 顶层，internal 只供内部引用。
+# 自构建包的实际定义在独立仓库 cookieidea/nur-packages，
+# 通过 flake input `neko-pkgs` 的 overlay 注入 pkgs。
+# 此文件只维持原有的 public / internal 接口，供 hmLib 等内部引用。
 { pkgs }:
-let
-  vsPlugins = import ./media/vs-plugins { inherit pkgs; };
-  markShotPython = import ./tools/mark-shot-python { inherit pkgs; };
 
-  # 成品：会被装进用户环境或系统，或用户可能单独构建。
+let
   public = {
     # 桌面和窗口管理。
-    niri-sidebar         = import ./desktop/niri-sidebar   { inherit pkgs; };
-    pins                 = import ./desktop/pins           { inherit pkgs; };
-    nyxniri-scratch-menu = import ./desktop/nyxniri-scratch-menu { inherit pkgs; };
+    niri-sidebar = pkgs.niri-sidebar;
+    pins = pkgs.pins;
+    nyxniri-scratch-menu = pkgs.nyxniri-scratch-menu;
 
     # 工具和网络。
-    ab-download-manager  = import ./tools/networking/ab-download-manager { inherit pkgs; };
-    astral               = import ./tools/networking/astral { inherit pkgs; lib = pkgs.lib; fetchurl = pkgs.fetchurl; };
-    uuyc                 = import ./tools/networking/uuyc { inherit pkgs; };
+    ab-download-manager = pkgs.ab-download-manager;
+    astral = pkgs.astral;
+    uuyc = pkgs.uuyc;
 
-    obs-vdoninja         = import ./media/obs-vdoninja { inherit pkgs; };
-    purevox              = import ./media/purevox      { inherit pkgs; };
+    # 影音和直播。
+    obs-vdoninja = pkgs.obs-vdoninja;
+    purevox = pkgs.purevox;
 
     # 游戏。
-    bedrockboot          = import ./games/bedrockboot { inherit pkgs; };
+    bedrockboot = pkgs.bedrockboot;
 
     # 终端。
-    tabby-terminal       = import ./terminal/tabby { inherit pkgs; };
+    tabby-terminal = pkgs.tabby-terminal;
 
     # 数据和字体。
-    harmonyos-sans-sc    = import ./data/fonts/harmonyos-sans-sc { inherit pkgs; };
+    harmonyos-sans-sc = pkgs.harmonyos-sans-sc;
 
     # 文件管理器扩展。
-    inherit (import ./file-managers/nautilus-extensions { inherit pkgs; })
-      nautilus-image-converter
-      nautilus-with-extensions;
+    nautilus-image-converter = pkgs.nautilus-image-converter;
+    nautilus-with-extensions = pkgs.nautilus-with-extensions;
 
     # VapourSynth 插件集：作为整体被 mpv / hmLib 使用，属成品。
-    inherit (vsPlugins) vapoursynth-with-plugins;
+    vapoursynth-with-plugins = pkgs.vapoursynth-with-plugins;
   };
 
   # 内部部件：只被上面的成品或 hmLib 引用。
   internal = {
-    inherit (vsPlugins)
-      l-smash
-      vapoursynth-lsmash
-      vapoursynth-akarin
-      vapoursynth-rife-ncnn
-      k7sfunc;
+    l-smash = pkgs.l-smash;
+    vapoursynth-lsmash = pkgs.vapoursynth-lsmash;
+    vapoursynth-akarin = pkgs.vapoursynth-akarin;
+    vapoursynth-rife-ncnn = pkgs.vapoursynth-rife-ncnn;
+    k7sfunc = pkgs.k7sfunc;
 
-    inherit (markShotPython)
-      markShotOcr
-      markShotScan
-      markShotOcrHelper
-      markShotScanHelper;
+    markShotOcr = pkgs.markShotOcr;
+    markShotScan = pkgs.markShotScan;
+    markShotOcrHelper = pkgs.markShotOcrHelper;
+    markShotScanHelper = pkgs.markShotScanHelper;
   };
 in
 public // internal // { inherit public internal; }

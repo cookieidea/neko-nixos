@@ -19,6 +19,8 @@
       "com.github.tchx84.Flatseal"
       "io.github.yucling.open-orpheus"
       "io.github.Predidit.Kazumi"
+      # Roblox 的 Android x86_64 客户端运行时（替代 Sober）。
+      "space.bigrat.mocktail"
     ];
 
     overrides = {

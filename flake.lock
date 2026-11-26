@@ -268,6 +268,24 @@
         "type": "github"
       }
     },
+    "flake-utils_2": {
+      "inputs": {
+        "systems": "systems_4"
+      },
+      "locked": {
+        "lastModified": 1794427683,
+        "narHash": "sha256-o7ey9gEilsxaifqJWnBDlYSKbNWYQYtKwDyXeZU2kaU=",
+        "owner": "numtide",
+        "repo": "flake-utils",
+        "rev": "cd489559845d81f673a12885576016c65cbe9363",
+        "type": "github"
+      },
+      "original": {
+        "owner": "numtide",
+        "repo": "flake-utils",
+        "type": "github"
+      }
+    },
     "home-manager": {
       "inputs": {
         "nixpkgs": [
@@ -374,6 +392,28 @@
         "url": "https://github.com/jswysnemc/mark-shot"
       }
     },
+    "neko-pkgs": {
+      "inputs": {
+        "flake-utils": "flake-utils_2",
+        "nix-repin": "nix-repin",
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1795691293,
+        "narHash": "sha256-3xphL3r4KZRaJqcuZoDvDUpgZL9Xhw8INw9YfXdE6ZY=",
+        "owner": "cookieidea",
+        "repo": "nur-packages",
+        "rev": "5b8f136a444a78158bba8c9aed67436e8f13d240",
+        "type": "github"
+      },
+      "original": {
+        "owner": "cookieidea",
+        "repo": "nur-packages",
+        "type": "github"
+      }
+    },
     "nix-cachyos-kernel": {
       "inputs": {
         "flake-compat": "flake-compat",
@@ -429,6 +469,27 @@
       "original": {
         "owner": "gmodena",
         "repo": "nix-flatpak",
+        "type": "github"
+      }
+    },
+    "nix-repin": {
+      "inputs": {
+        "nixpkgs": [
+          "neko-pkgs",
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1795091841,
+        "narHash": "sha256-C0QiIJBKR9zcN1dm1yPEkIUQC4jvuZibxhIbbnBIJJQ=",
+        "owner": "so1ve",
+        "repo": "nix-repin",
+        "rev": "9476f45aa4ac3d59e0110937c9f276aed0d492a4",
+        "type": "github"
+      },
+      "original": {
+        "owner": "so1ve",
+        "repo": "nix-repin",
         "type": "github"
       }
     },
@@ -682,6 +743,7 @@
         "linuxqq-wayland-fix": "linuxqq-wayland-fix",
         "llm-agents-nix": "llm-agents-nix",
         "mark-shot": "mark-shot",
+        "neko-pkgs": "neko-pkgs",
         "nix-cachyos-kernel": "nix-cachyos-kernel",
         "nix-flatpak": "nix-flatpak",
         "nix-vscode-extensions": "nix-vscode-extensions",
@@ -747,6 +809,21 @@
         "owner": "nix-systems",
         "repo": "default",
         "rev": "da67096a3b9bf56a91d16901293e51ba5b49a27e",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-systems",
+        "repo": "default",
+        "type": "github"
+      }
+    },
+    "systems_4": {
+      "locked": {
+        "lastModified": 1791244623,
+        "narHash": "sha256-uuanbkFk8a313Zfrxdcz8Us/yQtaxNnKJtX8v0ZPpd8=",
+        "owner": "nix-systems",
+        "repo": "default",
+        "rev": "d36eeed142f88b5a636f2e3856a53c61654cf29b",
         "type": "github"
       },
       "original": {
