@@ -1,0 +1,30 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended"],
+  "labels": ["dependencies"],
+  "nix": {
+    "enabled": true
+  },
+  "packageRules": [
+    {
+      "description": "所有 flake input 合成一个 PR，避免刷屏",
+      "matchManagers": ["nix"],
+      "groupName": "flake inputs"
+    },
+    {
+      "description": "nixpkgs 单独成组，便于单独评估",
+      "matchManagers": ["nix"],
+      "matchPackageNames": ["nixpkgs"],
+      "groupName": "nixpkgs"
+    },
+    {
+      "description": "GitHub Actions 版本",
+      "matchManagers": ["github-actions"],
+      "groupName": "github actions"
+    }
+  ],
+  "lockFileMaintenance": {
+    "enabled": true,
+    "schedule": ["before 6am on the first day of the month"]
+  }
+}

@@ -99,6 +99,7 @@
   };
 
   outputs = {
+      self,
       nixpkgs, home-manager, cooknixvim, bilihud, nix-cachyos-kernel,
       noctalia, noctalia-greeter, agenix, bestclient, mark-shot,
       llm-agents-nix, nix-flatpak, fenix, nix-vscode-extensions, nixcord,
@@ -168,6 +169,18 @@
             { nativeBuildInputs = [ pkgs.deadnix ]; } ''
             cd ${./.}
             deadnix --fail --no-underscore ${targets}
+            touch $out
+          '';
+
+          # 完整构建整机配置：`nix flake check` 会把系统按真实配置构建一遍，
+          # 坏掉的包在 check 阶段就暴露，不必等到 switch 失败。
+          nixos = self.nixosConfigurations.ATRI.config.system.build.toplevel;
+
+          # 格式化检查：确保所有 .nix 文件符合 nixfmt 风格。
+          formatting = pkgs.runCommand "formatting-check"
+            { nativeBuildInputs = [ pkgs.nixfmt ]; } ''
+            cd ${./.}
+            nixfmt --check ${targets} $(find configuration -name '*.nix')
             touch $out
           '';
         });
