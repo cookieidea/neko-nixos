@@ -1,5 +1,5 @@
 # flake 的 outputs。inputs 由 flake-file.nix 声明，flake.nix 自动生成。
-{ inputs, ... }:
+{ inputs, config, ... }:
 
 {
   outputs =
@@ -96,6 +96,9 @@
       };
 
       formatter = forAllSystems (system: nixpkgs.legacyPackages.${system}.nixfmt);
+
+      # flake-file 提供的写回工具：nix run .#write-flake
+      apps = forAllSystems (_system: config.flake-file.apps);
 
       checks = forAllSystems (
         system:
