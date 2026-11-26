@@ -512,11 +512,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1795703894,
-        "narHash": "sha256-URAwn1bN3CJvB9zFLUIXn3nZ9HF8bZpsiRTrizMs0co=",
+        "lastModified": 1795705825,
+        "narHash": "sha256-+VCHBr+LZdCC8gkLeYK533D9JASICpFIJ6nls/HxkIs=",
         "owner": "cookieidea",
         "repo": "nur-packages",
-        "rev": "75c4367588300a6403ef8b1dcdcfc937a8115bea",
+        "rev": "cdbdd77e3ecdd81c2e589c967eb559400f9c7473",
         "type": "github"
       },
       "original": {
