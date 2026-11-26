@@ -105,6 +105,12 @@
         url = "github:cookieidea/nur-packages";
         inputs.nixpkgs.follows = "nixpkgs";
       };
+
+      # bubblewrap 沙箱包装，供需要隔离的 GUI 应用使用。
+      nixpak = {
+        url = "github:nixpak/nixpak";
+        inputs.nixpkgs.follows = "nixpkgs";
+      };
     };
   };
 }

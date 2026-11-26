@@ -16,6 +16,8 @@ in
     selfPackages.ab-download-manager
     selfPackages.tabby-terminal
     selfPackages.astral
+    # 壁纸管理器（来自 neko-pkgs，自带 open-wallpaper-engine 场景插件）。
+    selfPackages.waywallen
     bilihudPkg
     cooknixvim.packages.${pkgs.stdenv.hostPlatform.system}.default
   ];

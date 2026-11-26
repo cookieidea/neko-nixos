@@ -32,6 +32,9 @@ let
     nautilus-image-converter = pkgs.nautilus-image-converter;
     nautilus-with-extensions = pkgs.nautilus-with-extensions;
 
+    # 壁纸管理器（含 open-wallpaper-engine 场景插件）。
+    waywallen = pkgs.waywallen;
+
     # VapourSynth 插件集：作为整体被 mpv / hmLib 使用，属成品。
     vapoursynth-with-plugins = pkgs.vapoursynth-with-plugins;
   };
