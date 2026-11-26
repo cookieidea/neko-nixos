@@ -17,9 +17,9 @@ jobs:
     # 防止求值/构建卡住时长时间占用 runner（默认上限达 6 小时）。
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
-      - uses: cachix/install-nix-action@v31
+      - uses: cachix/install-nix-action@v32
         with:
           extra_nix_config: |
             experimental-features = nix-command flakes
