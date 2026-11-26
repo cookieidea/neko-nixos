@@ -128,9 +128,11 @@
             touch $out
           '';
 
-          # 完整构建整机配置：`nix flake check` 会把系统按真实配置构建一遍，
-          # 坏掉的包在 check 阶段就暴露，不必等到 switch 失败。
-          nixos = self.nixosConfigurations.ATRI.config.system.build.toplevel;
+          # 注意：不要把 nixosConfigurations 的 toplevel 放进 checks。
+          # `nix flake check` 会构建 checks 里的每个 derivation，整机闭包
+          # 含 ROCm/Steam 等重量级依赖，CI runner 扛不住；而且 uuyc 这类
+          # 「永远最新版」的包 hash 不可复现，会让 CI 必挂。
+          # 整机的求值检查由 flake-check.yml 的 eval 步骤单独负责。
 
           # 格式检查：确保所有 .nix 文件符合 nixfmt 风格。
           formatting = pkgs.runCommand "formatting-check" { nativeBuildInputs = [ pkgs.nixfmt ]; } ''
