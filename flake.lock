@@ -171,6 +171,21 @@
         "type": "github"
       }
     },
+    "flake-file": {
+      "locked": {
+        "lastModified": 1792905615,
+        "narHash": "sha256-KdGEzlRQPHBbNPD+AChjry8eWEx0TCrGKy1Hkacj+bA=",
+        "owner": "denful",
+        "repo": "flake-file",
+        "rev": "7b08dbc223bb1a758a515aad9653a6bf196bc772",
+        "type": "github"
+      },
+      "original": {
+        "owner": "denful",
+        "repo": "flake-file",
+        "type": "github"
+      }
+    },
     "flake-parts": {
       "inputs": {
         "nixpkgs-lib": "nixpkgs-lib"
@@ -739,6 +754,7 @@
         "bilihud": "bilihud",
         "cooknixvim": "cooknixvim",
         "fenix": "fenix",
+        "flake-file": "flake-file",
         "home-manager": "home-manager",
         "linuxqq-wayland-fix": "linuxqq-wayland-fix",
         "llm-agents-nix": "llm-agents-nix",

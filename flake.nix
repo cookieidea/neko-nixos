@@ -26,6 +26,9 @@
 
   inputs = {
     nixpkgs.url = "git+https://mirrors.nju.edu.cn/git/nixpkgs.git?ref=nixos-unstable&shallow=1";
+
+    # flake.nix 由 flake-file 从 flake-file.nix 生成（nix run .#write-flake）。
+    flake-file.url = "github:denful/flake-file";
     home-manager = {
       url = "git+https://gitcode.com/nix-community/home-manager.git?ref=master";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -98,91 +101,17 @@
     };
   };
 
-  outputs = {
-      self,
-      nixpkgs, home-manager, cooknixvim, bilihud, nix-cachyos-kernel,
-      noctalia, noctalia-greeter, agenix, bestclient, mark-shot,
-      llm-agents-nix, nix-flatpak, fenix, nix-vscode-extensions, nixcord,
-      linuxqq-wayland-fix, neko-pkgs,
-      ...
-    }:
-    let
-      system = "x86_64-linux";
-      forAllSystems = nixpkgs.lib.genAttrs [ system ];
-      username = "cookie";
-      hostname = "ATRI";
-      desktop = "niri";
-
-      pkgs = import nixpkgs {
-        inherit system;
-        config = {
-          allowUnfree = true;
-          rocmSupport = true;
-          # 新版 nixpkgs 把 gtk+（gtk2）标记为 broken；这里只依赖它的
-          # 传递闭包，降级为警告而不是求值失败。
-          problems.handlers."gtk+".broken = "warn";
-        };
-        overlays = (import ./configuration/overlays/list.nix { inherit nix-cachyos-kernel; })
-          ++ [ neko-pkgs.overlays.default ];
+  outputs =
+    inputs:
+    (inputs.nixpkgs.lib.evalModules {
+      specialArgs = {
+        inherit inputs;
+        inherit (inputs) self;
       };
-
-      selfPackages = import ./configuration/pkgs { inherit pkgs; };
-      hmLib = import ./configuration/home/lib.nix { inherit pkgs selfPackages username; };
-
-      hmModule = {
-        imports = [ home-manager.nixosModules.home-manager ];
-
-        _module.args = { inherit desktop username selfPackages bestclient; };
-
-        home-manager.useGlobalPkgs = true;
-        home-manager.useUserPackages = true;
-        home-manager.sharedModules = [ nixcord.homeModules.nixcord ];
-        home-manager.users.${username} = import ./configuration/home.nix;
-        home-manager.extraSpecialArgs = { inherit desktop username cooknixvim bilihud selfPackages noctalia bestclient mark-shot llm-agents-nix hmLib fenix nix-vscode-extensions nixcord; };
-      };
-    in {
-      packages.${system} = selfPackages.public;
-
-      nixosConfigurations = {
-        ${hostname} = nixpkgs.lib.nixosSystem {
-          inherit system;
-          specialArgs = { inherit hostname noctalia-greeter; };
-          modules = [
-            ./configuration/system.nix
-            hmModule
-            agenix.nixosModules.default
-            (import ./configuration/overlays { inherit nix-cachyos-kernel; })
-            nix-flatpak.nixosModules.nix-flatpak
-            linuxqq-wayland-fix.nixosModules.default
-          ];
-        };
-      };
-
-      formatter = forAllSystems (system: nixpkgs.legacyPackages.${system}.nixfmt);
-
-      checks = forAllSystems (system:
-        let
-          pkgs = nixpkgs.legacyPackages.${system};
-          targets = "configuration flake.nix";
-        in {
-          deadnix = pkgs.runCommand "deadnix-check"
-            { nativeBuildInputs = [ pkgs.deadnix ]; } ''
-            cd ${./.}
-            deadnix --fail --no-underscore ${targets}
-            touch $out
-          '';
-
-          # 完整构建整机配置：`nix flake check` 会把系统按真实配置构建一遍，
-          # 坏掉的包在 check 阶段就暴露，不必等到 switch 失败。
-          nixos = self.nixosConfigurations.ATRI.config.system.build.toplevel;
-
-          # 格式化检查：确保所有 .nix 文件符合 nixfmt 风格。
-          formatting = pkgs.runCommand "formatting-check"
-            { nativeBuildInputs = [ pkgs.nixfmt ]; } ''
-            cd ${./.}
-            nixfmt --check ${targets} $(find configuration -name '*.nix')
-            touch $out
-          '';
-        });
-    };
+      modules = [
+        inputs.flake-file.flakeModules.flake
+        ./flake-file.nix
+      ];
+    }).config.outputs
+      inputs;
 }
