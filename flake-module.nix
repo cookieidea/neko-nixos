@@ -98,7 +98,22 @@
       formatter = forAllSystems (system: nixpkgs.legacyPackages.${system}.nixfmt);
 
       # flake-file 提供的写回工具：nix run .#write-flake
-      apps = forAllSystems (_system: config.flake-file.apps);
+      # 这些值是 `pkgs -> derivation` 的函数，需要按系统调用后包成 app。
+      apps = forAllSystems (
+        system:
+        let
+          p = nixpkgs.legacyPackages.${system};
+          mkApp = drv: {
+            type = "app";
+            program = nixpkgs.lib.getExe drv;
+          };
+        in
+        {
+          write-flake = mkApp (config.flake-file.apps.write-flake p);
+          write-inputs = mkApp (config.flake-file.apps.write-inputs p);
+          write-lock = mkApp (config.flake-file.apps.write-lock p);
+        }
+      );
 
       checks = forAllSystems (
         system:
