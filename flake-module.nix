@@ -25,8 +25,6 @@
         neko-pkgs
         ;
 
-      self = inputs.self;
-
       system = "x86_64-linux";
       forAllSystems = nixpkgs.lib.genAttrs [ system ];
       username = "cookie";
@@ -42,8 +40,9 @@
           # 传递闭包，降级为警告而不是求值失败。
           problems.handlers."gtk+".broken = "warn";
         };
-        overlays = (import ./configuration/overlays/list.nix { inherit nix-cachyos-kernel; })
-          ++ [ neko-pkgs.overlays.default ];
+        overlays = (import ./configuration/overlays/list.nix { inherit nix-cachyos-kernel; }) ++ [
+          neko-pkgs.overlays.default
+        ];
       };
 
       selfPackages = import ./configuration/pkgs { inherit pkgs; };
@@ -52,7 +51,14 @@
       hmModule = {
         imports = [ home-manager.nixosModules.home-manager ];
 
-        _module.args = { inherit desktop username selfPackages bestclient; };
+        _module.args = {
+          inherit
+            desktop
+            username
+            selfPackages
+            bestclient
+            ;
+        };
 
         home-manager.useGlobalPkgs = true;
         home-manager.useUserPackages = true;
