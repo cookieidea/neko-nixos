@@ -55,7 +55,6 @@
     MARK="$HOME/.local/share/mark-shot"
     $DRY_RUN_CMD mkdir -p "$MARK"
 
-    $DRY_RUN_CMD ln -sfn "${selfPackages.markShotScanHelper}/bin/code-scan-helper.py" "$MARK/code-scan-helper.sh"
 
     $DRY_RUN_CMD rm -rf "$MARK/ocr-venv" "$MARK/code-scan-venv"
 

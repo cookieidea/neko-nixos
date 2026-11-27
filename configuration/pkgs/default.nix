@@ -46,8 +46,6 @@ let
     vapoursynth-rife-ncnn = pkgs.vapoursynth-rife-ncnn;
     k7sfunc = pkgs.k7sfunc;
 
-    markShotScan = pkgs.markShotScan;
-    markShotScanHelper = pkgs.markShotScanHelper;
   };
 in
 public // internal // { inherit public internal; }
