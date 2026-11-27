@@ -99,5 +99,9 @@
       url = "git+https://github.com/noctalia-dev/noctalia-greeter?ref=main";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    uu-remote-linux = {
+      url = "github:VallierDev/uu-remote-linux";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 }

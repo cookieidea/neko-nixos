@@ -13,7 +13,6 @@ let
     # 工具和网络。
     ab-download-manager = pkgs.ab-download-manager;
     astral = pkgs.astral;
-    uuyc = pkgs.uuyc;
 
     # 影音和直播。
     obs-vdoninja = pkgs.obs-vdoninja;

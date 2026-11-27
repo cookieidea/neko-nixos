@@ -106,6 +106,13 @@
         inputs.nixpkgs.follows = "nixpkgs";
       };
 
+      # 非官方 UU 远程 Linux 被控端（GPL-3.0，Rust），替代官方的 uuyc deb。
+      # 自带 packages / overlays / nixosModules。
+      uu-remote-linux = {
+        url = "github:VallierDev/uu-remote-linux";
+        inputs.nixpkgs.follows = "nixpkgs";
+      };
+
       # bubblewrap 沙箱包装，供需要隔离的 GUI 应用使用。
       nixpak = {
         url = "github:nixpak/nixpak";

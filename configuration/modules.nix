@@ -7,7 +7,7 @@
     ./modules/minecraft.nix
     ./modules/ddnet.nix
     ./modules/linuxqq-wayland-fix.nix
-    ./modules/uuyc.nix
+    ./modules/uu-remote-linux.nix
     ./modules/dsh.nix
     ./modules/flatpak.nix
 

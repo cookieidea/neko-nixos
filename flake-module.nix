@@ -23,6 +23,7 @@
         nixcord
         linuxqq-wayland-fix
         neko-pkgs
+        uu-remote-linux
         ;
 
       system = "x86_64-linux";
@@ -97,6 +98,7 @@
             (import ./configuration/overlays { inherit nix-cachyos-kernel; })
             nix-flatpak.nixosModules.nix-flatpak
             linuxqq-wayland-fix.nixosModules.default
+            uu-remote-linux.nixosModules.default
           ];
         };
       };
