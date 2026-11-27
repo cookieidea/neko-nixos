@@ -46,9 +46,7 @@ let
     vapoursynth-rife-ncnn = pkgs.vapoursynth-rife-ncnn;
     k7sfunc = pkgs.k7sfunc;
 
-    markShotOcr = pkgs.markShotOcr;
     markShotScan = pkgs.markShotScan;
-    markShotOcrHelper = pkgs.markShotOcrHelper;
     markShotScanHelper = pkgs.markShotScanHelper;
   };
 in
