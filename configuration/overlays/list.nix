@@ -1,4 +1,4 @@
-  # nixpkgs overlays 列表，flake 与 NixOS 模块共用。
+# nixpkgs overlays 列表，flake 与 NixOS 模块共用。
 { nix-cachyos-kernel }:
 
 [
@@ -12,21 +12,21 @@
   (_final: prev: {
     neovim = prev.neovim.overrideAttrs (old: {
       postInstall = (old.postInstall or "") + ''
-        rm -f "$out/share/applications/nvim.desktop"
-        cat > "$out/share/applications/nvim.desktop" <<'DESKTOP'
-[Desktop Entry]
-Name=Neovim wrapper
-GenericName=Text Editor
-Comment=Edit text files
-TryExec=nvim
-Exec=kitty -e nvim %F
-Icon=nvim
-Type=Application
-Terminal=false
-Categories=Utility;TextEditor;Development;
-MimeType=text/plain;text/x-makefile;application/x-shellscript;text/x-c;text/x-c++src;
-StartupNotify=false
-DESKTOP
+                rm -f "$out/share/applications/nvim.desktop"
+                cat > "$out/share/applications/nvim.desktop" <<'DESKTOP'
+        [Desktop Entry]
+        Name=Neovim wrapper
+        GenericName=Text Editor
+        Comment=Edit text files
+        TryExec=nvim
+        Exec=kitty -e nvim %F
+        Icon=nvim
+        Type=Application
+        Terminal=false
+        Categories=Utility;TextEditor;Development;
+        MimeType=text/plain;text/x-makefile;application/x-shellscript;text/x-c;text/x-c++src;
+        StartupNotify=false
+        DESKTOP
       '';
     });
   })
@@ -67,5 +67,20 @@ DESKTOP
         '';
       });
     };
+  })
+
+  # 微信：nixpkgs 的 wechat 先校验上游 deb 的 crc/version-id，不匹配才回退
+  # web.archive.org 的存档。腾讯已把 4.1.13.26 换成 4.1.13.29，导致退到
+  # archive.org；而 archive.org 对本机 IP 段限流（429），构建直接失败。
+  #
+  # 这里直接指向腾讯原始地址并配上实际哈希（4.1.13.29）。等 nixpkgs 自己
+  # 更新到新版（届时 crc 校验会重新匹配上游）就可以删掉这段 override。
+  (_final: prev: {
+    wechat = prev.wechat.overrideAttrs (_old: {
+      src = prev.fetchurl {
+        url = "https://dldir1v6.qq.com/weixin/Universal/Linux/WeChatLinux_x86_64.deb";
+        hash = "sha256-1bIcbiEYaliywv1BcSpO+Q+UUnNZMaa4UA6FxbCROws=";
+      };
+    });
   })
 ]
